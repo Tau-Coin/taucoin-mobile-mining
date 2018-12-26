@@ -51,6 +51,7 @@ import javax.annotation.Nullable;
 
 import static org.ethereum.util.ByteUtil.bigIntegerToBytes;
 
+import io.taucoin.core.*
 /**
  * <p>Represents an elliptic curve public and (optionally) private key, usable for digital signatures but not encryption.
  * Creating a new ECKey with the empty constructor will generate a new random keypair. Other static methods can be used
@@ -253,7 +254,15 @@ public class ECKey implements Serializable {
         }
         return pubKeyHash;
     }
-
+    /*
+    *Gets the sha256sha160 form of the public key(compressed as seen in taucoin net)
+     **/
+    public byte[] getAddressBindAccount(){
+       if (pubKeyHash == null){
+           byte[] pubKeyHash = Utils.sha256hash160(this.pub.getEncoded(true));
+       }
+       return pubKeyHash;
+    }
     /**
      * Gets the raw public key value. This appears in transaction scriptSigs. Note that this is <b>not</b> the same
      * as the pubKeyHash/address.
