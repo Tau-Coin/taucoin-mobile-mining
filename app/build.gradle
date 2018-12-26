@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+buildscript {
+    repositories {
+        jcenter()
+        //google()
+    }
+    dependencies {
+
+        classpath 'com.android.tools.build:gradle:1.2.3'
+    }
+}
+
+configurations {
+    apt
+}
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 22
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'LICENSE'
+        exclude 'NOTICE'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+    
+    // TODO remove this
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+}
+
+dependencies {
+    compile (project(':taucoinj-core-android')) {
+        exclude group: "org.hibernate", module: "hibernate-core"
+    }
+    compile 'com.android.support:multidex:1.0.0'
+    compile fileTree(include: ['*.jar'], dir: '../libraries')
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
+
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    // Set this dependency to use JUnit 4 rules
+    androidTestCompile 'com.android.support.test:rules:0.3'
+
+}
