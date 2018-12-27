@@ -42,7 +42,7 @@ public abstract class AbstractTaucoinNetParams extends NetworkParameters {
     /**
      * Scheme part for Taucoin URIs.
      */
-    public static final String TAUCOIN_SCHEME = "bitcoin";
+    public static final String TAUCOIN_SCHEME = "taucoin";
 
     private static final Logger log = LoggerFactory.getLogger(AbstractTaucoinNetParams.class);
 

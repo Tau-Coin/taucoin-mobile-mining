@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
+import io.taucoin.core.*;
 
 /**
  * Representation of an actual account or contract
@@ -19,7 +20,7 @@ import javax.inject.Inject;
 public class Account {
 
     private ECKey ecKey;
-    private byte[] address;
+    private Address address;
 
     private Set<Transaction> pendingTransactions =
             Collections.synchronizedSet(new HashSet<Transaction>());
@@ -33,12 +34,12 @@ public class Account {
 
     public void init() {
         this.ecKey = new ECKey(Utils.getRandom());
-        address = this.ecKey.getAddress();
+        address = this.ecKey.getAccountAddress();
     }
 
     public void init(ECKey ecKey) {
         this.ecKey = ecKey;
-        address = this.ecKey.getAddress();
+        address = this.ecKey.getAccountAddress();
     }
 
     public BigInteger getNonce() {
@@ -84,10 +85,10 @@ public class Account {
     }
 
     public byte[] getAddress() {
-        return address;
+        return address.getHash160();
     }
 
-    public void setAddress(byte[] address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 
