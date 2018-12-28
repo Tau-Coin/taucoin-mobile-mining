@@ -43,12 +43,14 @@ public class UDPListener {
         if (SystemProperties.CONFIG.peerDiscovery()) {
             bootPeers = SystemProperties.CONFIG.peerDiscoveryIPList().toArray(new String[0]);
         }
-        this.init();
     }
 
     public UDPListener(String address, int port) {
         this.address = address;
         this.port = port;
+    }
+
+    public void start() {
         this.init();
     }
 
@@ -84,10 +86,8 @@ public class UDPListener {
 
         final List<Node> bootNodes = new ArrayList<>();
 
-        // FIXME: setting nodes from ip.list and attaching node nodeId [f35cc8] constantly
         for (String boot: args) {
-            bootNodes.add(new Node("enode://f35cc8a29929c7dc36bd46472d6cc68f104ede7fd42f1749c3533eb33a0fb6b45f2182c009271b83ca7f1d08ea5b1329056caf34c61e8f9e06314e39ec6f80b1" +
-                    "@" + boot));
+            bootNodes.add(Node.instanceOf(boot));
         }
 
         nodeManager.setBootNodes(bootNodes);
