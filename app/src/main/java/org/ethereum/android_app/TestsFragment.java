@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.ethereum.android.EthereumManager;
 import org.ethereum.android.interop.AdminInfo;
 import org.ethereum.android.service.ConnectorHandler;
 import org.ethereum.android.service.EthereumClientMessage;
 import org.ethereum.android.service.events.EventFlag;
 import org.ethereum.config.SystemProperties;
+import org.ethereum.net.rlpx.Node;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,9 +56,6 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
         getEthereumStatus.setOnClickListener(onClickListener);
         getBlockchainStatus.setOnClickListener(onClickListener);
 
-        EthereumApplication app = (EthereumApplication)getActivity().getApplication();
-        app.ethereum.registerHandler(this);
-
         return view;
     }
 
@@ -66,17 +63,17 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
         @Override
         public void onClick(final View v) {
 
-            EthereumApplication app = (EthereumApplication)getActivity().getApplication();
             switch(v.getId()){
                 case R.id.connectButton:
-                    app.ethereum.connect(CONFIG.activePeerIP(), CONFIG.activePeerPort(), CONFIG.activePeerNodeid());
+                    Node node = CONFIG.peerActive().get(0);
+                    EthereumApplication.ethereumConnector.connect(node.getHost(), node.getPort(), node.getHexId());
                     break;
                 case R.id.getEthereumStatus:
-                    app.ethereum.getConnectionStatus(identifier);
-                    app.ethereum.getAdminInfo(identifier);
+                    EthereumApplication.ethereumConnector.getConnectionStatus(identifier);
+                    EthereumApplication.ethereumConnector.getAdminInfo(identifier);
                     break;
                 case R.id.getBlockchainStatus:
-                    app.ethereum.getBlockchainStatus(identifier);
+                    EthereumApplication.ethereumConnector.getBlockchainStatus(identifier);
                     break;
             }
         }
@@ -134,9 +131,9 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
     @Override
     public void onConnectorConnected() {
 
-        EthereumApplication app = (EthereumApplication)getActivity().getApplication();
-        app.ethereum.addListener(identifier, EnumSet.allOf(EventFlag.class));
-        app.ethereum.connect(SystemProperties.CONFIG.activePeerIP(), SystemProperties.CONFIG.activePeerPort(), SystemProperties.CONFIG.activePeerNodeid());
+        //app.ethereum.addListener(identifier, EnumSet.allOf(EventFlag.class));
+        //Node node = SystemProperties.CONFIG.peerActive().get(0);
+        //app.ethereum.connect(node.getHost(), node.getPort(), node.getHexId());
     }
 
     @Override

@@ -1,7 +1,7 @@
 
-## taucoin-core
+## ethereum-core
 
-### Include taucoin-core in your project
+### Include ethereum-core in your project
 
 #### For snapshot builds:
 

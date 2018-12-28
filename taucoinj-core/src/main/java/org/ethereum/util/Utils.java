@@ -3,6 +3,7 @@ package org.ethereum.util;
 import org.spongycastle.util.encoders.DecoderException;
 import org.spongycastle.util.encoders.Hex;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 
 import java.net.URL;
@@ -12,6 +13,7 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,8 +34,9 @@ public class Utils {
         if (!match)
             return (new BigInteger(number));
         else{
-
-            byte[] numberBytes = Hex.decode(number.substring(2));
+            number = number.substring(2);
+            number = number.length() % 2 != 0 ? "0".concat(number) : number;
+            byte[] numberBytes = Hex.decode(number);
             return (new BigInteger(1, numberBytes));
         }
     }
@@ -139,4 +142,44 @@ public class Utils {
         return sb.append(" ").append(firstHash).append("...").append(lastHash).toString();
     }
 
+    public static String getNodeIdShort(String nodeId) {
+        return nodeId == null ? "<null>" : nodeId.substring(0, 8);
+    }
+
+    public static long toUnixTime(long javaTime) {
+        return javaTime / 1000;
+    }
+
+    public static <T> T[] mergeArrays(T[] ... arr) {
+        int size = 0;
+        for (T[] ts : arr) {
+            size += ts.length;
+        }
+        T[] ret = (T[]) Array.newInstance(arr[0].getClass().getComponentType(), size);
+        int off = 0;
+        for (T[] ts : arr) {
+            System.arraycopy(ts, 0, ret, off, ts.length);
+            off += ts.length;
+        }
+        return ret;
+    }
+
+    public static String repeat(String s, int n) {
+        if (s.length() == 1) {
+            byte[] bb = new byte[n];
+            Arrays.fill(bb, s.getBytes()[0]);
+            return new String(bb);
+        } else {
+            StringBuilder ret = new StringBuilder();
+            for (int i = 0; i < n; i++) ret.append(s);
+            return ret.toString();
+        }
+    }
+
+    public static String align(String s, char fillChar, int targetLen, boolean alignRight) {
+        if (targetLen <= s.length()) return s;
+        String alignString = repeat("" + fillChar, targetLen - s.length());
+        return alignRight ? alignString + s : s + alignString;
+
+    }
 }

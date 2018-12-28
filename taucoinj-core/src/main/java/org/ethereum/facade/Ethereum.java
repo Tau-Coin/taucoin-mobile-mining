@@ -1,5 +1,6 @@
 package org.ethereum.facade;
 
+import org.ethereum.core.CallTransaction;
 import org.ethereum.core.Transaction;
 import org.ethereum.core.Wallet;
 import org.ethereum.listener.EthereumListener;
@@ -7,10 +8,13 @@ import org.ethereum.manager.AdminInfo;
 import org.ethereum.manager.BlockLoader;
 import org.ethereum.net.client.PeerClient;
 import org.ethereum.net.peerdiscovery.PeerInfo;
+import org.ethereum.net.rlpx.Node;
 import org.ethereum.net.server.ChannelManager;
+import org.ethereum.vm.program.ProgramResult;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -26,7 +30,7 @@ public interface Ethereum {
      * @param excludePeer - peer to exclude
      * @return online peer if available otherwise null
      */
-    public PeerInfo findOnlinePeer(PeerInfo excludePeer);
+    PeerInfo findOnlinePeer(PeerInfo excludePeer);
 
     /**
      * Find an online peer but not from excluded list
@@ -34,12 +38,12 @@ public interface Ethereum {
      * @param excludePeerSet - peers to exclude
      * @return online peer if available otherwise null
      */
-    public PeerInfo findOnlinePeer(Set<PeerInfo> excludePeerSet);
+    PeerInfo findOnlinePeer(Set<PeerInfo> excludePeerSet);
 
     /**
      * @return online peer if available
      */
-    public PeerInfo findOnlinePeer();
+    PeerInfo findOnlinePeer();
 
 
     /**
@@ -47,7 +51,7 @@ public interface Ethereum {
      *
      * @return online peer.
      */
-    public PeerInfo waitForOnlinePeer();
+    PeerInfo waitForOnlinePeer();
 
     /*
      *
@@ -60,27 +64,27 @@ public interface Ethereum {
      *    }
      *
      */
-    public Set<PeerInfo> getPeers();
+    Set<PeerInfo> getPeers();
 
-    public void startPeerDiscovery();
+    void startPeerDiscovery();
 
-    public void stopPeerDiscovery();
+    void stopPeerDiscovery();
 
-    public void connect(InetAddress addr, int port, String remoteId);
+    void connect(InetAddress addr, int port, String remoteId);
 
-    public void connect(String ip, int port, String remoteId);
+    void connect(String ip, int port, String remoteId);
 
-    public Blockchain getBlockchain();
+    void connect(Node node);
 
-    public boolean isBlockchainLoading();
+    Blockchain getBlockchain();
 
-    public void addListener(EthereumListener listener);
+    void addListener(EthereumListener listener);
 
-    public PeerClient getDefaultPeer();
+    PeerClient getDefaultPeer();
 
-    public boolean isConnected();
+    boolean isConnected();
 
-    public void close();
+    void close();
 
     /**
      * Factory for general transaction
@@ -98,45 +102,81 @@ public interface Ethereum {
      *               transactions this one is empty.
      * @return newly created transaction
      */
-    public Transaction createTransaction(BigInteger nonce,
-                                         BigInteger gasPrice,
-                                         BigInteger gas,
-                                         byte[] receiveAddress,
-                                         BigInteger value, byte[] data);
+    Transaction createTransaction(BigInteger nonce,
+                                 BigInteger gasPrice,
+                                 BigInteger gas,
+                                 byte[] receiveAddress,
+                                 BigInteger value, byte[] data);
 
 
     /**
      * @param transaction submit transaction to the net, return option to wait for net
      *                    return this transaction as approved
      */
-    public Future<Transaction> submitTransaction(Transaction transaction);
+    Future<Transaction> submitTransaction(Transaction transaction);
 
+
+    /**
+     * Call a contract function locally without sending transaction to the network
+     * and without changing contract storage.
+     * @param receiveAddress hex encoded contract address
+     * @param function  contract function
+     * @param funcArgs  function arguments
+     * @return function result. The return value can be fetched via {@link ProgramResult#getHReturn()}
+     * and decoded with {@link org.ethereum.core.CallTransaction.Function#decodeResult(byte[])}.
+     */
+    ProgramResult callConstantFunction(String receiveAddress, CallTransaction.Function function,
+                                       Object... funcArgs);
 
     /**
      * @return wallet object which is the manager
      *         of internal accounts
      */
-    public Wallet getWallet();
+    Wallet getWallet();
 
 
     /**
      * @return - repository for all state data.
      */
-    public Repository getRepository();
+    Repository getRepository();
+
+    /**
+     * @return - pending state repository
+     */
+    Repository getPendingState();
 
 
     public void init();
 //  2.   // is blockchain still loading - if buffer is not empty
 
-    public AdminInfo getAdminInfo();
+    Repository getSnapshootTo(byte[] root);
 
-    public ChannelManager getChannelManager();
+    AdminInfo getAdminInfo();
 
-    public Set<Transaction> getPendingTransactions();
+    ChannelManager getChannelManager();
 
-    public BlockLoader getBlockLoader();
+    /**
+     * @return - currently pending transactions received from the net
+     */
+    Set<Transaction> getWireTransactions();
 
-    public void exitOn(long number);
+    /**
+     * @return - currently pending transactions sent to the net
+     */
+    List<Transaction> getPendingStateTransactions();
+
+    BlockLoader getBlockLoader();
+
+    /**
+     * Calculates a 'reasonable' Gas price based on statistics of the latest transaction's Gas prices
+     * Normally the price returned should be sufficient to execute a transaction since ~25% of the latest
+     * transactions were executed at this or lower price.
+     * If the transaction is wanted to be executed promptly with higher chances the returned price might
+     * be increased at some ratio (e.g. * 1.2)
+     */
+    long getGasPrice();
+
+    void exitOn(long number);
 
     public EthereumListener getListener();
 }

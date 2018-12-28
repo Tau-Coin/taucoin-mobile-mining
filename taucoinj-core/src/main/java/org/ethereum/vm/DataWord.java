@@ -183,7 +183,10 @@ public class DataWord implements Comparable<DataWord> {
     }
 
     public void bnot() {
-        if (this.isZero()) return;
+        if (this.isZero()) {
+            this.data = ByteUtil.copyToArray(MAX_VALUE);
+            return;
+        }
         this.data = ByteUtil.copyToArray(MAX_VALUE.subtract(this.value()));
     }
 
@@ -276,7 +279,12 @@ public class DataWord implements Comparable<DataWord> {
     }
 
     public void addmod(DataWord word1, DataWord word2) {
-
+        if (word1.data[0] != 0 || data[0] != 0) {
+            // overflow possible: slower path
+            this.mod(word2);
+            word1 = word1.clone();
+            word1.mod(word2);
+        }
         this.add(word1);
         this.mod(word2);
     }

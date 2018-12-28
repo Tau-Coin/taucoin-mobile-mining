@@ -1,0 +1,234 @@
+package org.ethereum.android;
+
+
+import org.ethereum.crypto.HashUtil;
+import org.ethereum.manager.AdminInfo;
+import org.ethereum.manager.WorldManager;
+import org.ethereum.net.client.PeerClient;
+import org.ethereum.net.server.ChannelManager;
+import org.ethereum.vm.program.invoke.ProgramInvokeFactory;
+import org.spongycastle.util.encoders.Hex;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+
+@Singleton
+public class Ethereum extends org.ethereum.facade.EthereumImpl {
+
+    @Inject
+    public Ethereum(WorldManager worldManager, AdminInfo adminInfo,
+                    ChannelManager channelManager, org.ethereum.manager.BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory,
+                    Provider<PeerClient> peerClientProvider) {
+
+        super(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider);
+    }
+
+    public void init(List<String> privateKeys) {
+
+        for (String privateKey: privateKeys) {
+            worldManager.getWallet().importKey(Hex.decode(privateKey));
+        }
+
+        worldManager.init();
+        init();
+    }
+
+    public void initSync() {
+        worldManager.initSync();
+    }
+
+    public byte[] createRandomAccount() {
+
+        byte[] randomPrivateKey = HashUtil.sha3(HashUtil.randomPeerId());
+        worldManager.getWallet().importKey(randomPrivateKey);
+        return randomPrivateKey;
+    }
+
+
+<<<<<<< HEAD
+=======
+        final Set<PeerInfo> peers = getPeers();
+        for (PeerInfo peer : peers) { // it blocks until a peer is available.
+            if (peer.isOnline() && !excludePeers.contains(peer)) {
+                logger.info("Found peer: {}", peer.toString());
+                listener.trace(String.format("Found online peer: [ %s ]", peer.toString()));
+                return peer;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public PeerInfo waitForOnlinePeer() {
+
+        PeerInfo peer = null;
+        while (peer == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            peer = this.findOnlinePeer();
+        }
+        return peer;
+    }
+
+    @Override
+    public Set<PeerInfo> getPeers() {
+
+        return peerDiscovery.getPeers();
+    }
+
+    @Override
+    public void startPeerDiscovery() {
+
+        if (!peerDiscovery.isStarted())
+            peerDiscovery.start();
+    }
+
+    @Override
+    public void stopPeerDiscovery() {
+
+        if (peerDiscovery.isStarted())
+            peerDiscovery.stop();
+    }
+
+    @Override
+    public void connect(InetAddress addr, int port, String remoteId) {
+
+        connect(addr.getHostName(), port, remoteId);
+    }
+
+    @Override
+    public void connect(String ip, int port, String remoteId) {
+
+        logger.info("Connecting to: {}:{}", ip, port);
+
+        if (activePeer == null)
+            activePeer = peerClientProvider.get();
+
+        activePeer.connect(ip, port, remoteId);
+    }
+
+    @Override
+    public Blockchain getBlockchain() {
+
+
+        return blockchain;
+    }
+
+    @Override
+    public void addListener(EthereumListener listener) {
+
+        ((CompositeEthereumListener) this.listener).addListener(listener);
+    }
+
+    @Override
+    public boolean isBlockchainLoading() {
+
+        return blockchain.getQueue().size() > 2;
+    }
+
+    @Override
+    public void close() {
+
+        stopPeerDiscovery();
+        repository.close();
+        blockchain.close();
+    }
+
+    @Override
+    public PeerClient getDefaultPeer() {
+
+        if (activePeer == null) {
+            activePeer = peerClientProvider.get();
+        }
+        return activePeer;
+    }
+
+    @Override
+    public boolean isConnected() {
+
+        return activePeer != null;
+    }
+
+    @Override
+    public Transaction createTransaction(BigInteger nonce,
+                                         BigInteger gasPrice,
+                                         BigInteger gas,
+                                         byte[] receiveAddress,
+                                         BigInteger value, byte[] data) {
+
+        byte[] nonceBytes = ByteUtil.bigIntegerToBytes(nonce);
+        byte[] gasPriceBytes = ByteUtil.bigIntegerToBytes(gasPrice);
+        byte[] gasBytes = ByteUtil.bigIntegerToBytes(gas);
+        byte[] valueBytes = ByteUtil.bigIntegerToBytes(value);
+
+        return new Transaction(nonceBytes, gasPriceBytes, gasBytes,
+                receiveAddress, valueBytes, data);
+    }
+
+
+    @Override
+    public Future<Transaction> submitTransaction(Transaction transaction) {
+
+        TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
+
+        return TransactionExecutor.instance.submitTransaction(transactionTask);
+    }
+
+
+    @Override
+    public Wallet getWallet() {
+
+        return wallet;
+    }
+
+
+    @Override
+    public Repository getRepository() {
+
+        return repository;
+    }
+
+    @Override
+    public AdminInfo getAdminInfo() {
+
+        return adminInfo;
+    }
+
+    @Override
+    public ChannelManager getChannelManager() {
+
+        return channelManager;
+    }
+
+
+    @Override
+    public Set<Transaction> getPendingTransactions() {
+
+        return blockchain.getPendingTransactions();
+    }
+
+    @Override
+    public BlockLoader getBlockLoader() {
+
+        return  blockLoader;
+    }
+
+    @Override
+    public void exitOn(long number) {
+
+        blockchain.setExitOn(number);
+    }
+
+    public EthereumListener getListener() {
+
+        return this.listener;
+    }
+>>>>>>> android-test-poc9-rlpx
+}
