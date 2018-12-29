@@ -153,7 +153,12 @@ public class EthereumImpl implements Ethereum {
     @Override
     public void startPeerDiscovery() {
         logger.info("Starting discovery");
-        worldManager.startPeerDiscovery();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                worldManager.startPeerDiscovery();
+            }
+        });
     }
 
     @Override

@@ -29,13 +29,25 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Connect"
-                android:id="@+id/connectButton"
+                android:text="Discovery"
+                android:id="@+id/discoveryButton"
                 android:layout_below="@+id/textView2"
                 android:layout_alignLeft="@+id/getBlockchainStatus"
                 android:layout_alignStart="@+id/getBlockchainStatus"
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center_horizontal"
+                android:textSize="10sp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connect"
+                android:id="@+id/connectButton"
+                android:layout_alignTop="@+id/discoveryButton"
+                android:layout_toRightOf="@+id/textView"
+                android:layout_toEndOf="@+id/textView"
+                android:layout_gravity="center_horizontal"
+                android:singleLine="true"
                 android:textSize="10sp" />
 
             <Button

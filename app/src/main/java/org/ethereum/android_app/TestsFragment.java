@@ -32,6 +32,7 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
     TextView isConsensus;
     TextView blockExecTime;
 
+    Button discoverytButton;
     Button connectButton;
     Button getEthereumStatus;
     Button getBlockchainStatus;
@@ -48,10 +49,12 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
         startupTime = (TextView)view.findViewById(R.id.startupTime);
         isConsensus = (TextView)view.findViewById(R.id.isConsensus);
         blockExecTime = (TextView)view.findViewById(R.id.blockExecTime);
+        discoverytButton = (Button)view.findViewById(R.id.discoveryButton);
         connectButton = (Button)view.findViewById(R.id.connectButton);
         getEthereumStatus = (Button)view.findViewById(R.id.getEthereumStatus);
         getBlockchainStatus = (Button)view.findViewById(R.id.getBlockchainStatus);
 
+        discoverytButton.setOnClickListener(onClickListener);
         connectButton.setOnClickListener(onClickListener);
         getEthereumStatus.setOnClickListener(onClickListener);
         getBlockchainStatus.setOnClickListener(onClickListener);
@@ -64,6 +67,9 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
         public void onClick(final View v) {
 
             switch(v.getId()){
+                case R.id.discoveryButton:
+                    EthereumApplication.ethereumConnector.startPeerDiscovery();
+                    break;
                 case R.id.connectButton:
                     Node node = CONFIG.peerActive().get(0);
                     EthereumApplication.ethereumConnector.connect(node.getHost(), node.getPort(), node.getHexId());
