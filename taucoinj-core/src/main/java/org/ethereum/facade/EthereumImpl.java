@@ -10,6 +10,7 @@ import org.ethereum.manager.WorldManager;
 import org.ethereum.net.client.PeerClient;
 import org.ethereum.net.peerdiscovery.PeerInfo;
 import org.ethereum.net.rlpx.Node;
+import org.ethereum.net.rlpx.discover.UDPListener;
 import org.ethereum.net.server.ChannelManager;
 import org.ethereum.net.server.PeerServer;
 import org.ethereum.net.submit.TransactionExecutor;
@@ -57,12 +58,14 @@ public class EthereumImpl implements Ethereum {
 
     protected Provider<PeerClient> peerClientProvider;
 
+    protected Provider<UDPListener> discoverServerProvider;
+
     protected GasPriceTracker gasPriceTracker = new GasPriceTracker();
 
     @Inject
     public EthereumImpl(WorldManager worldManager, AdminInfo adminInfo,
                         ChannelManager channelManager, BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory,
-                        Provider<PeerClient> peerClientProvider) {
+                        Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoverServerProvider) {
         System.out.println();
 		logger.info("EthereumImpl constructor");
         this.worldManager = worldManager;
@@ -71,7 +74,9 @@ public class EthereumImpl implements Ethereum {
         this.blockLoader = blockLoader;
         this.peerClientProvider = peerClientProvider;
         this.programInvokeFactory = programInvokeFactory;
+        this.discoverServerProvider = discoverServerProvider;
 
+        this.worldManager.setDiscoveryServer(discoverServerProvider.get());
     }
 
     public void init() {
@@ -147,6 +152,7 @@ public class EthereumImpl implements Ethereum {
 
     @Override
     public void startPeerDiscovery() {
+        logger.info("Starting discovery");
         worldManager.startPeerDiscovery();
     }
 

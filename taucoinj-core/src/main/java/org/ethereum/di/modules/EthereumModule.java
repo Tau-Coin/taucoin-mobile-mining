@@ -35,6 +35,7 @@ import org.ethereum.net.peerdiscovery.WorkerThread;
 import org.ethereum.net.rlpx.MessageCodec;
 import org.ethereum.net.rlpx.discover.NodeManager;
 import org.ethereum.net.rlpx.discover.PeerConnectionTester;
+import org.ethereum.net.rlpx.discover.UDPListener;
 import org.ethereum.net.server.ChannelManager;
 import org.ethereum.net.server.EthereumChannelInitializer;
 import org.ethereum.net.shh.ShhHandler;
@@ -78,7 +79,8 @@ public class EthereumModule {
     @Provides
     @Singleton
     Ethereum provideEthereum(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager,
-                             BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory, Provider<PeerClient> peerClientProvider) {
+                             BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory, Provider<PeerClient> peerClientProvider,
+                             Provider<UDPListener> discoveryServerProvider) {
         return null;
         //return new EthereumImpl(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider);
     }

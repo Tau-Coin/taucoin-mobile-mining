@@ -7,6 +7,7 @@ import org.ethereum.db.ByteArrayWrapper;
 import org.ethereum.listener.CompositeEthereumListener;
 import org.ethereum.listener.EthereumListener;
 import org.ethereum.net.client.PeerClient;
+import org.ethereum.net.rlpx.discover.UDPListener;
 import org.ethereum.sync.SyncManager;
 import org.ethereum.net.peerdiscovery.PeerDiscovery;
 import org.ethereum.net.rlpx.discover.NodeManager;
@@ -49,6 +50,8 @@ public class WorldManager {
     private PeerClient activePeer;
 
     private PeerDiscovery peerDiscovery;
+
+    private UDPListener discoveryServer;
 
     private BlockStore blockStore;
 
@@ -100,14 +103,32 @@ public class WorldManager {
         ((CompositeEthereumListener) this.listener).addListener(listener);
     }
 
+    public void setDiscoveryServer(UDPListener discoveryServer) {
+        if (this.discoveryServer == null) {
+            this.discoveryServer = discoveryServer;
+        }
+    }
+
     public void startPeerDiscovery() {
-        if (!peerDiscovery.isStarted())
-            peerDiscovery.start();
+        if (discoveryServer != null) {
+            if (!discoveryServer.isStarted()) {
+                discoveryServer.start();
+            }
+        } else {
+            if (!peerDiscovery.isStarted())
+                peerDiscovery.start();
+        }
     }
 
     public void stopPeerDiscovery() {
-        if (peerDiscovery.isStarted())
-            peerDiscovery.stop();
+        if (discoveryServer != null) {
+            if (discoveryServer.isStarted()) {
+                discoveryServer.close();
+            }
+        } else {
+            if (peerDiscovery.isStarted())
+                peerDiscovery.stop();
+        }
     }
 
     public ChannelManager getChannelManager() {

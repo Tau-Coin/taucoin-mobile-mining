@@ -11,6 +11,7 @@ import org.ethereum.crypto.HashUtil;
 import org.ethereum.manager.AdminInfo;
 import org.ethereum.manager.WorldManager;
 import org.ethereum.net.client.PeerClient;
+import org.ethereum.net.rlpx.discover.UDPListener;
 import org.ethereum.net.server.ChannelManager;
 import org.ethereum.vm.program.invoke.ProgramInvokeFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -28,9 +29,9 @@ public class Ethereum extends org.ethereum.facade.EthereumImpl {
     @Inject
     public Ethereum(WorldManager worldManager, AdminInfo adminInfo,
                     ChannelManager channelManager, org.ethereum.manager.BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory,
-                    Provider<PeerClient> peerClientProvider) {
+                    Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoveryServerProvider) {
 
-        super(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider);
+        super(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider, discoveryServerProvider);
     }
 
     public void init(List<String> privateKeys) {
