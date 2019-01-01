@@ -307,7 +307,7 @@ public class ECKey implements Serializable {
      **/
     public byte[] getAddressBindAccount(){
        if (pubKeyHash == null){
-           byte[] pubKeyHash = Utils.sha256hash160(this.pub.getEncoded(true));
+           pubKeyHash = Utils.sha256hash160(this.pub.getEncoded(true));
        }
        return pubKeyHash;
     }
@@ -324,7 +324,7 @@ public class ECKey implements Serializable {
         return nodeId;
     }
     public Address getAccountAddress(){
-        return new Address(MainNetParams.get(),pubKeyHash);
+        return new Address(MainNetParams.get(), getAddressBindAccount());
     }
     /**
      * Gets the raw public key value. This appears in transaction scriptSigs. Note that this is <b>not</b> the same

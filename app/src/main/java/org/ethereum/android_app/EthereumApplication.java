@@ -35,7 +35,7 @@ public class EthereumApplication extends MultiDexApplication implements Connecto
 
     public static String consoleLog = "";
 
-    private String handlerIdentifier = UUID.randomUUID().toString();
+    public static String handlerIdentifier = UUID.randomUUID().toString();
 
     @SuppressLint("SimpleDateFormat")
     private DateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");

@@ -98,6 +98,11 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         this.bootNodes = bootNodes;
     }
 
+    public void setWorldManager(WorldManager worldManager) {
+        this.worldManager = worldManager;
+        this.peerConnectionManager.setWorldManager(worldManager);
+    }
+
     void channelActivated() {
         // channel activated now can send messages
         if (!inited) {

@@ -82,6 +82,7 @@ public class WorldManager {
         this.syncManager = syncManager;
         this.pendingState = pendingState;
 
+        this.nodeManager.setWorldManager(this);
     }
 
     public void init() {

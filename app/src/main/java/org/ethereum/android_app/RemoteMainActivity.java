@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.ethereum.android.service.ConnectorHandler;
+import org.ethereum.android.service.EthereumConnector;
 import org.ethereum.android.service.EthereumClientMessage;
 import org.ethereum.android.service.events.BlockEventData;
 import org.ethereum.android.service.events.EventData;
@@ -28,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class RemoteMainActivity extends ActionBarActivity implements ActivityInterface {
@@ -37,6 +41,9 @@ public class RemoteMainActivity extends ActionBarActivity implements ActivityInt
     private SlidingTabLayout tabs;
     private TabsPagerAdapter adapter;
     protected ArrayList<FragmentInterface> fragments = new ArrayList<>();
+
+    private ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
+    public static final int BOOTUP_DELAY_INIT_SECONDS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,10 @@ public class RemoteMainActivity extends ActionBarActivity implements ActivityInt
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
         tabs.setDistributeEvenly(true);
         tabs.setViewPager(viewPager);
+
+        initializer.schedule(
+                new InitTask(EthereumApplication.ethereumConnector, EthereumApplication.handlerIdentifier),
+                BOOTUP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
     }
 
     @Override
@@ -87,4 +98,18 @@ public class RemoteMainActivity extends ActionBarActivity implements ActivityInt
         }
     }
 
+    private static class InitTask implements Runnable {
+        private EthereumConnector ethereumConnector;
+        private String handlerIdentifier;
+
+        public InitTask(EthereumConnector ethereumConnector, String handlerIdentifier) {
+            this.ethereumConnector = ethereumConnector;
+            this.handlerIdentifier = handlerIdentifier;
+        }
+
+        @Override
+        public void run() {
+            ethereumConnector.init(handlerIdentifier, null);
+        }
+    }
 }

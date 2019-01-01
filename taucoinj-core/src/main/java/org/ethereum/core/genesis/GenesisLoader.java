@@ -39,7 +39,10 @@ public class GenesisLoader {
 
             String genesisFile = CONFIG.genesisInfo();
 
-            InputStream is = ClassLoader.getSystemResourceAsStream("genesis/" + genesisFile);
+            ClassLoader loader = GenesisLoader.class.getClassLoader();
+            InputStream is = loader.getResourceAsStream("genesis/" + genesisFile);
+
+            //InputStream is = ClassLoader.getSystemResourceAsStream("genesis/" + genesisFile);
             String json = new String(ByteStreams.toByteArray(is));
 
             ObjectMapper mapper = new ObjectMapper();

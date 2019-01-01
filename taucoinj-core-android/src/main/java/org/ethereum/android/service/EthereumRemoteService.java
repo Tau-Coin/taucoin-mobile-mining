@@ -271,6 +271,7 @@ public class EthereumRemoteService extends EthereumService {
                 privateKeys.add(Hex.toHexString(cbAddr));
             }
             ethereum.init(privateKeys);
+            ethereum.getDefaultPeer();
 
             //startJsonRpc(null);
             //if (currentJsonRpcServer != null) {

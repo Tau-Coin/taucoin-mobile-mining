@@ -37,6 +37,7 @@ public class UDPListener {
 
     private Channel channel;
     private volatile boolean shutdown = false;
+    private volatile boolean initialized = false;
     private DiscoveryExecutor discoveryExecutor;
 
     @Inject
@@ -68,10 +69,12 @@ public class UDPListener {
                         UDPListener.this.start(bootPeers);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        initialized = false;
                         throw new RuntimeException(e);
                     }
                 }
             }.start();
+            initialized = true;
         }
     }
 
@@ -135,12 +138,13 @@ public class UDPListener {
     }
 
     public boolean isStarted() {
-        return !shutdown;
+        return initialized;
     }
 
     public void close() {
         logger.info("Closing UDPListener...");
         shutdown = true;
+        initialized = false;
         if (channel != null) {
             try {
                 channel.close().await(10, TimeUnit.SECONDS);
