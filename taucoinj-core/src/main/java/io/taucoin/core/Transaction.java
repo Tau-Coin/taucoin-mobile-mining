@@ -1,0 +1,302 @@
+package io.taucoin.core;
+
+import org.ethereum.crypto.ECKey;
+import org.ethereum.crypto.ECKey.ECDSASignature;
+import org.ethereum.crypto.ECKey.MissingPrivateKeyException;
+import org.ethereum.crypto.HashUtil;
+import org.ethereum.util.ByteUtil;
+import org.ethereum.util.RLP;
+import org.ethereum.util.RLPList;
+import org.ethereum.core.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.spongycastle.util.BigIntegers;
+import org.spongycastle.util.encoders.Hex;
+
+import java.math.BigInteger;
+import java.security.SignatureException;
+import java.util.Arrays;
+
+import static org.apache.commons.lang3.ArrayUtils.getLength;
+import static org.ethereum.util.ByteUtil.*;
+
+/**
+ * A transaction (formally, T) is a single cryptographically
+ * signed instruction sent by an actor external to Ethereum.
+ * An external actor can be a person (via a mobile device or desktop computer)
+ * or could be from a piece of automated software running on a server.
+ * There are two types of transactions: those which result in message calls
+ * and those which result in the creation of new contracts.
+ */
+public class Transaction {
+
+    private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
+
+    /* version is for upgrade to define the transition grace peroid */
+    private byte version;
+
+    /* option for future use*/
+    private byte option;
+
+    /* used for transaction validation eg expire or deny reentrance */
+    private byte[] timeStamp;
+
+
+    /* the address of the destination account
+     * 20 bytes, this is SHA256-ripemd 160 on a public key */
+    private byte[] toAddress;
+
+    /* 5 bytes,the amount of taucoin */
+    private byte[] amount;
+
+    /* 2 bytes,transaction fee ralated to transaction*/
+    private byte[] fee;
+
+    /* 520 bytes,the elliptic curve signature
+     * (including public key recovery bits) */
+    private ECDSASignature signature;
+    
+    private byte[] sendAddress;
+    
+    private byte[] hash;
+
+    /* Tx in encoded form */
+    protected byte[] rlpEncoded;
+    private byte[] rlpRaw;
+    /* Indicates if this transaction has been parsed
+     * from the RLP-encoded data */
+    private boolean parsed = false;
+
+    public Transaction(byte[] rawData) {
+        this.rlpEncoded = rawData;
+        parsed = false;
+    }
+
+    /* creation tx
+     * [ version, option, timeStamp, toAddress, amount, fee, signature(v, r, s) ]
+     */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee) {
+        this.version = version;
+        this.option = option;
+        this.timeStamp = timeStamp;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.fee = fee;
+
+        if (toAddress == null) {
+            //burn some money
+            this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
+        }
+
+        parsed = true;
+    }
+
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee, byte[] r, byte[] s, byte v) {
+        this(version, option, timeStamp, toAddress, amount, fee);
+
+        ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
+        signature.v = v;
+        this.signature = signature;
+    }
+
+    public byte[] transactionCost(){
+
+        if (!parsed) rlpParse();
+
+        return fee;
+    }
+
+    public void rlpParse() {
+
+        RLPList decodedTxList = RLP.decode2(rlpEncoded);
+        RLPList transaction = (RLPList) decodedTxList.get(0);
+
+        this.version = transaction.get(0).getRLPData()[0];
+        this.option = transaction.get(1).getRLPData()[0];
+        this.timeStamp = transaction.get(2).getRLPData();
+        this.toAddress = transaction.get(3).getRLPData();
+        this.amount = transaction.get(4).getRLPData();
+        this.fee = transaction.get(5).getRLPData();
+        // only parse signature in case tx is signed
+        if (transaction.get(6).getRLPData() != null) {
+            byte v = transaction.get(6).getRLPData()[0];
+            byte[] r = transaction.get(7).getRLPData();
+            byte[] s = transaction.get(8).getRLPData();
+            this.signature = ECDSASignature.fromComponents(r, s, v);
+        } else {
+            logger.debug("RLP encoded tx is not signed!");
+        }
+        this.parsed = true;
+        this.hash = getHash();
+    }
+
+    public boolean isParsed() {
+        return parsed;
+    }
+    
+    //entire transaction hash code
+    public byte[] getHash() {
+        if (!parsed) rlpParse();
+        byte[] plainMsg = this.getEncoded();
+        return HashUtil.sha3(plainMsg);
+    }
+    // transaction except to signature
+    public byte[] getRawHash() {
+        if (!parsed) rlpParse();
+        byte[] plainMsg = this.getEncodedRaw();
+        return HashUtil.sha3(plainMsg);
+    }
+
+
+    public byte[] getTime() {
+        if (!parsed) rlpParse();
+
+        return timeStamp;
+    }
+
+    public byte[] getAmount() {
+        if (!parsed) rlpParse();
+        return amount;
+    }
+
+    public byte[] getReceiveAddress() {
+        if (!parsed) rlpParse();
+        return toAddress;
+    }
+
+    public ECDSASignature getSignature() {
+        if (!parsed) rlpParse();
+        return signature;
+    }
+
+    /*
+     * Crypto, recover ECKey that only contains compressd pubkey
+     */
+
+    public ECKey getKey() {
+        byte[] hash = getRawHash();
+        return ECKey.recoverFromSignature(signature.v, signature, hash, true);
+    }
+    /*
+    * Crypto,recover compressed pubkey from signature further get sender address
+    */
+
+    public byte[] getSender() {
+        try {
+            if (sendAddress == null) {
+                ECKey key = ECKey.signatureToKey(getRawHash(), getSignature().toBase64());
+                sendAddress = key.getAddress();
+            }
+            return sendAddress;
+        } catch (SignatureException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public void sign(byte[] privKeyBytes) throws MissingPrivateKeyException {
+        byte[] hash = this.getRawHash();
+        ECKey key = ECKey.fromPrivate(privKeyBytes).decompress();
+        this.signature = key.sign(hash);
+        this.rlpEncoded = null;
+    }
+
+    @Override
+    public String toString() {
+        if (!parsed) rlpParse();
+        return "TransactionData [" +
+                "  version=" + ByteUtil.toHexString(new byte[]{version}) +
+                ", option=" + ByteUtil.toHexString(new byte[]{option}) +
+                ", receiveAddress=" + ByteUtil.toHexString(toAddress) +
+                ", amount=" + ByteUtil.toHexString(amount) +
+                ", fee=" + ByteUtil.toHexString(fee) +
+                ", signatureV=" + (signature == null ? "" : signature.v) +
+                ", signatureR=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.r))) +
+                ", signatureS=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.s))) +
+                "]";
+    }
+
+    /**
+     * For signatures you have to keep also
+     * RLP of the transaction without any signature data
+     */
+    public byte[] getEncodedRaw() {
+
+        if (!parsed) rlpParse();
+        if (rlpRaw != null) return rlpRaw;
+        byte[] version = RLP.encodeByte(this.version);
+        byte[] option = RLP.encodeByte(this.option);
+        byte[] timeStamp = RLP.encodeElement(this.timeStamp);
+        byte[] toAddress = RLP.encodeElement(this.toAddress);
+        byte[] amount = RLP.encodeElement(this.amount);
+        byte[] fee = RLP.encodeElement(this.fee);
+
+        rlpRaw = RLP.encodeList(version, option, timeStamp, toAddress,
+                amount, fee);
+        return rlpRaw;
+    }
+
+    public byte[] getEncoded() {
+        if (!parsed) rlpParse();
+        if (rlpEncoded != null) return rlpEncoded;
+
+        byte[] version = RLP.encodeByte(this.version);
+        byte[] option = RLP.encodeByte(this.option);
+        byte[] timeStamp = RLP.encodeElement(this.timeStamp);
+        byte[] toAddress = RLP.encodeElement(this.toAddress);
+        byte[] amount = RLP.encodeElement(this.amount);
+        byte[] fee = RLP.encodeElement(this.fee);
+
+        byte[] v, r, s;
+
+        if (signature != null) {
+            v = RLP.encodeByte(signature.v);
+            r = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.r));
+            s = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.s));
+        } else {
+            v = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+        }
+
+        this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
+                toAddress, amount, fee, v, r, s);
+
+        this.hash = this.getHash();
+
+        return rlpEncoded;
+    }
+
+    @Override
+    public int hashCode() {
+
+        byte[] hash = this.getHash();
+        int hashCode = 0;
+
+        for (int i = 0; i < hash.length; ++i) {
+            hashCode += hash[i] * i;
+        }
+
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (!(obj instanceof Transaction)) return false;
+        Transaction tx = (Transaction) obj;
+
+        return tx.hashCode() == this.hashCode();
+    }
+
+    public static Transaction create(BigInteger version,BigInteger option,BigInteger timeStamp,String to, BigInteger amount, BigInteger fee){
+        return new Transaction(BigIntegers.asUnsignedByteArray(version)[0],
+                BigIntegers.asUnsignedByteArray(option)[0],
+                BigIntegers.asUnsignedByteArray(timeStamp),
+                Hex.decode(to),
+                BigIntegers.asUnsignedByteArray(amount),
+                BigIntegers.asUnsignedByteArray(fee));
+    }
+}
