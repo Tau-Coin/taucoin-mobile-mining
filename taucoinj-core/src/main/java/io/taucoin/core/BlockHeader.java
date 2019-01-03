@@ -83,6 +83,10 @@ public class BlockHeader {
                     generatorPublicKey);
     }
 
+    public byte[] getHeaderHash(){
+       return HashUtil.ripemd160(HashUtil.sha256(this.getEncoded()));
+    }
+
     public byte[] getUnclesEncoded(List<BlockHeader> uncleList) {
 
         byte[][] unclesEncoded = new byte[uncleList.size()][];
@@ -100,7 +104,9 @@ public class BlockHeader {
 
         return null;
     }
-
+    /*
+    *TODO:
+     */
     public BigInteger calcDifficulty(BlockHeader parent) {
         BigInteger difficulty = max(MINIMUM_DIFFICULTY, BigInteger.valueOf(10000));
 

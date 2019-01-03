@@ -108,8 +108,8 @@ public class Block {
 
     public byte[] getHash() {
         if (!parsed) parseRLP();
-        //todo: need implementation
-        return null;
+        //temporary used header hash
+        return this.header.getHeaderHash();
     }
 
     public byte[] getPreviousHeaderHash() {
