@@ -10,6 +10,6 @@ public class KademliaOptions {
     public static final int MAX_STEPS = 8;
 
     public static final long REQ_TIMEOUT = 300;
-    public static final long BUCKET_REFRESH = 60000;     //bucket refreshing interval in millis
-    public static final long DISCOVER_CYCLE = 30;       //discovery cycle interval in seconds
+    public static final long BUCKET_REFRESH = 20 * 60 * 1000;     //bucket refreshing interval in millis
+    public static final long DISCOVER_CYCLE = 20 * 60;       //discovery cycle interval in seconds
 }

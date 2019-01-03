@@ -26,11 +26,11 @@ public class DiscoveryExecutor {
 
         discoverer.scheduleWithFixedDelay(
                 new DiscoverTask(nodeManager),
-                0, KademliaOptions.DISCOVER_CYCLE, TimeUnit.SECONDS);
+                10, KademliaOptions.DISCOVER_CYCLE, TimeUnit.SECONDS);
 
         refresher.scheduleWithFixedDelay(
                 new RefreshTask(nodeManager),
-                0, KademliaOptions.BUCKET_REFRESH, TimeUnit.MILLISECONDS);
+                10000, KademliaOptions.BUCKET_REFRESH, TimeUnit.MILLISECONDS);
 
     }
 
