@@ -3,7 +3,7 @@ package io.taucoin.core;
 import org.ethereum.util.RLP;
 import org.ethereum.util.RLPList;
 import org.ethereum.util.RLPElement;
-import java.util.ArrayList;
+import java.util.*;
 
 import org.spongycastle.util.encoders.Hex;
 
@@ -18,7 +18,7 @@ public class AccountState implements Serializable {
 
     /* A list size equal to the number of transactions sent since 24 h before.
      */
-    private ArrayList<TransactionInfo> tranHistory;
+    private HashMap<Integer,Long> tranHistory;
 
     /*
     * power owned by this account to new block.
@@ -34,14 +34,15 @@ public class AccountState implements Serializable {
 
     public AccountState() {
         this(BigInteger.ZERO, BigInteger.ZERO);
-        tranHistory = new ArrayList<TransactionInfo>();
+        tranHistory = new HashMap<Integer,Long>();
     }
 
     public AccountState(BigInteger forgePower, BigInteger balance) {
         this.forgePower = forgePower;
         this.balance = balance;
     }
-
+    
+    //used to initial a account from reposity
     public AccountState(byte[] rlpData) {
         this.rlpEncoded = rlpData;
 
@@ -52,7 +53,8 @@ public class AccountState implements Serializable {
         RLPList trHis = (RLPList) items.get(2);
         for(int i=0; i < trHis.size();++i){
              RLPElement transactionHis = trHis.get(i);
-             this.tranHistory.add(new TransactionInfo(transactionHis.getRLPData()));
+             TransactionInfo trinfo = new TransactionInfo(transactionHis.getRLPData());
+             this.tranHistory.put(trinfo.gettrHashcode(),trinfo.gettrTime());
         }
 
     }
@@ -97,8 +99,9 @@ public class AccountState implements Serializable {
 
             trHisEncoded[0] = forgePower;
             trHisEncoded[1] = balance;
-            int i = 0;
-            for (TransactionInfo txf : tranHistory) {
+            int i = 2;
+            for (int hashCode : tranHistory.keySet()) {
+              TransactionInfo txf = new TransactionInfo(hashCode,tranHistory.get(hashCode));
               trHisEncoded[i] = txf.getEncoded();
               ++i;
             }
