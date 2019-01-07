@@ -1,7 +1,7 @@
 package io.taucoin.core;
 
 import org.ethereum.crypto.ECKey;
-import org.ethereum.core.Repository;
+import io.taucoin.core.Repository;
 import org.ethereum.util.Utils;
 
 import java.math.BigInteger;
@@ -41,8 +41,8 @@ public class Account {
         address = this.ecKey.getAccountAddress();
     }
 
-    public BigInteger getNonce() {
-        return repository.getNonce(getAddress());
+    public BigInteger getforgePower() {
+        return repository.getforgePower(getAddress());
     }
 
     public BigInteger getBalance() {

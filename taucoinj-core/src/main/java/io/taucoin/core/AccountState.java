@@ -68,7 +68,7 @@ public class AccountState implements Serializable {
         this.forgePower = forgePower;
     }
 
-    public void incrementPower() {
+    public void incrementforgePower() {
         rlpEncoded = null;
         this.forgePower = forgePower.add(BigInteger.ONE);
         setDirty(true);
