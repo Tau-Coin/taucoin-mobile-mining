@@ -350,19 +350,6 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             //return false;
         }
 
-        String logBloomHash = Hex.toHexString(block.getLogBloom());
-        String logBloomListHash = Hex.toHexString(calcLogBloom(receipts));
-
-        if (!logBloomHash.equals(logBloomListHash)) {
-            logger.error("Block's given logBloom Hash doesn't match: {} != {}", logBloomHash, logBloomListHash);
-            //track.rollback();
-            //return;
-        }
-
-        //DEBUG
-        //System.out.println(" Receipts root is: " + receiptHash + " logbloomhash is " + logBloomHash);
-        //System.out.println(" Receipts listroot is: " + receiptListHash + " logbloomlisthash is " + logBloomListHash);
-
         track.commit();
         storeBlock(block, receipts);
 
@@ -467,37 +454,6 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
               //   FIXME: temporary comment out tx.trie validation
 //              return false;
             }
-
-
-            String unclesHash = Hex.toHexString(block.getHeader().getUnclesHash());
-            String unclesListHash = Hex.toHexString(HashUtil.sha3(block.getHeader().getUnclesEncoded(block.getUncleList())));
-
-            if (!unclesHash.equals(unclesListHash)) {
-                logger.error("Block's given Uncle Hash doesn't match: {} != {}", unclesHash, unclesListHash);
-                return false;
-            }
-
-
-            if (block.getUncleList().size() > UNCLE_LIST_LIMIT) {
-                logger.error("Uncle list to big: block.getUncleList().size() > UNCLE_LIST_LIMIT");
-                return false;
-            }
-
-
-            for (BlockHeader uncle : block.getUncleList()) {
-
-                // - They are valid headers (not necessarily valid blocks)
-                if (!isValid(uncle)) return false;
-
-                //if uncle's parent's number is not less than currentBlock - UNCLE_GEN_LIMIT, mark invalid
-                isValid = !(getParent(uncle).getNumber() < (block.getNumber() - UNCLE_GENERATION_LIMIT));
-                if (!isValid) {
-                    logger.error("Uncle too old: generationGap must be under UNCLE_GENERATION_LIMIT");
-                    return false;
-                }
-
-
-            }
         }
 
         return isValid;
@@ -590,19 +546,7 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 
         // Add standard block reward
         BigInteger totalBlockReward = Block.BLOCK_REWARD;
-
-        // Add extra rewards based on number of uncles
-        if (block.getUncleList().size() > 0) {
-            for (BlockHeader uncle : block.getUncleList()) {
-                track.addBalance(uncle.getCoinbase(),
-                        new BigDecimal(block.BLOCK_REWARD).multiply(BigDecimal.valueOf(8 + uncle.getNumber() - block.getNumber()).divide(new BigDecimal(8))).toBigInteger());
-
-                totalBlockReward = totalBlockReward.add(Block.INCLUSION_REWARD);
-            }
-        }
         track.addBalance(block.getCoinbase(), totalBlockReward);
-
-
     }
 
     @Override
