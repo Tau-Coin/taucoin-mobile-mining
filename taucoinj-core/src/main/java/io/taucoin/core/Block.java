@@ -33,6 +33,8 @@ public class Block {
     private byte[] blockSignature;
     /*this is left for future use 8 bits*/
     private byte option;
+    private BigInteger baseTarget; //this is uint64 type so here we should use compact type
+    private BigInteger cumulativeDifficulty; //this is total chain difficulty
 
     /* Transactions */
     private List<Transaction> transactionsList = new CopyOnWriteArrayList<>();
