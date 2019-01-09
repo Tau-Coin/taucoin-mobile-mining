@@ -1,6 +1,7 @@
 /*
  * Copyright 2011 Google Inc.
  * Copyright 2014 Andreas Schildbach
+ * Copyright 2019 Taucoin core
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,6 +246,15 @@ public class Utils {
         return ((bytes[offset] & 0xffl) << 24) |
                 ((bytes[offset + 1] & 0xffl) << 16) |
                 ((bytes[offset + 2] & 0xffl) << 8) |
+                (bytes[offset + 3] & 0xffl);
+    }
+
+    /** Parse 5 bytes from the byte array (starting at the offset) as unsigned 40-bit integer in big endian format. */
+    public static long readUint40BE(byte[] bytes, int offset) {
+        return ((bytes[offset] & 0xffl) << 32) |
+                ((bytes[offset + 1] & 0xffl) << 24) |
+                ((bytes[offset + 2] & 0xffl) << 16) |
+                ((bytes[offset + 2] & 0xffl) << 8)  |
                 (bytes[offset + 3] & 0xffl);
     }
 
