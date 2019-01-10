@@ -164,7 +164,7 @@ public class UDPListener {
 
     public static void main(String[] args) throws Exception {
         String address = "0.0.0.0";
-        int port = 30303;
+        int port = 30606;
         if (args.length >= 2) {
             address = args[0];
             port = Integer.parseInt(args[1]);

@@ -40,6 +40,7 @@ import org.ethereum.net.rlpx.discover.PeerConnectionTester;
 import org.ethereum.net.rlpx.discover.UDPListener;
 import org.ethereum.net.server.ChannelManager;
 import org.ethereum.net.server.EthereumChannelInitializer;
+import org.ethereum.net.server.PeerServer;
 import org.ethereum.net.shh.ShhHandler;
 import org.ethereum.net.shh.WhisperImpl;
 import org.ethereum.sync.PeersPool;
@@ -116,9 +117,10 @@ public class EthereumModule {
     @Singleton
     Ethereum provideEthereum(WorldManager worldManager, AdminInfo adminInfo,
                              ChannelManager channelManager, org.ethereum.manager.BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory,
-                             Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoveryServerProvider) {
+                             Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoveryServerProvider, PeerServer peerServer) {
 
-        return new org.ethereum.android.Ethereum(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider, discoveryServerProvider);
+        return new org.ethereum.android.Ethereum(worldManager, adminInfo, channelManager, blockLoader, programInvokeFactory, peerClientProvider,
+                discoveryServerProvider, peerServer);
     }
 
     @Provides
@@ -271,6 +273,13 @@ public class EthereumModule {
     PeerClient providePeerClient(EthereumListener listener, ChannelManager channelManager,
                                  Provider<EthereumChannelInitializer> ethereumChannelInitializerProvider) {
         return new PeerClient(listener, channelManager, ethereumChannelInitializerProvider);
+    }
+
+    @Provides
+    @Singleton
+    PeerServer providePeerServer(ChannelManager channelManager, EthereumChannelInitializer ethereumChannelInitializer,
+            EthereumListener listener) {
+        return new PeerServer(channelManager, ethereumChannelInitializer, listener);
     }
 
     @Provides

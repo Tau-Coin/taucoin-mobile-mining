@@ -52,7 +52,7 @@ public class EthereumRemoteService extends EthereumService {
     private String currentJsonRpcServer = null;
 
     protected String ipBootstrap = null;
-    protected int portBootstrap = 30303;
+    protected int portBootstrap = 30606;
     protected String remoteIdBootstrap = null;
 
     public EthereumRemoteService() {
@@ -277,6 +277,8 @@ public class EthereumRemoteService extends EthereumService {
             //if (currentJsonRpcServer != null) {
             //    this.changeJsonRpc(null);
             //}
+
+            ethereum.initSync();
             isEthereumStarted = true;
             isInitialized = true;
 
