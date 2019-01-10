@@ -65,7 +65,8 @@ public class EthereumImpl implements Ethereum {
     @Inject
     public EthereumImpl(WorldManager worldManager, AdminInfo adminInfo,
                         ChannelManager channelManager, BlockLoader blockLoader, ProgramInvokeFactory programInvokeFactory,
-                        Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoverServerProvider) {
+                        Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoverServerProvider,
+                        PeerServer peerServer) {
         System.out.println();
 		logger.info("EthereumImpl constructor");
         this.worldManager = worldManager;
@@ -75,12 +76,14 @@ public class EthereumImpl implements Ethereum {
         this.peerClientProvider = peerClientProvider;
         this.programInvokeFactory = programInvokeFactory;
         this.discoverServerProvider = discoverServerProvider;
+        this.peerServer = peerServer;
 
         this.worldManager.setDiscoveryServer(discoverServerProvider.get());
     }
 
     public void init() {
         if (CONFIG.listenPort() > 0) {
+            logger.info("Ethereum start server:" + CONFIG.listenPort());
             Executors.newSingleThreadExecutor().submit(
                     new Runnable() {
                         public void run() {

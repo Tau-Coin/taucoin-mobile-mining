@@ -464,7 +464,7 @@ public class SystemProperties {
             if (bindIp == null) {
                 logger.info("Bind address wasn't set, Punching to identify it...");
                 try {
-                    Socket s = new Socket("www.google.com", 80);
+                    Socket s = new Socket("www.taucoin.io", 80);
                     bindIp = s.getLocalAddress().getHostAddress();
                     logger.info("UDP local bound to: {}", bindIp);
                 } catch (IOException e) {
