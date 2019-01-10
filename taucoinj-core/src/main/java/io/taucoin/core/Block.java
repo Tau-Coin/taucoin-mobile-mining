@@ -33,6 +33,9 @@ public class Block {
     private byte[] blockSignature;
     /*this is left for future use 8 bits*/
     private byte option;
+    /* A scalar value equal to the number of ancestor blocks.
+     * The genesis block has a number of zero */
+    private long number;
     private BigInteger baseTarget; //this is uint64 type so here we should use compact type
     private BigInteger cumulativeDifficulty; //this is total chain difficulty
 

@@ -22,8 +22,6 @@ public class BlockWrapper {
     private static final long SOLID_BLOCK_DURATION_THRESHOLD = secondsToMillis(60);
 
     private Block block;
-    private BigInteger baseTarget; //this is uint64 type so here we should use compact type
-    private BigInteger cumulativeDifficulty; //this is total chain difficulty
 
     private long importFailedAt = 0;
     private long receivedAt = 0;
