@@ -45,9 +45,6 @@ public class Block {
     protected byte[] rlpEncoded;
     private boolean parsed = false;
 
-    private Trie txsState;
-
-
     /* Constructors */
 
     private Block() {
@@ -197,25 +194,11 @@ public class Block {
 
     private void parseTxs(RLPList txTransactions) {
 
-        this.txsState = new TrieImpl(null);
         for (int i = 0; i < txTransactions.size(); i++) {
             RLPElement transactionRaw = txTransactions.get(i);
             this.transactionsList.add(new Transaction(transactionRaw.getRLPData()));
-            this.txsState.update(RLP.encodeInt(i), transactionRaw.getRLPData());
         }
     }
-
-//    private boolean parseTxs(byte[] expectedRoot, RLPList txTransactions) {
-//
-//        parseTxs(txTransactions);
-//        String calculatedRoot = Hex.toHexString(txsState.getRootHash());
-//        if (!calculatedRoot.equals(Hex.toHexString(expectedRoot))) {
-//            logger.error("Transactions trie root validation failed for block #{}", this.header.getNumber());
-//            return false;
-//        }
-//
-//        return true;
-//    }
 
     /**
      * check if param block is son of this block
@@ -223,9 +206,9 @@ public class Block {
      * @param block - possible a son of this
      * @return - true if this block is parent of param block
      */
-//    public boolean isParentOf(Block block) {
-//        return Arrays.areEqual(this.getHash(), block.getParentHash());
-//    }
+    public boolean isParentOf(Block block) {
+        return Arrays.areEqual(this.getHash(), block.getPreviousHeaderHash());
+    }
 
     public boolean isGenesis() {
         return this.header.isGenesis();

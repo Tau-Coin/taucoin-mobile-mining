@@ -24,11 +24,11 @@ import static org.ethereum.util.ByteUtil.toHexString;
  */
 public class BlockHeader {
 
-    /* version of block 8 bits */
+    /* 8 bits, keeping version is for upgrade to define the transition grace peroid */
     private byte version;
-    /* unix time stamp related to block */
+    /* 32 bits, unix time stamp related to block */
     private byte[] timeStamp;
-    /* The SHA256 previous block header and RIPEMD 160 second 160 bits */
+    /* 160 bits, The SHA256 previous block header and RIPEMD 160 second 160 bits */
     private byte[] previousHeaderHash;
     /* The compressed public key in ECDSA 264 bits */
     private byte[] generatorPublicKey;
@@ -60,14 +60,32 @@ public class BlockHeader {
         return false;
     }
 
+    public void setVersion(byte version) {
+        this.version = version;
+    }
+
     public byte getVersion(){ return version;}
+
+    public void setPreviousHeaderHash(byte[] previousHeaderHash) {
+        this.previousHeaderHash = previousHeaderHash;
+    }
+
     public byte[] getPreviousHeaderHash() {
         return previousHeaderHash;
+    }
+
+    public void setTimeStamp(byte[] timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public byte[] getTimeStamp() {
         return timeStamp;
     }
+
+    public void setGeneratorPublicKey(byte[] generatorPublicKey) {
+        this.generatorPublicKey = generatorPublicKey;
+    }
+
     public byte[] getGeneratorPublicKey() {
         return generatorPublicKey;
     }
@@ -87,16 +105,6 @@ public class BlockHeader {
        return HashUtil.ripemd160(HashUtil.sha256(this.getEncoded()));
     }
 
-    public byte[] getUnclesEncoded(List<BlockHeader> uncleList) {
-
-        byte[][] unclesEncoded = new byte[uncleList.size()][];
-        int i = 0;
-        for (BlockHeader uncle : uncleList) {
-            unclesEncoded[i] = uncle.getEncoded();
-            ++i;
-        }
-        return RLP.encodeList(unclesEncoded);
-    }
     /*
     * TODO:
      */
