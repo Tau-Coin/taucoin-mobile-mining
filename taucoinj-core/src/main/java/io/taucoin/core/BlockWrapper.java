@@ -1,6 +1,6 @@
 package io.taucoin.core;
 
-import org.ethereum.core.Block;
+import io.taucoin.core.Block;
 import org.ethereum.util.RLP;
 import org.ethereum.util.RLPElement;
 import org.ethereum.util.RLPList;
@@ -79,7 +79,7 @@ public class BlockWrapper {
     }
 
     public byte[] getParentHash() {
-        return block.getParentHash();
+        return block.getPreviousHeaderHash();
     }
 
     public long getReceivedAt() {

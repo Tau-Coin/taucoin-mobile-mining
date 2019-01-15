@@ -4,7 +4,7 @@ import org.ethereum.crypto.HashUtil;
 import org.ethereum.crypto.SHA3Helper;
 import org.ethereum.trie.Trie;
 import org.ethereum.trie.TrieImpl;
-import org.ethereum.core.*;
+import io.taucoin.core.BlockHeader;
 import org.ethereum.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +139,30 @@ public class Block {
         return this.option;
     }
 
+    public void setNumber(long number) {
+        this.number = number;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    public void setBaseTarget(BigInteger baseTarget) {
+        this.baseTarget = baseTarget;
+    }
+
+    public BigInteger getBaseTarget() {
+        return baseTarget;
+    }
+
+    public void setCumulativeDifficulty(BigInteger cumulativeDifficulty) {
+        this.cumulativeDifficulty = cumulativeDifficulty;
+    }
+
+    public BigInteger getCumulativeDifficulty() {
+        return cumulativeDifficulty;
+    }
+
     public List<Transaction> getTransactionsList() {
         if (!parsed) parseRLP();
         return transactionsList;
@@ -214,9 +238,10 @@ public class Block {
         return this.header.isGenesis();
     }
 
-//    public boolean isEqual(Block block) {
-//        return Arrays.areEqual(this.getHash(), block.getHash());
-//    }
+    public boolean isEqual(Block block) {
+        return Arrays.areEqual(this.getHash(), block.getHash());
+    }
+
     private byte[] getSigAndOptionEncoded() {
         byte[] blockSig = RLP.encodeElement(this.blockSignature);
         byte[] option = RLP.encodeByte(this.option);
@@ -266,10 +291,10 @@ public class Block {
         return body;
     }
 
-//    public String getShortHash() {
-//        if (!parsed) parseRLP();
-//        return Hex.toHexString(getHash()).substring(0, 6);
-//    }
+    public String getShortHash() {
+        if (!parsed) parseRLP();
+        return Hex.toHexString(getHash()).substring(0, 6);
+    }
 
     public static class Builder {
 
