@@ -43,6 +43,7 @@ public class Block {
     private List<Transaction> transactionsList = new CopyOnWriteArrayList<>();
 
     protected byte[] rlpEncoded;
+    private boolean isMsg = false;
     private boolean parsed = false;
 
     /* Constructors */
@@ -53,6 +54,12 @@ public class Block {
     public Block(byte[] rawData) {
         logger.debug("new from [" + Hex.toHexString(rawData) + "]");
         this.rlpEncoded = rawData;
+    }
+
+    public Block(byte[] rawData, boolean isMsg) {
+        logger.debug("new from net [" + Hex.toHexString(rawData) + "]");
+        this.rlpEncoded = rawData;
+        this.isMsg = isMsg;
     }
 
     public Block(BlockHeader header, byte[] blockSignature,byte option,List<Transaction> transactionsList) {
@@ -92,13 +99,32 @@ public class Block {
         // Parse Header
         RLPList header = (RLPList) block.get(0);
         this.header = new BlockHeader(header);
-        // Parse blockSignature
-        this.blockSignature =  block.get(1).getRLPData();
-        // Parse option
-        this.option = block.get(2).getRLPData()[0];
-        // Parse Transactions
-        RLPList txTransactions = (RLPList) block.get(3);
-        //this.parseTxs(this.header.getTxTrieRoot(), txTransactions);
+        if (isMsg) {
+            byte[] nrBytes = block.get(1).getRLPData();
+            this.number = nrBytes == null ? 0 : (new BigInteger(1, nrBytes)).longValue();
+
+            byte[] btBytes = block.get(2).getRLPData();
+            this.baseTarget = new BigInteger(1, btBytes);
+
+            byte[] cyBytes = block.get(3).getRLPData();
+            this.cumulativeDifficulty = new BigInteger(1, cyBytes);
+
+            // Parse blockSignature
+            this.blockSignature = block.get(4).getRLPData();
+            // Parse option
+            this.option = block.get(5).getRLPData()[0];
+            // Parse Transactions
+            RLPList txTransactions = (RLPList) block.get(6);
+            //this.parseTxs(this.header.getTxTrieRoot(), txTransactions);
+        } else {
+            // Parse blockSignature
+            this.blockSignature = block.get(1).getRLPData();
+            // Parse option
+            this.option = block.get(2).getRLPData()[0];
+            // Parse Transactions
+            RLPList txTransactions = (RLPList) block.get(3);
+            //this.parseTxs(this.header.getTxTrieRoot(), txTransactions);
+        }
 
         this.parsed = true;
     }
@@ -258,7 +284,22 @@ public class Block {
         return RLP.encodeList(transactionsEncoded);
     }
 
+    //encode block on disk
     public byte[] getEncoded() {
+        if (rlpEncoded == null) {
+            byte[] header = this.header.getEncoded();
+
+            List<byte[]> block = getFullBodyElements();
+            block.add(0, header);
+            byte[][] elements = block.toArray(new byte[block.size()][]);
+
+            this.rlpEncoded = RLP.encodeList(elements);
+        }
+        return rlpEncoded;
+    }
+
+    //encode block on net
+    public byte[] getEncodedMsg() {
         if (rlpEncoded == null) {
             byte[] header = this.header.getEncoded();
 
@@ -285,6 +326,25 @@ public class Block {
         byte[] transactions = getTransactionsEncoded();
 
         List<byte[]> body = new ArrayList<>();
+        body.add(sigAndOption);
+        body.add(transactions);
+
+        return body;
+    }
+
+    private List<byte[]> getFullBodyElements() {
+        if (!parsed) parseRLP();
+
+        byte[] number = RLP.encodeBigInteger(BigInteger.valueOf(this.number));
+        byte[] baseTarget = RLP.encodeBigInteger(this.baseTarget);
+        byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty);
+        byte[] sigAndOption = getSigAndOptionEncoded();
+        byte[] transactions = getTransactionsEncoded();
+
+        List<byte[]> body = new ArrayList<>();
+        body.add(number);
+        body.add(baseTarget);
+        body.add(cumulativeDifficulty);
         body.add(sigAndOption);
         body.add(transactions);
 
