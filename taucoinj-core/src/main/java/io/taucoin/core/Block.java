@@ -115,7 +115,8 @@ public class Block {
             this.option = block.get(5).getRLPData()[0];
             // Parse Transactions
             RLPList txTransactions = (RLPList) block.get(6);
-            //this.parseTxs(this.header.getTxTrieRoot(), txTransactions);
+            // here may need original trie
+            this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
         } else {
             // Parse blockSignature
             this.blockSignature = block.get(1).getRLPData();
@@ -123,7 +124,7 @@ public class Block {
             this.option = block.get(2).getRLPData()[0];
             // Parse Transactions
             RLPList txTransactions = (RLPList) block.get(3);
-            //this.parseTxs(this.header.getTxTrieRoot(), txTransactions);
+            this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
         }
 
         this.parsed = true;
@@ -360,14 +361,16 @@ public class Block {
 
         private BlockHeader header;
         private byte[] body;
+        private boolean isPure = true;
 
         public Builder withHeader(BlockHeader header) {
             this.header = header;
             return this;
         }
 
-        public Builder withBody(byte[] body) {
+        public Builder withBody(byte[] body ,boolean ispure) {
             this.body = body;
+            this.isPure = ispure;
             return this;
         }
 
@@ -375,22 +378,25 @@ public class Block {
             if (header == null || body == null) {
                 return null;
             }
-
-            Block block = new Block();
-            block.header = header;
-            block.parsed = true;
-            block.blockSignature = RLP.decode2(body).get(0).getRLPData();
-            block.option = RLP.decode2(body).get(1).getRLPData()[0];
-            RLPList transactions = (RLPList) RLP.decode2(body).get(2);
-            //RLPList transactions = (RLPList) items.get(0);
-
-//            if (!block.parseTxs(header.getTxTrieRoot(), transactions)) {
-//                return null;
-//            }
-            //TODO:decodeRLPList---->List<Transactions>
-            //we avoid trie,because we think block header doesn't have large capacity
-
-            return block;
+            //tempory support simplied pure block 
+            if(isPure){
+                Block block = new Block();
+                block.header = header;
+                block.parsed = true;
+                block.blockSignature = RLP.decode2(body).get(0).getRLPData();
+                block.option = RLP.decode2(body).get(1).getRLPData()[0];
+                RLPList transactions = (RLPList) RLP.decode2(body).get(2);
+                //RLPList transactions = (RLPList) items.get(0);
+                if(transactions.size() == 0){
+                   return null;
+                }
+                block.parseTxs(transactions);
+               //delete txState may be stupid....
+               //we avoid trie,because we think block header doesn't have large capacity
+                return block;
+            }else{
+                return null;
+            }
         }
     }
 }
