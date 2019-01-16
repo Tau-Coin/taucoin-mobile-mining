@@ -99,7 +99,7 @@ public class Block {
         // Parse Header
         RLPList header = (RLPList) block.get(0);
         this.header = new BlockHeader(header);
-        if (isMsg) {
+        if (!isMsg) {
             byte[] nrBytes = block.get(1).getRLPData();
             this.number = nrBytes == null ? 0 : (new BigInteger(1, nrBytes)).longValue();
 
@@ -154,6 +154,11 @@ public class Block {
     public byte getVersion() {
         if (!parsed) parseRLP();
         return this.header.getVersion();
+    }
+
+    public byte[] getGeneratorPublicKey() {
+        if (!parsed) parseRLP();
+        return this.header.getGeneratorPublicKey();
     }
 
     public byte[] getblockSignature(){
