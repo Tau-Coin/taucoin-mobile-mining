@@ -1,10 +1,10 @@
 package io.taucoin.sync;
 
-import org.ethereum.core.Block;
-import org.ethereum.core.BlockHeader;
-import org.ethereum.core.BlockWrapper;
-import org.ethereum.core.Blockchain;
-import org.ethereum.core.BlockchainImpl;
+import io.taucoin.core.Block;
+import io.taucoin.core.BlockHeader;
+import io.taucoin.core.BlockWrapper;
+import io.taucoin.core.Blockchain;
+import io.taucoin.core.BlockchainImpl;
 import org.ethereum.core.ImportResult;
 import org.ethereum.datasource.mapdb.MapDBFactory;
 import org.ethereum.datasource.mapdb.MapDBFactoryImpl;

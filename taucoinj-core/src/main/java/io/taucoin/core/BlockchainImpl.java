@@ -1,10 +1,10 @@
 package io.taucoin.core;
 
 import org.ethereum.config.SystemProperties;
-import org.ethereum.core.Block;
-import org.ethereum.core.BlockHeader;
+import io.taucoin.core.Block;
+import io.taucoin.core.BlockHeader;
+import io.taucoin.core.Blockchain;
 import org.ethereum.core.BlockIdentifier;
-import org.ethereum.core.Blockchain;
 import org.ethereum.core.Bloom;
 import org.ethereum.core.Chain;
 import org.ethereum.core.ImportResult;
@@ -16,14 +16,14 @@ import org.ethereum.core.TransactionExecutor;
 import org.ethereum.core.TransactionReceipt;
 import org.ethereum.core.Wallet;
 import org.ethereum.crypto.HashUtil;
-import org.ethereum.db.BlockStore;
+import io.taucoin.db.BlockStore;
 import org.ethereum.listener.EthereumListener;
 import org.ethereum.manager.AdminInfo;
 import org.ethereum.trie.Trie;
 import org.ethereum.trie.TrieImpl;
 import org.ethereum.util.AdvancedDeviceUtils;
 import org.ethereum.util.RLP;
-import org.ethereum.validator.DependentBlockHeaderRule;
+import io.taucoin.validator.DependentBlockHeaderRule;
 import org.ethereum.vm.program.invoke.ProgramInvokeFactory;
 import org.ethereum.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.slf4j.Logger;
@@ -218,57 +218,74 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 
     public ImportResult tryConnectAndFork(Block block) {
 
-        Repository savedRepo = this.repository;
-        Block savedBest = this.bestBlock;
-        BigInteger savedTD = this.totalDifficulty;
+        //TODO::try to roll back
+        return IMPORTED_NOT_BEST;
 
-        this.bestBlock = blockStore.getBlockByHash(block.getParentHash());
-        totalDifficulty = blockStore.getTotalDifficultyForHash(block.getParentHash());
-        this.repository = this.repository.getSnapshotTo(this.bestBlock.getStateRoot());
-        this.fork = true;
-
-        try {
-
-            // FIXME: adding block with no option for flush
-            add(block);
-        } catch (Throwable th) {
-            logger.error("Unexpected error: ", th);
-        } finally {this.fork = false;}
-
-        if (isMoreThan(this.totalDifficulty, savedTD)) {
-
-            logger.info("Rebranching: {} ~> {}", savedBest.getShortHash(), block.getShortHash());
-
-            // main branch become this branch
-            // cause we proved that total difficulty
-            // is greateer
-            blockStore.reBranch(block);
-
-            // The main repository rebranch
-            this.repository = savedRepo;
-            this.repository.syncToRoot(block.getStateRoot());
-
-            // flushing
-            if (!byTest){
-                repository.flush();
-                blockStore.flush();
-                System.gc();
-            }
-
-            return IMPORTED_BEST;
-        } else {
-
-            // Stay on previous branch
-            this.repository = savedRepo;
-            this.bestBlock = savedBest;
-            this.totalDifficulty = savedTD;
-
-            return IMPORTED_NOT_BEST;
-        }
+//        Repository savedRepo = this.repository;
+//        Block savedBest = this.bestBlock;
+//        BigInteger savedTD = this.totalDifficulty;
+//
+//        this.bestBlock = blockStore.getBlockByHash(block.getPreviousHeaderHash());
+//        totalDifficulty = blockStore.getTotalDifficultyForHash(block.getPreviousHeaderHash());
+//        this.repository = this.repository.getSnapshotTo(this.bestBlock.getStateRoot());
+//        this.fork = true;
+//
+//        try {
+//
+//            // FIXME: adding block with no option for flush
+//            add(block);
+//        } catch (Throwable th) {
+//            logger.error("Unexpected error: ", th);
+//        } finally {this.fork = false;}
+//
+//        if (isMoreThan(this.totalDifficulty, savedTD)) {
+//
+//            logger.info("Rebranching: {} ~> {}", savedBest.getShortHash(), block.getShortHash());
+//
+//            // main branch become this branch
+//            // cause we proved that total difficulty
+//            // is greateer
+//            blockStore.reBranch(block);
+//
+//            // The main repository rebranch
+//            this.repository = savedRepo;
+//            this.repository.syncToRoot(block.getStateRoot());
+//
+//            // flushing
+//            if (!byTest){
+//                repository.flush();
+//                blockStore.flush();
+//                System.gc();
+//            }
+//
+//            return IMPORTED_BEST;
+//        } else {
+//
+//            // Stay on previous branch
+//            this.repository = savedRepo;
+//            this.bestBlock = savedBest;
+//            this.totalDifficulty = savedTD;
+//
+//            return IMPORTED_NOT_BEST;
+//        }
     }
 
 
     public ImportResult tryToConnect(Block block) {
+
+        //wrap the block
+        Block preBlock = blockStore.getBlockByHash(block.getPreviousHeaderHash());
+        if (preBlock == null)
+            return NO_PARENT;
+        if (block.isMsg()) {
+            block.setNumber(preBlock.getNumber() + 1);
+            BigInteger baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(block, blockStore);
+            block.setBaseTarget(baseTarget);
+            BigInteger lastCumulativeDifficulty = preBlock.getCumulativeDifficulty();
+            BigInteger cumulativeDifficulty = ProofOfTransaction.
+                    calculateCumulativeDifficulty(lastCumulativeDifficulty, baseTarget);
+            block.setCumulativeDifficulty(cumulativeDifficulty);
+        }
 
         if (logger.isInfoEnabled())
             logger.info("Try connect block hash: {}, number: {}",
@@ -298,7 +315,7 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             return IMPORTED_BEST;
         } else {
 
-            if (blockStore.isBlockExist(block.getParentHash())) {
+            if (blockStore.isBlockExist(block.getPreviousHeaderHash())) {
                 recordBlock(block);
                 ImportResult result = tryConnectAndFork(block);
 
@@ -333,22 +350,13 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 
         // keep chain continuity
         if (!Arrays.equals(getBestBlock().getHash(),
-                block.getParentHash())) return;
+                block.getPreviousHeaderHash())) return;
 
         if (block.getNumber() >= CONFIG.traceStartBlock() && CONFIG.traceStartBlock() != -1) {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
         }
 
         List<TransactionReceipt> receipts = processBlock(block);
-
-        // Sanity checks
-        String receiptHash = Hex.toHexString(block.getReceiptsRoot());
-        String receiptListHash = Hex.toHexString(calcReceiptsTrie(receipts));
-
-        if (!receiptHash.equals(receiptListHash)) {
-            logger.error("Block's given Receipt Hash doesn't match: {} != {}", receiptHash, receiptListHash);
-            //return false;
-        }
 
         track.commit();
         storeBlock(block, receipts);
@@ -410,7 +418,7 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 
     public Block getParent(BlockHeader header) {
 
-        return blockStore.getBlockByHash(header.getParentHash());
+        return blockStore.getBlockByHash(header.getPreviousHeaderHash());
     }
 
 
@@ -444,16 +452,6 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             isValid = isValid(block.getHeader());
 
             // Sanity checks
-            String trieHash = Hex.toHexString(block.getTxTrieRoot());
-            String trieListHash = Hex.toHexString(calcTxTrie(block.getTransactionsList()));
-
-
-            if( !trieHash.equals(trieListHash) ) {
-              logger.error("Block's given Trie Hash doesn't match: {} != {}", trieHash, trieListHash);
-
-              //   FIXME: temporary comment out tx.trie validation
-//              return false;
-            }
         }
 
         return isValid;
@@ -516,7 +514,6 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             receipts.add(receipt);
         }
 
-        addReward(block);
         updateTotalDifficulty(block);
 
         track.commit();
@@ -536,23 +533,11 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
         return receipts;
     }
 
-    /**
-     * Add reward to block- and every uncle coinbase
-     * assuming the entire block is valid.
-     *
-     * @param block object containing the header and uncles
-     */
-    private void addReward(Block block) {
-
-        // Add standard block reward
-        BigInteger totalBlockReward = Block.BLOCK_REWARD;
-        track.addBalance(block.getCoinbase(), totalBlockReward);
-    }
-
     @Override
     public void storeBlock(Block block, List<TransactionReceipt> receipts) {
 
         /* Debug check to see if the state is still as expected */
+        /*
         String blockStateRootHash = Hex.toHexString(block.getStateRoot());
         String worldStateRootHash = Hex.toHexString(repository.getRoot());
 
@@ -570,7 +555,7 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 //                repository.syncToRoot(parentBlock.getStateRoot());
 //                return false;
             }
-
+        */
         if (fork)
             blockStore.saveBlock(block, totalDifficulty, false);
         else
@@ -624,7 +609,8 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
 
     @Override
     public void updateTotalDifficulty(Block block) {
-        totalDifficulty = totalDifficulty.add(block.getDifficultyBI());
+//        totalDifficulty = totalDifficulty.add(block.getDifficultyBI());
+        totalDifficulty = block.getCumulativeDifficulty();
         logger.info("TD: updated to {}" , totalDifficulty);
     }
 
