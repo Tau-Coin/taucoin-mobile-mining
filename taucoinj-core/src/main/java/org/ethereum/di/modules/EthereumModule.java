@@ -283,10 +283,6 @@ public class EthereumModule {
                 new DifficultyRule()
         ));
 
-        if (!CONFIG.isFrontier()) {
-            rules.add(new ParentGasLimitRule());
-        }
-
         return new ParentBlockHeaderValidator(rules);
     }
 }

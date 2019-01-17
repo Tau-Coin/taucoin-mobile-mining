@@ -130,6 +130,10 @@ public class Block {
         this.parsed = true;
     }
 
+    public boolean isMsg() {
+        return isMsg;
+    }
+
     public BlockHeader getHeader() {
         if (!parsed) parseRLP();
         return this.header;

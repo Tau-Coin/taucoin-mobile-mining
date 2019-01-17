@@ -1,7 +1,7 @@
 package io.taucoin.core;
 
-import org.ethereum.core.Block;
-import org.ethereum.core.BlockHeader;
+import io.taucoin.core.Block;
+import io.taucoin.core.BlockHeader;
 import org.ethereum.core.BlockIdentifier;
 import org.ethereum.core.Chain;
 import org.ethereum.core.Genesis;
