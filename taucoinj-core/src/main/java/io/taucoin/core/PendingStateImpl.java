@@ -14,10 +14,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import static java.math.BigInteger.ZERO;
+import org.apache.commons.collections4.map.LRUMap;
 import static org.ethereum.config.SystemProperties.CONFIG;
 import static org.ethereum.util.BIUtil.toBI;
+import org.ethereum.db.ByteArrayWrapper;
 
 /**
  * Keeps logic providing pending state management
@@ -30,12 +33,16 @@ public class PendingStateImpl implements PendingState {
 
     private static final Logger logger = LoggerFactory.getLogger("state");
 
-//    private EthereumListener listener;
+    // Private EthereumListener listener;
     private Repository repository;
     private Blockchain blockchain;
 
     @Resource
     private final List<Transaction> wireTransactions = new ArrayList<>();
+
+    // To filter out the transactions we have already processed
+    // transactions could be sent by peers even if they were already included into blocks
+    private final Map<ByteArrayWrapper, Object> redceivedTxs = new LRUMap<>(500000);
 
     @Resource
     private final List<Transaction> pendingStateTransactions = new ArrayList<>();
@@ -45,7 +52,7 @@ public class PendingStateImpl implements PendingState {
     public PendingStateImpl() {
     }
 
-	//constructor
+    //constructor
     //public PendingStateImpl(EthereumListener listener, Repository repository) {
     @Inject
     public PendingStateImpl(Repository repository) {
@@ -61,7 +68,7 @@ public class PendingStateImpl implements PendingState {
         return pendingState;
     }
 
-	// Return Transaction Received From Network
+    // Return Transaction Received From Network
     public List<Transaction> getWireTransactions() {
 
         List<Transaction> txs = new ArrayList<>();
@@ -73,33 +80,88 @@ public class PendingStateImpl implements PendingState {
         return txs;
     }
 
-    @Override
-    public void addWireTransactions(Set<Transaction> transactions) {
-
-        if (transactions.isEmpty()) return;
-
-        logger.info("Wire transaction list added: size: [{}]", transactions.size());
-
-        //listener.onPendingTransactionsReceived(transactions);
-
-        for (Transaction tx : transactions) {
-            if (isValid(tx)) wireTransactions.add(tx);
+    private boolean addNewTxIfNotExist(Transaction tx) {
+        ByteArrayWrapper hash = new ByteArrayWrapper(tx.getHash());
+        synchronized (redceivedTxs) {
+            if (!redceivedTxs.containsKey(hash)) {
+                redceivedTxs.put(hash, null);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-	/*
-	 * Validation Of Transaction.
-	 * Nonce in ETH, Time In TAU.
-	*/
+    @Override
+    public void addWireTransactions(Set<Transaction> transactions) {
+
+        final List<Transaction> newTxs = new ArrayList<>();
+        int unknownTx = 0;
+
+        if (transactions.isEmpty()) return;
+
+        for (Transaction tx : transactions) {
+
+            if (addNewTxIfNotExist(tx)) {
+                unknownTx++;
+                if (isValid(tx)) {
+                    newTxs.add(tx);
+                } else {
+                    logger.info("Non valid TX: " + tx);
+                }
+            }
+        }
+
+        // tight synchronization here since a lot of duplicate transactions can arrive from many peers
+        // and isValid(tx) call is very expensive
+        synchronized (this) {
+            wireTransactions.addAll(newTxs);
+        }
+
+        /*
+        if (!newTxs.isEmpty()) {
+            EventDispatchThread.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onPendingTransactionsReceived(newTxs);
+                    listener.onPendingStateChanged(PendingStateImpl.this);
+                }
+            });
+        }
+*/
+
+        logger.info("Wire transaction list added: {} new, {} valid of received {}, #of known txs: {}", unknownTx, newTxs.size(), transactions.size(), redceivedTxs.size());
+    }
+
+    /*
+     * Validation Of Transaction.
+     * Nonce in ETH, Time In TAU.
+     * 1. Transaction data structure
+     * 2. Check in time
+     * 3. Signature
+     * 4. Balance
+    */
     private boolean isValid(Transaction tx) {
 
-        BigInteger txTime = toBI(tx.getTime());
+        try {
+            tx.verify();
+        } catch (Exception e) {
+            if (logger.isWarnEnabled())
+                logger.warn("Invalid transaction: %s", e.getMessage());
+			return false;
+        }
 
-		// Current Time
-        BigInteger nowTime = toBI(tx.getTime());
+        try {
+            tx.checkTime();
+        } catch (Exception e) {
+            if (logger.isWarnEnabled())
+                logger.warn("Invalid transaction: %s", e.getMessage());
+			return false;
+        }
+        
+        TransactionExecutor executor = new TransactionExecutor(tx, pendingState);
+        executor.init();
 
-		// nowTime- txTime< 12 hours
-		
         return true;
     }
 
@@ -125,8 +187,8 @@ public class PendingStateImpl implements PendingState {
         updateState();
     }
 
-	//Block Number -> Time
-	/*
+    //Block Number -> Time
+    /*
     private void clearOutdated(final long blockNumber) {
         List<Transaction> outdated = new ArrayList<>();
 
@@ -148,7 +210,7 @@ public class PendingStateImpl implements PendingState {
 
         wireTransactions.removeAll(outdated);
     }
-	*/
+    */
     private void clearWire(List<Transaction> txs) {
         for (Transaction tx : txs) {
             if (logger.isInfoEnabled() && wireTransactions.contains(tx))
@@ -177,11 +239,11 @@ public class PendingStateImpl implements PendingState {
         }
     }
 
-	/*
-	 * Transaction execution, which can be seen in transactionExecutor.java
-	 * 1. validation of sender's balance
-	 * 2. update of receiver and miner's balance
-	*/
+    /*
+     * Transaction execution, which can be seen in transactionExecutor.java
+     * 1. validation of sender's balance
+     * 2. update of receiver and miner's balance
+    */
     private void executeTx(Transaction tx) {
 
         logger.info("Apply pending state tx: {}", Hex.toHexString(tx.getHash()));
@@ -189,10 +251,10 @@ public class PendingStateImpl implements PendingState {
         //Block best = blockchain.getBestBlock();
 
         /* ********* Need getCoinbase method, block wrapper's address *******
-		 * TransactionExecutor executor = new TransactionExecutor(tx, best.getCoinbase(), pendingState);
+         * TransactionExecutor executor = new TransactionExecutor(tx, best.getCoinbase(), pendingState);
          * executor.init();
          * executor.execute();
-		*/
+        */
     }
 
     public void setBlockchain(Blockchain blockchain) {

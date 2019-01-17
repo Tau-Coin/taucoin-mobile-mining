@@ -62,6 +62,9 @@ public class Transaction {
     
     private byte[] hash;
 
+    public static final int HASH_LENGTH = 32;
+    public static final int ADDRESS_LENGTH = 20;
+
     /* Tx in encoded form */
     protected byte[] rlpEncoded;
     private byte[] rlpRaw;
@@ -108,6 +111,16 @@ public class Transaction {
         return fee;
     }
 
+    public synchronized void verify() {
+        rlpParse();
+        validate();
+    }  
+
+    //NowTime - TransactionTime < 1440s;
+    public synchronized void checkTime() {
+        //get current unix time
+    }  
+
     public void rlpParse() {
 
         RLPList decodedTxList = RLP.decode2(rlpEncoded);
@@ -132,6 +145,20 @@ public class Transaction {
         this.hash = getHash();
     }
 
+    private void validate() {
+        if (toAddress != null && toAddress.length != 0 && toAddress.length != ADDRESS_LENGTH)
+            throw new RuntimeException("Received address is not valid");
+
+        if (getSignature() != null) {
+            if (BigIntegers.asUnsignedByteArray(signature.r).length > HASH_LENGTH)
+                throw new RuntimeException("Signature R is not valid");
+            if (BigIntegers.asUnsignedByteArray(signature.s).length > HASH_LENGTH)
+                throw new RuntimeException("Signature S is not valid");
+            if (getSender() != null && getSender().length != ADDRESS_LENGTH)
+                throw new RuntimeException("Sender is not valid");
+        }
+    }
+
     public boolean isParsed() {
         return parsed;
     }
@@ -148,7 +175,6 @@ public class Transaction {
         byte[] plainMsg = this.getEncodedRaw();
         return HashUtil.sha3(plainMsg);
     }
-
 
     public byte[] getTime() {
         if (!parsed) rlpParse();
