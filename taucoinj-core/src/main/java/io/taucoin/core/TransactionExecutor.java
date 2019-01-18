@@ -40,9 +40,8 @@ public class TransactionExecutor {
     boolean localCall = false;
 
     //constructor
-    public TransactionExecutor(Transaction tx, byte[] coinbase, Repository track) {
+    public TransactionExecutor(Transaction tx, Repository track) {
         this.tx= tx;
-        this.coinbase= coinbase;
         this.track= track;
     }
 
@@ -98,6 +97,10 @@ public class TransactionExecutor {
      */
     public void execute() {
         if (!readyToExecute) return;
+
+		// Sender subtract balance
+        BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
+        track.addBalance(tx.getSender(), totalCost.negate());
 
 		// Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
