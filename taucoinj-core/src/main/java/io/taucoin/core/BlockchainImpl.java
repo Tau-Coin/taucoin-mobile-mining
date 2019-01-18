@@ -482,36 +482,16 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
         for (Transaction tx : block.getTransactionsList()) {
             stateLogger.info("apply block: [{}] tx: [{}] ", block.getNumber(), i);
 
-            TransactionExecutor executor = new TransactionExecutor(tx, block.getCoinbase(),
+            TransactionExecutor executor = new TransactionExecutor(tx, HashUtil.ripemd160(block.getGeneratorPublicKey()),
                     track, blockStore,
                     programInvokeFactory, block, listener, totalGasUsed);
 
             executor.init();
             executor.execute();
-            executor.go();
-            executor.finalization();
 
             totalGasUsed += executor.getGasUsed();
 
             track.commit();
-            TransactionReceipt receipt = new TransactionReceipt();
-            receipt.setCumulativeGas(totalGasUsed);
-            receipt.setPostTxState(repository.getRoot());
-            receipt.setTransaction(tx);
-            receipt.setLogInfoList(executor.getVMLogs());
-
-            stateLogger.info("block: [{}] executed tx: [{}] \n  state: [{}]", block.getNumber(), i,
-                    Hex.toHexString(repository.getRoot()));
-
-            stateLogger.info("[{}] ", receipt.toString());
-
-            if (stateLogger.isInfoEnabled())
-                stateLogger.info("tx[{}].receipt: [{}] ", i, Hex.toHexString(receipt.getEncoded()));
-
-            if (block.getNumber() >= CONFIG.traceStartBlock())
-                repository.dumpState(block, totalGasUsed, i++, tx.getHash());
-
-            receipts.add(receipt);
         }
 
         updateTotalDifficulty(block);
