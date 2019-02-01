@@ -15,9 +15,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import static org.ethereum.crypto.HashUtil.EMPTY_DATA_HASH;
-import static org.ethereum.crypto.HashUtil.EMPTY_TRIE_HASH;
-import static org.ethereum.crypto.SHA3Helper.sha3;
+import static io.taucoin.crypto.HashUtil.EMPTY_DATA_HASH;
+import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
+import static io.taucoin.crypto.SHA3Helper.sha3;
 import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static io.taucoin.util.ByteUtil.wrap;
 

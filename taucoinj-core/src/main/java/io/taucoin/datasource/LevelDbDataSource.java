@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.lang.System.getProperty;
-import static org.ethereum.config.SystemProperties.CONFIG;
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
 /**

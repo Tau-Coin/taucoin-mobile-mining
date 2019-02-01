@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 //import io.taucoin.core.Block;
 import io.taucoin.core.NetworkParameters;
 //import io.taucoin.core.StoredBlock;
-//import org.ethereum.core.Transaction;
-//import org.ethereum.core.Util;
-//import org.ethereum.util.MonetaryFormat;
+//import io.taucoin.core.Transaction;
+//import io.taucoin.core.Util;
+//import io.taucoin.util.MonetaryFormat;
 //import io.taucoin.core.VerificationException;
-//import org.ethereum.store.BlockStore;
-//import org.ethereum.store.BlockStoreException;
+//import io.taucoin.store.BlockStore;
+//import io.taucoin.store.BlockStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

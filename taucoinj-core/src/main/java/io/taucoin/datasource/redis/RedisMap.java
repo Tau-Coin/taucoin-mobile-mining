@@ -8,8 +8,8 @@ import redis.clients.jedis.JedisPool;
 import java.util.*;
 
 import static org.apache.commons.collections4.CollectionUtils.collect;
-import static org.ethereum.util.Functional.Consumer;
-import static org.ethereum.util.Functional.Function;
+import static io.taucoin.util.Functional.Consumer;
+import static io.taucoin.util.Functional.Function;
 
 public class RedisMap<K, V> extends RedisStorage<V> implements Map<K, V> {
 

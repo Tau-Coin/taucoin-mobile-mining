@@ -3,8 +3,7 @@ package io.taucoin.datasource.redis;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.ethereum.core.*;
-import org.ethereum.db.ContractDetailsImpl;
+import io.taucoin.core.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,25 +57,6 @@ public final class Serializers {
         }
     }
 
-    private static class TransactionReceiptSerializer extends BaseRedisSerializer<TransactionReceipt> {
-
-        @Override
-        public boolean supports(Class<?> aClass) {
-            return TransactionReceipt.class.isAssignableFrom(aClass);
-        }
-
-
-        @Override
-        public byte[] serialize(TransactionReceipt transactionReceipt) {
-            return (transactionReceipt == null) ? EMPTY_ARRAY : transactionReceipt.getEncoded();
-        }
-
-        @Override
-        public TransactionReceipt deserialize(byte[] bytes) {
-            return isEmpty(bytes) ? null : new TransactionReceipt(bytes);
-        }
-    }
-
     private static class TransactionSerializer extends BaseRedisSerializer<Transaction> {
 
         @Override
@@ -92,24 +72,6 @@ public final class Serializers {
         @Override
         public Transaction deserialize(byte[] bytes) {
             return isEmpty(bytes) ? null : new Transaction(bytes);
-        }
-    }
-
-    private static class PendingTransactionSerializer extends BaseRedisSerializer<PendingTransaction> {
-
-        @Override
-        public boolean supports(Class<?> aClass) {
-            return PendingTransaction.class.isAssignableFrom(aClass);
-        }
-
-        @Override
-        public byte[] serialize(PendingTransaction transaction) {
-            return (transaction == null) ? EMPTY_ARRAY : transaction.getBytes();
-        }
-
-        @Override
-        public PendingTransaction deserialize(byte[] bytes) {
-            return isEmpty(bytes) ? null : new PendingTransaction(bytes);
         }
     }
 
@@ -149,33 +111,11 @@ public final class Serializers {
         }
     }
 
-    private static class ContractDetailsSerializer extends BaseRedisSerializer<ContractDetailsImpl> {
-
-        @Override
-        public boolean supports(Class<?> aClass) {
-            return ContractDetailsImpl.class.isAssignableFrom(aClass);
-        }
-
-        @Override
-        public byte[] serialize(ContractDetailsImpl contractDetails) {
-            return (contractDetails == null) ? EMPTY_ARRAY : contractDetails.getEncoded();
-        }
-
-        @Override
-        public ContractDetailsImpl deserialize(byte[] bytes) {
-            return isEmpty(bytes) ? null : new ContractDetailsImpl(bytes);
-        }
-    }
-
-
     private static final byte[] EMPTY_ARRAY = new byte[0];
     private static final Set<? extends BaseRedisSerializer> SERIALIZERS = new HashSet<BaseRedisSerializer>() {{
         add(new TransactionSerializer());
-        add(new PendingTransactionSerializer());
-        add(new TransactionReceiptSerializer());
         add(new AccountStateSerializer());
         add(new BlockSerializer());
-        add(new ContractDetailsSerializer());
     }};
 
     public static <T> RedisSerializer<T> forClass(Class<T> clazz) {

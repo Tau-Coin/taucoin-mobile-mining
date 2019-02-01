@@ -1,8 +1,9 @@
 package io.taucoin.core;
 
-import org.ethereum.crypto.ECKey;
-import io.taucoin.core.Repository;
-import org.ethereum.util.Utils;
+import io.taucoin.crypto.ECKey;
+import io.taucoin.util.Utils;
+
+import javax.inject.Inject;
 
 import java.math.BigInteger;
 
@@ -11,7 +12,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
 
 /**
  * Representation of an actual account or contract
@@ -23,12 +23,11 @@ public class Account {
 
     private Set<Transaction> pendingTransactions =
             Collections.synchronizedSet(new HashSet<Transaction>());
-
+    @Inject
     Repository repository;
 
-    @Inject
-    public Account(Repository repository) {
-        this.repository = repository;
+
+    public Account() {
     }
 
     public void init() {

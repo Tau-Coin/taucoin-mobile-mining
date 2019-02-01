@@ -1,12 +1,5 @@
 package io.taucoin.core;
 
-import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
-import org.ethereum.core.BlockIdentifier;
-import org.ethereum.core.Chain;
-import org.ethereum.core.Genesis;
-import org.ethereum.core.ImportResult;
-import org.ethereum.core.TransactionReceipt;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -17,11 +10,11 @@ public interface Blockchain {
 
     public long getSize();
 
-    public void add(Block block);
+    public boolean add(Block block);
 
     public ImportResult tryToConnect(Block block);
 
-    public void storeBlock(Block block, List<TransactionReceipt> receipts);
+    public void storeBlock(Block block);
 
     public Block getBlockByNumber(long blockNr);
 
@@ -45,8 +38,6 @@ public interface Blockchain {
 
     public List<byte[]> getListOfHashesStartFromBlock(long blockNumber, int qty);
 
-    TransactionReceipt getTransactionReceiptByHash(byte[] hash);
-
     public Block getBlockByHash(byte[] hash);
 
     public List<Chain> getAltChains();
@@ -60,4 +51,9 @@ public interface Blockchain {
     List<BlockHeader> getListOfHeadersStartFrom(BlockIdentifier identifier, int skip, int limit, boolean reverse);
 
     List<byte[]> getListOfBodiesByHashes(List<byte[]> hashes);
+
+    Transaction getTransactionByHash(byte[] hash);
+
+    Block createNewBlock(Block parent, BigInteger baseTarget, BigInteger generationSignature,
+                         BigInteger cumulativeDifficulty, List<Transaction> transactions);
 }

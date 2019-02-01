@@ -1,15 +1,15 @@
 package io.taucoin.core;
 
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPList;
-import org.ethereum.util.ByteUtil;
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPList;
+import io.taucoin.util.ByteUtil;
 
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import static org.ethereum.crypto.HashUtil.*;
+import static io.taucoin.crypto.HashUtil.*;
 
 public class TransactionInfo implements Serializable {
    

@@ -1,10 +1,9 @@
 package io.taucoin.net.tau.message;
 
 import io.taucoin.core.Block;
-import org.ethereum.net.eth.message.EthMessage;
-import org.ethereum.net.eth.message.EthMessageCodes;
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPList;
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPList;
+
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -12,9 +11,9 @@ import java.math.BigInteger;
 /**
  * Wrapper around an Ethereum Blocks message on the network
  *
- * @see EthMessageCodes#NEW_BLOCK
+ * @see TauMessageCodes#NEW_BLOCK
  */
-public class NewBlockMessage extends EthMessage {
+public class NewBlockMessage extends TauMessage {
 
     private Block block;
     private byte[] difficulty;
@@ -52,13 +51,13 @@ public class NewBlockMessage extends EthMessage {
         return block;
     }
 
-    public byte[] getDifficulty() {
+    public byte[] getCumulativeDifficulty() {
         if (!parsed) parse();
         return difficulty;
     }
 
     public BigInteger getDifficultyAsBigInt() {
-        return new BigInteger(difficulty);
+        return new BigInteger(1, difficulty);
     }
 
     @Override
@@ -67,8 +66,8 @@ public class NewBlockMessage extends EthMessage {
     }
 
     @Override
-    public EthMessageCodes getCommand() {
-        return EthMessageCodes.NEW_BLOCK;
+    public TauMessageCodes getCommand() {
+        return TauMessageCodes.NEW_BLOCK;
     }
 
     @Override
@@ -79,8 +78,8 @@ public class NewBlockMessage extends EthMessage {
     public String toString() {
         if (!parsed) parse();
 
-        String hash = this.getBlock().getShortHash();
+//        String hash = this.getBlock().getShortHash();
         long number = this.getBlock().getNumber();
-        return "NEW_BLOCK [ number: " + number + " hash:" + hash + " difficulty: " + Hex.toHexString(difficulty) + " ]";
+        return "NEW_BLOCK [ number: " + number + " hash:" + /*hash +*/ " difficulty: " + Hex.toHexString(difficulty) + " ]";
     }
 }

@@ -2,8 +2,8 @@ package io.taucoin.db;
 
 import io.taucoin.core.BlockHeader;
 import io.taucoin.core.BlockWrapper;
-import org.ethereum.datasource.mapdb.MapDBFactory;
-import org.ethereum.datasource.mapdb.Serializers;
+import io.taucoin.datasource.mapdb.MapDBFactory;
+import io.taucoin.datasource.mapdb.Serializers;
 import org.mapdb.DB;
 import org.mapdb.Serializer;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.ethereum.config.SystemProperties.CONFIG;
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 /**
  * @author Mikhail Kalinin
@@ -143,6 +143,47 @@ public class BlockQueueImpl implements BlockQueue {
     }
 
     @Override
+    public void addOrReplace(BlockWrapper block) {
+        awaitInit();
+        synchronized (writeMutex) {
+
+            if (!index.contains(block.getNumber())) {
+                addInner(block);
+            } else {
+                replaceInner(block);
+            }
+        }
+        db.commit();
+    }
+
+    private void replaceInner(BlockWrapper block) {
+
+        BlockWrapper old = blocks.get(block.getNumber());
+
+        if (block.equals(old)) return;
+
+        if (old != null) {
+            hashes.remove(new ByteArrayWrapper(old.getHash()));
+        }
+
+        blocks.put(block.getNumber(), block);
+        hashes.add(new ByteArrayWrapper(block.getHash()));
+    }
+
+    private void addInner(BlockWrapper block) {
+        blocks.put(block.getNumber(), block);
+        hashes.add(new ByteArrayWrapper(block.getHash()));
+
+        takeLock.lock();
+        try {
+            index.add(block.getNumber());
+            notEmpty.signalAll();
+        } finally {
+            takeLock.unlock();
+        }
+    }
+
+    @Override
     public BlockWrapper poll() {
         awaitInit();
         BlockWrapper block = pollInner();
@@ -254,7 +295,10 @@ public class BlockQueueImpl implements BlockQueue {
     public boolean isBlockExist(byte[] hash) {
         return hashes.contains(new ByteArrayWrapper(hash));
     }
+    @Override
+    public void drop(byte[] nodeId, int scanLimit){
 
+    }
     private void awaitInit() {
         initLock.lock();
         try {

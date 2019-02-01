@@ -1,6 +1,6 @@
 package io.taucoin.db;
 
-import org.ethereum.util.FastByteComparisons;
+import io.taucoin.util.FastByteComparisons;
 
 import org.spongycastle.util.encoders.Hex;
 

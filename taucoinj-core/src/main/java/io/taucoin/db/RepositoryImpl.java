@@ -6,18 +6,19 @@ import io.taucoin.core.AccountState;
 import io.taucoin.core.Block;
 import io.taucoin.core.Repository;
 import io.taucoin.datasource.KeyValueDataSource;
-import org.ethereum.json.EtherObjectMapper;
-import org.ethereum.json.JSONHelper;
+import io.taucoin.json.EtherObjectMapper;
+import io.taucoin.json.JSONHelper;
 import io.taucoin.trie.SecureTrie;
 import io.taucoin.trie.Trie;
 import io.taucoin.trie.TrieImpl;
-import org.ethereum.util.Functional;
+import io.taucoin.util.Functional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,10 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
-import static org.ethereum.config.SystemProperties.CONFIG;
-import static org.ethereum.crypto.HashUtil.EMPTY_DATA_HASH;
-import static org.ethereum.crypto.HashUtil.EMPTY_TRIE_HASH;
-import static org.ethereum.crypto.SHA3Helper.sha3;
+import static io.taucoin.config.SystemProperties.CONFIG;
+import static io.taucoin.crypto.HashUtil.EMPTY_DATA_HASH;
+import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
+import static io.taucoin.crypto.SHA3Helper.sha3;
 import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static io.taucoin.util.ByteUtil.wrap;
 
@@ -41,7 +42,7 @@ import static io.taucoin.util.ByteUtil.wrap;
  * @author taucoin core
  * @since 01.07.2019
  */
-public class RepositoryImpl implements Repository , io.taucoin.facade.Repository{
+public class RepositoryImpl implements io.taucoin.facade.Repository{
 
     public final static String STATE_DB = "state";
 
@@ -204,12 +205,12 @@ public class RepositoryImpl implements Repository , io.taucoin.facade.Repository
     public void dumpState(Block block, long trFee, int txNumber, byte[] txHash) {
         dumpTrie(block);
         //TODO: getNumber() needed
-        if (!(CONFIG.dumpFull() /*CONFIG.dumpBlock() == block.getNumber()*/))
+        if (!(CONFIG.dumpFull() ||CONFIG.dumpBlock() == block.getNumber() ))
             return;
 
         // todo: dump block header and the relevant tx
 
-        if (txNumber == 0)
+        if (block.getNumber()==0 && txNumber == 0)
             if (CONFIG.dumpCleanOnRestart()) {
                 try{
                 	FileUtils.forceDelete(new File(CONFIG.dumpDir()));
@@ -223,10 +224,10 @@ public class RepositoryImpl implements Repository , io.taucoin.facade.Repository
         String fileName = "";
         if (txHash != null)
             // here block height is needed
-            fileName = String.format("%07d_%d_%s.dmp",/*block.getNumber()*/0, txNumber,
+            fileName = String.format("%07d_%d_%s.dmp",block.getNumber(), txNumber,
                     Hex.toHexString(txHash).substring(0, 8));
         else {
-            fileName = String.format("%07d_c.dmp", /*block.getNumber()*/0);
+            fileName = String.format("%07d_c.dmp", block.getNumber());
         }
 
         File dumpFile = new File(System.getProperty("user.dir") + "/" + dir + fileName);
@@ -275,7 +276,7 @@ public class RepositoryImpl implements Repository , io.taucoin.facade.Repository
 
     public void dumpTrie(Block block) {
         //todo: same as 206
-        if (!(CONFIG.dumpFull() /*CONFIG.dumpBlock() == block.getNumber()*/))
+        if (!(CONFIG.dumpFull() || CONFIG.dumpBlock() == block.getNumber()))
             return;
 
         String fileName = String.format("%07d_trie.dmp",/*block.getNumber()*/0);
@@ -315,10 +316,12 @@ public class RepositoryImpl implements Repository , io.taucoin.facade.Repository
             @Override
             public Set<byte[]> invoke() {
                 Set<byte[]> result = new HashSet<>();
-                //todo: need state Cache
-                //for (ByteArrayWrapper key : stateCache.keySet()) {
-                    //todo: all accountstate key needed probably
-                //}
+                //todo: here needless cache
+                for (ByteArrayWrapper key : stateDB.dumpKeys()) {
+                    if(isExist(key.getData())){
+                        result.add(key.getData());
+                    }
+                }
 
                 return result;
             }

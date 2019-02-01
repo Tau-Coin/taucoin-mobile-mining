@@ -1,12 +1,13 @@
 package io.taucoin.core;
 
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author Mikhail Kalinin
  * @since 28.09.2015
  */
-public interface PendingState{
+public interface PendingState extends io.taucoin.facade.PendingState{
 
     /**
      * Initialized pending state <br>
@@ -20,7 +21,7 @@ public interface PendingState{
      *
      * @param transactions txs received from the net
      */
-    void addWireTransactions(Set<Transaction> transactions);
+    List<Transaction> addWireTransactions(Set<Transaction> transactions);
 
     /**
      * Adds transaction to the list of pending state txs  <br>
@@ -29,7 +30,7 @@ public interface PendingState{
      *
      * @param tx transaction
      */
-    void addPendingTransaction(Transaction tx);
+    boolean addPendingTransaction(Transaction tx);
 
     /**
      * It should be called on each block imported as <b>BEST</b> <br>
@@ -43,4 +44,7 @@ public interface PendingState{
      * @param block block imported into blockchain as a <b>BEST</b> one
      */
     void processBest(Block block);
+
+	//PendingState Contains Tx
+    boolean pendingStateContains(Transaction tx);
 }

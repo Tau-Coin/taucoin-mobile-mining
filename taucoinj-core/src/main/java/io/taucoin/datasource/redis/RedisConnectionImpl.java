@@ -1,11 +1,11 @@
 package io.taucoin.datasource.redis;
 
-import org.ethereum.config.SystemProperties;
-import org.ethereum.core.PendingTransaction;
-import org.ethereum.core.Transaction;
+import io.taucoin.config.SystemProperties;
+import io.taucoin.core.Transaction;
 import io.taucoin.datasource.KeyValueDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -13,13 +13,11 @@ import redis.clients.jedis.Protocol;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Singleton;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-@Singleton
 public class RedisConnectionImpl implements RedisConnection {
 
     private static final Logger logger = LoggerFactory.getLogger("db");
@@ -105,11 +103,6 @@ public class RedisConnectionImpl implements RedisConnection {
     @Override
     public Set<Transaction> createTransactionSet(String name) {
         return createSetFor(Transaction.class, name);
-    }
-
-    @Override
-    public Set<PendingTransaction> createPendingTransactionSet(String name) {
-        return createSetFor(PendingTransaction.class, name);
     }
 
     @Override

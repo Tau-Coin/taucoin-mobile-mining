@@ -98,7 +98,6 @@ ext {
 dependencies {
     compile 'com.google.dagger:dagger:2.0'
     compile 'com.google.dagger:dagger-compiler:2.0'
-
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     compile "io.netty:netty-all:4.0.30.Final"

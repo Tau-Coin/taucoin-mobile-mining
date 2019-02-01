@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.ethereum.util.Functional.Consumer;
-import static org.ethereum.util.Functional.Function;
+import static io.taucoin.util.Functional.Consumer;
+import static io.taucoin.util.Functional.Function;
 
 public class RedisSet<T> extends RedisStorage<T> implements Set<T> {
 

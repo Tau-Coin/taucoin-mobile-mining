@@ -1,7 +1,6 @@
 package io.taucoin.datasource.redis;
 
-import org.ethereum.core.PendingTransaction;
-import org.ethereum.core.Transaction;
+import io.taucoin.core.Transaction;
 import io.taucoin.datasource.KeyValueDataSource;
 
 import java.util.Map;
@@ -18,8 +17,6 @@ public interface RedisConnection {
     <K,V> Map<K, V> createMapFor(Class<K> keyClass, Class<V> valueClass, String name);
 
     Set<Transaction> createTransactionSet(String name);
-
-    Set<PendingTransaction> createPendingTransactionSet(String name);
 
     KeyValueDataSource createDataSource(String name);
 }

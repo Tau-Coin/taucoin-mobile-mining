@@ -1,6 +1,6 @@
 package io.taucoin.datasource.mapdb;
 
-import org.ethereum.config.SystemProperties;
+import io.taucoin.config.SystemProperties;
 import io.taucoin.datasource.KeyValueDataSource;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;

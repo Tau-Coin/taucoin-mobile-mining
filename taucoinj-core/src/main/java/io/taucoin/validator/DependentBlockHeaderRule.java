@@ -1,7 +1,6 @@
 package io.taucoin.validator;
 
 import io.taucoin.core.BlockHeader;
-import org.ethereum.validator.AbstractValidationRule;
 
 /**
  * Parent class for {@link BlockHeader} validators

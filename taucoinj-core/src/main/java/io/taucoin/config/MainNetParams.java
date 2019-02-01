@@ -19,7 +19,7 @@
 package io.taucoin.config;
 
 import io.taucoin.core.*;
-//import org.ethereum.net.peerdiscovery.*;
+//import io.taucoin.net.peerdiscovery.*;
 
 import java.math.BigInteger;
 import java.net.*;

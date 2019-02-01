@@ -11,7 +11,7 @@ import redis.clients.jedis.Pipeline;
 import java.util.Collection;
 
 import static org.apache.commons.collections4.CollectionUtils.collect;
-import static org.ethereum.util.Functional.*;
+import static io.taucoin.util.Functional.*;
 
 public abstract class RedisStorage<T> {
 

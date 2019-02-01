@@ -1,14 +1,14 @@
 package io.taucoin.core;
 
-import io.taucoin.core.Block;
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPElement;
-import org.ethereum.util.RLPList;
+
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPElement;
+import io.taucoin.util.RLPList;
 
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.ethereum.util.TimeUtils.secondsToMillis;
+import static io.taucoin.util.TimeUtils.secondsToMillis;
 
 /**
  * <p> Wraps {@link Block} </p>

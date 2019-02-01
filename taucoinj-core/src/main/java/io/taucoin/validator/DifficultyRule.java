@@ -5,7 +5,7 @@ import io.taucoin.validator.DependentBlockHeaderRule;
 
 import java.math.BigInteger;
 
-import static org.ethereum.util.BIUtil.isEqual;
+import static io.taucoin.util.BIUtil.isEqual;
 
 /**
  * Checks block's difficulty against calculated difficulty value

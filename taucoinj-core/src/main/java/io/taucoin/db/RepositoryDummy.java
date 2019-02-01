@@ -1,7 +1,7 @@
 package io.taucoin.db;
 
 import io.taucoin.core.AccountState;
-import org.ethereum.core.Block;
+import io.taucoin.core.Block;
 import io.taucoin.core.Repository;
 
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.ethereum.crypto.SHA3Helper.sha3;
+import static io.taucoin.crypto.SHA3Helper.sha3;
 import static io.taucoin.util.ByteUtil.wrap;
 
 /**

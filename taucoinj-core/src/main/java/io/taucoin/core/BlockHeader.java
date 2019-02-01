@@ -1,22 +1,21 @@
 package io.taucoin.core;
 
-import org.ethereum.crypto.HashUtil;
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPList;
-import org.ethereum.util.Utils;
+import io.taucoin.crypto.HashUtil;
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPList;
+import io.taucoin.util.Utils;
 import org.spongycastle.util.Arrays;
 import org.spongycastle.util.BigIntegers;
 
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.ethereum.config.Constants.DIFFICULTY_BOUND_DIVISOR;
-import static org.ethereum.config.Constants.DURATION_LIMIT;
-import static org.ethereum.config.Constants.EXP_DIFFICULTY_PERIOD;
-import static org.ethereum.config.Constants.MINIMUM_DIFFICULTY;
-import static org.ethereum.crypto.HashUtil.EMPTY_TRIE_HASH;
-import static org.ethereum.util.BIUtil.max;
-import static org.ethereum.util.ByteUtil.toHexString;
+import static io.taucoin.config.Constants.DIFFICULTY_BOUND_DIVISOR;
+import static io.taucoin.config.Constants.EXP_DIFFICULTY_PERIOD;
+import static io.taucoin.config.Constants.MINIMUM_DIFFICULTY;
+import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
+import static io.taucoin.util.BIUtil.max;
+import static io.taucoin.util.ByteUtil.toHexString;
 
 /**
  * Block header is a value object containing
@@ -101,8 +100,12 @@ public class BlockHeader {
                     generatorPublicKey);
     }
 
-    public byte[] getHeaderHash(){
+    public byte[] getHeaderHash() {
        return HashUtil.ripemd160(HashUtil.sha256(this.getEncoded()));
+    }
+
+    public byte[] getHash() {
+       return getHeaderHash();
     }
 
     /*
@@ -120,7 +123,15 @@ public class BlockHeader {
 
         return difficulty;
     }
-
+    //temporary method will be discarded when smooth
+    public long getNumber(){
+        return 0;
+    }
+    //temporary method will be discarded when smooth
+    public byte[] getPotBoundary(){
+        return null;
+    }
+    
     public String toString() {
         return toStringWithSuffix("\n");
     }

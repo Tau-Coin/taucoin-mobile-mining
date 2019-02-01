@@ -1,13 +1,12 @@
 package io.taucoin.core;
 
-import org.ethereum.crypto.ECKey;
-import org.ethereum.crypto.ECKey.ECDSASignature;
-import org.ethereum.crypto.ECKey.MissingPrivateKeyException;
-import org.ethereum.crypto.HashUtil;
-import org.ethereum.util.ByteUtil;
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPList;
-import org.ethereum.core.*;
+import io.taucoin.crypto.ECKey;
+import io.taucoin.crypto.ECKey.ECDSASignature;
+import io.taucoin.crypto.ECKey.MissingPrivateKeyException;
+import io.taucoin.crypto.HashUtil;
+import io.taucoin.util.ByteUtil;
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,9 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 import static org.apache.commons.lang3.ArrayUtils.getLength;
-import static org.ethereum.util.ByteUtil.*;
+import static io.taucoin.util.ByteUtil.*;
+import static io.taucoin.util.BIUtil.toBI;
+import static io.taucoin.util.TimeUtils.timeNows;
 
 /**
  * A transaction (formally, T) is a single cryptographically
@@ -30,7 +31,7 @@ import static org.ethereum.util.ByteUtil.*;
  * There are two types of transactions: those which result in message calls
  * and those which result in the creation of new contracts.
  */
-public class Transaction {
+public class Transaction implements Comparable<Transaction>{
 
     private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
@@ -62,6 +63,7 @@ public class Transaction {
     
     private byte[] hash;
 
+    public static final int TTIME = 43200;
     public static final int HASH_LENGTH = 32;
     public static final int ADDRESS_LENGTH = 20;
 
@@ -111,24 +113,38 @@ public class Transaction {
         return fee;
     }
 
-    public synchronized void verify() {
+    public synchronized boolean verify() {
+
         rlpParse();
-        validate();
+
+        if(!validate()){
+            return false;
+        }
+
+        return true;
     }  
 
     //NowTime - TransactionTime < 1440s;
-    public synchronized void checkTime() {
+    public synchronized boolean checkTime() {
         //get current unix time
+        long diffTime = timeNows()- toBI(timeStamp).longValue();
+        if (diffTime > TTIME){
+            return false;
+		}
+        return true;
     }  
 
     public void rlpParse() {
 
         RLPList decodedTxList = RLP.decode2(rlpEncoded);
         RLPList transaction = (RLPList) decodedTxList.get(0);
-
-        this.version = transaction.get(0).getRLPData()[0];
-        this.option = transaction.get(1).getRLPData()[0];
+        logger.info("transaction item size is {}",transaction.size());
+        this.version = transaction.get(0).getRLPData()==null? (byte)0: transaction.get(0).getRLPData()[0];
+        logger.info("item version is {}",(int)this.version);
+        //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
+        this.option = transaction.get(1).getRLPData()==null? (byte)0: transaction.get(1).getRLPData()[0];
         this.timeStamp = transaction.get(2).getRLPData();
+        logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
         this.toAddress = transaction.get(3).getRLPData();
         this.amount = transaction.get(4).getRLPData();
         this.fee = transaction.get(5).getRLPData();
@@ -145,18 +161,20 @@ public class Transaction {
         this.hash = getHash();
     }
 
-    private void validate() {
+    public boolean validate() {
         if (toAddress != null && toAddress.length != 0 && toAddress.length != ADDRESS_LENGTH)
-            throw new RuntimeException("Received address is not valid");
+            return false;
 
         if (getSignature() != null) {
             if (BigIntegers.asUnsignedByteArray(signature.r).length > HASH_LENGTH)
-                throw new RuntimeException("Signature R is not valid");
+                return false;
             if (BigIntegers.asUnsignedByteArray(signature.s).length > HASH_LENGTH)
-                throw new RuntimeException("Signature S is not valid");
+                return false;
             if (getSender() != null && getSender().length != ADDRESS_LENGTH)
-                throw new RuntimeException("Sender is not valid");
+                return false;
         }
+
+        return true;
     }
 
     public boolean isParsed() {
@@ -185,6 +203,21 @@ public class Transaction {
     public byte[] getAmount() {
         if (!parsed) rlpParse();
         return amount;
+    }
+
+    public byte[] getFee() {
+        if (!parsed) rlpParse();
+        return fee;
+    }
+
+    private BigInteger getBigIntegerFee() {
+        if (!parsed) rlpParse();
+        return new BigInteger(fee);
+    }
+
+    public BigInteger getTotoalCost() {
+        if (!parsed) rlpParse();
+        return (new BigInteger(amount)).add(new BigInteger(fee));
     }
 
     public byte[] getReceiveAddress() {
@@ -235,9 +268,10 @@ public class Transaction {
         return "TransactionData [" +
                 "  version=" + ByteUtil.toHexString(new byte[]{version}) +
                 ", option=" + ByteUtil.toHexString(new byte[]{option}) +
+                ", time=" + ByteUtil.toHexString(timeStamp) +
                 ", receiveAddress=" + ByteUtil.toHexString(toAddress) +
-                ", amount=" + ByteUtil.toHexString(amount) +
-                ", fee=" + ByteUtil.toHexString(fee) +
+                ", amount=" + "0x" + ByteUtil.toHexString(amount) +
+                ", fee=" + "0x" + ByteUtil.toHexString(fee) +
                 ", signatureV=" + (signature == null ? "" : signature.v) +
                 ", signatureR=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.r))) +
                 ", signatureS=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.s))) +
@@ -324,5 +358,10 @@ public class Transaction {
                 Hex.decode(to),
                 BigIntegers.asUnsignedByteArray(amount),
                 BigIntegers.asUnsignedByteArray(fee));
+    }
+
+    @Override
+    public int compareTo(Transaction t){
+        return this.getBigIntegerFee().compareTo(t.getBigIntegerFee());
     }
 }

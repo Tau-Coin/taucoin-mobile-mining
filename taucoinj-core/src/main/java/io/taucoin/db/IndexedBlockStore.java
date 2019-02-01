@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.math.BigInteger.ZERO;
-import static org.ethereum.crypto.HashUtil.shortHash;
+import static io.taucoin.crypto.HashUtil.shortHash;
 import static org.spongycastle.util.Arrays.areEqual;
 
 public class IndexedBlockStore implements BlockStore{
@@ -43,6 +43,7 @@ public class IndexedBlockStore implements BlockStore{
     public Block getBestBlock(){
 
         Long maxLevel = getMaxNumber();
+        logger.info("getBestBlock maxLevel is {}",maxLevel.intValue());
         if (maxLevel < 0) return null;
 
         Block bestBlock = getChainBlockByNumber(maxLevel);

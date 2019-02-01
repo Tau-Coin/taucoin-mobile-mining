@@ -1,8 +1,5 @@
 package io.taucoin.core;
 
-import org.ethereum.core.*;
-import org.ethereum.vm.LogInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -12,10 +9,10 @@ import java.util.List;
 
 import static org.apache.commons.lang3.ArrayUtils.getLength;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.ethereum.config.SystemProperties.CONFIG;
-import static org.ethereum.util.BIUtil.*;
-import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static org.ethereum.util.ByteUtil.toHexString;
+import static io.taucoin.config.SystemProperties.CONFIG;
+import static io.taucoin.util.BIUtil.*;
+import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
+import static io.taucoin.util.ByteUtil.toHexString;
 
 /**
  * @author Roman Mandeleil
@@ -34,8 +31,6 @@ public class TransactionExecutor {
 
     long basicTxAmount = 0;
     long basicTxFee = 0;
-
-    List<LogInfo> logs = null;
 
     boolean localCall = false;
 
@@ -95,11 +90,12 @@ public class TransactionExecutor {
      * 1. add balance to received address 
      * 2. add transaction fee to actually miner 
      */
-    public void execute() {
+    public void executeFinal() {
         if (!readyToExecute) return;
 
 		// Sender subtract balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
+        logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
         track.addBalance(tx.getSender(), totalCost.negate());
 
 		// Receiver add balance
@@ -108,6 +104,16 @@ public class TransactionExecutor {
         // Transfer fees to miner
         track.addBalance(coinbase, toBI(tx.transactionCost()));
 
+        // Increase forge power.
+        track.increaseforgePower(tx.getSender());
+
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
+    }
+
+	/**
+	 * Set Miner Address
+	 */
+	public void setCoinbase(byte [] address){
+        this.coinbase= address;
     }
 }
