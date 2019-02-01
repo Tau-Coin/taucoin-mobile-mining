@@ -58,7 +58,8 @@ public class TimeUtils {
         return System.currentTimeMillis() + millis;
     }
     /**
-     * Returns timestamp in seconds
+     * Returns timestamp time now in seconds
+     *
      * @return now timestamp
      */
     public static long timeNows() {
