@@ -6,11 +6,10 @@ import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-/*
+
 import javax.annotation.Resource;
 
 import javax.inject.Singleton;
-*/
 import javax.inject.Inject;
 
 import java.math.BigInteger;
@@ -35,7 +34,7 @@ import io.taucoin.db.ByteArrayWrapper;
  * @author Mikhail Kalinin
  * @since 28.09.2015
  */
-//@Singleton
+@Singleton
 public class PendingStateImpl implements PendingState {
 
     /*
@@ -56,7 +55,7 @@ public class PendingStateImpl implements PendingState {
     private Repository repository;
     private Blockchain blockchain;
 
-    //@Resource
+    @Resource
     private final List<Transaction> wireTransactions = new ArrayList<>();
 
     // To filter out the transactions we have already processed
@@ -65,7 +64,7 @@ public class PendingStateImpl implements PendingState {
 
     private final Map<String, BigInteger> expendList = new HashMap<String, BigInteger>(500000);
 
-    //@Resource
+    @Resource
     private final List<Transaction> pendingStateTransactions = new ArrayList<>();
 
     private Repository pendingState;

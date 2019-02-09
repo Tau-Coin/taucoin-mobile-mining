@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
 import javax.annotation.PostConstruct;
@@ -67,6 +68,7 @@ import static io.taucoin.util.BIUtil.isMoreThan;
  * @author Nick Savers
  * @since 20.05.2014
  */
+@Singleton
 public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
 
@@ -120,6 +122,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     //todo: autowire over constructor
+    @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
                           Wallet wallet, AdminInfo adminInfo,
                           EthereumListener listener, ParentBlockHeaderValidator parentHeaderValidator) {

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 //import org.springframework.context.ApplicationContext;
 //import org.springframework.context.annotation.DependsOn;
 import org.w3c.dom.*;
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The Wallet handles the management of accounts with addresses and private keys.
  * New accounts can be generated and added to the wallet and existing accounts can be queried.
  */
-//@DependsOn("worldManager")
+@Singleton
 public class Wallet {
 
     private Logger logger = LoggerFactory.getLogger("wallet");
