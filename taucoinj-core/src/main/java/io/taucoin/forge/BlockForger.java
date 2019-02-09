@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static java.lang.Math.max;
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 
 /**
@@ -51,11 +52,17 @@ public class BlockForger {
 
     private CompositeEthereumListener listener;
 
-
-    private SystemProperties config;
-
-
     protected PendingState pendingState;
+
+    @Inject
+    public BlockForger(Repository repository, Blockchain blockchain, BlockStore blockStore, Taucoin taucoin, CompositeEthereumListener listener, PendingState pendingState) {
+        this.repository = repository;
+        this.blockchain = blockchain;
+        this.blockStore = blockStore;
+        this.taucoin = taucoin;
+        this.listener = listener;
+        this.pendingState = pendingState;
+    }
 
     private List<ForgerListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -72,8 +79,8 @@ public class BlockForger {
 
     @PostConstruct
     private void init() {
-        minerPubkey = config.getForgerPubkey();
-        minerCoinbase = config.getForgerCoinbase();
+        minerPubkey = CONFIG.getForgerPubkey();
+        minerCoinbase = CONFIG.getForgerCoinbase();
         listener.addListener(new EthereumListenerAdapter() {
 
             @Override
@@ -83,16 +90,16 @@ public class BlockForger {
 
             @Override
             public void onSyncDone() {
-                if (config.forgerStart() && config.isSyncEnabled()) {
+                if (CONFIG.forgerStart() && CONFIG.isSyncEnabled()) {
                     logger.info("Sync complete, start forging...");
-                    startForging((long)config.getForgedAmount());
+                    startForging((long)CONFIG.getForgedAmount());
                 }
             }
         });
 
-        if (config.forgerStart() && !config.isSyncEnabled()) {
+        if (CONFIG.forgerStart() && !CONFIG.isSyncEnabled()) {
             logger.info("Start forging now...");
-            startForging((long)config.getForgedAmount());
+            startForging((long)CONFIG.getForgedAmount());
         }
     }
 

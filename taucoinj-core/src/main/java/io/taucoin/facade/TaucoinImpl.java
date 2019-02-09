@@ -62,8 +62,11 @@ public class TaucoinImpl implements Taucoin {
 
     PendingState pendingState;
 
+    Provider<BlockForger> providerForger;
+
     @Inject
-    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager, PeerServer peerServer, Provider<PeerClient> providerPeer, BlockLoader blockLoader, PendingState pendingState) {
+    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager, PeerServer peerServer, Provider<PeerClient> providerPeer, BlockLoader blockLoader,
+                       Provider<BlockForger> providerForger,PendingState pendingState) {
         this.worldManager = worldManager;
         this.adminInfo = adminInfo;
         this.channelManager = channelManager;
@@ -71,6 +74,7 @@ public class TaucoinImpl implements Taucoin {
         this.providerPeer = providerPeer;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
+        this.providerForger = providerForger;
     }
 
     public TaucoinImpl() {
@@ -211,7 +215,7 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public BlockForger getBlockForger() {
-        return new BlockForger();// ctx.getBean(BlockForger.class);
+        return providerForger.get();
     }
 
     @Override
