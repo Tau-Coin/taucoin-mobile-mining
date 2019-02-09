@@ -1,26 +1,27 @@
 package io.taucoin.manager;
 
-
-
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 /**
  * @author Roman Mandeleil
  * @since 11.12.2014
  */
-
+@Singleton
 public class AdminInfo {
-
 
     private long startupTimeStamp;
     private boolean consensus = true;
     private List<Long> blockExecTime = new LinkedList<>();
 
+    public AdminInfo() {
+        this.init();
+    }
 
-    @PostConstruct
     public void init() {
         startupTimeStamp = System.currentTimeMillis();
     }

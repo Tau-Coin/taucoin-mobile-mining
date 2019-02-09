@@ -10,25 +10,28 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
+@Singleton
 public class BlockLoader {
     private static final Logger logger = LoggerFactory.getLogger("blockqueue");
 
-
     private BlockHeaderValidator headerValidator;
 
-
     SystemProperties config;
-
 
     private Blockchain blockchain;
 
     Scanner scanner = null;
 
+    @Inject
+    public BlockLoader(Blockchain blockchain) {
+        this.blockchain = blockchain;
+    }
 
     public void loadBlocks(){
 

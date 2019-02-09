@@ -15,13 +15,16 @@ import io.taucoin.net.server.ChannelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-import javax.inject.Inject;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
 
@@ -31,7 +34,7 @@ import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
  * @author Roman Mandeleil
  * @since 01.06.2014
  */
-
+@Singleton
 public class WorldManager {
 
     private static final Logger logger = LoggerFactory.getLogger("general");
@@ -61,6 +64,25 @@ public class WorldManager {
     private PendingState pendingState;
 
     SystemProperties config;
+
+    @Inject
+    public WorldManager(EthereumListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
+                        , BlockStore blockStore, ChannelManager channelManager, AdminInfo adminInfo, NodeManager nodeManager, SyncManager syncManager
+                        , PendingState pendingState) {
+        logger.info("World manager instantiated");
+        this.listener = listener;
+        this.blockchain = blockchain;
+        this.repository = repository;
+        this.wallet = wallet;
+        this.peerDiscovery = peerDiscovery;
+        this.blockStore = blockStore;
+        this.channelManager = channelManager;
+        this.adminInfo = adminInfo;
+        this.nodeManager = nodeManager;
+        this.syncManager = syncManager;
+        this.pendingState = pendingState;
+        //this.nodeManager.setWorldManager(this);
+    }
 
     @PostConstruct
     public void init() {
