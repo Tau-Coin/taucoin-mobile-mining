@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.min;
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.net.rlpx.FrameCodec.Frame;
 
 /**
@@ -48,11 +49,7 @@ public class MessageCodec extends MessageToMessageCodec<Frame, Message> {
     private MessageFactory bzzMessageFactory;
     private TauVersion ethVersion;
 
-    @Inject
     EthereumListener ethereumListener;
-
-    @Inject
-    SystemProperties config;
 
     private boolean supportChunkedFrames = true;
 
@@ -60,9 +57,14 @@ public class MessageCodec extends MessageToMessageCodec<Frame, Message> {
     // LRU avoids OOM on invalid peers
     AtomicInteger contextIdCounter = new AtomicInteger(1);
 
+    @Inject
+    public MessageCodec(EthereumListener listener) {
+        this.ethereumListener = listener;
+    }
+
     @PostConstruct
     private void init() {
-        setMaxFramePayloadSize(config.rlpxMaxFrameSize());
+        setMaxFramePayloadSize(CONFIG.rlpxMaxFrameSize());
     }
 
     @Override

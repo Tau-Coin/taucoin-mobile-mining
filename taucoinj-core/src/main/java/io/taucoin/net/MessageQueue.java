@@ -54,7 +54,7 @@ public class MessageQueue {
 
     @Inject
     public MessageQueue(EthereumListener listener) {
-                this.ethereumListener = listener;
+        this.ethereumListener = listener;
     }
 
     public void activate(ChannelHandlerContext ctx) {

@@ -15,8 +15,9 @@ import io.taucoin.net.p2p.P2pHandler;
 import io.taucoin.net.rlpx.MessageCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.springframework.context.ApplicationContext;
+
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,24 +34,24 @@ public class DiscoveryChannel {
 
     private boolean peerDiscoveryMode = false;
 
-    @Inject
     EthereumListener ethereumListener;
 
-    @Inject
     MessageQueue messageQueue;
 
-    @Inject
     P2pHandler p2pHandler;
 
-    @Inject
     TauHandler ethHandler;
 
+    Provider<MessageCodec> messageCodecProvider;
+
     @Inject
-    //ApplicationContext ctx;
-
-
-    public DiscoveryChannel() {
-
+    public DiscoveryChannel(MessageQueue messageQueue, P2pHandler p2pHandler, TauHandler ethHandler,
+                            EthereumListener listener, Provider<MessageCodec> messageCodecProvider) {
+        this.messageQueue = messageQueue;
+        this.p2pHandler = p2pHandler;
+        this.ethHandler = ethHandler;
+        this.ethereumListener = listener;
+        this.messageCodecProvider = messageCodecProvider;
     }
 
     public void connect(String host, int port) {
@@ -75,7 +76,7 @@ public class DiscoveryChannel {
             ethHandler.setMsgQueue(messageQueue);
             ethHandler.setPeerDiscoveryMode(true);
 
-            final MessageCodec decoder = new MessageCodec();// ctx.getBean(MessageCodec.class);
+            final MessageCodec decoder = messageCodecProvider.get();
 
             b.handler(
 

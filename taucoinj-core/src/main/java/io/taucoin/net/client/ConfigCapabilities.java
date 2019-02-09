@@ -12,20 +12,18 @@ import java.util.TreeSet;
 
 import static io.taucoin.net.tau.TauVersion.fromCode;
 import static io.taucoin.net.client.Capability.*;
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 /**
  * Created by Anton Nashatyrev on 13.10.2015.
  */
 public class ConfigCapabilities {
-    @Inject
-    SystemProperties config;
 
-    private SortedSet<Capability> AllCaps = new TreeSet<>();
+    private static SortedSet<Capability> AllCaps = new TreeSet<>();
 
-    @PostConstruct
-    private void init() {
-        if (config.syncVersion() != null) {
-            TauVersion eth = fromCode(config.syncVersion());
+    static {
+        if (CONFIG.syncVersion() != null) {
+            TauVersion eth = fromCode(CONFIG.syncVersion());
             if (eth != null) AllCaps.add(new Capability(TAU, eth.getCode()));
         } else {
             for (TauVersion v : TauVersion.supported())
@@ -37,9 +35,9 @@ public class ConfigCapabilities {
      * Gets the capabilities listed in 'peer.capabilities' config property
      * sorted by their names.
      */
-    public List<Capability> getConfigCapabilities() {
+    public static List<Capability> getConfigCapabilities() {
         List<Capability> ret = new ArrayList<>();
-        List<String> caps = config.peerCapabilities();
+        List<String> caps = CONFIG.peerCapabilities();
         for (Capability capability : AllCaps) {
             if (caps.contains(capability.getName())) {
                 ret.add(capability);

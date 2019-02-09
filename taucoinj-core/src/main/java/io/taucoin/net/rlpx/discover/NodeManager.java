@@ -12,13 +12,15 @@ import io.taucoin.util.Functional;
 import org.mapdb.DB;
 import org.mapdb.HTreeMap;
 import org.slf4j.LoggerFactory;
-import javax.inject.Inject;
 
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static java.lang.Math.min;
 import static io.taucoin.config.SystemProperties.CONFIG;
@@ -32,6 +34,7 @@ import static io.taucoin.config.SystemProperties.CONFIG;
  *
  * Created by Anton Nashatyrev on 16.07.2015.
  */
+@Singleton
 public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     static final org.slf4j.Logger logger = LoggerFactory.getLogger("discover");
 
@@ -44,16 +47,12 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     private static final int DB_MAX_LOAD_NODES = 100;
     static final int MAX_NODES = 2000;
 
-    @Inject
     PeerConnectionTester peerConnectionManager;
 
-    @Inject
     MapDBFactory mapDBFactory;
 
-    @Inject
     EthereumListener ethereumListener;
 
-    @Inject
     SystemProperties config = SystemProperties.CONFIG;
 
     Functional.Consumer<DiscoveryEvent> messageSender;
@@ -75,14 +74,30 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     private HTreeMap<Node, NodeStatistics.Persistent> nodeStatsDB;
     private boolean inited = false;
 
-    public NodeManager() {
+    @Inject
+    public NodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, EthereumListener ethereumListener) {
+
+        this.peerConnectionManager = peerConnectionManager;
+        this.mapDBFactory = mapDBFactory;
+        this.ethereumListener = ethereumListener;
+        key = CONFIG.getMyKey();
+        homeNode = new Node(CONFIG.nodeId(), CONFIG.externalIp(), CONFIG.listenPort());
+        table = new NodeTable(homeNode, CONFIG.isPublicHomeNode());
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                logger.trace("Statistics:\n {}", dumpAllStatistics());
+            }
+        }, 1 * 1000, 10 * 1000);
     }
 
-//    public NodeManager(NodeTable table, ECKey key) {
-//        this.table = table;
-//        homeNode = table.getNode();
-//        this.key = key;
-//    }
+    public NodeManager(NodeTable table, ECKey key) {
+        this.table = table;
+        homeNode = table.getNode();
+        this.key = key;
+    }
 
     @PostConstruct
     void init() {

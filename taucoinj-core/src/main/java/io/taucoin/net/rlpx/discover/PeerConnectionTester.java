@@ -5,18 +5,21 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.rlpx.Node;
 import org.slf4j.LoggerFactory;
-import javax.inject.Inject;
 
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Makes test RLPx connection to the peers to acquire statistics
  *
  * Created by Anton Nashatyrev on 17.07.2015.
  */
+@Singleton
 public class PeerConnectionTester {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("discover");
 
@@ -76,7 +79,9 @@ public class PeerConnectionTester {
         }
     }
 
-    public PeerConnectionTester() {
+    @Inject
+    public PeerConnectionTester(WorldManager worldManager) {
+        this.worldManager = worldManager;
     }
 
     @PostConstruct

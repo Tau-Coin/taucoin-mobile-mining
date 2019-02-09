@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.net.tau.TauVersion.*;
 import static io.taucoin.net.message.StaticMessages.*;
 
@@ -74,24 +75,17 @@ public class P2pHandler extends SimpleChannelInboundHandler<P2pMessage> {
     private int ethInbound;
     private int ethOutbound;
 
-    @Inject
     EthereumListener ethereumListener;
 
-    @Inject
     PeerDiscovery peerDiscovery;
-
-    @Inject
-    ConfigCapabilities configCapabilities;
-
-    @Inject
-    SystemProperties config;
 
     private Channel channel;
     private ScheduledFuture<?> pingTask;
 
-
-    public P2pHandler() {
-
+    @Inject
+    public P2pHandler(PeerDiscovery peerDiscovery, EthereumListener listener) {
+        this.peerDiscovery = peerDiscovery;
+        this.ethereumListener = listener;
         this.peerDiscoveryMode = false;
     }
 
@@ -297,7 +291,7 @@ public class P2pHandler extends SimpleChannelInboundHandler<P2pMessage> {
                     logger.error("Unhandled exception", t);
                 }
             }
-        }, 2, config.getProperty("peer.p2p.pingInterval", 5), TimeUnit.SECONDS);
+        }, 2, CONFIG.getProperty("peer.p2p.pingInterval", 5), TimeUnit.SECONDS);
     }
 
     public void killTimers() {
@@ -322,7 +316,7 @@ public class P2pHandler extends SimpleChannelInboundHandler<P2pMessage> {
     }
 
     public List<Capability> getSupportedCapabilities(HelloMessage hello) {
-        List<Capability> configCaps = configCapabilities.getConfigCapabilities();
+        List<Capability> configCaps = ConfigCapabilities.getConfigCapabilities();
         List<Capability> supported = new ArrayList<>();
 
         List<Capability> eths = new ArrayList<>();

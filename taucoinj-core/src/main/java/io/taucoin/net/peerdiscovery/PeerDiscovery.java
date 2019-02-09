@@ -5,8 +5,9 @@ import io.taucoin.net.p2p.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import org.springframework.context.ApplicationContext;
 import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,6 +32,7 @@ import static io.taucoin.config.SystemProperties.CONFIG;
  * @author Roman Mandeleil
  * @since 22.05.2014
  */
+@Singleton
 public class PeerDiscovery {
 
     private static final Logger logger = LoggerFactory.getLogger("peerdiscovery");
@@ -42,11 +44,14 @@ public class PeerDiscovery {
     private ThreadPoolExecutor executorPool;
     private RejectedExecutionHandler rejectionHandler;
 
-    //@Inject
-    //private ApplicationContext ctx;
-
-
     private final AtomicBoolean started = new AtomicBoolean(false);
+
+    Provider<WorkerThread> workerThreadProvider;
+
+    @Inject
+    public PeerDiscovery(Provider<WorkerThread> workerThreadProvider) {
+        this.workerThreadProvider = workerThreadProvider;
+    }
 
     public void start() {
 
@@ -70,7 +75,7 @@ public class PeerDiscovery {
         addPeers(peerDataList);
 
         for (PeerInfo peerData : this.peers) {
-            WorkerThread workerThread = new WorkerThread();//= ctx.getBean(WorkerThread.class);
+            WorkerThread workerThread = workerThreadProvider.get();
             workerThread.init(peerData, executorPool);
             executorPool.execute(workerThread);
         }
@@ -120,7 +125,7 @@ public class PeerDiscovery {
     private void startWorker(PeerInfo peerInfo) {
 
         logger.debug("Add new peer for discovery: {}", peerInfo);
-        WorkerThread workerThread = new WorkerThread();//= ctx.getBean(WorkerThread.class);
+        WorkerThread workerThread = workerThreadProvider.get();
         workerThread.init(peerInfo, executorPool);
         executorPool.execute(workerThread);
     }

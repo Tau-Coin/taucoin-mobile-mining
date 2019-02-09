@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
+@Singleton
 public class UDPListener {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("discover");
 
@@ -25,13 +26,18 @@ public class UDPListener {
     private String address;
     private String[] bootPeers;
 
-
     private NodeManager nodeManager;
-
 
     SystemProperties config = SystemProperties.CONFIG;
 
-    public UDPListener() {
+    @Inject
+    public UDPListener(NodeManager nodeManager) {
+        this.nodeManager = nodeManager;
+        this.address = SystemProperties.CONFIG.bindIp();
+        port = SystemProperties.CONFIG.listenPort();
+        if (SystemProperties.CONFIG.peerDiscovery()) {
+            bootPeers = SystemProperties.CONFIG.peerDiscoveryIPList().toArray(new String[0]);
+        }
     }
 
     public UDPListener(String address, int port) {

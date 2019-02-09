@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-//import org.springframework.context.ApplicationContext;
+import javax.inject.Provider;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -19,10 +19,11 @@ public class WorkerThread implements Runnable {
     private PeerInfo peerInfo;
     private ThreadPoolExecutor poolExecutor;
 
-    @Inject
-    //ApplicationContext ctx;
+    Provider<DiscoveryChannel> discoveryChannelProvider;
 
-    public WorkerThread() {
+    @Inject
+    public WorkerThread(Provider<DiscoveryChannel> discoveryChannelProvider) {
+        this.discoveryChannelProvider = discoveryChannelProvider;
     }
 
     public void init(PeerInfo peer, ThreadPoolExecutor poolExecutor) {
@@ -44,7 +45,7 @@ public class WorkerThread implements Runnable {
 
         try {
 
-            DiscoveryChannel discoveryChannel = new DiscoveryChannel();//ctx.getBean(DiscoveryChannel.class);
+            DiscoveryChannel discoveryChannel = discoveryChannelProvider.get();
             discoveryChannel.connect(peerInfo.getAddress().getHostAddress(), peerInfo.getPort());
             peerInfo.setOnline(true);
 
