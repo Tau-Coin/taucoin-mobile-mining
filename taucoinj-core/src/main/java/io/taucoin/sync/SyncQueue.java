@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import java.util.*;
 
@@ -26,7 +27,7 @@ import static io.taucoin.core.ImportResult.IMPORTED_BEST;
  * @author Mikhail Kalinin
  * @since 27.07.2014
  */
-
+@Singleton
 public class SyncQueue {
 
     private static final Logger logger = LoggerFactory.getLogger("blockqueue");
@@ -53,7 +54,7 @@ public class SyncQueue {
 
     public boolean noParent = false;
 
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
     private Blockchain blockchain;
 
@@ -62,6 +63,15 @@ public class SyncQueue {
     private BlockHeaderValidator headerValidator;
 
     private MapDBFactory mapDBFactory;
+
+    public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
+        this.blockchain = blockchain;
+        this.headerValidator = headerValidator;
+    }
+
+    public void setSyncManager(SyncManager syncManager) {
+        this.syncManager = syncManager;
+    }
 
     /**
      * Loads HashStore and BlockQueue from disk,

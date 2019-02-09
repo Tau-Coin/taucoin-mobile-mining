@@ -27,6 +27,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.net.tau.TauVersion.*;
 import static io.taucoin.net.message.ReasonCode.USELESS_PEER;
@@ -38,6 +41,7 @@ import static io.taucoin.util.TimeUtils.secondsToMillis;
  * @author Mikhail Kalinin
  * @since 14.07.2015
  */
+@Singleton
 public class SyncManager {
 
     private final static Logger logger = LoggerFactory.getLogger("sync");
@@ -88,6 +92,29 @@ public class SyncManager {
     PeersPool pool;
 
     ChannelManager channelManager;
+
+    @Inject
+    public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, EthereumListener ethereumListener
+                        , PeersPool pool) {
+        this.blockchain = blockchain;
+        this.queue = queue;
+        this.queue.setSyncManager(this);
+        this.nodeManager = nodeManager;
+        this.ethereumListener = ethereumListener;
+        this.pool = pool;
+
+        syncStates.put(SyncStateName.IDLE, new IdleState());
+        syncStates.put(SyncStateName.HASH_RETRIEVING, new HashRetrievingState());
+        syncStates.put(SyncStateName.BLOCK_RETRIEVING, new BlockRetrievingState());
+
+        for (SyncState state : syncStates.values()) {
+            ((AbstractSyncState)state).setSyncManager(this);
+        }
+    }
+
+    public void setChannelManager(ChannelManager channelManager) {
+        this.channelManager = channelManager;
+    }
 
     @PostConstruct
     public void init() {

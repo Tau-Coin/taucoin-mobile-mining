@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,7 @@ import static io.taucoin.util.TimeUtils.*;
  * @author Mikhail Kalinin
  * @since 10.08.2015
  */
+@Singleton
 public class PeersPool implements Iterable<Channel> {
 
     public static final Logger logger = LoggerFactory.getLogger("sync");
