@@ -41,6 +41,8 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * @author Roman Mandeleil
  * @since 01.11.2014
@@ -50,8 +52,6 @@ public class Channel {
     private final static Logger logger = LoggerFactory.getLogger("net");
 
     public static final int MAX_SAFE_TXS = 192;
-
-    SystemProperties config;
 
     private MessageQueue msgQueue;
 
@@ -77,12 +77,23 @@ public class Channel {
     private boolean discoveryMode;
     private boolean isActive;
 
+    @Inject
+    public Channel(MessageQueue msgQueue, P2pHandler p2pHandler
+            , MessageCodec messageCodec
+            , NodeManager nodeManager, TauHandlerFactory ethHandlerFactory) {
+        this.msgQueue = msgQueue;
+        this.p2pHandler = p2pHandler;
+        this.messageCodec = messageCodec;
+        this.nodeManager = nodeManager;
+        this.ethHandlerFactory = ethHandlerFactory;
+    }
+
     public void init(ChannelPipeline pipeline, String remoteId, boolean discoveryMode) {
 
         isActive = remoteId != null && !remoteId.isEmpty();
 
         pipeline.addLast("readTimeoutHandler",
-                new ReadTimeoutHandler(config.peerChannelReadTimeout(), TimeUnit.SECONDS));
+                new ReadTimeoutHandler(CONFIG.peerChannelReadTimeout(), TimeUnit.SECONDS));
         pipeline.addLast("handshakeHandler", handshakeHandler);
 
         this.discoveryMode = discoveryMode;

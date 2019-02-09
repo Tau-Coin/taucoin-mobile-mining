@@ -21,14 +21,18 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static io.taucoin.net.message.ReasonCode.DUPLICATE_PEER;
 import static io.taucoin.net.message.ReasonCode.TOO_MANY_PEERS;
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 /**
  * @author Roman Mandeleil
  * @since 11.11.2014
  */
+@Singleton
 public class ChannelManager {
 
     private static final Logger logger = LoggerFactory.getLogger("net");
@@ -59,19 +63,21 @@ public class ChannelManager {
     private Thread blockDistributeThread;
     private Thread txDistributeThread;
 
-
-    SystemProperties config;
-
-
     SyncManager syncManager;
-
 
     private PendingState pendingState;
 
-    @PostConstruct
+    @Inject
+    public ChannelManager(SyncManager syncManager, PendingState pendingState) {
+        this.syncManager = syncManager;
+        //this.syncManager.setChannelManager(this);
+        this.pendingState = pendingState;
+        this.init();
+    }
+
     public void init() {
-        maxActivePeers = config.maxActivePeers();
-        trustedPeers = config.peerTrusted();
+        maxActivePeers = CONFIG.maxActivePeers();
+        trustedPeers = CONFIG.peerTrusted();
         mainWorker.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {

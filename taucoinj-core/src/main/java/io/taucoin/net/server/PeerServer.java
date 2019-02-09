@@ -16,8 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.spongycastle.util.encoders.Hex;
-//import org.springframework.context.ApplicationContext;
 import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import static org.ethereum.config.SystemProperties.CONFIG;
+
 /**
  * This class establishes a listener for incoming connections.
  * See <a href="http://netty.io">http://netty.io</a>.
@@ -25,32 +29,29 @@ import javax.inject.Inject;
  * @author Roman Mandeleil
  * @since 01.11.2014
  */
+@Singleton
 public class PeerServer {
 
     private static final Logger logger = LoggerFactory.getLogger("net");
 
-    @Inject
-    SystemProperties config;
-
-    @Inject
-    //private ApplicationContext ctx;
-
     public TauChannelInitializer ethereumChannelInitializer;
 
-    @Inject
     EthereumListener ethereumListener;
 
-    public PeerServer() {
+    Provider<TauChannelInitializer> provider;
+
+    @Inject
+    public PeerServer(EthereumListener listener, Provider<TauChannelInitializer> provider) {
+        this.ethereumListener = listener;
+        this.provider = provider;
     }
 
-
     public void start(int port) {
-
 
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        ethereumChannelInitializer = new TauChannelInitializer();// ctx.getBean(TauChannelInitializer.class, "");
+        ethereumChannelInitializer = provider.get();
 
         ethereumListener.trace("Listening on port " + port);
 
@@ -63,14 +64,14 @@ public class PeerServer {
 
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
-            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.peerConnectionTimeout());
+            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
 
             b.handler(new LoggingHandler());
             b.childHandler(ethereumChannelInitializer);
 
             // Start the client.
             logger.info("Listening for incoming connections, port: [{}] ", port);
-            logger.info("NodeId: [{}] ", Hex.toHexString(config.nodeId()));
+            logger.info("NodeId: [{}] ", Hex.toHexString(CONFIG.nodeId()));
 
             ChannelFuture f = b.bind(port).sync();
 

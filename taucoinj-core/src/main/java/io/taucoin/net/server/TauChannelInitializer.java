@@ -4,8 +4,8 @@ import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.springframework.context.ApplicationContext;
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author Roman Mandeleil
@@ -15,22 +15,19 @@ public class TauChannelInitializer extends ChannelInitializer<NioSocketChannel> 
 
     private static final Logger logger = LoggerFactory.getLogger("net");
 
-    //@Inject
-    //private ApplicationContext ctx;
-
-    @Inject
     ChannelManager channelManager;
+
+    Provider<Channel> channelProvider;
 
     private String remoteId;
 
     private boolean peerDiscoveryMode = false;
 
-    public TauChannelInitializer(String remoteId) {
+    @Inject
+    public TauChannelInitializer(ChannelManager channelManager, Provider<Channel> channelProvider, String remoteId) {
+        this.channelManager = channelManager;
+        this.channelProvider = channelProvider;
         this.remoteId = remoteId;
-    }
-    //temporary schema
-    public TauChannelInitializer() {
-       
     }
 
     @Override
@@ -47,7 +44,7 @@ public class TauChannelInitializer extends ChannelInitializer<NioSocketChannel> 
                 return;
             }
 
-            final Channel channel = new Channel();// ctx.getBean(Channel.class);
+            final Channel channel = channelProvider.get();// ctx.getBean(Channel.class);
             channel.init(ch.pipeline(), remoteId, peerDiscoveryMode);
 
             if(!peerDiscoveryMode) {

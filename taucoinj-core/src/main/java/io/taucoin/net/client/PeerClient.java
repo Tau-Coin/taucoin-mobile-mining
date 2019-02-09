@@ -16,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-//import org.springframework.context.ApplicationContext;
+import javax.inject.Provider;
 
 import java.io.IOException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 
 /**
@@ -32,14 +34,16 @@ public class PeerClient {
 
     private static final Logger logger = LoggerFactory.getLogger("net");
 
-    @Inject
-    SystemProperties config;
 
-    //@Inject
-    //private ApplicationContext ctx;
-
-    @Inject
     EthereumListener ethereumListener;
+
+    Provider<TauChannelInitializer> provider;
+
+    @Inject
+    public PeerClient(EthereumListener ethereumListener, Provider<TauChannelInitializer> provider) {
+        this.ethereumListener = ethereumListener;
+        this.provider = provider;
+    }
 
     private static EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
         AtomicInteger cnt = new AtomicInteger(0);
@@ -85,7 +89,7 @@ public class PeerClient {
     public ChannelFuture connectAsync(String host, int port, String remoteId, boolean discoveryMode) {
         ethereumListener.trace("Connecting to: " + host + ":" + port);
 
-        TauChannelInitializer ethereumChannelInitializer =new TauChannelInitializer();// ctx.getBean(TauChannelInitializer.class, remoteId);
+        TauChannelInitializer ethereumChannelInitializer = provider.get();
         ethereumChannelInitializer.setPeerDiscoveryMode(discoveryMode);
 
         Bootstrap b = new Bootstrap();
@@ -94,7 +98,7 @@ public class PeerClient {
 
         b.option(ChannelOption.SO_KEEPALIVE, true);
         b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
-        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.peerConnectionTimeout());
+        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
         b.remoteAddress(host, port);
 
         b.handler(ethereumChannelInitializer);
