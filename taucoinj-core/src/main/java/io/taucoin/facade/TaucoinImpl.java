@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import javax.inject.Inject;
-//import org.springframework.context.ApplicationContext;
-
-//import org.springframework.util.concurrent.FutureAdapter;
+import javax.inject.Provider;
 
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
@@ -38,6 +36,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * @author Roman Mandeleil
  * @since 27.07.2014
@@ -48,32 +48,30 @@ public class TaucoinImpl implements Taucoin {
     private static final Logger logger = LoggerFactory.getLogger("facade");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
 
-    @Inject
     WorldManager worldManager;
 
-    @Inject
     AdminInfo adminInfo;
 
-    @Inject
     ChannelManager channelManager;
 
-    @Inject
     PeerServer peerServer;
 
-    //@Inject
-    //ApplicationContext ctx;
+    Provider<PeerClient> providerPeer;
 
-    @Inject
     BlockLoader blockLoader;
 
-    @Inject
     PendingState pendingState;
 
     @Inject
-    SystemProperties config;
-
-    @Inject
-    CompositeEthereumListener compositeEthereumListener;
+    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager, PeerServer peerServer, Provider<PeerClient> providerPeer, BlockLoader blockLoader, PendingState pendingState) {
+        this.worldManager = worldManager;
+        this.adminInfo = adminInfo;
+        this.channelManager = channelManager;
+        this.peerServer = peerServer;
+        this.providerPeer = providerPeer;
+        this.blockLoader = blockLoader;
+        this.pendingState = pendingState;
+    }
 
     public TaucoinImpl() {
         System.out.println();
@@ -81,18 +79,18 @@ public class TaucoinImpl implements Taucoin {
 
     @PostConstruct
     public void init() {
-        if (config.listenPort() > 0) {
+        if (CONFIG.listenPort() > 0) {
             Executors.newSingleThreadExecutor().submit(
                     new Runnable() {
                         public void run() {
-                            peerServer.start(config.listenPort());
+                            peerServer.start(CONFIG.listenPort());
                         }
                     }
             );
         }
         //compositeEthereumListener.addListener(gasPriceTracker);
 
-        gLogger.info("EthereumJ node started: enode://" + Hex.toHexString(config.nodeId()) + "@" + config.externalIp() + ":" + config.listenPort());
+        gLogger.info("EthereumJ node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
     }
 
     /**
@@ -171,7 +169,7 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public void connect(final String ip, final int port, final String remoteId) {
         logger.info("Connecting to: {}:{}", ip, port);
-        final PeerClient peerClient = new PeerClient();// ctx.getBean(PeerClient.class);
+        final PeerClient peerClient = providerPeer.get();
         peerClient.connectAsync(ip, port, remoteId, false);
     }
 
@@ -232,7 +230,7 @@ public class TaucoinImpl implements Taucoin {
         PeerClient peer = worldManager.getActivePeer();
         if (peer == null) {
 
-            peer = new PeerClient();
+            peer = providerPeer.get();
             worldManager.setActivePeer(peer);
         }
         return peer;
