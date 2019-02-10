@@ -4,13 +4,14 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.datasource.KeyValueDataSource;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-//import org.springframework.stereotype.Component;
+
 import java.io.File;
 
-
+import javax.inject.Singleton;
 
 import static java.lang.System.getProperty;
 
+@Singleton
 public class MapDBFactoryImpl implements MapDBFactory {
 
     @Override

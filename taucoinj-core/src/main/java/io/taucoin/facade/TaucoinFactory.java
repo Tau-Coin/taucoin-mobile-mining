@@ -9,16 +9,16 @@ import io.taucoin.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Singleton;
 
 /**
  * @author Roman Mandeleil
  * @since 13.11.2014
  */
+@Singleton
 public class TaucoinFactory {
 
     private static final Logger logger = LoggerFactory.getLogger("general");
