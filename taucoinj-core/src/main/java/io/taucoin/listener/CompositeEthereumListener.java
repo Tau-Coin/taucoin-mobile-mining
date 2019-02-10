@@ -6,6 +6,7 @@ import io.taucoin.net.message.Message;
 import io.taucoin.net.p2p.HelloMessage;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.server.Channel;
+import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Roman Mandeleil
  * @since 12.11.2014
  */
+@Singleton
 public class CompositeEthereumListener implements EthereumListener {
 
     List<EthereumListener> listeners = new CopyOnWriteArrayList<>();
