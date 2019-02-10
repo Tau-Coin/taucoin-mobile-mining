@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-//import org.springframework.context.ApplicationContext;
-//import org.springframework.context.annotation.DependsOn;
+import javax.inject.Provider;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -50,12 +49,18 @@ public class Wallet {
     private Map<String, Account> rows = new HashMap<>();
     private long high;
 
-    //@Inject
-    //private ApplicationContext context;
-
     private CompositeEthereumListener listener;
 
     private List<WalletListener> listeners = new ArrayList<>();
+
+    Repository repository;
+    Provider<Account> accountProvider;
+
+    @Inject
+    public Wallet(Repository repository, Provider<Account> accountProvider) {
+        this.repository = repository;
+        this.accountProvider = accountProvider;
+    }
 
     @PostConstruct
     private void init() {
@@ -69,13 +74,15 @@ public class Wallet {
         });
     }
 
-    public void addNewAccount() {
-        Account account = new Account();
+    public Account addNewAccount() {
+        Account account = accountProvider.get();
         account.init();
         String address = Hex.toHexString(account.getEcKey().getAddress());
         rows.put(address, account);
         for (WalletListener listener : listeners)
             listener.valueChanged();
+
+        return account;
     }
     public void addNewAccount(Account account) {
         String address = Hex.toHexString(account.getEcKey().getAddress());
@@ -84,7 +91,7 @@ public class Wallet {
             listener.valueChanged();
     }
     public void importKey(byte[] privKey) {
-        Account account = new Account();//context.getBean(Account.class);
+        Account account = accountProvider.get();
         account.init(ECKey.fromPrivate(privKey));
         String address = Hex.toHexString(account.getEcKey().getAddress());
         rows.put(address, account);

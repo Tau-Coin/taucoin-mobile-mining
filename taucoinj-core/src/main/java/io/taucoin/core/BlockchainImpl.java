@@ -125,13 +125,14 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
                           Wallet wallet, AdminInfo adminInfo,
-                          EthereumListener listener, ParentBlockHeaderValidator parentHeaderValidator) {
+                          ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, EthereumListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.wallet = wallet;
         this.adminInfo = adminInfo;
-        this.listener = listener;
         this.parentHeaderValidator = parentHeaderValidator;
+        this.pendingState = pendingState;
+        this.listener = listener;
     }
 
     @PostConstruct

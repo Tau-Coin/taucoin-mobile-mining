@@ -80,7 +80,9 @@ public class PeerConnectionTester {
     }
 
     @Inject
-    public PeerConnectionTester(WorldManager worldManager) {
+    public PeerConnectionTester() {}
+
+    public void setWorldManager(WorldManager worldManager) {
         this.worldManager = worldManager;
     }
 

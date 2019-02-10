@@ -23,11 +23,12 @@ public class Account {
 
     private Set<Transaction> pendingTransactions =
             Collections.synchronizedSet(new HashSet<Transaction>());
-    @Inject
+
     Repository repository;
 
-
-    public Account() {
+    @Inject
+    public Account(Repository repository) {
+        this.repository = repository;
     }
 
     public void init() {

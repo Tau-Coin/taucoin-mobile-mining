@@ -34,16 +34,17 @@ public class PeerServer {
 
     private static final Logger logger = LoggerFactory.getLogger("net");
 
-    public TauChannelInitializer ethereumChannelInitializer;
+    ChannelManager channelManager;
+
+    public TauChannelInitializer tauChannelInitializer;
 
     EthereumListener ethereumListener;
 
-    Provider<TauChannelInitializer> provider;
-
     @Inject
-    public PeerServer(EthereumListener listener, Provider<TauChannelInitializer> provider) {
+    public PeerServer(ChannelManager channelManager, TauChannelInitializer tauChannelInitializer, EthereumListener listener) {
+        this.channelManager = channelManager;
+        this.tauChannelInitializer = tauChannelInitializer;
         this.ethereumListener = listener;
-        this.provider = provider;
     }
 
     public void start(int port) {
@@ -51,10 +52,7 @@ public class PeerServer {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        ethereumChannelInitializer = provider.get();
-
         ethereumListener.trace("Listening on port " + port);
-
 
         try {
             ServerBootstrap b = new ServerBootstrap();
@@ -67,7 +65,7 @@ public class PeerServer {
             b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
 
             b.handler(new LoggingHandler());
-            b.childHandler(ethereumChannelInitializer);
+            b.childHandler(tauChannelInitializer);
 
             // Start the client.
             logger.info("Listening for incoming connections, port: [{}] ", port);

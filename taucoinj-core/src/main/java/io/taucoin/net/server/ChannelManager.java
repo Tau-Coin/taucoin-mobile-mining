@@ -9,6 +9,7 @@ import io.taucoin.core.BlockWrapper;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.PendingState;
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.listener.EthereumListener;
 
 import io.taucoin.net.message.ReasonCode;
 import io.taucoin.sync.SyncManager;
@@ -66,11 +67,13 @@ public class ChannelManager {
     SyncManager syncManager;
 
     private PendingState pendingState;
+    EthereumListener listener;
 
     @Inject
-    public ChannelManager(SyncManager syncManager, PendingState pendingState) {
+    public ChannelManager(EthereumListener listener, SyncManager syncManager, PendingState pendingState) {
+        this.listener = listener;
         this.syncManager = syncManager;
-        //this.syncManager.setChannelManager(this);
+        this.syncManager.setChannelManager(this);
         this.pendingState = pendingState;
         this.init();
     }

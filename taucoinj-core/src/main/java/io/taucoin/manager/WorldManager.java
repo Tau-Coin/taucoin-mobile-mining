@@ -81,7 +81,7 @@ public class WorldManager {
         this.nodeManager = nodeManager;
         this.syncManager = syncManager;
         this.pendingState = pendingState;
-        //this.nodeManager.setWorldManager(this);
+        this.nodeManager.setWorldManager(this);
     }
 
     @PostConstruct

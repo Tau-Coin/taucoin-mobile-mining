@@ -15,14 +15,14 @@ import io.taucoin.listener.EthereumListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.BigIntegers;
-import javax.inject.Inject;
-
 import org.spongycastle.util.encoders.Hex;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static java.lang.Math.max;
 import static io.taucoin.config.SystemProperties.CONFIG;
@@ -32,6 +32,7 @@ import static io.taucoin.config.SystemProperties.CONFIG;
  * Created by Anton Nashatyrev on 10.12.2015.
  * Modified by Taucoin Core Developers on 01.29.2019.
  */
+@Singleton
 public class BlockForger {
     private static final Logger logger = LoggerFactory.getLogger("forge");
 
@@ -55,13 +56,15 @@ public class BlockForger {
     protected PendingState pendingState;
 
     @Inject
-    public BlockForger(Repository repository, Blockchain blockchain, BlockStore blockStore, Taucoin taucoin, CompositeEthereumListener listener, PendingState pendingState) {
-        this.repository = repository;
-        this.blockchain = blockchain;
-        this.blockStore = blockStore;
+    public BlockForger() {}
+
+    public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;
-        this.listener = listener;
-        this.pendingState = pendingState;
+        this.repository = taucoin.getRepository();
+        this.blockchain = taucoin.getBlockchain();
+        this.blockStore = taucoin.getBlockStore();
+        this.pendingState = taucoin.getWorldManager().getPendingState();
+        this.listener = (CompositeEthereumListener)taucoin.getWorldManager().getListener();
     }
 
     private List<ForgerListener> listeners = new CopyOnWriteArrayList<>();

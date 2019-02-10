@@ -24,7 +24,7 @@ public class BlockLoader {
 
     SystemProperties config;
 
-    private Blockchain blockchain;
+    protected Blockchain blockchain;
 
     Scanner scanner = null;
 

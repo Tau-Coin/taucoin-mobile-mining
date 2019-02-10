@@ -12,6 +12,8 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.util.*;
 
+import javax.inject.Inject;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Collections.reverse;
@@ -42,6 +44,7 @@ public class Tau62 extends TauHandler {
 
     private boolean commonAncestorFound = false;
 
+    @Inject
     public Tau62() {
         super(V62);
     }

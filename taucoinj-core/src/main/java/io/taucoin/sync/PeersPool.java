@@ -55,9 +55,13 @@ public class PeersPool implements Iterable<Channel> {
     private final Map<String, Long> bans = new HashMap<>();
     private final Map<String, Long> pendingConnections = new HashMap<>();
 
-    private Taucoin ethereum;
+    private Taucoin taucoin;
 
     private EthereumListener ethereumListener;
+
+    public void setTaucoin(Taucoin taucoin) {
+        this.taucoin = taucoin;
+    }
 
     @PostConstruct
     public void init() {
@@ -198,7 +202,7 @@ public class PeersPool implements Iterable<Channel> {
         }
 
         synchronized (pendingConnections) {
-            ethereum.connect(node);
+            taucoin.connect(node);
             pendingConnections.put(node.getHexId(), timeAfterMillis(CONNECTION_TIMEOUT));
         }
     }

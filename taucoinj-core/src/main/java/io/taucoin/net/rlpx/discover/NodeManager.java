@@ -53,6 +53,8 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
 
     EthereumListener ethereumListener;
 
+    WorldManager worldManager;
+
     SystemProperties config = SystemProperties.CONFIG;
 
     Functional.Consumer<DiscoveryEvent> messageSender;
@@ -97,6 +99,11 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         this.table = table;
         homeNode = table.getNode();
         this.key = key;
+    }
+
+    public void setWorldManager(WorldManager worldManager) {
+        this.worldManager = worldManager;
+        this.peerConnectionManager.setWorldManager(worldManager);
     }
 
     @PostConstruct

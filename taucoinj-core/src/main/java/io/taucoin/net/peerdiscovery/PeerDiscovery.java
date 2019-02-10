@@ -46,12 +46,11 @@ public class PeerDiscovery {
 
     private final AtomicBoolean started = new AtomicBoolean(false);
 
+    @Inject
     Provider<WorkerThread> workerThreadProvider;
 
     @Inject
-    public PeerDiscovery(Provider<WorkerThread> workerThreadProvider) {
-        this.workerThreadProvider = workerThreadProvider;
-    }
+    public PeerDiscovery() {}
 
     public void start() {
 

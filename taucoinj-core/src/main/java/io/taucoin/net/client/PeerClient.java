@@ -2,6 +2,7 @@ package io.taucoin.net.client;
 
 import io.taucoin.config.SystemProperties;
 import io.taucoin.listener.EthereumListener;
+import io.taucoin.net.server.ChannelManager;
 import io.taucoin.net.server.TauChannelInitializer;
 
 import io.netty.bootstrap.Bootstrap;
@@ -34,14 +35,16 @@ public class PeerClient {
 
     private static final Logger logger = LoggerFactory.getLogger("net");
 
+    ChannelManager channelManager;
 
     EthereumListener ethereumListener;
 
     Provider<TauChannelInitializer> provider;
 
     @Inject
-    public PeerClient(EthereumListener ethereumListener, Provider<TauChannelInitializer> provider) {
+    public PeerClient(EthereumListener ethereumListener, ChannelManager channelManager, Provider<TauChannelInitializer> provider) {
         this.ethereumListener = ethereumListener;
+        this.channelManager = channelManager;
         this.provider = provider;
     }
 

@@ -12,6 +12,7 @@ import io.taucoin.forge.BlockForger;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
+import io.taucoin.net.rlpx.discover.UDPListener;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.net.server.PeerServer;
 import io.taucoin.net.submit.NewBlockHeaderBroadcaster;
@@ -48,33 +49,38 @@ public class TaucoinImpl implements Taucoin {
     private static final Logger logger = LoggerFactory.getLogger("facade");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
 
-    WorldManager worldManager;
+    protected WorldManager worldManager;
 
-    AdminInfo adminInfo;
+    protected AdminInfo adminInfo;
 
-    ChannelManager channelManager;
+    protected ChannelManager channelManager;
 
-    PeerServer peerServer;
+    protected PeerServer peerServer;
 
-    Provider<PeerClient> providerPeer;
+    protected Provider<PeerClient> providerPeer;
 
-    BlockLoader blockLoader;
+    protected Provider<UDPListener> discoveryServerProvider;
 
-    PendingState pendingState;
+    protected BlockLoader blockLoader;
 
-    Provider<BlockForger> providerForger;
+    protected PendingState pendingState;
+
+    protected BlockForger blockForger;
 
     @Inject
-    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager, PeerServer peerServer, Provider<PeerClient> providerPeer, BlockLoader blockLoader,
-                       Provider<BlockForger> providerForger,PendingState pendingState) {
+    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager,
+            BlockLoader blockLoader, PendingState pendingState, Provider<PeerClient> providerPeer,
+            Provider<UDPListener> discoveryServerProvider, PeerServer peerServer, BlockForger blockForger) {
         this.worldManager = worldManager;
         this.adminInfo = adminInfo;
         this.channelManager = channelManager;
-        this.peerServer = peerServer;
-        this.providerPeer = providerPeer;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
-        this.providerForger = providerForger;
+        this.providerPeer = providerPeer;
+        this.discoveryServerProvider = discoveryServerProvider;
+        this.peerServer = peerServer;
+        this.blockForger = blockForger;
+        this.blockForger.setTaucoin(this);
     }
 
     public TaucoinImpl() {
@@ -183,6 +189,11 @@ public class TaucoinImpl implements Taucoin {
     }
 
     @Override
+    public WorldManager getWorldManager() {
+        return this.worldManager;
+    }
+
+    @Override
     public io.taucoin.facade.Blockchain getBlockchain() {
         return (io.taucoin.facade.Blockchain)worldManager.getBlockchain();
     }
@@ -215,7 +226,7 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public BlockForger getBlockForger() {
-        return providerForger.get();
+        return blockForger;
     }
 
     @Override
