@@ -112,10 +112,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     public boolean byTest = false;
     private boolean fork = false;
 
-    private byte[] minerCoinbase;
-    private byte[] minerPrikey;
-    private byte[] minerPubkey;
-
     private Stack<State> stateStack = new Stack<>();
 
     public BlockchainImpl() {
@@ -133,13 +129,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         this.parentHeaderValidator = parentHeaderValidator;
         this.pendingState = pendingState;
         this.listener = listener;
-    }
-
-    @PostConstruct
-    private void init() {
-        minerCoinbase = config.getForgerCoinbase();
-        minerPrikey = config.getForgerPrikey();
-        minerPubkey = config.getForgerPubkey();
     }
 
     @Override
@@ -309,7 +298,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             block.setBaseTarget(baseTarget);
 
             byte[] gsBytes = ProofOfTransaction.
-                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature().toByteArray(), minerPubkey);
+                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature().toByteArray(), config.getForgerPubkey());
             BigInteger generationSignature = new BigInteger(1, gsBytes);
             block.setGenerationSignature(generationSignature);
 
@@ -387,14 +376,14 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         Block block = new Block(version,
                 timeStamp,
                 parent.getHash(),
-                minerPubkey,
+                config.getForgerPubkey(),
                 option,
                 txs);
         block.setNumber(parent.getNumber() + 1);
         block.setBaseTarget(baseTarget);
         block.setGenerationSignature(generationSignature);
         block.setCumulativeDifficulty(cumulativeDifficulty);
-        block.sign(minerPrikey);
+        block.sign(config.getForgerPrikey());
 
 //        pushState(parent.getHash());
 //
@@ -819,14 +808,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     public void setExitOn(long exitOn) {
         this.exitOn = exitOn;
-    }
-
-    public void setMinerCoinbase(byte[] minerCoinbase) {
-        this.minerCoinbase = minerCoinbase;
-    }
-
-    public void setMinerPubkey(byte[] minerPubkey) {
-        this.minerPubkey = minerPubkey;
     }
 
     public boolean isBlockExist(byte[] hash) {

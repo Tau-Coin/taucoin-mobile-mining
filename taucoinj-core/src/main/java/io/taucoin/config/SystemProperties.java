@@ -86,6 +86,11 @@ public class SystemProperties {
 
     private Genesis genesis;
 
+    // Forger private key, public key and coinbase management.
+    private byte[] forgerPrivateKey = null;
+    private byte[] forgerPublicKey = null;
+    private byte[] forgerCoinbase = null;
+
     public SystemProperties() {
         this(ConfigFactory.empty());
     }
@@ -684,8 +689,24 @@ public class SystemProperties {
         return config.getInt("forge.forgedAmount");
     }
 
+    public void importForgerPrikey(byte[] prikey) {
+        if (prikey == null) {
+            forgerPrivateKey = null;
+            forgerPublicKey = null;
+            forgerCoinbase = null;
+        } else {
+            forgerPrivateKey = prikey;
+            forgerPublicKey = ECKey.fromPrivate(prikey).getPubKey();
+            forgerCoinbase = ECKey.fromPrivate(prikey).getAddress();
+        }
+    }
+
     @ValidateMe
     public byte[] getForgerPrikey() {
+        if (forgerPrivateKey != null) {
+            return forgerPrivateKey;
+        }
+
         String sc = config.getString("forge.prikey");
         byte[] c = Hex.decode(sc);
         //if (c.length != 32 && c.length != 33) throw new RuntimeException("mine.coinbase has invalid value: '" + sc + "'");
@@ -694,6 +715,10 @@ public class SystemProperties {
 
     @ValidateMe
     public byte[] getForgerPubkey() {
+        if (forgerPublicKey != null) {
+            return forgerPublicKey;
+        }
+
         String sc = config.getString("forge.pubkey");
         byte[] c = Hex.decode(sc);
         //if (c.length != 32 && c.length != 33) throw new RuntimeException("mine.coinbase has invalid value: '" + sc + "'");
@@ -702,6 +727,10 @@ public class SystemProperties {
 
     @ValidateMe
     public byte[] getForgerCoinbase() {
+        if (forgerCoinbase != null) {
+            return forgerCoinbase;
+        }
+
         String sc = config.getString("forge.coinbase");
         byte[] c = Hex.decode(sc);
         if (c.length != 20) throw new RuntimeException("forge.coinbase has invalid value: '" + sc + "'");

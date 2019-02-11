@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 @Singleton
 public class Taucoin extends io.taucoin.facade.TaucoinImpl {
@@ -41,6 +42,11 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
 
         for (String privateKey: privateKeys) {
             worldManager.getWallet().importKey(Hex.decode(privateKey));
+        }
+
+        // By default, import first privkey as block forger private key.
+        if (!privateKeys.isEmpty()) {
+            CONFIG.importForgerPrikey(Hex.decode(privateKeys.get(0)));
         }
 
         worldManager.init();
