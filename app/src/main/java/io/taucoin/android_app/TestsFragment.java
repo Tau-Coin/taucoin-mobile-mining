@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.os.Bundle;
 import android.os.Message;
@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.ethereum.android.interop.AdminInfo;
-import org.ethereum.android.service.ConnectorHandler;
-import org.ethereum.android.service.EthereumClientMessage;
-import org.ethereum.android.service.events.EventFlag;
+import io.taucoin.android.interop.AdminInfo;
+import io.taucoin.android.service.ConnectorHandler;
+import io.taucoin.android.service.TaucoinClientMessage;
+import io.taucoin.android.service.events.EventFlag;
 import org.ethereum.config.SystemProperties;
 import org.ethereum.net.rlpx.Node;
 
@@ -68,18 +68,18 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
 
             switch(v.getId()){
                 case R.id.discoveryButton:
-                    EthereumApplication.ethereumConnector.startPeerDiscovery();
+                    TaucoinApplication.ethereumConnector.startPeerDiscovery();
                     break;
                 case R.id.connectButton:
                     Node node = CONFIG.peerActive().get(0);
-                    EthereumApplication.ethereumConnector.connect(node.getHost(), node.getPort(), node.getHexId());
+                    TaucoinApplication.ethereumConnector.connect(node.getHost(), node.getPort(), node.getHexId());
                     break;
                 case R.id.getEthereumStatus:
-                    EthereumApplication.ethereumConnector.getConnectionStatus(identifier);
-                    EthereumApplication.ethereumConnector.getAdminInfo(identifier);
+                    TaucoinApplication.ethereumConnector.getConnectionStatus(identifier);
+                    TaucoinApplication.ethereumConnector.getAdminInfo(identifier);
                     break;
                 case R.id.getBlockchainStatus:
-                    EthereumApplication.ethereumConnector.getBlockchainStatus(identifier);
+                    TaucoinApplication.ethereumConnector.getBlockchainStatus(identifier);
                     break;
             }
         }
@@ -100,13 +100,13 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
 
         boolean isClaimed = true;
         switch(message.what) {
-            case EthereumClientMessage.MSG_CONNECTION_STATUS:
+            case TaucoinClientMessage.MSG_CONNECTION_STATUS:
                 updateTextView(connectionStatus, message.getData().getString("status"));
                 break;
-            case EthereumClientMessage.MSG_BLOCKCHAIN_STATUS:
+            case TaucoinClientMessage.MSG_BLOCKCHAIN_STATUS:
                 updateTextView(blockchainStatus, message.getData().getString("status"));
                 break;
-            case EthereumClientMessage.MSG_ADMIN_INFO:
+            case TaucoinClientMessage.MSG_ADMIN_INFO:
                 Bundle data = message.getData();
                 data.setClassLoader(AdminInfo.class.getClassLoader());
                 AdminInfo adminInfo = data.getParcelable("adminInfo");
@@ -114,13 +114,13 @@ public class TestsFragment extends Fragment implements ConnectorHandler {
                 updateTextView(isConsensus, adminInfo.isConsensus() ? "true" : "false");
                 updateTextView(blockExecTime, adminInfo.getExecAvg().toString());
                 break;
-            case EthereumClientMessage.MSG_ONLINE_PEER:
+            case TaucoinClientMessage.MSG_ONLINE_PEER:
                 break;
-            case EthereumClientMessage.MSG_PEERS:
+            case TaucoinClientMessage.MSG_PEERS:
                 break;
-            case EthereumClientMessage.MSG_PENDING_TRANSACTIONS:
+            case TaucoinClientMessage.MSG_PENDING_TRANSACTIONS:
                 break;
-            case EthereumClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
+            case TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
                 break;
             default:
                 isClaimed = false;

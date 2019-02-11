@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.os.Message;
 import android.support.v4.view.ViewPager;
@@ -8,17 +8,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.ethereum.android.service.ConnectorHandler;
-import org.ethereum.android.service.EthereumConnector;
-import org.ethereum.android.service.EthereumClientMessage;
-import org.ethereum.android.service.events.BlockEventData;
-import org.ethereum.android.service.events.EventData;
-import org.ethereum.android.service.events.EventFlag;
-import org.ethereum.android.service.events.MessageEventData;
-import org.ethereum.android.service.events.PeerDisconnectEventData;
-import org.ethereum.android.service.events.PendingTransactionsEventData;
-import org.ethereum.android.service.events.TraceEventData;
-import org.ethereum.android.service.events.VMTraceCreatedEventData;
+import io.taucoin.android.service.ConnectorHandler;
+import io.taucoin.android.service.TaucoinConnector;
+import io.taucoin.android.service.TaucoinClientMessage;
+import io.taucoin.android.service.events.BlockEventData;
+import io.taucoin.android.service.events.EventData;
+import io.taucoin.android.service.events.EventFlag;
+import io.taucoin.android.service.events.MessageEventData;
+import io.taucoin.android.service.events.PeerDisconnectEventData;
+import io.taucoin.android.service.events.PendingTransactionsEventData;
+import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.android.service.events.VMTraceCreatedEventData;
 import org.ethereum.config.SystemProperties;
 import org.ethereum.net.p2p.HelloMessage;
 import org.ethereum.net.rlpx.Node;
@@ -63,7 +63,7 @@ public class RemoteMainActivity extends ActionBarActivity implements ActivityInt
         tabs.setViewPager(viewPager);
 
         initializer.schedule(
-                new InitTask(EthereumApplication.ethereumConnector, EthereumApplication.handlerIdentifier),
+                new InitTask(TaucoinApplication.ethereumConnector, TaucoinApplication.handlerIdentifier),
                 BOOTUP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -99,10 +99,10 @@ public class RemoteMainActivity extends ActionBarActivity implements ActivityInt
     }
 
     private static class InitTask implements Runnable {
-        private EthereumConnector ethereumConnector;
+        private TaucoinConnector ethereumConnector;
         private String handlerIdentifier;
 
-        public InitTask(EthereumConnector ethereumConnector, String handlerIdentifier) {
+        public InitTask(TaucoinConnector ethereumConnector, String handlerIdentifier) {
             this.ethereumConnector = ethereumConnector;
             this.handlerIdentifier = handlerIdentifier;
         }

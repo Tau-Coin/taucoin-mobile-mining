@@ -307,20 +307,21 @@ public class TaucoinRemoteService extends TaucoinService {
         System.setProperty("leveldb.mmap", "false");
 
         String databaseFolder = getApplicationInfo().dataDir;
-        System.out.println("Database folder: " + databaseFolder);
+        logger.info("Database folder: {}", databaseFolder);
         CONFIG.setDataBaseDir(databaseFolder);
 
         component = DaggerTaucoinComponent.builder()
                 .taucoinModule(new TaucoinModule(this))
                 .build();
-        //component.udpListener();
-        //taucoin = (io.taucoin.android.Taucoin)component.taucoin();
+
         taucoin = component.taucoin();
         taucoin.addListener(new EthereumListener());
         PeersPool peersPool = component.peersPool();
         peersPool.setTaucoin(taucoin);
         ChannelManager channelManager = component.channelManager();
         //channelManager.setTaucoin(taucoin);
+
+        // You can also add some other initialization logic.
     }
 
 

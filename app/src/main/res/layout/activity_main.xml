@@ -12,7 +12,7 @@ tools:context=".MainActivity">
         android:layout_width="match_parent"
         />
 
-    <org.ethereum.android_app.SlidingTabLayout
+    <io.taucoin.android_app.SlidingTabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

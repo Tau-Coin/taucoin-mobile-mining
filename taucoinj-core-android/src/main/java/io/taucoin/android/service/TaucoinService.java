@@ -54,24 +54,11 @@ public class TaucoinService extends Service {
     public TaucoinService() {
     }
 
-    protected void broadcastEvent(EventFlag event, EventData data) {
-
-
-    }
+    protected void broadcastEvent(EventFlag event, EventData data) {}
 
     @Override
     public void onCreate() {
-
         super.onCreate();
-        /*
-        if (!isInitialized) {
-            isInitialized = true;
-            new InitializeTask(null).execute();
-        } else {
-            System.out.println(" Already initialized");
-            System.out.println("x " + (taucoin != null));
-        }
-        */
     }
 
     @Override
@@ -109,52 +96,9 @@ public class TaucoinService extends Service {
     }
 
     protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply) {
-
-        /*
-        if (false && taucoin != null) {
-            if (privateKeys == null || privateKeys.size() == 0) {
-                privateKeys = new ArrayList<>();
-                byte[] cowAddr = HashUtil.sha3("cow".getBytes());
-                privateKeys.add(Hex.toHexString(cowAddr));
-
-                String secret = CONFIG.coinbaseSecret();
-                byte[] cbAddr = HashUtil.sha3(secret.getBytes());
-                privateKeys.add(Hex.toHexString(cbAddr));
-            }
-            taucoin.init(privateKeys);
-            broadcastEvent(EventFlag.EVENT_SYNC_DONE, new EventData());
-        }
-        */
     }
 
     protected void createTaucoin() {
-
-        /*
-        System.setProperty("sun.arch.data.model", "32");
-        System.setProperty("leveldb.mmap", "false");
-
-        String databaseFolder = getApplicationInfo().dataDir;
-        System.out.println("Database folder: " + databaseFolder);
-        CONFIG.setDataBaseDir(databaseFolder);
-        System.out.println("Loading genesis");
-        String genesisFile = CONFIG.genesisInfo();
-        try {
-            InputStream is = getApplication().getAssets().open("genesis/" + genesisFile);
-            Genesis.androidGetInstance(is);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("Genesis loaded");
-        component = DaggerTaucoinComponent.builder()
-                .taucoinModule(new TaucoinModule(this))
-                .build();
-        taucoin = component.taucoin();
-        taucoin.addListener(new EthereumListener());
-        PeersPool peersPool = component.peersPool();
-        peersPool.setTaucoin(taucoin);
-        ChannelManager channelManager = component.channelManager();
-        channelManager.setTaucoin(taucoin);
-        */
     }
 
     @Override

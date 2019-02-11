@@ -16,7 +16,7 @@ public class TaucoinAidlService extends TaucoinService {
 
     public static String log = "";
 
-    IEthereumService.Stub binder = null;
+    ITaucoinService.Stub binder = null;
 
     public TaucoinAidlService() {
 
@@ -25,7 +25,7 @@ public class TaucoinAidlService extends TaucoinService {
 
     protected void initializeBinder() {
 
-        binder = new IEthereumService.Stub() {
+        binder = new ITaucoinService.Stub() {
 
             public void loadBlocks(String dumpFile) throws RemoteException {
 

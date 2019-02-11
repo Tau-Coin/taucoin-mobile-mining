@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 
 import android.annotation.SuppressLint;
@@ -6,17 +6,17 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.multidex.MultiDexApplication;
 
-import org.ethereum.android.service.ConnectorHandler;
-import org.ethereum.android.service.EthereumClientMessage;
-import org.ethereum.android.service.EthereumConnector;
-import org.ethereum.android.service.events.BlockEventData;
-import org.ethereum.android.service.events.EventData;
-import org.ethereum.android.service.events.EventFlag;
-import org.ethereum.android.service.events.MessageEventData;
-import org.ethereum.android.service.events.PeerDisconnectEventData;
-import org.ethereum.android.service.events.PendingTransactionsEventData;
-import org.ethereum.android.service.events.TraceEventData;
-import org.ethereum.android.service.events.VMTraceCreatedEventData;
+import io.taucoin.android.service.ConnectorHandler;
+import io.taucoin.android.service.TaucoinClientMessage;
+import io.taucoin.android.service.TaucoinConnector;
+import io.taucoin.android.service.events.BlockEventData;
+import io.taucoin.android.service.events.EventData;
+import io.taucoin.android.service.events.EventFlag;
+import io.taucoin.android.service.events.MessageEventData;
+import io.taucoin.android.service.events.PeerDisconnectEventData;
+import io.taucoin.android.service.events.PendingTransactionsEventData;
+import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.android.service.events.VMTraceCreatedEventData;
 import org.ethereum.config.SystemProperties;
 import org.ethereum.net.p2p.HelloMessage;
 import org.ethereum.net.rlpx.Node;
@@ -28,10 +28,10 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.UUID;
 
-public class EthereumApplication extends MultiDexApplication implements ConnectorHandler {
+public class TaucoinApplication extends MultiDexApplication implements ConnectorHandler {
 
-    public static EthereumConnector ethereumConnector = null;
-    public static EthereumApplication instance;
+    public static TaucoinConnector ethereumConnector = null;
+    public static TaucoinApplication instance;
 
     public static String consoleLog = "";
 
@@ -44,7 +44,7 @@ public class EthereumApplication extends MultiDexApplication implements Connecto
 
     public boolean isEthereumConnected = false;
 
-    public EthereumApplication() {
+    public TaucoinApplication() {
 
         instance = this;
     }
@@ -54,7 +54,7 @@ public class EthereumApplication extends MultiDexApplication implements Connecto
         super.onCreate();
         if (ethereumConnector == null) {
             System.out.println("Creating ethereum connector");
-            ethereumConnector = new EthereumConnector(this, EthereumRemoteService.class);
+            ethereumConnector = new TaucoinConnector(this, TaucoinRemoteService.class);
             ethereumConnector.registerHandler(this);
             ethereumConnector.bindService();
         }
@@ -112,7 +112,7 @@ public class EthereumApplication extends MultiDexApplication implements Connecto
 
         boolean isClaimed = true;
         switch (message.what) {
-            case EthereumClientMessage.MSG_EVENT:
+            case TaucoinClientMessage.MSG_EVENT:
                 Bundle data = message.getData();
                 data.setClassLoader(EventFlag.class.getClassLoader());
                 EventFlag event = (EventFlag) data.getSerializable("event");
@@ -125,7 +125,7 @@ public class EthereumApplication extends MultiDexApplication implements Connecto
                 switch (event) {
                     case EVENT_BLOCK:
                         BlockEventData blockEventData = data.getParcelable("data");
-                        logMessage = "Added block with " + blockEventData.receipts.size() + " transaction receipts.";
+                        logMessage = "Added block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
                         time = blockEventData.registeredTime;
                         addLogEntry(time, logMessage);
                         break;

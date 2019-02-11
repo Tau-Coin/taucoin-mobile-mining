@@ -14,7 +14,7 @@ import org.ethereum.ethereum_android.di.modules.ApplicationModule;
 /**
  * Created by userica on 20.05.2015.
  */
-public class EthereumApplication extends MultiDexApplication {
+public class TaucoinApplication extends MultiDexApplication {
 
     private ApplicationComponent applicationComponent = null;
 

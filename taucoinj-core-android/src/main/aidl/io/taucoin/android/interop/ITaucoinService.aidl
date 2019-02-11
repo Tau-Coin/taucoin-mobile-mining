@@ -3,7 +3,7 @@ package io.taucoin.android.interop;
 import io.taucoin.android.interop.IListener;
 import io.taucoin.android.interop.IAsyncCallback;
 
-oneway interface IEthereumService {
+oneway interface ITaucoinService {
 
     void loadBlocks(String dumpFile);
     void connect(String ip, int port, String remoteId);

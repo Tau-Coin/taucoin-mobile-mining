@@ -1,11 +1,11 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
-import org.ethereum.android.service.EthereumAidlService;
-import org.ethereum.android.interop.IListener;
+import io.taucoin.android.service.TaucoinAidlService;
+import io.taucoin.android.interop.IListener;
 
-public class EthereumService extends EthereumAidlService {
+public class TaucoinService extends TaucoinAidlService {
 
-    public EthereumService() {
+    public TaucoinService() {
 
     }
 
@@ -25,10 +25,10 @@ public class EthereumService extends EthereumAidlService {
 
     private void updateLog(String message) {
 
-        EthereumService.log += message;
-        int logLength = EthereumService.log.length();
+        TaucoinService.log += message;
+        int logLength = TaucoinService.log.length();
         if (logLength > 5000) {
-            EthereumService.log = EthereumService.log.substring(2500);
+            TaucoinService.log = TaucoinService.log.substring(2500);
         }
     }
 

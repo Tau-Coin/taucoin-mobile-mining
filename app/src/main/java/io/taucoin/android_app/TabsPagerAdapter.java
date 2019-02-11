@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;

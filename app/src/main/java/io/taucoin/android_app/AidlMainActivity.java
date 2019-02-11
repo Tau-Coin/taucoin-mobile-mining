@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,8 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.ethereum.android.interop.IEthereumService;
-import org.ethereum.android.interop.IListener;
+import io.taucoin.android.interop.ITaucoinService;
+import io.taucoin.android.interop.IListener;
 import org.ethereum.config.SystemProperties;
 import org.ethereum.net.rlpx.Node;
 
@@ -38,7 +38,7 @@ public class AidlMainActivity extends ActionBarActivity implements ActivityInter
     protected static String consoleLog = "";
 
     /** Ethereum Aidl Service. */
-    IEthereumService ethereumService = null;
+    ITaucoinService ethereumService = null;
 
     IListener.Stub ethereumListener = new IListener.Stub() {
 
@@ -63,7 +63,7 @@ public class AidlMainActivity extends ActionBarActivity implements ActivityInter
             // interact with the service.  We are communicating with our
             // service through an IDL interface, so get a client-side
             // representation of that from the raw service object.
-            ethereumService = IEthereumService.Stub.asInterface(service);
+            ethereumService = ITaucoinService.Stub.asInterface(service);
             Toast.makeText(AidlMainActivity.this, "service attached", Toast.LENGTH_SHORT).show();
 
             try {
@@ -121,7 +121,7 @@ public class AidlMainActivity extends ActionBarActivity implements ActivityInter
         tabs.setDistributeEvenly(true);
         tabs.setViewPager(viewPager);
 
-        ComponentName myService = startService(new Intent(AidlMainActivity.this, EthereumService.class));
+        ComponentName myService = startService(new Intent(AidlMainActivity.this, TaucoinService.class));
         doBindService();
 
         //StrictMode.enableDefaults();
@@ -151,7 +151,7 @@ public class AidlMainActivity extends ActionBarActivity implements ActivityInter
         // Establish a connection with the service.  We use an explicit
         // class name because there is no reason to be able to let other
         // applications replace our component.
-        bindService(new Intent(AidlMainActivity.this, EthereumService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(AidlMainActivity.this, TaucoinService.class), serviceConnection, Context.BIND_AUTO_CREATE);
         isBound = true;
         Toast.makeText(AidlMainActivity.this, "binding to service", Toast.LENGTH_SHORT).show();
     }

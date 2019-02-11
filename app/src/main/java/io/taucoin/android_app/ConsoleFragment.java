@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -28,11 +28,11 @@ public class ConsoleFragment extends Fragment {
         @Override
         public void run() {
 
-            int length = EthereumApplication.consoleLog.length();
+            int length = TaucoinApplication.consoleLog.length();
             if (length > CONSOLE_LENGTH) {
-                EthereumApplication.consoleLog = EthereumApplication.consoleLog.substring(CONSOLE_LENGTH * ((length / CONSOLE_LENGTH) - 1) + length % CONSOLE_LENGTH);
+                TaucoinApplication.consoleLog = TaucoinApplication.consoleLog.substring(CONSOLE_LENGTH * ((length / CONSOLE_LENGTH) - 1) + length % CONSOLE_LENGTH);
             }
-            consoleText.setText(EthereumApplication.consoleLog);
+            consoleText.setText(TaucoinApplication.consoleLog);
 
             handler.postDelayed(consoleUpdater, CONSOLE_REFRESH_MILLS);
         }

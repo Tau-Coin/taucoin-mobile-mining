@@ -1,4 +1,4 @@
-package org.ethereum.android_app;
+package io.taucoin.android_app;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
