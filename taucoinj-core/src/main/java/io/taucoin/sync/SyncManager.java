@@ -116,7 +116,6 @@ public class SyncManager {
         this.channelManager = channelManager;
     }
 
-    @PostConstruct
     public void init() {
 
         // make it asynchronously

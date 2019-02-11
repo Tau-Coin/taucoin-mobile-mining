@@ -84,17 +84,16 @@ public class WorldManager {
         this.nodeManager.setWorldManager(this);
     }
 
-    @PostConstruct
     public void init() {
-        byte[] cowAddr = HashUtil.sha3("cow".getBytes());
-        //wallet.importKey(cowAddr);
-
-        String secret = config.coinbaseSecret();
-        byte[] cbAddr = HashUtil.sha3(secret.getBytes());
-        //wallet.importKey(cbAddr);
-
         loadBlockchain();
         logger.info("chain size is {}",blockchain.getSize());
+    }
+
+    public void initSync() {
+
+        // must be initialized after blockchain is loaded
+        syncManager.init();
+        pendingState.init();
     }
 
     public void addListener(EthereumListener listener) {

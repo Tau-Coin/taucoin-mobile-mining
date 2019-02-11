@@ -12,6 +12,7 @@ import io.taucoin.forge.BlockForger;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
+import io.taucoin.net.rlpx.NodeType;
 import io.taucoin.net.rlpx.discover.UDPListener;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.net.server.PeerServer;
@@ -87,9 +88,9 @@ public class TaucoinImpl implements Taucoin {
         System.out.println();
     }
 
-    @PostConstruct
     public void init() {
-        if (CONFIG.listenPort() > 0) {
+        if (CONFIG.listenPort() > 0
+                && CONFIG.getHomeNodeType() == NodeType.SUPER) {
             Executors.newSingleThreadExecutor().submit(
                     new Runnable() {
                         public void run() {
@@ -98,7 +99,6 @@ public class TaucoinImpl implements Taucoin {
                     }
             );
         }
-        //compositeEthereumListener.addListener(gasPriceTracker);
 
         gLogger.info("EthereumJ node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
     }

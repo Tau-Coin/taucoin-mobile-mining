@@ -48,7 +48,7 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
     }
 
     public void initSync() {
-        //worldManager.initSync();
+        worldManager.initSync();
     }
 
     public byte[] createRandomAccount() {
@@ -57,6 +57,4 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
         worldManager.getWallet().importKey(randomPrivateKey);
         return randomPrivateKey;
     }
-
-
 }

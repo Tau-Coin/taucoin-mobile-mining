@@ -231,38 +231,9 @@ public class TaucoinRemoteService extends TaucoinService {
         if (taucoin != null) {
             System.out.println("Loading genesis");
             broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData("Loading genesis block. This may take a few minutes..."));
-            /*
-            String genesisFile = CONFIG.genesisInfo();
-            long startTime = System.nanoTime();
-            try {
-                InputStream genesis = getApplication().getAssets().open("genesis/" + genesisFile);
-                Genesis.androidGetInstance(genesis);
-                genesis.close();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            long endTime = System.nanoTime();
-            System.out.println((endTime - startTime)/1000000);
-            Genesis.reset();
-            */
-            long startTime1 = System.nanoTime();
-            /*
-            try {
-                InputStream genesis = getApplication().getAssets().open("genesis/genesis.bin");
-                InputStream premine = getApplication().getAssets().open("genesis/premine.bin");
-                InputStream roothash = getApplication().getAssets().open("genesis/roothash.bin");
-                Genesis.binaryGetInstance(genesis, premine, roothash);
-                genesis.close();
-                premine.close();
-                roothash.close();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            */
-            long endTime1 = System.nanoTime();
-            System.out.println((endTime1 - startTime1)/1000000);
 
-            System.out.println("Genesis loaded");
+            long startTime1 = System.nanoTime();
+
             if (privateKeys == null || privateKeys.size() == 0) {
                 privateKeys = new ArrayList<>();
                 byte[] cowAddr = HashUtil.sha3("cow".getBytes());
@@ -273,16 +244,22 @@ public class TaucoinRemoteService extends TaucoinService {
                 privateKeys.add(Hex.toHexString(cbAddr));
             }
             taucoin.init(privateKeys);
-            taucoin.getDefaultPeer();
 
-            //startJsonRpc(null);
-            //if (currentJsonRpcServer != null) {
-            //    this.changeJsonRpc(null);
-            //}
+            long endTime1 = System.nanoTime();
+            logger.info("Loading genesis cost {} ms", (endTime1 - startTime1)/1000000);
+            logger.info("Genesis loaded");
+
+            taucoin.getDefaultPeer();
 
             taucoin.initSync();
             isTaucoinStarted = true;
             isInitialized = true;
+
+            // Start rpc server
+            if (CONFIG.isRpcEnabled()) {
+                logger.info("Starting json rpc...");
+                startJsonRpc(null);
+            }
 
             // Send reply
             if (replyTo != null && reply != null) {
