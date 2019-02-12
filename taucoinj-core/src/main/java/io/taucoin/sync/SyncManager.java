@@ -17,16 +17,12 @@ import io.taucoin.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-import javax.inject.Inject;
-//import org.springframework.beans.factory.annotation.Qualifier;
 
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
-
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -50,11 +46,10 @@ public class SyncManager {
     private static final long PEER_STUCK_TIMEOUT = secondsToMillis(60);
     private static final long GAP_RECOVERY_TIMEOUT = secondsToMillis(2);
 
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
-    //@Resource
-    //@Qualifier("syncStates")
-    private Map<SyncStateName, SyncState> syncStates;
+    @Resource
+    private Map<SyncStateName, SyncState> syncStates = new IdentityHashMap<>();
 
     private StateInitiator stateInitiator;
 
@@ -140,7 +135,7 @@ public class SyncManager {
 
                 updateDifficulties();
 
-                changeState(stateInitiator.initiate());
+                changeState(initialState());
 
                 addBestKnownNodeListener();
 
@@ -293,6 +288,15 @@ public class SyncManager {
 
         // TODO decrease peer's reputation
 
+    }
+
+    private SyncStateName initialState() {
+        if (queue.hasSolidBlocks()) {
+            logger.info("It seems that BLOCK_RETRIEVING was interrupted, starting from this state now");
+            return BLOCK_RETRIEVING;
+        } else {
+            return HASH_RETRIEVING;
+        }
     }
 
     private int gapSize(BlockWrapper block) {

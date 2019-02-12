@@ -34,6 +34,7 @@ import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.sync.SyncStateName.*;
 import static io.taucoin.util.BIUtil.isLessThan;
 
@@ -61,8 +62,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     protected static final int MAX_HASHES_TO_SEND = 65536;
 
-    @Inject
-    protected SystemProperties config;
+    protected SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
     protected Blockchain blockchain;

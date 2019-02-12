@@ -8,6 +8,9 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.util.List;
 import javax.inject.Inject;
+
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * This class contains static values of messages on the network. These message
  * will always be the same and therefore don't need to be created each time.
@@ -17,8 +20,7 @@ import javax.inject.Inject;
  */
 public class StaticMessages {
 
-    @Inject
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
     ConfigCapabilities configCapabilities;

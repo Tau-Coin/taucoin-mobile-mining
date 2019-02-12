@@ -26,6 +26,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
 
 /**
@@ -63,7 +64,7 @@ public class WorldManager {
 
     private PendingState pendingState;
 
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
     public WorldManager(EthereumListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery

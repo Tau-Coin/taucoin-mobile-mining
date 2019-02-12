@@ -16,13 +16,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 @Singleton
 public class BlockLoader {
     private static final Logger logger = LoggerFactory.getLogger("blockqueue");
 
     private BlockHeaderValidator headerValidator;
 
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
     protected Blockchain blockchain;
 

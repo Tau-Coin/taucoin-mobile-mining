@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.net.rlpx.FrameCodec.Frame;
 
 /**
@@ -42,8 +43,7 @@ import static io.taucoin.net.rlpx.FrameCodec.Frame;
  */
 public class HandshakeHandler extends ByteToMessageDecoder {
 
-    @Inject
-    SystemProperties config;
+    SystemProperties config = SystemProperties.CONFIG;
 
     private static final Logger loggerWire = LoggerFactory.getLogger("wire");
     private static final Logger loggerNet = LoggerFactory.getLogger("net");
