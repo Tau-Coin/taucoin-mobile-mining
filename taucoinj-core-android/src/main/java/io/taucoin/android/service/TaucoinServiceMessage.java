@@ -87,4 +87,25 @@ public class TaucoinServiceMessage {
      * Command to the service to change the json rpc server
      */
     public static final int MSG_CHANGE_JSON_RPC_SERVER = 17;
+
+    /**
+     * Command to the service to import block forger private key
+     */
+    public static final int MSG_IMPORT_FORGER_PRIVKEY = 18;
+
+    /**
+     * Command to the service to start block forging
+     */
+    public static final int MSG_START_FORGING = 19;
+
+    /**
+     * Command to the service to stop block forging
+     */
+    public static final int MSG_STOP_FORGING = 20;
+
+    /**
+     * Command to the service to start sync
+     */
+    public static final int MSG_START_SYNC = 21;
+
 }

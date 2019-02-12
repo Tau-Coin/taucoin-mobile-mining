@@ -218,6 +218,22 @@ public class TaucoinRemoteService extends TaucoinService {
                 getPendingTransactions(message);
                 break;
 
+            case TaucoinServiceMessage.MSG_IMPORT_FORGER_PRIVKEY:
+                importForgerPrivkey(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_START_FORGING:
+                startBlockForging(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_STOP_FORGING:
+                stopBlockForging(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_START_SYNC:
+                startSync(message);
+                break;
+
             default:
                 return false;
         }
@@ -826,5 +842,17 @@ public class TaucoinRemoteService extends TaucoinService {
         } catch (RemoteException e) {
             logger.error("Exception sending pending transactions to client: " + e.getMessage());
         }
+    }
+
+    protected void importForgerPrivkey(Message message) {
+    }
+
+    protected void startBlockForging(Message message) {
+    }
+
+    protected void stopBlockForging(Message message) {
+    }
+
+    protected void startSync(Message message) {
     }
 }

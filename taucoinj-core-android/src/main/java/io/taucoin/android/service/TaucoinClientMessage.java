@@ -41,4 +41,20 @@ public class TaucoinClientMessage {
      * Send event to the client
      */
     public static final int MSG_EVENT = 8;
+
+    /**
+     * Send importing forger private key result to client
+     */
+    public static final int MSG_IMPORT_FORGER_PRIVKEY_RESULT = 9;
+
+    /**
+     * Send starting sync  result to client
+     */
+    public static final int MSG_START_SYNC_RESULT = 10;
+
+    /**
+     * Send importing forger private key result to client
+     */
+    public static final int MSG_START_FORGING_RESULT = 11;
+
 }

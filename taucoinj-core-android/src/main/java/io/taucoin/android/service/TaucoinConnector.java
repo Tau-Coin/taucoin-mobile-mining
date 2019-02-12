@@ -46,6 +46,96 @@ public class TaucoinConnector extends ServiceConnector {
     }
 
     /**
+     * Import block forger private key.
+     *
+     * @param privateKey block forger private key
+     * Please handle TaucoinClientMessage.MSG_IMPORT_FORGER_PRIVKEY_RESULT
+     * for result of importing forger private key.
+     */
+    public void importForgerPrivkey(String privateKey) {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_IMPORT_FORGER_PRIVKEY, 0, 0);
+        msg.replyTo = clientMessenger;
+        Bundle data = new Bundle();
+        data.putString("privateKey", privateKey);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(init) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start block forging.
+     *
+     * @param privateKey block forger private key
+     * Please handle TaucoinClientMessage.MSG_START_FORGING_RESULT for result
+     * of starting forging.
+     */
+    public void startBlockForging(int targetAmount) {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_START_FORGING, 0, 0);
+        msg.replyTo = clientMessenger;
+        Bundle data = new Bundle();
+        ArrayList<Integer> targetAmountList = new ArrayList<Integer>();
+        targetAmountList.add(targetAmount);
+        data.putIntegerArrayList("forgedAmount", targetAmountList);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(init) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Stop block forging.
+     */
+    public void stopBlockForging(int targetAmount) {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_STOP_FORGING, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(init) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start block syncing.
+     * Please handle TaucoinClientMessage.MSG_START_SYNC_RESULT for result
+     * of starting syncing.
+     */
+    public void startSync() {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_START_SYNC, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(init) to service: " + e.getMessage());
+        }
+    }
+
+    /**
      * Connect ethereum to peer
      * @param ip String Peer ip address
      * @param port int Peer port
