@@ -63,7 +63,7 @@ public class DefaultConfig {
                 .counterEnable()
                 .makeOrGet();
 
-        KeyValueDataSource blocksDB = new KeyValueDataSource();//appCtx.getBean(LevelDbDataSource.class, "blocks");
+        KeyValueDataSource blocksDB = new LevelDbDataSource("blocks");
         blocksDB.init();
 
 

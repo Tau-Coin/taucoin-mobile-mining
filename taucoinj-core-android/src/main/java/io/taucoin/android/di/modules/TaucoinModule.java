@@ -13,9 +13,12 @@ import io.taucoin.core.PendingState;
 import io.taucoin.core.PendingStateImpl;
 import io.taucoin.core.Repository;
 import io.taucoin.core.Wallet;
+import io.taucoin.datasource.HashMapDB;
+import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.datasource.mapdb.MapDBFactory;
 import io.taucoin.datasource.mapdb.MapDBFactoryImpl;
 import io.taucoin.db.BlockStore;
+import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.db.RepositoryImpl;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.forge.BlockForger;
@@ -53,15 +56,22 @@ import io.taucoin.validator.ParentBlockHeaderValidator;
 import io.taucoin.validator.ParentNumberRule;
 import io.taucoin.validator.ProofOfTransactionRule;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
+import static io.taucoin.db.IndexedBlockStore.BLOCK_INFO_SERIALIZER;
 import static java.util.Arrays.asList;
 import static io.taucoin.config.SystemProperties.CONFIG;
 
@@ -73,6 +83,8 @@ public class TaucoinModule {
     boolean storeAllBlocks;
     static WorldManager worldManager = null;
     static Taucoin taucoin = null;
+
+    static BlockStore sBlockStore = null;
 
     public TaucoinModule(Context context) {
 
@@ -122,9 +134,38 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    BlockStore provideBlockStore() {
-        OrmLiteBlockStoreDatabase database = OrmLiteBlockStoreDatabase.getHelper(context);
-        return new InMemoryBlockStore(database, storeAllBlocks);
+    BlockStore provideBlockStore(MapDBFactory mapDBFactory) {
+        //OrmLiteBlockStoreDatabase database = OrmLiteBlockStoreDatabase.getHelper(context);
+        //return new InMemoryBlockStore(database, storeAllBlocks);
+        if (sBlockStore != null) {
+            return sBlockStore;
+        }
+
+        String database = CONFIG.databaseDir();
+
+        String blocksIndexFile = database + "/blocks/index";
+        File dbFile = new File(blocksIndexFile);
+        if (!dbFile.getParentFile().exists()) dbFile.getParentFile().mkdirs();
+
+        DB indexDB = mapDBFactory.createDB(dbFile.getAbsolutePath());
+
+        Map<Long, List<IndexedBlockStore.BlockInfo>> indexMap = indexDB.hashMapCreate("index")
+                .keySerializer(Serializer.LONG)
+                .valueSerializer(BLOCK_INFO_SERIALIZER)
+                .counterEnable()
+                .makeOrGet();
+
+        KeyValueDataSource blocksDB = new io.taucoin.android.datasource.LevelDbDataSource("blocks");
+        blocksDB.init();
+
+        IndexedBlockStore cache = new IndexedBlockStore();
+        cache.init(new HashMap<Long, List<IndexedBlockStore.BlockInfo>>(), new HashMapDB(), null, null);
+
+        IndexedBlockStore indexedBlockStore = new IndexedBlockStore();
+        indexedBlockStore.init(indexMap, blocksDB, cache, indexDB);
+        sBlockStore = indexedBlockStore;
+
+        return sBlockStore;
     }
 
     @Provides

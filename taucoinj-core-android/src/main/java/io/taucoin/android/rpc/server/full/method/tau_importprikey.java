@@ -32,7 +32,9 @@ public class tau_importprikey extends JsonRpcServerMethod {
             return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
         }
         ECKey key;
-        String prikey = (String)params.get(0);
+        String prikey = Hex.toHexString(jsToByteArray((String)params.get(0)));
+        log.info("privkey is {}",prikey);
+
         if (prikey.length() == 51 || prikey.length() == 52) {
             DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(),prikey);
             key = dumpedPrivateKey.getKey();
