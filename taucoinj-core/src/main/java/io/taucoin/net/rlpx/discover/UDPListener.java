@@ -45,8 +45,7 @@ public class UDPListener {
         this.port = port;
     }
 
-    @PostConstruct
-    void init() {
+    public void init() {
         this.address = config.bindIp();
         port = config.listenPort();
         if (config.peerDiscovery()) {

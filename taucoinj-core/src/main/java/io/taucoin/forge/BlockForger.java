@@ -36,20 +36,15 @@ import static io.taucoin.config.SystemProperties.CONFIG;
 public class BlockForger {
     private static final Logger logger = LoggerFactory.getLogger("forge");
 
-    private static ExecutorService executor = Executors.newSingleThreadExecutor();
-
+    private static ExecutorService executor = null;//Executors.newSingleThreadExecutor();
 
     private  Repository repository;
 
-
     private Blockchain blockchain;
-
 
     private BlockStore blockStore;
 
-
     private Taucoin taucoin;
-
 
     private CompositeEthereumListener listener;
 
@@ -110,6 +105,9 @@ public class BlockForger {
             return;
         }
 
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
         executor.submit(new ForgeTask(this, amount));
         fireForgerStarted();
         this.isForging = true;
@@ -120,6 +118,7 @@ public class BlockForger {
         this.isForging = false;
         this.stopForge = true;
         executor.shutdownNow();
+        executor = null;
         fireForgerStopped();
     }
 

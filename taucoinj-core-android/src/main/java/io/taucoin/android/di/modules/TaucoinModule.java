@@ -99,11 +99,11 @@ public class TaucoinModule {
     @Singleton
     Taucoin provideTaucoin(WorldManager worldManager, AdminInfo adminInfo,
                              ChannelManager channelManager, io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
-                             Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoveryServerProvider,
+                             Provider<PeerClient> peerClientProvider, UDPListener discoveryServer,
                              PeerServer peerServer, BlockForger blockForger) {
 
         return new io.taucoin.android.Taucoin(worldManager, adminInfo, channelManager, blockLoader, pendingState, peerClientProvider,
-                discoveryServerProvider, peerServer, blockForger);
+                discoveryServer, peerServer, blockForger);
     }
 
     @Provides
@@ -296,5 +296,11 @@ public class TaucoinModule {
     @Singleton
     BlockForger provideBlockForger() {
         return new BlockForger();
+    }
+
+    @Provides
+    @Singleton
+    UDPListener provideUDPListener(NodeManager nodeManager) {
+        return new UDPListener(nodeManager);
     }
 }

@@ -31,11 +31,11 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
     @Inject
     public Taucoin(WorldManager worldManager, AdminInfo adminInfo,
                     ChannelManager channelManager, io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
-                    Provider<PeerClient> peerClientProvider, Provider<UDPListener> discoveryServerProvider,
+                    Provider<PeerClient> peerClientProvider, UDPListener discoveryServer,
                     PeerServer peerServer, BlockForger blockForger) {
 
         super(worldManager, adminInfo, channelManager, blockLoader, pendingState, peerClientProvider,
-                discoveryServerProvider, peerServer, blockForger);
+                discoveryServer, peerServer, blockForger);
     }
 
     public void init(List<String> privateKeys) {

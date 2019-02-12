@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
@@ -844,15 +845,83 @@ public class TaucoinRemoteService extends TaucoinService {
         }
     }
 
+    /**
+     * Import block forger private key.
+     *
+     * Incoming message:{"privateKey":<private key>}
+     *
+     * Response message:{"result": "OK" or "Fail"}
+     */
     protected void importForgerPrivkey(Message message) {
+
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_IMPORT_FORGER_PRIVKEY_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        Bundle data = message.getData();
+        String privateKey = data.getString("privateKey");
+
+        if (taucoin != null && !TextUtils.isEmpty(privateKey)) {
+            taucoin.getWorldManager().getWallet().importKey(Hex.decode(privateKey));
+            CONFIG.importForgerPrikey(Hex.decode(privateKey));
+            replyData.putString("result", "OK");
+        } else {
+            replyData.putString("result", "Fail");
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending importing privkey result to client: " + e.getMessage());
+        }
     }
 
     protected void startBlockForging(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_START_FORGING_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        Bundle data = message.getData();
+        ArrayList<Integer> targetAmountList = data.getIntegerArrayList("forgedAmount");
+
+        if (taucoin != null && !targetAmountList.isEmpty()) {
+            int forgedAmount = targetAmountList.get(0).intValue();
+            taucoin.getBlockForger().startForging((long)forgedAmount);
+            replyData.putString("result", "OK");
+        } else {
+            replyData.putString("result", "Fail");
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending forging result to client: " + e.getMessage());
+        }
+
     }
 
     protected void stopBlockForging(Message message) {
+       if (taucoin != null) {
+           taucoin.getBlockForger().stopForging();
+       }
     }
 
     protected void startSync(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_START_SYNC_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        if (taucoin != null) {
+            taucoin.startPeerDiscovery();
+            replyData.putString("result", "OK");
+        } else {
+            replyData.putString("result", "Fail");
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending importing privkey result to client: " + e.getMessage());
+        }
     }
 }

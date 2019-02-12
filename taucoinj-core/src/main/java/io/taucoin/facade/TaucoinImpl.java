@@ -60,7 +60,7 @@ public class TaucoinImpl implements Taucoin {
 
     protected Provider<PeerClient> providerPeer;
 
-    protected Provider<UDPListener> discoveryServerProvider;
+    protected UDPListener discoveryServer;
 
     protected BlockLoader blockLoader;
 
@@ -71,14 +71,14 @@ public class TaucoinImpl implements Taucoin {
     @Inject
     public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager,
             BlockLoader blockLoader, PendingState pendingState, Provider<PeerClient> providerPeer,
-            Provider<UDPListener> discoveryServerProvider, PeerServer peerServer, BlockForger blockForger) {
+            UDPListener discoveryServer, PeerServer peerServer, BlockForger blockForger) {
         this.worldManager = worldManager;
         this.adminInfo = adminInfo;
         this.channelManager = channelManager;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
         this.providerPeer = providerPeer;
-        this.discoveryServerProvider = discoveryServerProvider;
+        this.discoveryServer = discoveryServer;
         this.peerServer = peerServer;
         this.blockForger = blockForger;
         this.blockForger.setTaucoin(this);
@@ -163,12 +163,13 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public void startPeerDiscovery() {
-        worldManager.startPeerDiscovery();
+        discoveryServer.init();
+        //worldManager.startPeerDiscovery();
     }
 
     @Override
     public void stopPeerDiscovery() {
-        worldManager.stopPeerDiscovery();
+        //worldManager.stopPeerDiscovery();
     }
 
     @Override
