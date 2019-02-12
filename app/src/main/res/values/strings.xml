@@ -5,10 +5,17 @@
 
     <string name="console_output">Console Output:</string>
 
-    <string name="ethereumj_tests">EthereumJ Tests</string>
+    <string name="taucoin_tests">Taucoinj Tests</string>
     <string name="title_activity_test">TestActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_remote_main">RemoteMainActivity</string>
+
+    <string name="fun_import_key_init">Import Key &#38; Init</string>
+    <string name="fun_sync_block">Sync Block</string>
+    <string name="btn_import_init">Import &#38; Init</string>
+    <string name="btn_send">send</string>
+    <string name="btn_mining_start">start mining</string>
+    <string name="btn_mining_end">end mining</string>
 
 </resources>

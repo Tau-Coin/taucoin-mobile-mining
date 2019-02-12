@@ -12,10 +12,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".RemoteMainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,9 +26,10 @@
         <service
             android:name=".TaucoinRemoteService"
             android:enabled="true"
-            android:process=":ethereum_service">
-        </service>
+            android:process=":taucoin_service" />
 
+        <activity android:name=".KeyActivity" />
+        <activity android:name=".SendActivity"/>
     </application>
 
 </manifest>

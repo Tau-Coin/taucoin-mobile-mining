@@ -1,150 +1,128 @@
 package io.taucoin.android_app;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
-import io.taucoin.android.interop.AdminInfo;
-import io.taucoin.android.service.ConnectorHandler;
-import io.taucoin.android.service.TaucoinClientMessage;
-import io.taucoin.android.service.events.EventFlag;
-import org.ethereum.config.SystemProperties;
-import org.ethereum.net.rlpx.Node;
+public class TestsFragment extends Fragment implements View.OnClickListener {
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.UUID;
+    static final int REQUEST_CODE_KEY = 1000;
+    Button keyButton;
+    Button syncButton;
+    Button sendButton;
+    Button miningButton;
 
-import static org.ethereum.config.SystemProperties.CONFIG;
+    boolean isMiningStart = false;
 
-public class TestsFragment extends Fragment implements ConnectorHandler {
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent != null && intent.getAction() != null){
+                switch (intent.getAction()){
+                    case RemoteConnectorManager.ACTION_BLOCK_SYNC:
+                        sendButton.setEnabled(true);
+                        miningButton.setEnabled(true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    };
 
-    TextView connectionStatus;
-    TextView blockchainStatus;
-    TextView startupTime;
-    TextView isConsensus;
-    TextView blockExecTime;
-
-    Button discoverytButton;
-    Button connectButton;
-    Button getEthereumStatus;
-    Button getBlockchainStatus;
-
-    String identifier = UUID.randomUUID().toString();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RemoteConnectorManager.ACTION_BLOCK_SYNC);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_tests, container, false);
 
-        connectionStatus = (TextView)view.findViewById(R.id.connectionStatus);
-        blockchainStatus = (TextView)view.findViewById(R.id.blockchainStatus);
-        startupTime = (TextView)view.findViewById(R.id.startupTime);
-        isConsensus = (TextView)view.findViewById(R.id.isConsensus);
-        blockExecTime = (TextView)view.findViewById(R.id.blockExecTime);
-        discoverytButton = (Button)view.findViewById(R.id.discoveryButton);
-        connectButton = (Button)view.findViewById(R.id.connectButton);
-        getEthereumStatus = (Button)view.findViewById(R.id.getEthereumStatus);
-        getBlockchainStatus = (Button)view.findViewById(R.id.getBlockchainStatus);
+        keyButton = (Button)view.findViewById(R.id.keyButton);
+        syncButton = (Button)view.findViewById(R.id.syncButton);
+        sendButton = (Button)view.findViewById(R.id.sendButton);
+        miningButton = (Button)view.findViewById(R.id.miningButton);
 
-        discoverytButton.setOnClickListener(onClickListener);
-        connectButton.setOnClickListener(onClickListener);
-        getEthereumStatus.setOnClickListener(onClickListener);
-        getBlockchainStatus.setOnClickListener(onClickListener);
+        keyButton.setOnClickListener(this);
+        syncButton.setOnClickListener(this);
+        sendButton.setOnClickListener(this);
+        miningButton.setOnClickListener(this);
 
+        changeButtonState(false);
         return view;
     }
 
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(final View v) {
+    private void changeButtonState(boolean isImportKey) {
+        syncButton.setEnabled(isImportKey);
+        if(!isImportKey){
+            sendButton.setEnabled(false);
+            miningButton.setEnabled(false);
 
-            switch(v.getId()){
-                case R.id.discoveryButton:
-                    TaucoinApplication.ethereumConnector.startPeerDiscovery();
-                    break;
-                case R.id.connectButton:
-                    Node node = CONFIG.peerActive().get(0);
-                    TaucoinApplication.ethereumConnector.connect(node.getHost(), node.getPort(), node.getHexId());
-                    break;
-                case R.id.getEthereumStatus:
-                    TaucoinApplication.ethereumConnector.getConnectionStatus(identifier);
-                    TaucoinApplication.ethereumConnector.getAdminInfo(identifier);
-                    break;
-                case R.id.getBlockchainStatus:
-                    TaucoinApplication.ethereumConnector.getBlockchainStatus(identifier);
-                    break;
-            }
+            changeMiningState();
         }
-    };
-
-    protected void updateTextView(final TextView view, final String text) {
-
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                view.setText(text);
-            }
-        });
     }
 
     @Override
-    public boolean handleMessage(final Message message) {
-
-        boolean isClaimed = true;
-        switch(message.what) {
-            case TaucoinClientMessage.MSG_CONNECTION_STATUS:
-                updateTextView(connectionStatus, message.getData().getString("status"));
-                break;
-            case TaucoinClientMessage.MSG_BLOCKCHAIN_STATUS:
-                updateTextView(blockchainStatus, message.getData().getString("status"));
-                break;
-            case TaucoinClientMessage.MSG_ADMIN_INFO:
-                Bundle data = message.getData();
-                data.setClassLoader(AdminInfo.class.getClassLoader());
-                AdminInfo adminInfo = data.getParcelable("adminInfo");
-                updateTextView(startupTime, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(new Date(adminInfo.getStartupTimeStamp())));
-                updateTextView(isConsensus, adminInfo.isConsensus() ? "true" : "false");
-                updateTextView(blockExecTime, adminInfo.getExecAvg().toString());
-                break;
-            case TaucoinClientMessage.MSG_ONLINE_PEER:
-                break;
-            case TaucoinClientMessage.MSG_PEERS:
-                break;
-            case TaucoinClientMessage.MSG_PENDING_TRANSACTIONS:
-                break;
-            case TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
-                break;
-            default:
-                isClaimed = false;
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CODE_KEY && resultCode == Activity.RESULT_OK){
+            changeButtonState(true);
         }
-        return isClaimed;
+    }
+
+    private void changeMiningState() {
+        if(miningButton.isEnabled()){
+            isMiningStart = !isMiningStart;
+        }else{
+            isMiningStart = false;
+        }
+        miningButton.setText(isMiningStart ? R.string.btn_mining_end : R.string.btn_mining_start);
     }
 
     @Override
-    public String getID() {
+    public void onClick(final View v) {
 
-        return identifier;
+        switch(v.getId()){
+            case R.id.keyButton:
+                Intent intent = new Intent(getActivity(), KeyActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_KEY);
+                break;
+            case R.id.syncButton:
+                TaucoinApplication.getRemoteConnector().startSync();
+                break;
+            case R.id.sendButton:
+                intent = new Intent(getActivity(), SendActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.miningButton:
+                if(isMiningStart){
+                    TaucoinApplication.getRemoteConnector().stopBlockForging();
+                }else{
+                    TaucoinApplication.getRemoteConnector().startBlockForging();
+                }
+                changeMiningState();
+                break;
+        }
     }
 
     @Override
-    public void onConnectorConnected() {
-
-        //app.ethereum.addListener(identifier, EnumSet.allOf(EventFlag.class));
-        //Node node = SystemProperties.CONFIG.peerActive().get(0);
-        //app.ethereum.connect(node.getHost(), node.getPort(), node.getHexId());
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
-
-    @Override
-    public void onConnectorDisconnected() {
-
-    }
-
 }
