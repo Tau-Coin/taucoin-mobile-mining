@@ -37,7 +37,6 @@ import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.net.p2p.HelloMessage;
 import io.taucoin.util.ByteUtil;
 
-import org.spongycastle.util.encoders.Base64;
 import org.spongycastle.util.encoders.Hex;
 
 public class RemoteConnectorManager implements ConnectorHandler {
@@ -213,8 +212,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
     }
 
     public void importForgerPrivkey(String privateKey){
-        String hexPrivateKey = Hex.toHexString(Hex.encode(Base64.decode(privateKey)));
-        mTaucoinConnector.importForgerPrivkey(hexPrivateKey);
+        mTaucoinConnector.importForgerPrivkey(privateKey);
     }
 
     public void importPrivkeyAndInit(String privateKey){
@@ -231,8 +229,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
         InitTask(TaucoinConnector taucoinConnector, String handlerIdentifier, String privateKey) {
             this.taucoinConnector = taucoinConnector;
             this.handlerIdentifier = handlerIdentifier;
-            String hexPrivateKey = Hex.toHexString(Hex.encode(Base64.decode(privateKey)));
-            this.privateKeys.add(hexPrivateKey);
+            this.privateKeys.add(privateKey);
         }
 
         @Override
@@ -247,7 +244,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
         long timeStamp = new Date().getTime();
-        byte[] privateKey = Base64.decode(senderPrivateKey);
+        byte[] privateKey = senderPrivateKey.getBytes();
         byte[] toAddress = txToAddress.getBytes();
         byte[] amount = txAmount.getBytes();
         byte[] fee = txFee.getBytes();
