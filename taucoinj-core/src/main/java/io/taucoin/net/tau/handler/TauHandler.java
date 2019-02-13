@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -135,9 +134,9 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     protected TauHandler(TauVersion version) {
         this.version = version;
+        init();
     }
 
-    @PostConstruct
     private void init() {
         maxHashesAsk = config.maxHashesAsk();
         bestBlock = blockchain.getBestBlock();

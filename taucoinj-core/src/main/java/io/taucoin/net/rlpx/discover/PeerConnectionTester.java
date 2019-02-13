@@ -6,7 +6,6 @@ import io.taucoin.manager.WorldManager;
 import io.taucoin.net.rlpx.Node;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;

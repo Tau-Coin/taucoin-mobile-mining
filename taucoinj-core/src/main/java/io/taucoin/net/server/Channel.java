@@ -80,12 +80,14 @@ public class Channel {
     @Inject
     public Channel(MessageQueue msgQueue, P2pHandler p2pHandler
             , MessageCodec messageCodec
-            , NodeManager nodeManager, TauHandlerFactory ethHandlerFactory) {
+            , NodeManager nodeManager, TauHandlerFactory ethHandlerFactory
+            , HandshakeHandler handshakeHandler) {
         this.msgQueue = msgQueue;
         this.p2pHandler = p2pHandler;
         this.messageCodec = messageCodec;
         this.nodeManager = nodeManager;
         this.ethHandlerFactory = ethHandlerFactory;
+        this.handshakeHandler = handshakeHandler;
     }
 
     public void init(ChannelPipeline pipeline, String remoteId, boolean discoveryMode) {

@@ -21,7 +21,6 @@ import org.spongycastle.math.ec.ECPoint;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -57,10 +56,11 @@ public class HandshakeHandler extends ByteToMessageDecoder {
     private Channel channel;
     private boolean isHandshakeDone;
 
+    @Inject
     public HandshakeHandler() {
+        init();
     }
 
-    @PostConstruct
     private void init() {
         myKey = config.getMyKey();
     }

@@ -4,7 +4,6 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.net.tau.TauVersion;
 import javax.inject.Inject;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;

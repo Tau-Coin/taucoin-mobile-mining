@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,9 +59,9 @@ public class MessageCodec extends MessageToMessageCodec<Frame, Message> {
     @Inject
     public MessageCodec(EthereumListener listener) {
         this.ethereumListener = listener;
+        init();
     }
 
-    @PostConstruct
     private void init() {
         setMaxFramePayloadSize(CONFIG.rlpxMaxFrameSize());
     }

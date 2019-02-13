@@ -38,10 +38,12 @@ import io.taucoin.net.p2p.P2pHandler;
 import io.taucoin.net.peerdiscovery.DiscoveryChannel;
 import io.taucoin.net.peerdiscovery.PeerDiscovery;
 import io.taucoin.net.peerdiscovery.WorkerThread;
+import io.taucoin.net.rlpx.HandshakeHandler;
 import io.taucoin.net.rlpx.MessageCodec;
 import io.taucoin.net.rlpx.discover.NodeManager;
 import io.taucoin.net.rlpx.discover.PeerConnectionTester;
 import io.taucoin.net.rlpx.discover.UDPListener;
+import io.taucoin.net.server.Channel;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.net.server.TauChannelInitializer;
 import io.taucoin.net.server.PeerServer;
@@ -343,5 +345,18 @@ public class TaucoinModule {
     @Singleton
     UDPListener provideUDPListener(NodeManager nodeManager) {
         return new UDPListener(nodeManager);
+    }
+
+    @Provides
+    HandshakeHandler provideHandshakeHandler() {
+        return new HandshakeHandler();
+    }
+
+    @Provides
+    Channel provideChannel(MessageQueue msgQueue, P2pHandler p2pHandler,
+            MessageCodec messageCodec, NodeManager nodeManager,
+            TauHandlerFactory tauHandlerFactory, HandshakeHandler handshakeHandler) {
+        return new Channel(msgQueue, p2pHandler, messageCodec, nodeManager,
+                tauHandlerFactory, handshakeHandler);
     }
 }

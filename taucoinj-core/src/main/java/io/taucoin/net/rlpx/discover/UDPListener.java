@@ -13,7 +13,6 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
