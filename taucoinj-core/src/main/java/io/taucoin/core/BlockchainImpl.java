@@ -21,8 +21,6 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-
-import javax.annotation.PostConstruct;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

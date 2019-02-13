@@ -13,7 +13,6 @@ import javax.inject.Provider;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,9 +59,9 @@ public class Wallet {
     public Wallet(Repository repository, Provider<Account> accountProvider) {
         this.repository = repository;
         this.accountProvider = accountProvider;
+        init();
     }
-
-    @PostConstruct
+    
     private void init() {
         listener.addListener(new EthereumListenerAdapter() {
             @Override

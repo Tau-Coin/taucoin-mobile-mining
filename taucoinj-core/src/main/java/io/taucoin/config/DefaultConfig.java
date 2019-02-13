@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.springframework.context.ApplicationContext;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,10 @@ public class DefaultConfig {
 
     SystemProperties config;
 
-    @PostConstruct
+	public DefaultConfig(){
+        init();
+	}
+
     public void init() {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override

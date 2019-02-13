@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -62,8 +61,11 @@ public class PeersPool implements Iterable<Channel> {
     public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;
     }
+    
+	public PeersPool(){
+        init();
+    }
 
-    @PostConstruct
     public void init() {
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
                 new Runnable() {

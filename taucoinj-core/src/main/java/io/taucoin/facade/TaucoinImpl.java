@@ -28,7 +28,6 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.HashSet;

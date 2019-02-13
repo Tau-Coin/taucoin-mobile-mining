@@ -10,7 +10,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
@@ -25,7 +24,10 @@ public class RedisConnectionImpl implements RedisConnection {
 
     private JedisPool jedisPool;
 
-    @PostConstruct
+	public RedisConnectionImpl(){
+        tryConnect();
+    }
+
     public void tryConnect() {
         if (!SystemProperties.CONFIG.isRedisEnabled()) return;
 

@@ -1,6 +1,5 @@
 package io.taucoin.manager;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

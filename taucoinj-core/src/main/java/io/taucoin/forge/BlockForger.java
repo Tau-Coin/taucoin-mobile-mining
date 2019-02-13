@@ -20,7 +20,6 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -51,7 +50,9 @@ public class BlockForger {
     protected PendingState pendingState;
 
     @Inject
-    public BlockForger() {}
+    public BlockForger() {
+        init();
+	}
 
     public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;
@@ -72,7 +73,6 @@ public class BlockForger {
 
     private static final int TNO = 50;
 
-    @PostConstruct
     private void init() {
         listener.addListener(new EthereumListenerAdapter() {
 

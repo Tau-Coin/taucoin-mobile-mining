@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.math.BigInteger;
 import java.util.ArrayList;
