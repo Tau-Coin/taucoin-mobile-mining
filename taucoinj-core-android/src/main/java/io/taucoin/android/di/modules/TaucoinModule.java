@@ -128,8 +128,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    Wallet provideWallet(Repository repository, Provider<Account> accountProvider) {
-        return new Wallet(repository, accountProvider);
+    Wallet provideWallet(Repository repository, Provider<Account> accountProvider, EthereumListener listener) {
+        return new Wallet(repository, accountProvider, listener);
     }
 
     @Provides

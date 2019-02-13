@@ -82,8 +82,13 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         this.peerConnectionManager = peerConnectionManager;
         this.mapDBFactory = mapDBFactory;
         this.ethereumListener = ethereumListener;
+
+        PERSIST = config.peerDiscoveryPersist();
+        discoveryEnabled = config.peerDiscovery();
+
         key = CONFIG.getMyKey();
         homeNode = new Node(CONFIG.nodeId(), CONFIG.externalIp(), CONFIG.listenPort());
+        homeNode.setType(config.getHomeNodeType());
         table = new NodeTable(homeNode, CONFIG.isPublicHomeNode());
 
         Timer timer = new Timer();
@@ -95,39 +100,9 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         }, 1 * 1000, 10 * 1000);
     }
 
-    public NodeManager(NodeTable table, ECKey key) {
-        this.table = table;
-        homeNode = table.getNode();
-        this.key = key;
-    }
-
     public void setWorldManager(WorldManager worldManager) {
         this.worldManager = worldManager;
         this.peerConnectionManager.setWorldManager(worldManager);
-    }
-
-    @PostConstruct
-    void init() {
-        PERSIST = config.peerDiscoveryPersist();
-        discoveryEnabled = config.peerDiscovery();
-
-        key = config.getMyKey();
-        homeNode = new Node(config.nodeId(), config.externalIp(), config.listenPort());
-        homeNode.setType(config.getHomeNodeType());
-        logger.info("Home node type:" + config.getHomeNodeType().toString());
-        table = new NodeTable(homeNode, config.isPublicHomeNode());
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                logger.trace("Statistics:\n {}", dumpAllStatistics());
-            }
-        }, 1 * 1000, 60 * 1000);
-
-        for (Node node : config.peerActive()) {
-            getNodeHandler(node).getNodeStatistics().setPredefined(true);
-        }
     }
 
     void setBootNodes(List<Node> bootNodes) {
@@ -139,6 +114,8 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         if (!inited) {
             // no another init on a new channel activation
             inited = true;
+            logger.info("channel activated");
+            peerConnectionManager.init();
 
             Timer timer = new Timer("NodeManagerTasks");
 
@@ -160,6 +137,10 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                         dbWrite();
                     }
                 }, DB_COMMIT_RATE, DB_COMMIT_RATE);
+            }
+
+            for (Node node : config.peerActive()) {
+                getNodeHandler(node).getNodeStatistics().setPredefined(true);
             }
 
             for (Node node : bootNodes) {

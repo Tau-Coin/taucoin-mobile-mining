@@ -89,13 +89,12 @@ public class UDPListener {
             Node n = Node.instanceOf(boot);
             if (!localAddress.equals(n.getHost())
                 && !externalAddress.equals(n.getHost())) {
-                n.setType(NodeType.SUPER);
+                n.setType(NodeType.MOBILE);
                 bootNodes.add(n);
             }
         }
 
         nodeManager.setBootNodes(bootNodes);
-
 
         try {
             DiscoveryExecutor discoveryExecutor = new DiscoveryExecutor(nodeManager);

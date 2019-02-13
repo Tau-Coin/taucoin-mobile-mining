@@ -81,6 +81,7 @@ public class TaucoinImpl implements Taucoin {
         this.peerServer = peerServer;
         this.blockForger = blockForger;
         this.blockForger.setTaucoin(this);
+        this.blockForger.init();
     }
 
     public TaucoinImpl() {

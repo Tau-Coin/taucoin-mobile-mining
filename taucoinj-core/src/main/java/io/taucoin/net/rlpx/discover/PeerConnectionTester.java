@@ -1,6 +1,6 @@
 package io.taucoin.net.rlpx.discover;
 
-import org.apache.commons.codec.binary.Hex;
+import org.spongycastle.util.encoders.Hex;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.rlpx.Node;
@@ -56,7 +56,7 @@ public class PeerConnectionTester {
                     logger.debug("Trying node connection: " + nodeHandler);
                     Node node = nodeHandler.getNode();
                     worldManager.getActivePeer().connect(node.getHost(), node.getPort(),
-                            Hex.encodeHexString(node.getId()), true);
+                            Hex.toHexString(node.getId()), true);
                     logger.debug("Terminated node connection: " + nodeHandler);
                     nodeHandler.getNodeStatistics().disconnected();
                     if (!nodeHandler.getNodeStatistics().getEthTotalDifficulty().equals(BigInteger.ZERO) &&
@@ -80,14 +80,14 @@ public class PeerConnectionTester {
     }
 
     @Inject
-    public PeerConnectionTester() {}
+    public PeerConnectionTester() {
+    }
 
     public void setWorldManager(WorldManager worldManager) {
         this.worldManager = worldManager;
     }
 
-    @PostConstruct
-    void init() {
+    public void init() {
         ConnectThreads = config.peerDiscoveryWorkers();
         ReconnectPeriod = config.peerDiscoveryTouchPeriod() * 1000;
         ReconnectMaxPeers = config.peerDiscoveryTouchMaxNodes();

@@ -51,7 +51,6 @@ public class BlockForger {
 
     @Inject
     public BlockForger() {
-        init();
 	}
 
     public void setTaucoin(Taucoin taucoin) {
@@ -73,7 +72,7 @@ public class BlockForger {
 
     private static final int TNO = 50;
 
-    private void init() {
+    public void init() {
         listener.addListener(new EthereumListenerAdapter() {
 
             @Override

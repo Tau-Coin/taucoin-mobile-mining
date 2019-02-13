@@ -2,6 +2,7 @@ package io.taucoin.core;
 
 import io.taucoin.crypto.ECKey;
 import io.taucoin.listener.CompositeEthereumListener;
+import io.taucoin.listener.EthereumListener;
 import io.taucoin.listener.EthereumListenerAdapter;
 import io.taucoin.net.submit.WalletTransaction;
 import org.slf4j.Logger;
@@ -56,9 +57,10 @@ public class Wallet {
     Provider<Account> accountProvider;
 
     @Inject
-    public Wallet(Repository repository, Provider<Account> accountProvider) {
+    public Wallet(Repository repository, Provider<Account> accountProvider, EthereumListener listener) {
         this.repository = repository;
         this.accountProvider = accountProvider;
+        this.listener = (CompositeEthereumListener)listener;
         init();
     }
     
