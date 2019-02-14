@@ -20,10 +20,7 @@ import static io.taucoin.config.SystemProperties.CONFIG;
  */
 public class StaticMessages {
 
-    SystemProperties config = SystemProperties.CONFIG;
-
-    @Inject
-    ConfigCapabilities configCapabilities;
+    private static SystemProperties config = SystemProperties.CONFIG;
 
     public final static PingMessage PING_MESSAGE = new PingMessage();
     public final static PongMessage PONG_MESSAGE = new PongMessage();
@@ -32,20 +29,20 @@ public class StaticMessages {
 
     public static final byte[] SYNC_TOKEN = Hex.decode("22400891");
 
-    public HelloMessage createHelloMessage(String peerId) {
+    public static HelloMessage createHelloMessage(String peerId) {
         return createHelloMessage(peerId, config.listenPort());
     }
-    public HelloMessage createHelloMessage(String peerId, int listenPort) {
+    public static HelloMessage createHelloMessage(String peerId, int listenPort) {
 
         String helloAnnouncement = buildHelloAnnouncement();
         byte p2pVersion = (byte) config.defaultP2PVersion();
-        List<Capability> capabilities = configCapabilities.getConfigCapabilities();
+        List<Capability> capabilities = ConfigCapabilities.getConfigCapabilities();
 
         return new HelloMessage(p2pVersion, helloAnnouncement,
                 capabilities, listenPort, peerId);
     }
 
-    private String buildHelloAnnouncement() {
+    private static String buildHelloAnnouncement() {
         String version = config.projectVersion();
         String system = System.getProperty("os.name");
         if (system.contains(" "))

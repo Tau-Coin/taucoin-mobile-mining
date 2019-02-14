@@ -65,8 +65,6 @@ public class Channel {
 
     private TauHandlerFactory ethHandlerFactory;
 
-    private StaticMessages staticMessages;
-
     private Tau eth = new TauAdapter();
 
     private InetSocketAddress inetSocketAddress;
@@ -143,8 +141,8 @@ public class Channel {
 
         // in discovery mode we are supplying fake port along with fake nodeID to not receive
         // incoming connections with fake public key
-        HelloMessage helloMessage = discoveryMode ? staticMessages.createHelloMessage(nodeId, 9) :
-                staticMessages.createHelloMessage(nodeId);
+        HelloMessage helloMessage = discoveryMode ? StaticMessages.createHelloMessage(nodeId, 9) :
+                StaticMessages.createHelloMessage(nodeId);
 
         if (inboundHelloMessage != null && P2pHandler.isProtocolVersionSupported(inboundHelloMessage.getP2PVersion())) {
             // the p2p version can be downgraded if requested by peer and supported by us
