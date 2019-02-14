@@ -88,7 +88,7 @@ public class UDPListener {
             Node n = Node.instanceOf(boot);
             if (!localAddress.equals(n.getHost())
                 && !externalAddress.equals(n.getHost())) {
-                n.setType(NodeType.MOBILE);
+                n.setType(NodeType.SUPER);
                 bootNodes.add(n);
             }
         }

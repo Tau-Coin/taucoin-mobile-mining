@@ -44,7 +44,7 @@ public class TauChannelInitializer extends ChannelInitializer<NioSocketChannel> 
                 return;
             }
 
-            final Channel channel = channelProvider.get();// ctx.getBean(Channel.class);
+            final Channel channel = channelProvider.get();
             channel.init(ch.pipeline(), remoteId, peerDiscoveryMode);
 
             if(!peerDiscoveryMode) {

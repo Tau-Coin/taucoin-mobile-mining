@@ -92,7 +92,6 @@ public class WorldManager {
     public void initSync() {
 
         // must be initialized after blockchain is loaded
-        syncManager.init();
         pendingState.init();
     }
 
@@ -153,6 +152,10 @@ public class WorldManager {
 
     public PendingState getPendingState() {
         return pendingState;
+    }
+
+    public SyncManager getSyncManager() {
+        return syncManager;
     }
 
     public void loadBlockchain() {

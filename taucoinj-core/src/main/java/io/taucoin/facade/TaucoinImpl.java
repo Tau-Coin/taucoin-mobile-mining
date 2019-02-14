@@ -163,6 +163,7 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public void startPeerDiscovery() {
+        worldManager.getSyncManager().init();
         discoveryServer.init();
         //worldManager.startPeerDiscovery();
     }
