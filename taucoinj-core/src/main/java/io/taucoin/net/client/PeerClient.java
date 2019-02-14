@@ -93,6 +93,7 @@ public class PeerClient {
         ethereumListener.trace("Connecting to: " + host + ":" + port);
 
         TauChannelInitializer ethereumChannelInitializer = provider.get();
+        ethereumChannelInitializer.setRemoteId(remoteId);
         ethereumChannelInitializer.setPeerDiscoveryMode(discoveryMode);
 
         Bootstrap b = new Bootstrap();

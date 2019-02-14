@@ -78,4 +78,8 @@ public class TauChannelInitializer extends ChannelInitializer<NioSocketChannel> 
     public void setPeerDiscoveryMode(boolean peerDiscoveryMode) {
         this.peerDiscoveryMode = peerDiscoveryMode;
     }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
 }
