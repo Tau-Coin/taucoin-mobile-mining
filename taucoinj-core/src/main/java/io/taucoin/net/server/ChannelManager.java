@@ -151,6 +151,10 @@ public class ChannelManager {
         recentlyDisconnected.put(peer.getInetSocketAddress().getAddress(), new Date());
     }
 
+    public EthereumListener getListener() {
+        return listener;
+    }
+
     public boolean isRecentlyDisconnected(InetAddress peerAddr) {
         Date disconnectTime = recentlyDisconnected.get(peerAddr);
         if (disconnectTime != null &&

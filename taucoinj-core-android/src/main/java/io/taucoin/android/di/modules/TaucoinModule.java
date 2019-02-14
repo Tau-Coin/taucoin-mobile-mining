@@ -319,8 +319,11 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    TauHandlerFactory provideTauHandlerFactory(Provider<Tau60> eth60Provider, Provider<Tau61> eth61Provider, Provider<Tau62> eth62Provider) {
-        return new TauHandlerFactoryImpl(eth60Provider, eth61Provider, eth62Provider);
+    TauHandlerFactory provideTauHandlerFactory(Provider<Tau60> eth60Provider, Provider<Tau61> eth61Provider, Provider<Tau62> eth62Provider,
+            Blockchain blockchain, BlockStore blockstore, SyncManager syncManager,
+            SyncQueue queue, Wallet wallet, PendingState pendingState, ChannelManager channelManager) {
+        return new TauHandlerFactoryImpl(eth60Provider, eth61Provider, eth62Provider,
+            blockchain, blockstore, syncManager, queue, wallet, pendingState, channelManager);
     }
 
     @Provides

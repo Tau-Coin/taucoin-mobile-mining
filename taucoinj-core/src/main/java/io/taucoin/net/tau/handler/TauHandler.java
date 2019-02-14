@@ -63,28 +63,20 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     protected SystemProperties config = SystemProperties.CONFIG;
 
-    @Inject
     protected Blockchain blockchain;
 
-    @Inject
     protected BlockStore blockstore;
 
-    @Inject
     protected SyncManager syncManager;
 
-    @Inject
     protected SyncQueue queue;
 
-    @Inject
     protected CompositeEthereumListener ethereumListener;
 
-    @Inject
     protected Wallet wallet;
 
-    @Inject
     protected PendingState pendingState;
 
-    @Inject
     protected ChannelManager channelManager;
 
     protected Channel channel;
@@ -134,10 +126,20 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     protected TauHandler(TauVersion version) {
         this.version = version;
-        init();
     }
 
-    private void init() {
+    public void init(Blockchain blockchain, BlockStore blockstore, SyncManager syncManager,
+            SyncQueue queue,
+            Wallet wallet, PendingState pendingState, ChannelManager channelManager) {
+        this.blockchain = blockchain;
+        this.blockstore = blockstore;
+        this.syncManager = syncManager;
+        this.queue = queue;
+        this.wallet = wallet;
+        this.pendingState = pendingState;
+        this.channelManager = channelManager;
+        this.ethereumListener = (CompositeEthereumListener)channelManager.getListener();
+
         maxHashesAsk = config.maxHashesAsk();
         bestBlock = blockchain.getBestBlock();
         ethereumListener.addListener(listener);
