@@ -18,9 +18,11 @@ public class KeyActivity extends AppCompatActivity implements View.OnClickListen
         privateKeyET = (EditText)findViewById(R.id.privateKeyET);
         Button clearButton = (Button) findViewById(R.id.clearButton);
         Button importButton = (Button) findViewById(R.id.importButton);
+        Button initButton = (Button) findViewById(R.id.initButton);
 
         clearButton.setOnClickListener(this);
         importButton.setOnClickListener(this);
+        initButton.setOnClickListener(this);
 
         String privateKey = Sp.getInstance().getString(Sp.PRIVATE_KEY, "");
         privateKeyET.setText(privateKey);
@@ -35,6 +37,18 @@ public class KeyActivity extends AppCompatActivity implements View.OnClickListen
                 break;
             case R.id.importButton:
                 String privateKey = privateKeyET.getText().toString();
+                if(!privateKey.isEmpty()){
+                    Sp.getInstance().putString(Sp.PRIVATE_KEY, privateKey);
+                    TaucoinApplication.getRemoteConnector().importForgerPrivkey(privateKey);
+                    setResult(RESULT_OK);
+                    this.finish();
+                }else{
+                    Toast.makeText(this, "private key is empty!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case R.id.initButton:
+                privateKey = privateKeyET.getText().toString();
                 if(!privateKey.isEmpty()){
                     Sp.getInstance().putString(Sp.PRIVATE_KEY, privateKey);
                     TaucoinApplication.getRemoteConnector().importPrivkeyAndInit(privateKey);

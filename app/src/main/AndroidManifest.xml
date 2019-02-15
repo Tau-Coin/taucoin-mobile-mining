@@ -30,6 +30,9 @@
 
         <activity android:name=".KeyActivity" />
         <activity android:name=".SendActivity"/>
+        <activity android:name=".MiningActivity"/>
+        <activity android:name=".BlockHashActivity"/>
+        <activity android:name=".PoolTxsActivity"/>
     </application>
 
 </manifest>

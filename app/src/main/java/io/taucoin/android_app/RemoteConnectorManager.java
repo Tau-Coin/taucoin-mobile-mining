@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -56,6 +57,8 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     static final String ACTION_CONSOLE_LOG = "intent.action.console.log";
     static final String ACTION_BLOCK_SYNC = "intent.action.block.sync";
+    static final String ACTION_BLOCK_HASH = "intent.action.block.hash";
+    static final String ACTION_POOL_TXS = "intent.action.pool.txs";
 
     public void createRemoteConnector(){
         if (mTaucoinConnector == null) {
@@ -87,6 +90,10 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     private void broadcastAction(String action) {
         Intent intent = new Intent();
+        broadcastAction(intent, action);
+    }
+
+    private void broadcastAction(Intent intent, String action) {
         intent.setAction(action);
         LocalBroadcastManager.getInstance(TaucoinApplication.getInstance()).sendBroadcast(intent);
     }
@@ -127,7 +134,6 @@ public class RemoteConnectorManager implements ConnectorHandler {
     @SuppressWarnings("ConstantConditions")
     @Override
     public boolean handleMessage(Message message) {
-
         boolean isClaimed = true;
         switch (message.what) {
             case TaucoinClientMessage.MSG_EVENT:
@@ -205,6 +211,16 @@ public class RemoteConnectorManager implements ConnectorHandler {
                         break;
                 }
                 break;
+            case TaucoinClientMessage.MSG_BLOCK_HASH_LIST:
+                Intent intent = new Intent();
+                intent.putExtras(message.getData());
+                broadcastAction(intent, ACTION_BLOCK_HASH);
+                break;
+            case TaucoinClientMessage.MSG_POOL_TXS:
+                intent = new Intent();
+                intent.putExtras(message.getData());
+                broadcastAction(intent, ACTION_POOL_TXS);
+                break;
             default:
                 isClaimed = false;
         }
@@ -270,5 +286,15 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     public void stopBlockForging(int targetAmount){
         mTaucoinConnector.stopBlockForging(targetAmount);
+    }
+
+    public void getBlockHashList(long start, long limit){
+        Toast.makeText(TaucoinApplication.getInstance(), "getBlockHashList", Toast.LENGTH_SHORT).show();
+        mTaucoinConnector.getBlockHashList(start, limit);
+    }
+
+    public void getPendingTxs(){
+        Toast.makeText(TaucoinApplication.getInstance(), "getPendingTxs", Toast.LENGTH_SHORT).show();
+        mTaucoinConnector.getPendingTxs();
     }
 }

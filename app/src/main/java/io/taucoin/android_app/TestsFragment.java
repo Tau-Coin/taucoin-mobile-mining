@@ -13,16 +13,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class TestsFragment extends Fragment implements View.OnClickListener {
 
     static final int REQUEST_CODE_KEY = 1000;
+    static final int REQUEST_START_MINING = 1001;
     Button keyButton;
     Button syncButton;
     Button sendButton;
     Button miningButton;
+    Button blockButton;
+    Button txButton;
 
     boolean isMiningStart = false;
+    int targetAmount = -1;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -32,6 +37,8 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
                     case RemoteConnectorManager.ACTION_BLOCK_SYNC:
                         sendButton.setEnabled(true);
                         miningButton.setEnabled(true);
+                        blockButton.setEnabled(true);
+                        txButton.setEnabled(true);
                         break;
                     default:
                         break;
@@ -57,24 +64,30 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
         syncButton = (Button)view.findViewById(R.id.syncButton);
         sendButton = (Button)view.findViewById(R.id.sendButton);
         miningButton = (Button)view.findViewById(R.id.miningButton);
+        blockButton = (Button)view.findViewById(R.id.blockButton);
+        txButton = (Button)view.findViewById(R.id.txButton);
 
         keyButton.setOnClickListener(this);
         syncButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         miningButton.setOnClickListener(this);
+        blockButton.setOnClickListener(this);
+        txButton.setOnClickListener(this);
 
         changeButtonState(false);
         return view;
     }
 
     private void changeButtonState(boolean isImportKey) {
-        syncButton.setEnabled(isImportKey);
-        if(!isImportKey){
-            sendButton.setEnabled(false);
-            miningButton.setEnabled(false);
-
-            changeMiningState();
-        }
+//        syncButton.setEnabled(isImportKey);
+//        if(!isImportKey){
+//            sendButton.setEnabled(false);
+//            miningButton.setEnabled(false);
+//            blockButton.setEnabled(false);
+//            txButton.setEnabled(false);
+//
+//            changeMiningState();
+//        }
     }
 
     @Override
@@ -82,6 +95,11 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE_KEY && resultCode == Activity.RESULT_OK){
             changeButtonState(true);
+        }else if(requestCode == REQUEST_START_MINING && resultCode == Activity.RESULT_OK){
+            targetAmount = data.getIntExtra("targetAmount", -1);
+            Toast.makeText(getActivity(), " " +targetAmount, Toast.LENGTH_SHORT).show();
+            TaucoinApplication.getRemoteConnector().startBlockForging(targetAmount);
+            changeMiningState();
         }
     }
 
@@ -111,12 +129,20 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.miningButton:
                 if(isMiningStart){
-                    TaucoinApplication.getRemoteConnector().stopBlockForging();
+                    TaucoinApplication.getRemoteConnector().stopBlockForging(targetAmount);
+                    changeMiningState();
                 }else{
-                    TaucoinApplication.getRemoteConnector().startBlockForging();
+                    intent = new Intent(getActivity(), MiningActivity.class);
+                    startActivityForResult(intent, REQUEST_START_MINING);
                 }
-                changeMiningState();
                 break;
+            case R.id.blockButton:
+                intent = new Intent(getActivity(), BlockHashActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.txButton:
+                intent = new Intent(getActivity(), PoolTxsActivity.class);
+                startActivity(intent);
         }
     }
 

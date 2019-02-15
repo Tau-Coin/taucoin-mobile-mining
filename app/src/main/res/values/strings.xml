@@ -14,6 +14,7 @@
     <string name="fun_import_key_init">Import Key &#38; Init</string>
     <string name="fun_sync_block">Sync Block</string>
     <string name="btn_import_init">Import &#38; Init</string>
+    <string name="btn_import">Import</string>
     <string name="btn_send">send</string>
     <string name="btn_mining_start">start mining</string>
     <string name="btn_mining_end">end mining</string>

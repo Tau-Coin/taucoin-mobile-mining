@@ -44,8 +44,20 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_import_init"
+            android:text="@string/btn_import"
             android:id="@+id/importButton"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="12sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_import_init"
+            android:id="@+id/initButton"
             android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="0dp"
