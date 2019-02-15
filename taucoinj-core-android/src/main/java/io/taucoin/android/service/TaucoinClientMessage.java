@@ -57,4 +57,14 @@ public class TaucoinClientMessage {
      */
     public static final int MSG_START_FORGING_RESULT = 11;
 
+    /**
+     * Send block hash list to client
+     */
+    public static final int MSG_BLOCK_HASH_LIST = 12;
+
+    /**
+     * Send pending transactions from mem pool to client
+     */
+    public static final int MSG_POOL_TXS = 13;
+
 }

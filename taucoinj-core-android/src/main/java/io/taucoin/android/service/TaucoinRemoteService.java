@@ -235,6 +235,14 @@ public class TaucoinRemoteService extends TaucoinService {
                 startSync(message);
                 break;
 
+            case TaucoinServiceMessage.MSG_GET_BLOCK_HASH_LIST:
+                getBlockHashList(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_GET_POOL_TXS:
+                getPendingTxs(message);
+                break;
+
             default:
                 return false;
         }
@@ -922,6 +930,55 @@ public class TaucoinRemoteService extends TaucoinService {
             message.replyTo.send(replyMessage);
         } catch (RemoteException e) {
             logger.error("Exception sending importing privkey result to client: " + e.getMessage());
+        }
+    }
+
+    protected void getBlockHashList(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCK_HASH_LIST, 0, 0);
+        Bundle replyData = new Bundle();
+
+        Bundle data = message.getData();
+        long start = data.getLong("start");
+        long limit = data.getLong("limit");
+        ArrayList<String> blockHashList = new ArrayList<String>();
+
+        if (taucoin != null && start >= 0 && limit > 0) {
+            List<byte[]> hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(start, (int)limit);
+            for (byte[] hash : hashList) {
+                blockHashList.add("0x" + Hex.toHexString(hash));
+            }
+        }
+
+        replyData.putStringArrayList("hashList", blockHashList);
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending block hash list to client: " + e.getMessage());
+        }
+
+    }
+
+    protected void getPendingTxs(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_POOL_TXS, 0, 0);
+        Bundle replyData = new Bundle();
+
+        ArrayList<String> pendingTxs = new ArrayList<String>();
+        if (taucoin != null) {
+            for(Transaction tx: taucoin.getPendingStateTransactions()){
+               pendingTxs.add("0x" + Hex.toHexString(tx.getHash()));
+            }
+            for(Transaction tx: taucoin.getWireTransactions()) {
+               pendingTxs.add("0x" + Hex.toHexString(tx.getHash()));
+            }
+        }
+
+        replyData.putStringArrayList("txs", pendingTxs);
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending pending txs to client: " + e.getMessage());
         }
     }
 }

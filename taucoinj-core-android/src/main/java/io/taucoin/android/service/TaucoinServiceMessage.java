@@ -108,4 +108,14 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_START_SYNC = 21;
 
+    /**
+     * Command to the service to get block hash list from some height
+     */
+    public static final int MSG_GET_BLOCK_HASH_LIST = 22;
+
+    /**
+     * Command to the service to get pending transactions from mem pool
+     */
+    public static final int MSG_GET_POOL_TXS = 23;
+
 }

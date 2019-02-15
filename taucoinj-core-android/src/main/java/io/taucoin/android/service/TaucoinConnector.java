@@ -136,6 +136,54 @@ public class TaucoinConnector extends ServiceConnector {
     }
 
     /**
+     * Get block hash list.
+     *
+     * @param start start height
+     * @param limit
+     * For response please handle message TaucoinClientMessage.MSG_BLOCK_HASH_LIST
+     *      {"hashList": <array list of block hash>}
+     */
+    public void getBlockHashList(long start, long limit) {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCK_HASH_LIST, 0, 0);
+        msg.replyTo = clientMessenger;
+        Bundle data = new Bundle();
+        data.putLong("start", start);
+        data.putLong("limit", limit);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(get block hash list) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get pending transactions from memeory pool.
+     *
+     * For response please handle message TaucoinClientMessage.MSG_POOL_TXS
+     *      {"txs": <array list of tx id>}
+     */
+    public void getPendingTxs() {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_POOL_TXS, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(get pending txs) to service: " + e.getMessage());
+        }
+    }
+
+    /**
      * Connect ethereum to peer
      * @param ip String Peer ip address
      * @param port int Peer port
