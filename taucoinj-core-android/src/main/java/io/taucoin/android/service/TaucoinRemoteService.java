@@ -885,7 +885,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         if (taucoin != null && !targetAmountList.isEmpty()) {
             int forgedAmount = targetAmountList.get(0).intValue();
-            taucoin.getBlockForger().startForging((long)forgedAmount);
+            taucoin.getBlockForger().startForging(1/*(long)forgedAmount*/);
             replyData.putString("result", "OK");
         } else {
             replyData.putString("result", "Fail");
