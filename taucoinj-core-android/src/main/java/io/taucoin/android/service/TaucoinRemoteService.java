@@ -944,8 +944,11 @@ public class TaucoinRemoteService extends TaucoinService {
 
         if (taucoin != null && start >= 0 && limit > 0) {
             List<byte[]> hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(start, (int)limit);
+            int count=0;
             for (byte[] hash : hashList) {
                 blockHashList.add("0x" + Hex.toHexString(hash));
+                logger.info("num:{} hash:{}",count,Hex.toHexString(hash));
+                count++;
             }
         }
 
