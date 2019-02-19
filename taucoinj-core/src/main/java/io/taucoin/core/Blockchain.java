@@ -54,6 +54,12 @@ public interface Blockchain {
 
     Transaction getTransactionByHash(byte[] hash);
 
-    Block createNewBlock(Block parent, BigInteger baseTarget, BigInteger generationSignature,
+    Block createNewBlock(Block parent, BigInteger baseTarget, byte[] generationSignature,
                          BigInteger cumulativeDifficulty, List<Transaction> transactions);
+
+    /**
+     * Get object to wait
+     * @return
+     */
+    Object getLockObject();
 }

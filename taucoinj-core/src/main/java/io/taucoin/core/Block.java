@@ -39,7 +39,7 @@ public class Block {
      * The genesis block has a number of zero */
     private long number;
     private BigInteger baseTarget; //this is uint64 type so here we should use compact type
-    private BigInteger generationSignature;
+    private byte[] generationSignature;
     private BigInteger cumulativeDifficulty = BigInteger.ZERO; //this is total chain difficulty
 
     // Store stateRoot into just local block not network block.
@@ -150,8 +150,7 @@ public class Block {
             byte[] btBytes = block.get(2).getRLPData();
             this.baseTarget = new BigInteger(1, btBytes);
 
-            byte[] gsBytes = block.get(3).getRLPData();
-            this.generationSignature = new BigInteger(1, gsBytes);
+            this.generationSignature = block.get(3).getRLPData();
 
             byte[] cyBytes = block.get(4).getRLPData();
             this.cumulativeDifficulty = cyBytes == null ? BigInteger.ZERO
@@ -199,9 +198,6 @@ public class Block {
         this.parsed = true;
     }
 
-    public void parseBlock() {
-        parseRLP();
-    }
 
     public boolean isMsg() {
         return isMsg;
@@ -261,7 +257,8 @@ public class Block {
     }
 
     public long getNumber() {
-        return number;
+        if (!parsed) parseRLP();
+        return this.number;
     }
 
     public void setBaseTarget(BigInteger baseTarget) {
@@ -269,15 +266,17 @@ public class Block {
     }
 
     public BigInteger getBaseTarget() {
-        return baseTarget;
+        if (!parsed) parseRLP();
+        return this.baseTarget;
     }
 
-    public void setGenerationSignature(BigInteger generationSignature) {
+    public void setGenerationSignature(byte[] generationSignature) {
         this.generationSignature = generationSignature;
     }
 
-    public BigInteger getGenerationSignature() {
-        return generationSignature;
+    public byte[] getGenerationSignature() {
+        if (!parsed) parseRLP();
+        return this.generationSignature;
     }
 
     public void setCumulativeDifficulty(BigInteger cumulativeDifficulty) {
@@ -285,7 +284,8 @@ public class Block {
     }
 
     public BigInteger getCumulativeDifficulty() {
-        return cumulativeDifficulty;
+        if (!parsed) parseRLP();
+        return this.cumulativeDifficulty;
     }
 
     /**
@@ -302,6 +302,7 @@ public class Block {
      * Get block state root.
      */
     public byte[] getStateRoot() {
+        if (!parsed) parseRLP();
         return this.stateRoot;
     }
 
@@ -489,13 +490,9 @@ public class Block {
     private List<byte[]> getFullBodyElements() {
         if (!parsed) parseRLP();
 
-        System.out.println("number:" + this.number);
-        System.out.println("baseTarget:" + this.baseTarget);
-        System.out.println("generationSignature:" + this.generationSignature);
-        System.out.println("cumulativeDifficulty:" + this.cumulativeDifficulty);
         byte[] number = RLP.encodeBigInteger(BigInteger.valueOf(this.number));
         byte[] baseTarget = RLP.encodeBigInteger(this.baseTarget == null ? BigInteger.valueOf(0x0ffffffff): this.baseTarget);
-        byte[] generationSignature = RLP.encodeBigInteger(this.generationSignature == null ? BigInteger.valueOf(0xffffff):this.generationSignature);
+        byte[] generationSignature = RLP.encodeElement(this.generationSignature);
         byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty == null ? BigInteger.valueOf(0xffffff):this.cumulativeDifficulty);
         byte[] signature = getSignatureEncoded();
         byte[] option = getOptionEncoded();

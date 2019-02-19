@@ -102,6 +102,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     SystemProperties config = SystemProperties.CONFIG;
 
+    private Object lock = new Object();
+
     private List<Chain> altChains = new ArrayList<>();
     private List<Block> garbage = new ArrayList<>();
 
@@ -155,6 +157,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     @Override
+    public Object getLockObject() {
+        return lock;
+    }
+
+    @Override
     public synchronized List<byte[]> getListOfHashesStartFrom(byte[] hash, int qty) {
         return blockStore.getListHashesEndWith(hash, qty);
     }
@@ -183,19 +190,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return hashes;
     }
 
-    public static byte[] calcTxTrie(List<Transaction> transactions) {
-
-        Trie txsState = new TrieImpl(null);
-
-        if (transactions == null || transactions.isEmpty())
-            return HashUtil.EMPTY_TRIE_HASH;
-
-        for (int i = 0; i < transactions.size(); i++) {
-            txsState.update(RLP.encodeInt(i), transactions.get(i).getEncoded());
-        }
-        return txsState.getRootHash();
-    }
-
     public Repository getRepository() {
         return repository;
     }
@@ -206,9 +200,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private State pushState(byte[] bestBlockHash) {
         State push = stateStack.push(new State());
-//        this.bestBlock = blockStore.getBlockByHash(bestBlockHash);
-//        totalDifficulty = blockStore.getTotalDifficultyForHash(bestBlockHash);
-//        this.repository = this.repository.getSnapshotTo(this.bestBlock.getStateRoot());
+        this.bestBlock = blockStore.getBlockByHash(bestBlockHash);
+        totalDifficulty = blockStore.getTotalDifficultyForHash(bestBlockHash);
+        this.repository = this.repository.getSnapshotTo(this.bestBlock.getStateRoot());
         return push;
     }
 
@@ -224,58 +218,57 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     public synchronized ImportResult tryConnectAndFork(final Block block) {
-        return IMPORTED_NOT_BEST;
-//        State savedState = pushState(block.getParentHash());
-//        this.fork = true;
+        State savedState = pushState(block.getPreviousHeaderHash());
+        this.fork = true;
+
+        try {
+
+            // FIXME: adding block with no option for flush
+            if (!add(block)) {
+                return INVALID_BLOCK;
+            }
+        } catch (Throwable th) {
+            logger.error("Unexpected error: ", th);
+        } finally {
+            this.fork = false;
+        }
+
+        if (isMoreThan(this.totalDifficulty, savedState.savedTD)) {
+
+            logger.info("Rebranching: {} ~> {}", savedState.savedBest.getShortHash(), block.getShortHash());
+
+            // main branch become this branch
+            // cause we proved that total difficulty
+            // is greateer
+            blockStore.reBranch(block);
+
+            // The main repository rebranch
+            this.repository = savedState.savedRepo;
+            this.repository.syncToRoot(block.getStateRoot());
+
+            // flushing
+            if (!byTest) {
+                repository.flush();
+                blockStore.flush();
+                System.gc();
+            }
+
+            dropState();
+
+//            EDT.invokeLater(new Runnable() {
+//                @Override
+//                public void run() {
+//                    pendingState.processBest(block);
+//                }
+//            });
 //
-//        try {
-//
-//            // FIXME: adding block with no option for flush
-//            if (!add(block)) {
-//                return INVALID_BLOCK;
-//            }
-//        } catch (Throwable th) {
-//            logger.error("Unexpected error: ", th);
-//        } finally {
-//            this.fork = false;
-//        }
-//
-//        if (isMoreThan(this.totalDifficulty, savedState.savedTD)) {
-//
-//            logger.info("Rebranching: {} ~> {}", savedState.savedBest.getShortHash(), block.getShortHash());
-//
-//            // main branch become this branch
-//            // cause we proved that total difficulty
-//            // is greateer
-//            blockStore.reBranch(block);
-//
-//            // The main repository rebranch
-//            this.repository = savedState.savedRepo;
-//            this.repository.syncToRoot(block.getStateRoot());
-//
-//            // flushing
-//            if (!byTest) {
-//                repository.flush();
-//                blockStore.flush();
-//                System.gc();
-//            }
-//
-//            dropState();
-//
-////            EDT.invokeLater(new Runnable() {
-////                @Override
-////                public void run() {
-////                    pendingState.processBest(block);
-////                }
-////            });
-////
-//            return IMPORTED_BEST;
-//        } else {
-//            // Stay on previous branch
-//            popState();
-//
-//            return IMPORTED_NOT_BEST;
-//        }
+            return IMPORTED_BEST;
+        } else {
+            // Stay on previous branch
+            popState();
+
+            return IMPORTED_NOT_BEST;
+        }
     }
 
 
@@ -286,18 +279,14 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         if (preBlock == null)
             return NO_PARENT;
 
-        //parse the block firstly
-        preBlock.parseBlock();
-
         if (block.isMsg()) {
             block.setNumber(preBlock.getNumber() + 1);
 
             BigInteger baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(preBlock, blockStore);
             block.setBaseTarget(baseTarget);
 
-            byte[] gsBytes = ProofOfTransaction.
-                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature().toByteArray(), config.getForgerPubkey());
-            BigInteger generationSignature = new BigInteger(1, gsBytes);
+            byte[] generationSignature = ProofOfTransaction.
+                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature(), block.getGeneratorPublicKey());
             block.setGenerationSignature(generationSignature);
 
             BigInteger lastCumulativeDifficulty = preBlock.getCumulativeDifficulty();
@@ -332,6 +321,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        synchronized (lock) {
+                            lock.notify();
+                        }
                         pendingState.processBest(block);
                     }
                 });
@@ -349,6 +341,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     EventDispatchThread.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            synchronized (lock) {
+                                lock.notify();
+                            }
                             pendingState.processBest(block);
                         }
                     });
@@ -362,7 +357,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return NO_PARENT;
     }
 
-    public synchronized Block createNewBlock(Block parent, BigInteger baseTarget, BigInteger generationSignature,
+    public synchronized Block createNewBlock(Block parent, BigInteger baseTarget, byte[] generationSignature,
                                              BigInteger cumulativeDifficulty, List<Transaction> txs) {
 
         // adjust time to parent block this may happen due to system clocks difference
@@ -547,10 +542,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * @return
      */
     private boolean verifyProofOfTransaction(Block block) {
-        if (block.getNumber() == 0)
-            return true;
+        if (block.getNumber() == 0 ) {
+            byte[] genesisHash = Hex.decode(Constants.GENESIS_BLOCK_HASH);
+            if (Arrays.equals(block.getHash(), genesisHash)) {
+                return true;
+            } else {
+                logger.error("Genesis block hash is not right!!! ({})", block.getGenerationSignature());
+                return false;
+            }
+        }
 
-        //block.toString();
         ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
         byte[] address = key.getAddress();
         BigInteger forgingPower = repository.getforgePower(address);
@@ -566,7 +567,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         BigInteger targetValue = ProofOfTransaction.
                 calculateMinerTargetValue(block.getBaseTarget(), forgingPower, blockTime - preBlockTime);
 
-        BigInteger hit = ProofOfTransaction.calculateRandomHit(block.getGenerationSignature().toByteArray());
+        logger.info("Generation Signature {}", block.getGenerationSignature());
+        BigInteger hit = ProofOfTransaction.calculateRandomHit(block.getGenerationSignature());
         logger.info("verify block target value {}, hit {}", targetValue, hit);
 
         if (targetValue.compareTo(hit) < 0) {
@@ -686,8 +688,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     @Override
     public synchronized void storeBlock(Block block) {
-
-        updateTotalDifficulty(block);
 
         if (fork)
             blockStore.saveBlock(block, totalDifficulty, false);
