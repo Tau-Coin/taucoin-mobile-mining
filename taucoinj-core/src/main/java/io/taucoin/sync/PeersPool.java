@@ -60,6 +60,7 @@ public class PeersPool implements Iterable<Channel> {
 
     public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;
+        this.ethereumListener = taucoin.getWorldManager().getListener();
     }
     
 	public PeersPool(){

@@ -74,7 +74,6 @@ public class ChannelManager {
         this.syncManager = syncManager;
         this.syncManager.setChannelManager(this);
         this.pendingState = pendingState;
-        this.init();
     }
 
     public void init() {
