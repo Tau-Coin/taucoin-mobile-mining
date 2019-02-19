@@ -1,5 +1,6 @@
 package io.taucoin.core.genesis;
 
+import java.util.ArrayList;
 import java.util.Map;
 /*
 *Items 1-9 construct tau ,1-6 will be recorded in genesis block.
@@ -15,7 +16,7 @@ public class GenesisJson {
     String blockSignature;
     String option;
 
-    String coinbase;
+    ArrayList<String> coinbase;
     Map<String, AllocatedAccount> alloc;
 
     String geneBasetarget;
@@ -79,11 +80,11 @@ public class GenesisJson {
         this.geneBasetarget = geneBasetarget;
     }
 
-    public String getCoinbase() {
+    public ArrayList<String> getCoinbase() {
         return coinbase;
     }
 
-    public void setCoinbase(String coinbase) {
+    public void setCoinbase(ArrayList<String> coinbase) {
         this.coinbase = coinbase;
     }
 

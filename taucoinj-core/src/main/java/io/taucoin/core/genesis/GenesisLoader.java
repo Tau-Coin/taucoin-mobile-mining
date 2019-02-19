@@ -82,7 +82,7 @@ public class GenesisLoader {
         byte version       = Utils.parseByte(genesisJson.version);
         byte[] baseTarget  = Utils.parseData(genesisJson.geneBasetarget);
         byte[] preheaderHash     = Utils.parseData(genesisJson.previousHeaderHash);
-        byte[] coinbase    = Utils.parseData(genesisJson.coinbase);
+        byte[][] coinbase    = Utils.parseHexArrayData(genesisJson.coinbase);
 
         byte[] timestampBytes = Utils.parseData(genesisJson.timestamp);
         long   timestamp         = ByteUtil.byteArrayToLong(timestampBytes);
@@ -93,7 +93,9 @@ public class GenesisLoader {
         byte option    = Utils.parseByte(genesisJson.option);
         //here is temporary method...
         List<Transaction> tr = new ArrayList<Transaction>();
-        tr.add(new Transaction(coinbase));
+        for(byte[] tcoinbase: coinbase) {
+            tr.add(new Transaction(tcoinbase));
+        }
         byte[] r = new byte[32];
         byte[] s = new byte[32];
         System.arraycopy(geneSig, 0, r, 0, 32);

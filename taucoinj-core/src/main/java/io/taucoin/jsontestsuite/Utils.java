@@ -5,8 +5,10 @@ import io.taucoin.util.ByteUtil;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
+import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY_ARRAY;
 import static io.taucoin.util.Utils.unifiedNumericToBigInteger;
 
 /**
@@ -36,6 +38,20 @@ public class Utils {
         return Hex.decode(data);
     }
 
+    public static byte[][] parseHexArrayData(ArrayList<String> data){
+        if (data == null) return EMPTY_BYTE_ARRAY_ARRAY;
+        byte[][] retval = new byte[data.size()][0];
+        String temp;
+        for(int i=0;i < data.size();++i){
+            if (data.get(i).startsWith("0x")){
+                temp = data.get(i).substring(2);
+            }else{
+                temp = data.get(i);
+            }
+            retval[i] = Hex.decode(temp);
+        }
+        return retval;
+    }
     public static byte[] parseNumericData(String data){
 
         if (data == null || data.equals("")) return EMPTY_BYTE_ARRAY;
