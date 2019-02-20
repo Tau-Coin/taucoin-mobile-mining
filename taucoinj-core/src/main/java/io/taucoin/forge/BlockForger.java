@@ -37,7 +37,7 @@ public class BlockForger {
 
     private static ExecutorService executor = null;//Executors.newSingleThreadExecutor();
 
-    private  Repository repository;
+    private Repository repository;
 
     private Blockchain blockchain;
 
@@ -107,10 +107,11 @@ public class BlockForger {
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
         }
-        executor.submit(new ForgeTask(this, amount));
-        fireForgerStarted();
+
         this.isForging = true;
         this.stopForge = false;
+        executor.submit(new ForgeTask(this, amount));
+        fireForgerStarted();
     }
 
     public void stopForging() {
@@ -129,6 +130,10 @@ public class BlockForger {
 
     public boolean isForging() {
         return this.isForging;
+    }
+
+    public boolean isForgingStopped() {
+        return this.stopForge;
     }
 
     protected List<Transaction> getAllPendingTransactions() {
@@ -151,70 +156,64 @@ public class BlockForger {
         // TODO: wakeup forging sleep thread or interupt forging process.
     }
 
-    public void restartMining() {
+    public boolean restartForging() {
 
         Block bestBlock;
         BigInteger baseTarget;
         byte[] generationSignature;
         BigInteger cumulativeDifficulty;
 
-        while (true) {
-            bestBlock = blockchain.getBestBlock();
+        bestBlock = blockchain.getBestBlock();
+        baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
+        BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
+        if (forgingPower.longValue() < 0) {
+            logger.error("Forging Power < 0!!!");
+            return false;
+        }
 
-            baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
-            logger.info("forging... baseTarget {}", baseTarget);
+        logger.info("base target {}, forging power {}", baseTarget, forgingPower);
 
-            BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
-            logger.info("forging... forging power {}", forgingPower);
-            if (forgingPower.longValue() < 0) {
-                logger.error("Forging Power < 0!!!");
-                return;
-            }
+        generationSignature = ProofOfTransaction.
+                calculateNextBlockGenerationSignature(bestBlock.getGenerationSignature(), CONFIG.getForgerPubkey());
+        logger.info("generationSignature {}", new BigInteger(generationSignature));
 
-            logger.info("forging... base target {}, forging power {}", baseTarget, forgingPower);
+        BigInteger hit = ProofOfTransaction.calculateRandomHit(generationSignature);
+        logger.info("hit {}", hit.longValue());
 
-            generationSignature = ProofOfTransaction.
-                    calculateNextBlockGenerationSignature(bestBlock.getGenerationSignature(), CONFIG.getForgerPubkey());
-            logger.info("forging... generationSignature {}", generationSignature);
+        long timeInterval = ProofOfTransaction.calculateForgingTimeInterval(hit, baseTarget, forgingPower);
+        logger.info("timeInterval {}", timeInterval);
+        BigInteger targetValue = ProofOfTransaction.calculateMinerTargetValue(baseTarget, forgingPower, timeInterval);
+        logger.info("target value {}", hit.longValue(), targetValue);
+        long timeNow = System.currentTimeMillis() / 1000;
+        long timePreBlock = new BigInteger(bestBlock.getTimestamp()).longValue();
+        logger.info("Block forged time {}", timePreBlock + timeInterval);
 
-            BigInteger hit = ProofOfTransaction.calculateRandomHit(generationSignature);
-            logger.info("forging... hit {}", hit.longValue());
-
-            long timeInterval = ProofOfTransaction.calculateForgingTimeInterval(hit, baseTarget, forgingPower);
-            logger.info("forging... timeInterval {}", timeInterval);
-            BigInteger targetValue = ProofOfTransaction.calculateMinerTargetValue(baseTarget, forgingPower, timeInterval);
-            logger.info("forging... hit {}, target value {}", hit.longValue(), targetValue);
-            long timeNow = System.currentTimeMillis() / 1000;
-            long timePreBlock = new BigInteger(bestBlock.getTimestamp()).longValue();
-            logger.info("forging... forging time {}", timePreBlock + timeInterval);
-
-            if (timeNow < timePreBlock + timeInterval) {
-                long sleepTime = timePreBlock + timeInterval - timeNow;
-                logger.debug("Sleeping " + sleepTime + " s before importing...");
-                synchronized (blockchain.getLockObject()) {
-                    try {
-                        blockchain.getLockObject().wait(sleepTime * 1000);
-                    } catch (InterruptedException e) {
-                        //
-                    }
+        if (timeNow < timePreBlock + timeInterval) {
+            long sleepTime = timePreBlock + timeInterval - timeNow;
+            logger.debug("Sleeping " + sleepTime + " s before importing...");
+            synchronized (blockchain.getLockObject()) {
+                try {
+                    blockchain.getLockObject().wait(sleepTime * 1000);
+                } catch (InterruptedException e) {
+                    logger.warn("Forging task is interrupted");
+                    return false;
                 }
             }
+        }
 
-            if (stopForge) {
-                logger.info("~~~~~~~~~~~~~~~~~~Stop forging!!!~~~~~~~~~~~~~~~~~~");
-                return;
-            }
+        if (stopForge) {
+            logger.info("~~~~~~~~~~~~~~~~~~Stop forging!!!~~~~~~~~~~~~~~~~~~");
+            return false;
+        }
 
-            cumulativeDifficulty = ProofOfTransaction.
-                    calculateCumulativeDifficulty(bestBlock.getCumulativeDifficulty(), baseTarget);
+        cumulativeDifficulty = ProofOfTransaction.
+                calculateCumulativeDifficulty(bestBlock.getCumulativeDifficulty(), baseTarget);
 
-            if (bestBlock.equals(blockchain.getBestBlock())) {
-                logger.info("~~~~~~~~~~~~~~~~~~Forging a new block...~~~~~~~~~~~~~~~~~~");
-                break;
-            } else {
-                logger.info("~~~~~~~~~~~~~~~~~~Got a new best block, continue forging...~~~~~~~~~~~~~~~~~~");
-            }
-
+        if (bestBlock.equals(blockchain.getBestBlock())) {
+            logger.info("~~~~~~~~~~~~~~~~~~Forging a new block...~~~~~~~~~~~~~~~~~~");
+        } else {
+            logger.info("~~~~~~~~~~~~~~~~~~Got a new best block, continue forging...~~~~~~~~~~~~~~~~~~");
+            return true;
         }
 
         miningBlock = blockchain.createNewBlock(bestBlock, baseTarget,
@@ -225,11 +224,14 @@ public class BlockForger {
             blockForged(miningBlock);
         } catch (InterruptedException | CancellationException e) {
             // OK, we've been cancelled, just exit
+            return false;
         } catch (Exception e) {
             logger.warn("Exception during mining: ", e);
+            return false;
         }
 
         fireBlockStarted(miningBlock);
+        return true;
     }
 
     protected void blockForged(Block newBlock) throws InterruptedException {
@@ -295,11 +297,13 @@ public class BlockForger {
 
         public ForgeTask(BlockForger forger) {
             this.forger = forger;
+            forgeTargetAmount = -1;
             registerForgeListener();
         }
 
         public ForgeTask(BlockForger forger, long forgeTargetAmount) {
            this.forger = forger;
+           forgedBlockAmount = 0;
            this.forgeTargetAmount = forgeTargetAmount;
            registerForgeListener();
         }
@@ -310,9 +314,11 @@ public class BlockForger {
 
         @Override
         public void run() {
-            while (forgeTargetAmount == -1
-                    || (forgeTargetAmount > 0 && forgedBlockAmount < forgeTargetAmount)) {
-               forger.restartMining();
+            boolean forgingResult = true;
+            while (forgingResult && !Thread.interrupted() && !forger.isForgingStopped()
+                    && (forgeTargetAmount == -1
+                            || (forgeTargetAmount > 0 && forgedBlockAmount < forgeTargetAmount))) {
+               forgingResult = forger.restartForging();
             }
 
             forger.onForgingStopped();

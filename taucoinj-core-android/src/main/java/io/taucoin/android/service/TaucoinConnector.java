@@ -86,9 +86,7 @@ public class TaucoinConnector extends ServiceConnector {
         Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_START_FORGING, 0, 0);
         msg.replyTo = clientMessenger;
         Bundle data = new Bundle();
-        ArrayList<Integer> targetAmountList = new ArrayList<Integer>();
-        targetAmountList.add(targetAmount);
-        data.putIntegerArrayList("forgedAmount", targetAmountList);
+        data.putLong("forgedAmount", (long)targetAmount);
         msg.setData(data);
         try {
             serviceMessenger.send(msg);
