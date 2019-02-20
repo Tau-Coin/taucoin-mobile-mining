@@ -8,18 +8,18 @@ import java.util.Map;
 */
 public class GenesisJson {
 
-    String version;
-    String timestamp;
-    String previousHeaderHash;
-    String generatorPublicKey;
+    private String version;
+    private String timestamp;
+    private String previousHeaderHash;
+    private String generatorPublicKey;
 
-    String blockSignature;
-    String option;
+    private String blockSignature;
+    private String option;
 
-    ArrayList<String> coinbase;
-    Map<String, AllocatedAccount> alloc;
+    private ArrayList<String> coinbase;
+    private Map<String, AllocatedAccount> alloc;
 
-    String geneBasetarget;
+    private String geneBasetarget;
     public GenesisJson() {
     }
 
@@ -53,7 +53,7 @@ public class GenesisJson {
     }
 
     public void setGeneratorPublicKey(String generatorPublicKey) {
-        this.geneBasetarget = generatorPublicKey;
+        this.generatorPublicKey = generatorPublicKey;
     }
 
     public String getBlockSignature() {

@@ -11,5 +11,5 @@ public final class Constants {
     //block time drift
     public static final int MAX_TIMEDRIFT = 60; // allow up to 60 s clock difference
 
-    public static final String GENESIS_BLOCK_HASH = "fbc608d4e9a8c31576df9065d55289465c4be9f7";
+    public static final String GENESIS_BLOCK_HASH = "0e19e167b7160f7ce173dbe8dbf50d2266365907";
 }
