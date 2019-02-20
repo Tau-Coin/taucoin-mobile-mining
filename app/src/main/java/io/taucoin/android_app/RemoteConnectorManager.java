@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
 
 import io.taucoin.core.Transaction;
+import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.net.p2p.HelloMessage;
@@ -260,15 +262,15 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
         long timeStamp = new Date().getTime();
-        byte[] privateKey = senderPrivateKey.getBytes();
-        byte[] toAddress = txToAddress.getBytes();
-        byte[] amount = txAmount.getBytes();
-        byte[] fee = txFee.getBytes();
+        byte[] privateKey = Utils.parseAsHexOrBase58(senderPrivateKey);
+        byte[] toAddress = Utils.parseAsHexOrBase58(txToAddress);
+        byte[] amount = (new BigInteger(txAmount)).toByteArray();
+        byte[] fee = (new BigInteger(txFee)).toByteArray();
 
         Transaction transaction = new Transaction(TransactionVersion.V01.getCode(),
                 TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
         transaction.sign(privateKey);
-
+        //io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
         mTaucoinConnector.submitTransaction(mHandlerIdentifier, transaction);
     }
 
