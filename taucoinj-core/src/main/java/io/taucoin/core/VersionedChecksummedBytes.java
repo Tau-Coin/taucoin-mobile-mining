@@ -25,7 +25,7 @@ public class VersionedChecksummedBytes implements Serializable, Cloneable, Compa
     protected final int version;
     protected byte[] bytes;
 
-    protected VersionedChecksummedBytes(String encoded) throws AddressFormatException {
+    public VersionedChecksummedBytes(String encoded) throws AddressFormatException {
         byte[] versionAndDataBytes = Base58.decodeChecked(encoded);
         byte versionByte = versionAndDataBytes[0];
         version = versionByte & 0xFF;
@@ -103,5 +103,14 @@ public class VersionedChecksummedBytes implements Serializable, Cloneable, Compa
      */
     public int getVersion() {
         return version;
+    }
+
+	/**
+	 * Returns the bytes for encoded address string.
+	 *
+	 */
+
+    public byte[] getBytes() {
+        return bytes;
     }
 }
