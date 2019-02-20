@@ -261,7 +261,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
     }
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
-        long timeStamp = new Date().getTime();
+        long timeStamp = (new Date().getTime())/1000;
         byte[] privateKey = Utils.parseAsHexOrBase58(senderPrivateKey);
         byte[] toAddress = Utils.parseAsHexOrBase58(txToAddress);
         byte[] amount = (new BigInteger(txAmount)).toByteArray();
