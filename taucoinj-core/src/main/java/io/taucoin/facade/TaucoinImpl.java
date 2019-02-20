@@ -272,7 +272,7 @@ public class TaucoinImpl implements Taucoin {
 
 
     @Override
-    public Future<Transaction> submitTransaction(Transaction transaction) {
+    public boolean submitTransaction(Transaction transaction) {
 
         boolean submitResult = pendingState.addPendingTransaction(transaction);
         if (submitResult) {
@@ -281,12 +281,12 @@ public class TaucoinImpl implements Taucoin {
             final Future<List<Transaction>> listFuture =
                     TransactionExecutor.instance.submitTransaction(transactionTask);
 
-            //return new FutureAdapter<Transaction, List<Transaction>>(listFuture) {
-            //    @Override
-            //    protected Transaction adapt(List<Transaction> adapteeResult) throws ExecutionException {
-            //        return adapteeResult.get(0);
+//            return new FutureAdapter<Transaction, List<Transaction>>(listFuture) {
+//                @Override
+//                protected Transaction adapt(List<Transaction> adapteeResult) throws ExecutionException {
+//                    return adapteeResult.get(0);
         }
-        return null;
+        return submitResult;
     }
 
     @Override

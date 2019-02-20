@@ -752,7 +752,9 @@ public class TaucoinRemoteService extends TaucoinService {
      */
     protected void submitTransaction(Message message) {
 
+        logger.info("transaction has been submited to services");
         if (!isConnected) {
+            logger.info("submited to services {}",isConnected);
             new SubmitTransactionTask(message).execute(taucoin);
         } else {
             logger.warn("Taucoin not connected.");
@@ -768,20 +770,30 @@ public class TaucoinRemoteService extends TaucoinService {
 
             this.message = message;
             Bundle data = message.getData();
-            transaction = data.getParcelable("transaction");
+            //transaction = data.getParcelable("transaction");
+            data.setClassLoader(io.taucoin.android.interop.Transaction.class.getClassLoader());
+            io.taucoin.android.interop.Transaction  temptransaction = data.getParcelable("transaction");
+            transaction = temptransaction;
         }
 
         protected Transaction doInBackground(Taucoin... args) {
 
-            Transaction submitedTransaction = null;
+            logger.info("doInBackground=======");
+            boolean submitedTransaction = false;
+            Transaction ret;
             try {
-                submitedTransaction = taucoin.submitTransaction(transaction).get(CONFIG.transactionApproveTimeout(), TimeUnit.SECONDS);
-                logger.info("Submitted transaction.");
+                submitedTransaction = taucoin.submitTransaction(transaction);
             } catch (Exception e) {
                 logger.error("Exception submitting transaction: " + e.getMessage());
             }
-
-            return submitedTransaction;
+            if(submitedTransaction){
+                ret = transaction;
+                logger.info("Submit transaction to taucoin success {}",Hex.toHexString(ret.getHash()));
+            }else{
+                ret = null;
+                logger.info("Submit transaction to taucoin fail");
+            }
+            return ret;
         }
 
         protected void onPostExecute(Transaction submittedTransaction) {
@@ -790,12 +802,12 @@ public class TaucoinRemoteService extends TaucoinService {
             Bundle replyData = new Bundle();
             replyData.putParcelable("transaction", new io.taucoin.android.interop.Transaction(submittedTransaction));
             replyMessage.setData(replyData);
-            try {
-                message.replyTo.send(replyMessage);
-                logger.info("Sent submitted transaction: " + submittedTransaction.toString());
-            } catch (RemoteException e) {
-                logger.error("Exception sending submitted transaction to client: " + e.getMessage());
-            }
+//            try {
+//                message.replyTo.send(replyMessage);
+//                logger.info("Sent submitted transaction: " + submittedTransaction.toString());
+//            } catch (RemoteException e) {
+//                logger.error("Exception sending submitted transaction to client: " + e.getMessage());
+//            }
         }
     }
 

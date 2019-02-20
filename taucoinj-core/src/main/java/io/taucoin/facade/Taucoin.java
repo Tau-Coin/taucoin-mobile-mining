@@ -131,7 +131,7 @@ public interface Taucoin {
      * @param transaction submit transaction to the net, return option to wait for net
      *                    return this transaction as approved
      */
-    Future<Transaction> submitTransaction(Transaction transaction);
+    boolean submitTransaction(Transaction transaction);
 
 
     /**

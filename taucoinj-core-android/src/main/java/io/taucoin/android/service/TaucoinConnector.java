@@ -6,7 +6,7 @@ import android.os.Message;
 import android.os.RemoteException;
 
 import io.taucoin.android.service.events.EventFlag;
-import io.taucoin.core.Transaction;
+import io.taucoin.android.interop.Transaction;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class TaucoinConnector extends ServiceConnector {
     /**
      * Start block forging.
      *
-     * @param privateKey block forger private key
+     * @param targetAmount block forger wanted
      * Please handle TaucoinClientMessage.MSG_START_FORGING_RESULT for result
      * of starting forging.
      */
@@ -552,7 +552,7 @@ public class TaucoinConnector extends ServiceConnector {
         msg.replyTo = clientMessenger;
         msg.obj = getIdentifierBundle(identifier);
         Bundle data = new Bundle();
-        data.putParcelable("transaction", (io.taucoin.android.interop.Transaction)transaction);
+        data.putParcelable("transaction", transaction);
         msg.setData(data);
         try {
             serviceMessenger.send(msg);

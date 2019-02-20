@@ -270,8 +270,8 @@ public class RemoteConnectorManager implements ConnectorHandler {
         Transaction transaction = new Transaction(TransactionVersion.V01.getCode(),
                 TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
         transaction.sign(privateKey);
-        //io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
-        mTaucoinConnector.submitTransaction(mHandlerIdentifier, transaction);
+        io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
+        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
     }
 
     public void startBlockForging(){
