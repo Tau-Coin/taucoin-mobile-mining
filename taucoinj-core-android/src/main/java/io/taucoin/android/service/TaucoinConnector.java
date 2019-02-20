@@ -603,4 +603,152 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    /**
+     * Get chain height.
+     * @param identifier String Caller identifier used to return the response
+     *
+     * For response, please handle TaucoinClientMessage.MSG_CHAIN_HEIGHT:
+     *                {"height": <chain height with long data type>}
+     */
+    public void getChainHeight(String identifier) {
+
+        if (!isBound)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_CHAIN_HEIGHT, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getChainHeight) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get block by number.
+     * @param identifier String Caller identifier used to return the response
+     * @param number long requested block number
+     *
+     * For response, please handle TaucoinClientMessage.MSG_BLOCK:
+     *                {
+     *                    "number": <requested block number>,
+     *                    "block": <io.taucoin.android.interop.Block>
+     *                }
+     */
+    public void getBlockByNumber(String identifier, long number) {
+
+        if (!isBound || number < 0)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCK, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putLong("number", number);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getBlockByNumber) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get block by hash.
+     * @param identifier String Caller identifier used to return the response
+     * @param hash byte[] requested block hash
+     *
+     * For response, please handle TaucoinClientMessage.MSG_BLOCK:
+     *                {
+     *                    "hash": <requested block hash>,
+     *                    "block": <io.taucoin.android.interop.Block>
+     *                }
+     */
+    public void getBlockByHash(String identifier, byte[] hash) {
+
+        if (!isBound || hash == null)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCK, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putByteArray("hash", hash);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getBlockByHash) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get block list by starting number.
+     * @param identifier String Caller identifier used to return the response
+     * @param number long requested block number
+     * @param limit int max requested block account
+     *
+     * For response, please handle TaucoinClientMessage.MSG_BLOCKS:
+     *                {
+     *                    "number": <requested block number>,
+     *                    "limit": <max requested block account>,
+     *                    "blocks": <ArrayList of io.taucoin.android.interop.Block>
+     *                }
+     */
+    public void getBlockListByStartNumber(String identifier, long number, int limit) {
+
+        if (!isBound || number < 0 || limit <= 0)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCKS, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putLong("number", number);
+        data.putInt("limit", limit);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getBlockByNumber) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get block list by starting hash.
+     * @param identifier String Caller identifier used to return the response
+     * @param hash byte[] requested starting block hash
+     * @param limit int max requested block account
+     *
+     * For response, please handle TaucoinClientMessage.MSG_BLOCKS:
+     *                {
+     *                    "hash": <requested starting block hash>,
+     *                    "limit": <max requested block account>,
+     *                    "blocks": <ArrayList of io.taucoin.android.interop.Block>
+     *                }
+     */
+    public void getBlockListByStartHash(String identifier, byte[] hash, int limit) {
+
+        if (!isBound || hash == null || limit <= 0)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCKS, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putByteArray("hash", hash);
+        data.putInt("limit", limit);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getBlockByNumber) to service: " + e.getMessage());
+        }
+    }
+
 }

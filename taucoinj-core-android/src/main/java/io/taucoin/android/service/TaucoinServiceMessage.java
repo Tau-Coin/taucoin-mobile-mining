@@ -118,4 +118,20 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_GET_POOL_TXS = 23;
 
+    /**
+     * Command to the service to get chain height
+     */
+    public static final int MSG_GET_CHAIN_HEIGHT = 24;
+
+    /**
+     * Command to the service to get block by number or hash
+     */
+    public static final int MSG_GET_BLOCK = 25;
+
+    /**
+     * Command to the service to get blocks by starting number
+     * or starting hash
+     */
+    public static final int MSG_GET_BLOCKS = 26;
+
 }

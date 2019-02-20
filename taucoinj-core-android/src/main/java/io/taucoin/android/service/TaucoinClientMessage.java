@@ -67,4 +67,18 @@ public class TaucoinClientMessage {
      */
     public static final int MSG_POOL_TXS = 13;
 
+    /**
+     * Send chain height to client
+     */
+    public static final int MSG_CHAIN_HEIGHT = 14;
+
+    /**
+     * Send block indexed by number or hash to client
+     */
+    public static final int MSG_BLOCK = 15;
+
+    /**
+     * Send block indexed by starting number or hash to client
+     */
+    public static final int MSG_BLOCKS = 16;
 }

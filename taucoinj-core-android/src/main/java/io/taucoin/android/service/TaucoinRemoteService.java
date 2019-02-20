@@ -16,6 +16,7 @@ import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.core.Block;
 import io.taucoin.core.Genesis;
 import io.taucoin.core.Transaction;
 import io.taucoin.crypto.HashUtil;
@@ -241,6 +242,14 @@ public class TaucoinRemoteService extends TaucoinService {
 
             case TaucoinServiceMessage.MSG_GET_POOL_TXS:
                 getPendingTxs(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_GET_BLOCK:
+                getBlock(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_GET_BLOCKS:
+                getBlockList(message);
                 break;
 
             default:
@@ -995,4 +1004,176 @@ public class TaucoinRemoteService extends TaucoinService {
             logger.error("Exception sending pending txs to client: " + e.getMessage());
         }
     }
+
+    protected void getBlock(Message message) {
+
+        logger.info("get block from taucoin service");
+        if (taucoin != null) {
+            new GetBlockTask(message).execute(taucoin);
+        } else {
+            logger.warn("Taucoin not connected.");
+        }
+    }
+
+    protected class GetBlockTask extends AsyncTask<Taucoin, Void, Block> {
+
+        Message message;
+        long number;
+        byte[] hash;
+
+        public GetBlockTask(Message message) {
+
+            this.message = message;
+            this.number = -1;
+            this.hash = null;
+
+            Bundle data = message.getData();
+            if (data.containsKey("number")) {
+                this.number = data.getLong("number");
+            }
+            if (data.containsKey("hash")) {
+                this.hash = data.getByteArray("hash");
+            }
+        }
+
+        protected Block doInBackground(Taucoin... args) {
+
+            Block block = null;
+            if (taucoin != null) {
+                if (number != -1) {
+                    block = taucoin.getBlockchain().getBlockByNumber(number);
+                } else if (hash != null) {
+                    block = taucoin.getBlockchain().getBlockByHash(hash);
+                }
+            }
+
+            return block;
+        }
+
+        protected void onPostExecute(Block block) {
+
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCK, 0, 0, message.obj);
+            Bundle replyData = new Bundle();
+            if (number != -1) {
+                replyData.putLong("number", number);
+            }
+            if (hash != null) {
+                replyData.putByteArray("hash", hash);
+            }
+            replyData.putParcelable("block", new io.taucoin.android.interop.Block(block));
+            replyMessage.setData(replyData);
+            try {
+                message.replyTo.send(replyMessage);
+                logger.info("Sent to app block: " + block.toString());
+            } catch (RemoteException e) {
+                logger.error("Exception sending block to client: " + e.getMessage());
+            }
+        }
+    }
+
+    protected void getBlockList(Message message) {
+
+        logger.info("get block list from taucoin service");
+        if (taucoin != null) {
+            new GetBlockListTask(message).execute(taucoin);
+        } else {
+            logger.warn("Taucoin not connected.");
+        }
+    }
+
+    protected class GetBlockListTask extends AsyncTask<Taucoin, Void, ArrayList<Block>> {
+
+        Message message;
+        long number;
+        byte[] hash;
+        int limit;
+
+        public GetBlockListTask(Message message) {
+
+            this.message = message;
+            this.number = -1;
+            this.hash = null;
+            this.limit = 500;
+
+            Bundle data = message.getData();
+            if (data.containsKey("number")) {
+                this.number = data.getLong("number");
+            }
+            if (data.containsKey("hash")) {
+                this.hash = data.getByteArray("hash");
+            }
+            if (data.containsKey("limit")) {
+                this.limit = data.getInt("limit");
+            }
+        }
+
+        protected ArrayList<Block> doInBackground(Taucoin... args) {
+
+            ArrayList<Block> blockList = new ArrayList<Block>();
+            List<byte[]> hashList = null;
+            if (taucoin != null) {
+                if (number != -1) {
+                    hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(number, limit);
+                } else if (hash != null) {
+                    hashList = taucoin.getBlockchain().getListOfHashesStartFrom(hash, limit);
+                }
+
+                if (hashList != null) {
+                    for (byte[] hash : hashList) {
+                        Block block = taucoin.getBlockchain().getBlockByHash(hash);
+                        if (block != null) {
+                            blockList.add(block);
+                        }
+                    }
+                }
+            }
+
+            return blockList;
+        }
+
+        protected void onPostExecute(ArrayList<Block> blockList) {
+
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, message.obj);
+            Bundle replyData = new Bundle();
+            if (number != -1) {
+                replyData.putLong("number", number);
+            }
+            if (hash != null) {
+                replyData.putByteArray("hash", hash);
+            }
+            replyData.putInt("limit", limit);
+            ArrayList<io.taucoin.android.interop.Block> parcelBlockList
+                    = new ArrayList<io.taucoin.android.interop.Block>();
+            for (Block block : blockList) {
+                parcelBlockList.add(new io.taucoin.android.interop.Block(block));
+            }
+            replyData.putParcelableArrayList("blocks", parcelBlockList);
+            replyMessage.setData(replyData);
+            try {
+                message.replyTo.send(replyMessage);
+                logger.info("Sent blocks to app");
+            } catch (RemoteException e) {
+                logger.error("Exception sending blocks to client: " + e.getMessage());
+            }
+        }
+    }
+
+    protected void getChainHeight(Message message) {
+         Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CHAIN_HEIGHT, 0, 0, message.obj);
+         Bundle replyData = new Bundle();
+         long height = 0;
+
+         if (taucoin != null) {
+             height = taucoin.getBlockchain().getSize();
+         }
+
+         replyData.putLong("height", height);
+         replyMessage.setData(replyData);
+         try {
+             message.replyTo.send(replyMessage);
+         } catch (RemoteException e) {
+             logger.error("Exception sending chain height to client: " + e.getMessage());
+         }
+     }
+
 }
