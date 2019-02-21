@@ -1,2 +1,2 @@
-include ':app', ':taucoinj-core-android'
+include ':app', ':taucoinj-core-android', ':lib_foundation', ':lib_bitcoin', ':lib_platform', ':app-wallet'
 include ':taucoinj-core'

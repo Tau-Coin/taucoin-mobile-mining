@@ -1,10 +1,13 @@
 buildscript {
     repositories {
+        google()
         jcenter()
+        mavenCentral()
         maven { url 'http://repo.spring.io/plugins-release-local' }
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.0'
     }
 }
 
@@ -20,6 +23,7 @@ plugins {
 repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     jcenter()
+    mavenCentral()
 }
 
 sourceCompatibility = 1.7
@@ -96,8 +100,14 @@ ext {
 }
 
 dependencies {
-    compile 'com.google.dagger:dagger:2.0'
-    compile 'com.google.dagger:dagger-compiler:2.0'
+//    compile 'com.google.dagger:dagger:2.17'
+//    compile 'com.google.dagger:dagger-compiler:2.17'
+
+    compile 'com.google.dagger:dagger:2.17'
+    compile 'com.google.dagger:dagger-android-support:2.17'
+
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.17'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.17'
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
@@ -137,10 +147,14 @@ dependencies {
         exclude group: 'com.google.android'
     }
 
-	compile 'commons-io:commons-io:2.4'
+    compile 'commons-io:commons-io:2.6'
 
     testCompile "junit:junit:${junitVersion}"
-    testCompile 'com.google.dagger:dagger:2.0'
-    testCompile 'com.google.dagger:dagger-compiler:2.0'
+//    testCompile 'com.google.dagger:dagger:2.0'
+//    testCompile 'com.google.dagger:dagger-compiler:2.0'
+
+    testCompile 'com.google.dagger:dagger:2.17'
+    testCompile 'com.google.dagger:dagger-android-support:2.17'
+//    testImplementation 'com.google.dagger:dagger-android-support:2.16'
 }
 
