@@ -1,5 +1,6 @@
 package io.taucoin.core;
 
+import io.taucoin.config.Constants;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
