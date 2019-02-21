@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_main_bg"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:id="@+id/toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/main_send_receive" />
+
+    <TextView
+        android:layout_below="@+id/toolBar"
+        android:id="@+id/balance_text"
+        style="@style/style_tau_black"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/color_white"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center|center_vertical"
+        android:gravity="center_vertical|center" />
+
+    <TextView
+        android:layout_below="@+id/balance_text"
+        style="@style/style_normal_yellow"
+        android:id="@+id/tv_address"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:drawablePadding="10dp"
+        android:layout_marginStart="15dp"
+        android:text=""
+        android:layout_marginEnd="15dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/color_tool_bar"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_below="@+id/tv_address"
+        android:id="@+id/btn_send"
+        style="@style/style_big_white"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/color_yellow"
+        android:text="@string/tx_send"
+        android:textAllCaps="false" />
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_tip"
+        android:layout_below="@+id/btn_send"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/color_white"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/style_normal_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="30dp"
+            android:text="@string/tx_log" />
+
+        <ImageView
+            android:id="@+id/iv_tx_log_tips"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_log_help" />
+
+    </LinearLayout>
+
+    <io.taucoin.android.wallet.widget.EmptyLayout
+        android:layout_below="@+id/ll_tip"
+        android:visibility="gone"
+        android:id="@+id/empty_layout"
+        android:layout_width="match_parent"
+        app:empty_tip="@string/tx_log_empty"
+        android:layout_height="match_parent"/>
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:layout_below="@+id/ll_tip"
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srlAccentColor="#00000000"
+        app:srlPrimaryColor="#00000000"
+        app:srlEnablePreviewInEditMode="true">
+
+        <io.taucoin.android.wallet.widget.refresh.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ExpandableListView
+            android:id="@+id/list_view_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null"
+            android:groupIndicator="@null"
+            android:dividerHeight="0dp"
+            android:scrollbars="none" />
+
+        <io.taucoin.android.wallet.widget.refresh.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+</RelativeLayout>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@color/color_main_bg"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_back_back"
+        app:titleBackground="@color/color_tool_bar_child"
+        app:titleText="@string/tx_send" />
+
+    <EditText
+        android:id="@+id/et_address"
+        style="@style/style_normal_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="50dp"
+        android:hint="@string/send_receiver_address"
+        android:text=""
+        android:textColorHint="@color/color_grey" />
+
+    <EditText
+        android:id="@+id/et_amount"
+        style="@style/style_normal_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="50dp"
+        android:hint="@string/send_amount"
+        android:inputType="numberDecimal|number"
+        android:singleLine="true"
+        android:textColorHint="@color/color_grey" />
+
+    <EditText
+        android:id="@+id/et_memo"
+        style="@style/style_normal_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="50dp"
+        android:hint="@string/send_memo"
+        android:maxLength="25"
+        android:textColorHint="@color/color_grey" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="50dp">
+
+        <TextView
+            android:id="@+id/tv_fee_title"
+            style="@style/style_normal_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/tx_transaction_fee" />
+
+        <io.taucoin.android.wallet.widget.EditInput
+            android:layout_toStartOf="@+id/iv_fee"
+            android:layout_toEndOf="@+id/tv_fee_title"
+            android:id="@+id/et_fee"
+            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true" />
+
+        <ImageView
+            android:id="@+id/iv_fee"
+            android:layout_width="24dp"
+            android:layout_height="28dp"
+            android:paddingStart="2dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="2dp"
+            android:contentDescription="@null"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/icon_arrow" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_send"
+        style="@style/style_big_white_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/yellow_rect_round_bg"
+        android:text="@string/tx_send"
+        android:textAllCaps="false" />
+
+</LinearLayout>

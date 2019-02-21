@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_main_bg"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_back_back"
+        app:titleBackground="@color/color_tool_bar_child" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@color/color_main_line"
+        android:layout_height="wrap_content">
+
+        <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_mining_income"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:itemRightTextColor="@color/color_grey_dark"
+            app:itemLeftText="@string/block_mining_income" />
+
+        <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_miner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:layout_marginTop="1dp"
+            app:itemLeftText="@string/block_miner" />
+
+        <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_total_transaction"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            app:itemRightImage="@mipmap/icon_up"
+            app:itemImageRotation="90"
+            app:itemRightTextColor="@color/color_grey_dark"
+            app:itemLeftText="@string/block_total_transaction" />
+    </LinearLayout>
+</LinearLayout>

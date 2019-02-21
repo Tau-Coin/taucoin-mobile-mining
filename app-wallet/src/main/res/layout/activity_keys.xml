@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_white"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_back_back"
+        app:titleBackground="@color/color_tool_bar_child"
+        app:titleText="@string/manager_keys" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="35dp"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:visibility="visible"
+            style="@style/style_normal_grey"
+            android:id="@+id/tv_address_title"
+            android:layout_width="wrap_content"
+            android:text="@string/keys_address"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_toEndOf="@+id/tv_address_title"
+            android:id="@+id/iv_address_copy"
+            android:layout_width="@dimen/dimen_size_20"
+            android:src="@mipmap/icon_copy"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:layout_height="@dimen/dimen_size_20" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_address"
+        style="@style/style_big_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:gravity="center_vertical"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:tag="@string/keys_address" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:visibility="visible"
+            style="@style/style_normal_grey"
+            android:id="@+id/tv_public_keys_title"
+            android:layout_width="wrap_content"
+            android:text="@string/keys_public_key"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_toEndOf="@+id/tv_public_keys_title"
+            android:id="@+id/iv_public_keys_copy"
+            android:layout_width="@dimen/dimen_size_20"
+            android:src="@mipmap/icon_copy"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:layout_height="@dimen/dimen_size_20" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_public_key"
+        style="@style/style_big_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:gravity="center_vertical"
+        android:minHeight="30dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:tag="@string/keys_public_key"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:visibility="visible"
+            style="@style/style_normal_grey"
+            android:id="@+id/tv_private_key_title"
+            android:layout_width="wrap_content"
+            android:text="@string/keys_private_key"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_toEndOf="@+id/tv_private_key_title"
+            android:id="@+id/iv_private_key_copy"
+            android:layout_width="@dimen/dimen_size_20"
+            android:src="@mipmap/icon_copy"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:layout_height="@dimen/dimen_size_20" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_private_key"
+        style="@style/style_big_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:gravity="center_vertical"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:tag="@string/keys_private_key" />
+
+    <Button
+        android:id="@+id/btn_import_key"
+        style="@style/style_big_white_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="35dp"
+        android:layout_gravity="center"
+        android:textAllCaps="false"
+        android:text="@string/keys_import_key"
+        android:background="@drawable/yellow_rect_round_bg" />
+
+    <Button
+        android:id="@+id/btn_generate_key"
+        style="@style/style_big_white_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="35dp"
+        android:layout_gravity="center"
+        android:textAllCaps="false"
+        android:text="@string/keys_generate"
+        android:background="@drawable/black_rect_round_bg" />
+</LinearLayout>

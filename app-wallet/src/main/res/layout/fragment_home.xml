@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_white"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/main_home_title" />
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srlAccentColor="#00000000"
+        app:srlPrimaryColor="#00000000"
+        app:srlEnablePreviewInEditMode="true">
+
+        <io.taucoin.android.wallet.widget.refresh.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_nick"
+                    style="@style/style_normal_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dimen_size_32"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/common_no_login"
+                    android:textColorHint="@color/color_grey" />
+
+                <TextView
+                    android:id="@+id/tv_balance"
+                    style="@style/style_tau_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="70dp"
+                    android:layout_below="@id/tv_nick"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_vertical|center"
+                    android:textColorHint="@color/color_black" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btn_mining"
+                style="@style/style_normal_white"
+                android:layout_width="match_parent"
+                android:textAllCaps="false"
+                android:background="@drawable/yellow_rect_round_bg"
+                android:layout_marginEnd="60dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="60dp"
+                android:text="@string/home_mining_start"
+                android:layout_height="50dp" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/ll_mining"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="30dp"
+                android:background="@color/color_main_line"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:layout_height="wrap_content">
+
+                <io.taucoin.android.wallet.widget.ItemTextView
+                    android:id="@+id/tv_block_height"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:itemLeftText="@string/home_block_height" />
+
+                <io.taucoin.android.wallet.widget.ItemTextView
+                    android:id="@+id/tv_block_synchronized"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="1dp"
+                    app:itemLeftText="@string/home_block_synchronized" />
+
+                <io.taucoin.android.wallet.widget.ItemTextView
+                    android:id="@+id/tv_block_mined"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="1dp"
+                    app:itemLeftText="@string/home_block_mined" />
+
+                <io.taucoin.android.wallet.widget.ItemTextView
+                    android:id="@+id/tv_mining_income"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="1dp"
+                    app:itemLeftText="@string/home_mining_income" />
+
+                <io.taucoin.android.wallet.widget.ItemTextView
+                    android:id="@+id/tv_mining_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="1dp"
+                    app:itemRightImage="@mipmap/icon_up"
+                    app:itemImageRotation="90"
+                    app:itemLeftText="@string/home_mining_details" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <io.taucoin.android.wallet.widget.refresh.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+</LinearLayout>

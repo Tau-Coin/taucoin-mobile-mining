@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_white">
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="@dimen/dimen_size_150"
+        android:layout_height="@dimen/dimen_size_150"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_size_150"
+        android:contentDescription="@null"
+        android:src="@mipmap/icon_splash" />
+
+    <TextView
+        android:id="@+id/app_title"
+        style="@style/style_tau_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_logo"
+        android:layout_centerHorizontal="true"
+        android:typeface="serif"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/color_logo"
+        android:text="@string/splash_title" />
+
+    <TextView
+        style="@style/style_normal_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/app_title"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:typeface="serif"
+        android:layout_marginTop="2dp"
+        android:lineSpacingExtra="2dp"
+        android:textColor="@color/color_logo"
+        android:text="@string/splash_subheading" />
+
+    <TextView
+        style="@style/style_normal_light_grey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/dimen_size_50"
+        android:gravity="center"
+        android:lineSpacingExtra="2dp"
+        android:typeface="serif"
+        android:textColor="@color/color_grey_normal"
+        android:text="@string/splash_describe" />
+</RelativeLayout>

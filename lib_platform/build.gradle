@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibilityVersion
+        targetCompatibility rootProject.ext.targetCompatibilityVersion
+    }
+}
+
+dependencies {
+    api(project(':taucoinj-core-android')) {
+        exclude group: "org.hibernate", module: "hibernate-core"
+        exclude group: 'com.google.android'
+    }
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    api project(':lib_foundation')
+    api project(':lib_bitcoin')
+    api rootProject.ext.supportv4
+    api rootProject.ext.design
+    api rootProject.ext.greendao
+    api rootProject.ext.eventbus
+    api rootProject.ext.circleimageview
+    api rootProject.ext.smartrefreshlayout
+    api rootProject.ext.smartrefreshheader
+    api rootProject.ext.expandable
+    api rootProject.ext.butterknife
+    api rootProject.ext.butterknifecompiler
+    api rootProject.ext.crashlytics
+    debugApi rootProject.ext.leakcanarydebug
+    releaseApi rootProject.ext.leakcanaryrelease
+    api rootProject.ext.rxlifecycleComponents
+    api rootProject.ext.multidex
+}

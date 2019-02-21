@@ -1,0 +1,22 @@
+<resources>
+
+    <dimen name="dimen_size_14">14dip</dimen>
+    <dimen name="dimen_size_15">15dip</dimen>
+    <dimen name="dimen_size_16">16dip</dimen>
+    <dimen name="dimen_size_18">18dip</dimen>
+    <dimen name="dimen_size_20">20dip</dimen>
+    <dimen name="dimen_size_22">22dip</dimen>
+    <dimen name="dimen_size_26">26dip</dimen>
+    <dimen name="dimen_size_30">30dip</dimen>
+    <dimen name="dimen_size_32">32dip</dimen>
+    <dimen name="dimen_size_34">34dip</dimen>
+    <dimen name="dimen_size_40">40dip</dimen>
+    <dimen name="dimen_size_50">50dip</dimen>
+    <dimen name="dimen_size_60">60dip</dimen>
+
+    <dimen name="dimen_size_120">120dip</dimen>
+    <dimen name="dimen_size_150">150dip</dimen>
+    <dimen name="dimen_size_180">180dip</dimen>
+    <dimen name="dimen_size_250">250dip</dimen>
+
+</resources>

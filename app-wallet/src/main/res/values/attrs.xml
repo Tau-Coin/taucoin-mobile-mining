@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomToolBar">
+        <attr name="android:background" />
+        <attr name="enableLeftTextView" format="boolean" />
+        <attr name="enableRightTextView" format="boolean" />
+        <attr name="disableRightView" format="boolean" />
+        <attr name="enableGoBackEvent" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="UserInfoLayout">
+        <attr name="viewBackground" format="integer|reference" />
+        <attr name="viewHeaderSrc" format="integer|reference" />
+        <attr name="viewNickName" format="string" />
+        <attr name="viewBalance" format="integer" />
+        <attr name="viewBalance1" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="ItemLineView">
+        <attr name="leftImage" format="reference" />
+        <attr name="rightText" format="string" />
+        <attr name="rightTextColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ItemTextView">
+        <attr name="itemLeftText" format="string" />
+        <attr name="itemLeftTextColor" format="color" />
+        <attr name="itemRightImage" format="reference" />
+        <attr name="itemImageRotation" format="integer" />
+        <attr name="itemRightText" format="string" />
+        <attr name="itemRightTextColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ToolbarView">
+        <attr name="leftBackImage" format="reference" />
+        <attr name="titleText" format="string" />
+        <attr name="titleBackground" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyLayout">
+        <attr name="empty_text" format="string" />
+        <attr name="empty_textColor" format="color|reference" />
+        <attr name="empty_tip" format="string" />
+        <attr name="empty_textSize" format="dimension" />
+    </declare-styleable>
+
+</resources>

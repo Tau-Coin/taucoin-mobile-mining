@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <paths>
+        <!--
+        <files-path/>： Context.getFilesDir()
+        <cache-path/>: getCacheDir()
+        <external-path/>: Environment.getExternalStorageDirectory()
+        <external-files-path/>: Context.getExternalFilesDir(String) Context.getExternalFilesDir(null).
+        <external-cache-path />: Context.getExternalCacheDir().
+        <root-path />new File("/");
+        -->
+        <!-- path=""Represents the root directory, or you can specify a specific directory
+            ，name="camera_picture" Is a virtual directory camera_picture -->
+        <root-path name="root" path="" />
+        <files-path name="files" path="com.mofei.tau" />
+        <cache-path name="cache" path="" />
+        <external-path name="external" path="" />
+        <external-files-path name="external_files" path="" />
+        <external-cache-path name="external_cache" path="" />
+    </paths>
+</resources>

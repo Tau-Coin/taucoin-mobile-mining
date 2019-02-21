@@ -1,0 +1,223 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+         <!--Customize your theme here.-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ActivityTheme.Full" parent="@style/AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="dialog_translucent" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowFrame">@null</item><!-- border -->
+        <item name="android:windowIsFloating">true</item><!-- is over activity-->
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
+
+    <style name="CommonDialog" parent="android:style/Theme.Dialog">
+        <item name="android:background">#00000000</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <!--<style name="leftMenuItemStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/click_item_selector</item>
+        <item name="android:gravity">center</item>
+    </style>-->
+
+    <!-- application start theme. -->
+
+    <style name="ActionSheetDialogStyle" parent="@android:style/Theme.Dialog">
+
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/ActionSheetDialogAnimation</item>
+    </style>
+
+    <!-- ActionSheet in out animation  -->
+    <style name="ActionSheetDialogAnimation" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/action_sheet_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/action_sheet_dialog_out</item>
+    </style>
+
+    <declare-styleable name="EditInput">
+        <attr name="ei_paddingBottom" format="dimension"/>
+        <attr name="ei_paddingTop" format="dimension"/>
+        <attr name="ei_paddingLeft" format="dimension"/>
+        <attr name="ei_paddingRight" format="dimension"/>
+    </declare-styleable>
+
+    <style name="style_middle_white">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_white</item>
+    </style>
+
+    <style name="style_normal_white">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_white</item>
+    </style>
+
+    <style name="style_big_white">
+        <item name="android:textSize">@dimen/dimen_size_18</item>
+        <item name="android:textColor">@color/color_white</item>
+    </style>
+
+    <style name="style_big_white_button">
+        <item name="android:textSize">@dimen/dimen_size_18</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:layout_marginStart">@dimen/dimen_size_40</item>
+        <item name="android:layout_marginEnd">@dimen/dimen_size_40</item>
+    </style>
+
+    <style name="style_middle_black">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_black</item>
+    </style>
+
+    <style name="style_normal_black">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_black</item>
+    </style>
+
+    <style name="style_normal_red">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_red</item>
+    </style>
+
+    <style name="style_big_black">
+        <item name="android:textSize">@dimen/dimen_size_18</item>
+        <item name="android:textColor">@color/color_black</item>
+    </style>
+
+    <style name="style_normal_blue">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_blue</item>
+    </style>
+
+    <style name="style_middle_grey">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_grey</item>
+    </style>
+
+    <style name="style_normal_grey">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_grey</item>
+    </style>
+
+    <style name="style_big_grey">
+        <item name="android:textSize">@dimen/dimen_size_18</item>
+        <item name="android:textColor">@color/color_grey</item>
+    </style>
+
+    <style name="style_normal_light_grey">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_grey_light</item>
+    </style>
+
+    <style name="style_middle_light_grey">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_grey_light</item>
+    </style>
+
+    <style name="style_normal_grey_dark">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_grey_dark</item>
+    </style>
+
+    <style name="style_super_yellow">
+        <item name="android:textSize">@dimen/dimen_size_22</item>
+        <item name="android:textColor">@color/color_yellow</item>
+    </style>
+
+    <style name="style_middle_yellow">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_yellow</item>
+    </style>
+
+    <style name="style_normal_yellow">
+        <item name="android:textSize">@dimen/dimen_size_16</item>
+        <item name="android:textColor">@color/color_yellow</item>
+    </style>
+
+
+    <style name="style_big_yellow">
+        <item name="android:textSize">@dimen/dimen_size_18</item>
+        <item name="android:textColor">@color/color_yellow</item>
+    </style>
+
+    <style name="style_tau_yellow">
+        <item name="android:textSize">@dimen/dimen_size_20</item>
+        <item name="android:textColor">@color/color_yellow</item>
+    </style>
+
+    <style name="style_tau_black">
+        <item name="android:textSize">@dimen/dimen_size_26</item>
+        <item name="android:textColor">@color/color_black</item>
+    </style>
+
+
+    <style name="dialog_normal" parent="android:Theme.Holo.Dialog.MinWidth">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <style name="transparent_dialog" parent="@android:style/Theme.Black.NoTitleBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <style name="transparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/color_transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/animation</item>
+    </style>
+
+    <style name="animation">
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:activityOpenExitAnimation">@null</item>
+        <item name="android:activityCloseEnterAnimation">@null</item>
+        <item name="android:activityCloseExitAnimation">@null</item>
+        <item name="android:taskOpenEnterAnimation">@null</item>
+        <item name="android:taskOpenExitAnimation">@null</item>
+        <item name="android:taskCloseEnterAnimation">@null</item>
+        <item name="android:taskCloseExitAnimation">@null</item>
+        <item name="android:taskToFrontEnterAnimation">@null</item>
+        <item name="android:taskToFrontExitAnimation">@null</item>
+        <item name="android:taskToBackEnterAnimation">@null</item>
+        <item name="android:taskToBackExitAnimation">@null</item>
+    </style>
+
+</resources>
