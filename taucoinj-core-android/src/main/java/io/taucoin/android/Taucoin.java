@@ -52,6 +52,7 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
             } else {
                 BigInteger privKey = new BigInteger(prikey,16);
                 key = ECKey.fromPrivate(privKey);
+                log.info("taucoin init prikey wif:{}",key.getPrivateKeyAsWiF(MainNetParams.get()));
             }
             ecprivateKey.add(key);
         }

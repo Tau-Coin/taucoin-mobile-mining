@@ -900,6 +900,7 @@ public class TaucoinRemoteService extends TaucoinService {
         } else {
             BigInteger privKey = new BigInteger(privateKey,16);
             key = ECKey.fromPrivate(privKey);
+            logger.info("import forge prikey wif:{}",key.getPrivateKeyAsWiF(MainNetParams.get()));
         }
 
         if (taucoin != null && !TextUtils.isEmpty(privateKey)) {
