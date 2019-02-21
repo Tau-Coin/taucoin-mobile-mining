@@ -93,10 +93,12 @@ public class BlockListActivity extends BaseActivity {
     private void updateListView() {
         if(mKeyValue != null){
             if(mPageNo == 0){
+                // TODO test delete
+                mKeyValue.setBlockSynchronized(10);
                 mDataSize = mKeyValue.getBlockSynchronized();
                 // TODO test delete
                 mKeyValue.getMiningInfos().clear();
-                for (int i = mDataSize - 1; i >= mDataSize - 50; i--) {
+                for (int i = mDataSize - 1; i >= mDataSize - 5; i--) {
                     if(i%2 == 1){
                         MiningInfo entry = new MiningInfo();
                         entry.setBlockNo("" + i);
@@ -181,7 +183,7 @@ public class BlockListActivity extends BaseActivity {
             ProgressManager.closeProgressDialog();
             Bundle bundle = (Bundle) msgEvent.getData();
             if(bundle != null){
-                BlockEventData block = bundle.getParcelable("block");
+                Block block = bundle.getParcelable("block");
                 if(block != null){
                     Intent intent = new Intent();
                     intent.putExtra(TransmitKey.BEAN, block);

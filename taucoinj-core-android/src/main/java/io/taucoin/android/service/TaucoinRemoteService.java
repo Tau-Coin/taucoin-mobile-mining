@@ -1017,13 +1017,15 @@ public class TaucoinRemoteService extends TaucoinService {
 
     protected class GetBlockTask extends AsyncTask<Taucoin, Void, Block> {
 
-        Message message;
+        Messenger messenger;
+        Object obj;
         long number;
         byte[] hash;
 
         public GetBlockTask(Message message) {
 
-            this.message = message;
+            this.messenger = message.replyTo;
+            this.obj = message.obj;
             this.number = -1;
             this.hash = null;
 
@@ -1052,7 +1054,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         protected void onPostExecute(Block block) {
 
-            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCK, 0, 0, message.obj);
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCK, 0, 0, obj);
             Bundle replyData = new Bundle();
             if (number != -1) {
                 replyData.putLong("number", number);
@@ -1060,12 +1062,13 @@ public class TaucoinRemoteService extends TaucoinService {
             if (hash != null) {
                 replyData.putByteArray("hash", hash);
             }
-            replyData.putParcelable("block", new io.taucoin.android.interop.Block(block));
-            replyMessage.setData(replyData);
             try {
-                message.replyTo.send(replyMessage);
+                replyData.setClassLoader(io.taucoin.android.interop.Block.class.getClassLoader());
+                replyData.putParcelable("block", new io.taucoin.android.interop.Block(block));
+                replyMessage.setData(replyData);
+                messenger.send(replyMessage);
                 logger.info("Sent to app block: " + block.toString());
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 logger.error("Exception sending block to client: " + e.getMessage());
             }
         }
