@@ -50,7 +50,7 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
                 DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(),prikey);
                 key = dumpedPrivateKey.getKey();
             } else {
-                BigInteger privKey = new BigInteger(Hex.decode(prikey));
+                BigInteger privKey = new BigInteger(prikey,16);
                 key = ECKey.fromPrivate(privKey);
             }
             ecprivateKey.add(key);
