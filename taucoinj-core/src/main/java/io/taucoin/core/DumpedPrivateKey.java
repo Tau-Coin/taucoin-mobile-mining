@@ -47,7 +47,7 @@ public class DumpedPrivateKey extends VersionedChecksummedBytes {
     }
 
     // Used by ECKey.getPrivateKeyEncoded()
-    DumpedPrivateKey(NetworkParameters params, byte[] keyBytes, boolean compressed) {
+    public DumpedPrivateKey(NetworkParameters params, byte[] keyBytes, boolean compressed) {
         super(params.getDumpedPrivateKeyHeader(), encode(keyBytes, compressed));
     }
 

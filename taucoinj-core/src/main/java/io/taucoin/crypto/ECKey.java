@@ -396,6 +396,21 @@ public class ECKey implements Serializable {
         return b.toString();
     }
 
+    public String getPrivateKeyAsWiF(NetworkParameters params) {
+        return getPrivateKeyEncoded(params).toString();
+    }
+
+    /**
+     * Exports the private key in the form used by Bitcoin Core's "dumpprivkey" and "importprivkey" commands. Use
+     *
+     * @param params The network this key is intended for use on.
+     * @return Private key bytes as a {@link DumpedPrivateKey}.
+     * @throws IllegalStateException if the private key is not available.
+     */
+    public DumpedPrivateKey getPrivateKeyEncoded(NetworkParameters params) {
+        return new DumpedPrivateKey(params, getPrivKeyBytes(), isCompressed());
+    }
+
     /**
      * Groups the two components that make up a signature, and provides a way to encode to Base64 form, which is
      * how ECDSA signatures are represented when embedded in other data structures in the Ethereum protocol. The raw

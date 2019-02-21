@@ -16,9 +16,12 @@ import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.config.MainNetParams;
 import io.taucoin.core.Block;
+import io.taucoin.core.DumpedPrivateKey;
 import io.taucoin.core.Genesis;
 import io.taucoin.core.Transaction;
+import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
 import io.taucoin.manager.AdminInfo;
@@ -31,6 +34,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -888,10 +892,20 @@ public class TaucoinRemoteService extends TaucoinService {
 
         Bundle data = message.getData();
         String privateKey = data.getString("privateKey");
+        //support that importing key to base58 or Hex format.
+        ECKey key;
+        if (privateKey.length() == 51 || privateKey.length() == 52) {
+            DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(),privateKey);
+            key = dumpedPrivateKey.getKey();
+        } else {
+            BigInteger privKey = new BigInteger(privateKey,16);
+            key = ECKey.fromPrivate(privKey);
+            logger.info("import forge prikey wif:{}",key.getPrivateKeyAsWiF(MainNetParams.get()));
+        }
 
         if (taucoin != null && !TextUtils.isEmpty(privateKey)) {
-            taucoin.getWorldManager().getWallet().importKey(Hex.decode(privateKey));
-            CONFIG.importForgerPrikey(Hex.decode(privateKey));
+            taucoin.getWorldManager().getWallet().importKey(key.getPrivKeyBytes());
+            CONFIG.importForgerPrikey(key.getPrivKeyBytes());
             replyData.putString("result", "OK");
         } else {
             replyData.putString("result", "Fail");
