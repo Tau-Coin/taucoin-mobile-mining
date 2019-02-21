@@ -34,11 +34,11 @@ public class ProgressManager {
 
     private static WeakReference<FragmentActivity> mWeakReference;
 
-    public static synchronized void showProgressDialog(FragmentActivity activity){
-        showProgressDialog(activity, true);
+    public static synchronized Dialog showProgressDialog(FragmentActivity activity){
+        return showProgressDialog(activity, true);
     }
 
-    public static synchronized void showProgressDialog(FragmentActivity activity, boolean isCanCancel){
+    public static synchronized Dialog showProgressDialog(FragmentActivity activity, boolean isCanCancel){
         closeProgressDialog();
         Logger.d("showProgressDialog");
         mWeakReference = new WeakReference<>(activity);
@@ -55,6 +55,7 @@ public class ProgressManager {
                 closeProgressDialog();
             }
         }
+        return mProgress;
     }
 
     public static synchronized void closeProgressDialog(){
@@ -78,5 +79,12 @@ public class ProgressManager {
                 }
             }
         }catch (Exception ignore){}
+    }
+
+    public static synchronized boolean isShowing(){
+        if(mProgress != null && mProgress.isShowing()){
+            return true;
+        }
+        return false;
     }
 }

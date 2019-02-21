@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseFragment;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
@@ -120,6 +121,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case BLOCK_HEIGHT:
                 MiningUtil.setBlockHeight(tvBlockHeight);
                 break;
+            case MINING_INFO:
+                handleMiningView();
+                break;
             default:
                 break;
         }
@@ -138,12 +142,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             miningPresenter.getMiningInfo(new LogicObserver<KeyValue>() {
                 @Override
                 public void handleData(KeyValue keyValue) {
-                    boolean isStart = true;
+                    boolean isStart = false;
                     if (keyValue != null) {
                         if(StringUtil.isNotEmpty(keyValue.getMiningState())){
                             TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
                         }
-                        isStart = StringUtil.isNotSame(keyValue.getMiningState(), TransmitKey.MiningState.Stop);
+                        isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                         llMining.setVisibility(StringUtil.isNotEmpty(keyValue.getMiningState()) ? View.VISIBLE : View.GONE);
 
                         tvBlockHeight.setRightText(keyValue.getBlockHeight());
@@ -151,6 +155,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
                         tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(keyValue));
                         tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(keyValue));
+                    }
+                    if(isStart){
+                        MyApplication.getRemoteConnector().init();
                     }
                     btnMining.setText(isStart ? R.string.home_mining_stop : R.string.home_mining_start);
                     btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);

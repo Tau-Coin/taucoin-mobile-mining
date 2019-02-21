@@ -6,10 +6,13 @@ import android.view.View;
 
 import com.mofei.tau.R;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.BlockBean;
@@ -18,7 +21,8 @@ import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.android.wallet.widget.ToolbarView;
-import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.core.Block;
+import io.taucoin.core.Transaction;
 
 public class BlockDetailActivity extends BaseActivity {
 
@@ -41,21 +45,20 @@ public class BlockDetailActivity extends BaseActivity {
     }
 
     private void initView() {
-        int blockNo = getIntent().getIntExtra(TransmitKey.ID, -1);
-        if(blockNo > -1){
-            blockBean = new BlockBean();
-            blockBean.setPublicKey("131231231312312313123123131231231312312313123123");
-            blockBean.setReward("100.00");
-            blockBean.setTotal(100);
-        }
-        String title = getIntent().getStringExtra(TransmitKey.TITLE);
-        if(StringUtil.isNotEmpty(title)){
-            toolBar.setTitle(title);
-        }
-        if(blockBean != null){
-            tvMiningIncome.setRightText(blockBean.getReward() + "TAU");
+
+        BlockEventData blockEvent = getIntent().getParcelableExtra(TransmitKey.BEAN);
+        if(blockEvent != null){
+            Block block = blockEvent.block;
+            tvMiningIncome.setRightText(block + "TAU");
             tvMiner.setRightText(blockBean.getPublicKey());
-            tvTotalTransaction.setRightText(blockBean.getTotal());
+            List<Transaction> txList = block.getTransactionsList();
+            if(txList != null){
+                int total = txList.size();
+                tvTotalTransaction.setRightText(total);
+            }
+            String title = getText(R.string.block_no).toString();
+            title = String.format(title, block.getNumber());
+            toolBar.setTitle(title);
         }
     }
 

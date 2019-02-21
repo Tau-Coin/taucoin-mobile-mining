@@ -75,6 +75,13 @@
             android:value="9f48df0306d5e440ef9e9386600379da6134f3a0" />
 
         <service
+            android:name="io.taucoin.android.service.TaucoinRemoteService"
+            android:enabled="true"
+            android:priority="1000"
+            android:exported="false"
+            android:process=":taucoin_service" />
+
+        <service
             android:name="io.taucoin.android.wallet.module.service.TxService"
             android:priority="1000"
             android:enabled="true"

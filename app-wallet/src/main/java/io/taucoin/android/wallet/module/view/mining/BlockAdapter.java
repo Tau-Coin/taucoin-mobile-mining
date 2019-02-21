@@ -67,7 +67,7 @@ public class BlockAdapter extends BaseAdapter {
         }
         title = String.format(title, num);
         viewHolder.tvHelpTitle.setLeftText(title);
-        convertView.setTag(R.id.block_list_tag, title);
+        convertView.setTag(R.id.block_list_tag, num);
         viewHolder.tvHelpTitle.setLeftTextColor(isMe || isMe(num) ? R.color.color_yellow : R.color.color_grey_dark);
         return convertView;
     }

@@ -13,17 +13,28 @@ import com.mofei.tau.R;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
+import io.taucoin.android.interop.Block;
+import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.presenter.MiningPresenter;
 import io.taucoin.android.wallet.util.ActivityUtil;
+import io.taucoin.android.wallet.util.ProgressManager;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.ToolbarView;
+import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class BlockListActivity extends BaseActivity {
 
@@ -46,6 +57,8 @@ public class BlockListActivity extends BaseActivity {
     private int mPageNo = 0;
     private int mDataSize = 0;
     private boolean mIsMe = false;
+    private MiningPresenter miningPresenter;
+    private KeyValue mKeyValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,30 +66,48 @@ public class BlockListActivity extends BaseActivity {
         setContentView(R.layout.activity_block_list);
         ButterKnife.bind(this);
         initView();
+        miningPresenter = new MiningPresenter();
         getData();
     }
 
     private void getData() {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue != null){
-            // TODO test delete
-            keyValue.setBlockSynchronized(101);
+        if(mPageNo == 0){
+            miningPresenter.getMiningInfo(new LogicObserver<KeyValue>() {
+                @Override
+                public void handleData(KeyValue keyValue) {
+                    mKeyValue = keyValue;
+                    updateListView();
+                }
+
+                @Override
+                public void handleError(int code, String msg) {
+                    super.handleError(code, msg);
+                    updateListView();
+                }
+            });
+        }else{
+            updateListView();
+        }
+    }
+
+    private void updateListView() {
+        if(mKeyValue != null){
             if(mPageNo == 0){
-                mDataSize = keyValue.getBlockSynchronized();
+                mDataSize = mKeyValue.getBlockSynchronized();
                 // TODO test delete
-                keyValue.getMiningInfos().clear();
-                for (int i = 100; i >= 0; i--) {
+                mKeyValue.getMiningInfos().clear();
+                for (int i = mDataSize - 1; i >= mDataSize - 50; i--) {
                     if(i%2 == 1){
                         MiningInfo entry = new MiningInfo();
                         entry.setBlockNo("" + i);
-                        keyValue.getMiningInfos().add(entry);
+                        mKeyValue.getMiningInfos().add(entry);
                     }
                 }
 
-                if(keyValue.getMiningInfos() != null){
-                    mAdapter.setListData(keyValue.getMiningInfos());
+                if(mKeyValue.getMiningInfos() != null){
+                    mAdapter.setListData(mKeyValue.getMiningInfos());
                     if(mIsMe){
-                        mDataSize = keyValue.getMiningInfos().size();
+                        mDataSize = mKeyValue.getMiningInfos().size();
                     }
                 }
             }
@@ -134,12 +165,29 @@ public class BlockListActivity extends BaseActivity {
 
     @OnItemClick(R.id.list_view_help)
     void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        Intent intent = new Intent();
-        intent.putExtra(TransmitKey.ID, position);
         Object tagObj = view.getTag(R.id.block_list_tag);
         String tag = tagObj == null ? "" : tagObj.toString();
-        intent.putExtra(TransmitKey.TITLE, tag);
+        int number = StringUtil.getIntString(tag);
+        ProgressManager.showProgressDialog(this);
+        MyApplication.getRemoteConnector().getBlockByNumber(number);
+    }
 
-        ActivityUtil.startActivity(intent, this, BlockDetailActivity.class);
+    @Override
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MessageEvent msgEvent) {
+        if(msgEvent != null && msgEvent.getCode() == MessageEvent.EventCode.GET_BLOCK
+                && ProgressManager.isShowing()){
+            ToastUtils.showShortToast("onEventBlock");
+            ProgressManager.closeProgressDialog();
+            Bundle bundle = (Bundle) msgEvent.getData();
+            if(bundle != null){
+                BlockEventData block = bundle.getParcelable("block");
+                if(block != null){
+                    Intent intent = new Intent();
+                    intent.putExtra(TransmitKey.BEAN, block);
+                    ActivityUtil.startActivity(intent, this, BlockDetailActivity.class);
+                }
+            }
+        }
     }
 }

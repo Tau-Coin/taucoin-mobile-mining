@@ -21,7 +21,9 @@ import android.os.Bundle;
 
 import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
@@ -40,6 +42,7 @@ public class MyApplication extends MultiDexApplication {
 
     private static MyApplication mInstance;
     private static volatile KeyValue mKeyValue;
+    private static RemoteConnectorManager mRemoteConnector;
 
     @Override
     public void onCreate() {
@@ -52,7 +55,6 @@ public class MyApplication extends MultiDexApplication {
                 || LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
-
 //        FontUtil.replaceSystemDefaultFont(this, "fonts/test.ttf");
 
         // Property init
@@ -81,6 +83,8 @@ public class MyApplication extends MultiDexApplication {
         LeakCanary.install(this);
 
         registerCurrentActivityLifecycleCallbacks();
+
+        mRemoteConnector = new RemoteConnectorManager();
     }
 
     private void initKeyValue() {
@@ -96,9 +100,6 @@ public class MyApplication extends MultiDexApplication {
         return mKeyValue;
     }
     public static synchronized void setKeyValue(KeyValue entry) {
-        if(entry.getMiningInfos() == null && mKeyValue != null){
-            entry.setMiningInfos(mKeyValue.getMiningInfos());
-        }
         mKeyValue = entry;
     }
 
@@ -138,5 +139,9 @@ public class MyApplication extends MultiDexApplication {
 
             }
         });
+    }
+
+    public static RemoteConnectorManager getRemoteConnector(){
+        return mRemoteConnector;
     }
 }

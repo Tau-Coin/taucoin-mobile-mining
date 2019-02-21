@@ -18,7 +18,7 @@ package io.taucoin.android.wallet.base;
 public class TransmitKey {
     public static final String SERVICE_TYPE = "service_type";
 
-    public static class ServiceType{
+    public static class ServiceType {
         public static final String GET_IMPORT_DATA = "get_import_data";
         public static final String GET_HOME_DATA = "get_home_data";
         public static final String GET_SEND_DATA = "get_send_data";
@@ -40,18 +40,18 @@ public class TransmitKey {
     public static final int PAGE_SIZE = 20;
     public static final int TX_CONFIRMATIONS = 2;
 
-    public static class TxResult{
+    public static class TxResult {
         public static final String FAILED = "Failed";
         public static final String SUCCESSFUL = "Successful";
         public static final String CONFIRMING = "Confirming";
     }
 
-    public static class TxType{
+    public static class TxType {
         public static final String SEND = "Send";
         public static final String RECEIVE = "Receive";
     }
 
-    public static class MiningState{
+    public static class MiningState {
         public static final String Start = "Start";
         public static final String Stop = "Stop";
     }
@@ -60,4 +60,11 @@ public class TransmitKey {
     public static final String UPGRADE = "upgrade";
     public static final String ISSHOWTIP = "isShowTip";
     public static final String ID = "id";
+
+    public static final String RESULT = "result";
+    public static class RemoteResult {
+        public static final String OK = "OK";
+        public static final String FAIL = "Fail";
+
+    }
 }

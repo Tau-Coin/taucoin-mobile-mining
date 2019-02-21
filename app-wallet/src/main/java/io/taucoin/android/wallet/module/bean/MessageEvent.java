@@ -9,7 +9,10 @@ public class MessageEvent{
         TRANSACTION,
         TRANSACTION_IMPORT,
         UPGRADE,
-        BLOCK_HEIGHT
+        BLOCK_HEIGHT,
+        MINING_INFO,
+        GET_BLOCK,
+        GET_BLOCK_LIST
     }
     private Object data;
 

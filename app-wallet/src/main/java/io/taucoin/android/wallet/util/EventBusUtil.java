@@ -53,6 +53,10 @@ public class EventBusUtil {
         EventBus.getDefault().post(msg);
     }
 
+    public static void post(MessageEvent msgEvent){
+        EventBus.getDefault().post(msgEvent);
+    }
+
     public static void postSticky(MessageEvent.EventCode code){
         MessageEvent msg = new MessageEvent();
         msg.setCode(code);

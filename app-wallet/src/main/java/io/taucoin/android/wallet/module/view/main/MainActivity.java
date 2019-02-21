@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
@@ -46,6 +47,8 @@ public class MainActivity extends BaseActivity implements IMainView {
         changeTab(0);
         initExitApp();
         UpgradeService.startUpdateService();
+
+        MyApplication.getRemoteConnector().createRemoteConnector();
     }
 
     @Override
@@ -142,6 +145,7 @@ public class MainActivity extends BaseActivity implements IMainView {
         ProgressManager.closeProgressDialog();
         TxService.stopService();
         UpgradeService.stopUpdateService();
+        MyApplication.getRemoteConnector().cancelRemoteConnector();
     }
 
     @Override
