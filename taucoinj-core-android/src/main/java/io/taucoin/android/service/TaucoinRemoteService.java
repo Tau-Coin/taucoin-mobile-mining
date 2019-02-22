@@ -28,6 +28,7 @@ import io.taucoin.manager.AdminInfo;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.PeersPool;
+import io.taucoin.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -327,7 +328,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         // Import private key
         CONFIG.importForgerPrikey(TextUtils.isEmpty(privateKey) ?
-                null : Hex.decode(privateKey));
+                null : Utils.getRawPrivateKeyString(privateKey));
         String databaseFolder = getApplicationInfo().dataDir;
         logger.info("Database folder: {}", databaseFolder);
         CONFIG.setDataBaseDir(databaseFolder);

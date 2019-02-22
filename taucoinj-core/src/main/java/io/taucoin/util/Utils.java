@@ -1,5 +1,9 @@
 package io.taucoin.util;
 
+import io.taucoin.crypto.ECKey;
+import io.taucoin.config.MainNetParams;
+import io.taucoin.core.DumpedPrivateKey;
+
 import org.spongycastle.util.encoders.DecoderException;
 import org.spongycastle.util.encoders.Hex;
 
@@ -174,6 +178,7 @@ public class Utils {
         return alignRight ? alignString + s : s + alignString;
 
     }
+
     public static String repeat(String s, int n) {
         if (s.length() == 1) {
             byte[] bb = new byte[n];
@@ -184,5 +189,25 @@ public class Utils {
             for (int i = 0; i < n; i++) ret.append(s);
             return ret.toString();
         }
+    }
+
+    /**
+     * Transfer WIF format private into raw private key string.
+     *
+     * @privateKey String  raw private key string with length 64
+     *         or WIF format.
+     */
+    public static byte[] getRawPrivateKeyString(String privateKey) {
+        ECKey key;
+
+        if (privateKey.length() == 51 || privateKey.length() == 52) {
+            DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(), privateKey);
+            key = dumpedPrivateKey.getKey();
+        } else {
+            BigInteger privKey = new BigInteger(privateKey, 16);
+            key = ECKey.fromPrivate(privKey);
+        }
+
+        return key.getPrivKey().toByteArray();
     }
 }

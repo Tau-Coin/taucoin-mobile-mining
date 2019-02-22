@@ -41,18 +41,18 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
 
     public void init(List<String> privateKeys) {
         List<ECKey> ecprivateKey = new ArrayList<>();
-        for (String prikey: privateKeys) {
+        for (String prikey : privateKeys) {
             ECKey key;
             //String prikey = privateKeys.get(0);
-            log.info("privkey is {}",prikey);
+            log.info("privkey is {}", prikey);
 
             if (prikey.length() == 51 || prikey.length() == 52) {
-                DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(),prikey);
+                DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(), prikey);
                 key = dumpedPrivateKey.getKey();
             } else {
-                BigInteger privKey = new BigInteger(prikey,16);
+                BigInteger privKey = new BigInteger(prikey, 16);
                 key = ECKey.fromPrivate(privKey);
-                log.info("taucoin init prikey wif:{}",key.getPrivateKeyAsWiF(MainNetParams.get()));
+                log.info("taucoin init prikey wif:{}", key.getPrivateKeyAsWiF(MainNetParams.get()));
             }
             ecprivateKey.add(key);
         }
