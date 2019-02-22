@@ -22,6 +22,7 @@ import io.taucoin.android.service.TaucoinConnector;
 import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
@@ -168,6 +169,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.startSync();
             getChainHeight();
         }
+    }
+
+    void submitTransaction(String senderPrivateKey, TransactionHistory tx){
+        submitTransaction(senderPrivateKey, tx.getToAddress(), tx.getValue(), tx.getFee());
     }
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){

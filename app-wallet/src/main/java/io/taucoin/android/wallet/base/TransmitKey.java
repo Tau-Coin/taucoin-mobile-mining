@@ -67,6 +67,7 @@ public class TransmitKey {
         public static final String FAIL = "Fail";
         public static final String HEIGHT = "height";
         public static final String BLOCKS = "blocks";
+        public static final String TRANSACTION = "transaction";
 
     }
 }

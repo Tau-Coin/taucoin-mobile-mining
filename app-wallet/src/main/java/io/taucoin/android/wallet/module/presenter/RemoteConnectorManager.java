@@ -9,6 +9,7 @@ import com.github.naturs.logger.Logger;
 import java.util.Date;
 import java.util.List;
 
+import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
@@ -24,29 +25,30 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.net.p2p.HelloMessage;
 
 public class RemoteConnectorManager extends ConnectorManager implements ConnectorHandler {
 
-    private IMiningModel miningModel;
+    private IMiningModel mMiningModel;
 
     private synchronized IMiningModel getMiningModel(){
-        if(miningModel == null){
+        if(mMiningModel == null){
             synchronized (MiningModel.class){
-                if(miningModel == null){
-                    miningModel = new MiningModel();
+                if(mMiningModel == null){
+                    mMiningModel = new MiningModel();
                 }
             }
         }
-        return miningModel;
+        return mMiningModel;
     }
 
     @Override
     public void onConnectorConnected() {
         super.onConnectorConnected();
-        miningModel = null;
+        mMiningModel = null;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -169,6 +171,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 long height =  replyData.getLong(TransmitKey.RemoteResult.HEIGHT);
                 updateBlockSynchronized(height);
                 getBlockList(height);
+                break;
+            case TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
+                replyData = message.getData();
+                replyData.setClassLoader(Transaction.class.getClassLoader());
+                Transaction transaction = replyData.getParcelable(TransmitKey.RemoteResult.TRANSACTION);
+                ToastUtils.showShortToast("MSG_SUBMIT_TRANSACTION_RESULT");
                 break;
             default:
                 isClaimed = false;

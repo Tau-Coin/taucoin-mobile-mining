@@ -132,9 +132,9 @@ public class SendActivity extends BaseActivity implements ISendView {
         tx.setValue(amount);
         tx.setFee(fee);
 
-        if(Wallet.getInstance().validateTxParameter(tx)){
+//        if(Wallet.getInstance().validateTxParameter(tx)){
             showSureDialog(tx);
-        }
+//        }
     }
 
     private void showSureDialog(TransactionHistory tx) {
@@ -156,8 +156,8 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void handleSendTransaction(TransactionHistory tx) {
-        ProgressManager.showProgressDialog(this);
-        mTxPresenter.getBalanceAndUTXO(tx, new LogicObserver<Boolean>() {
+//        ProgressManager.showProgressDialog(this);
+        mTxPresenter.sendRawTransaction(tx, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 ProgressManager.closeProgressDialog();
@@ -172,6 +172,21 @@ public class SendActivity extends BaseActivity implements ISendView {
                 }
             }
         });
+//        mTxPresenter.getBalanceAndUTXO(tx, new LogicObserver<Boolean>() {
+//            @Override
+//            public void handleData(Boolean isSuccess) {
+//                ProgressManager.closeProgressDialog();
+//                if(isSuccess){
+//                    // clear all editText data
+//                    etAddress.getText().clear();
+//                    etAmount.getText().clear();
+//                    etMemo.getText().clear();
+//                    etFee.setText(R.string.send_normal_value);
+//                }else {
+//                    ToastUtils.showShortToast(R.string.send_tx_invalid_error);
+//                }
+//            }
+//        });
     }
 
     private void showSoftInput() {

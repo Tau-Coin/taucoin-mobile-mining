@@ -39,6 +39,7 @@ import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.RetResult;
+import io.taucoin.foundation.util.StringUtil;
 
 public class TxPresenter {
     private ISendView mSendView;
@@ -63,12 +64,12 @@ public class TxPresenter {
         mTxModel.isAnyTxPending(new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isAnyTxPending) {
-                if(isAnyTxPending){
-                    TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
-                    ToastUtils.showShortToast(R.string.send_has_pending);
-                }else{
+//                if(isAnyTxPending){
+//                    TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
+//                    ToastUtils.showShortToast(R.string.send_has_pending);
+//                }else{
                     mSendView.checkForm();
-                }
+//                }
             }
         });
     }
@@ -218,5 +219,22 @@ public class TxPresenter {
                 }
             }
         });
+    }
+
+    public void sendRawTransaction(TransactionHistory tx, LogicObserver<Boolean> observer){
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue == null) {
+            observer.onError();
+            return;
+        }
+        if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start)){
+            if(MyApplication.getRemoteConnector().isInit() &&
+                    keyValue.getBlockHeight() == keyValue.getBlockSynchronized()){
+                ToastUtils.showShortToast("In Synchronization Block");
+            }
+            MyApplication.getRemoteConnector().submitTransaction(keyValue.getPrivkey(), tx);
+        }else{
+            ToastUtils.showShortToast("on develop");
+        }
     }
 }

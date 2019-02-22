@@ -784,11 +784,13 @@ public class TaucoinRemoteService extends TaucoinService {
     protected class SubmitTransactionTask extends AsyncTask<Taucoin, Void, Transaction> {
 
         Transaction transaction;
-        Message message;
+        Messenger messenger;
+        Object obj;
 
         public SubmitTransactionTask(Message message) {
 
-            this.message = message;
+            this.messenger = message.replyTo;
+            this.obj = message.obj;
             Bundle data = message.getData();
             //transaction = data.getParcelable("transaction");
             data.setClassLoader(io.taucoin.android.interop.Transaction.class.getClassLoader());
@@ -818,16 +820,16 @@ public class TaucoinRemoteService extends TaucoinService {
 
         protected void onPostExecute(Transaction submittedTransaction) {
 
-            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT, 0, 0, message.obj);
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT, 0, 0, obj);
             Bundle replyData = new Bundle();
-            replyData.putParcelable("transaction", new io.taucoin.android.interop.Transaction(submittedTransaction));
-            replyMessage.setData(replyData);
-//            try {
-//                message.replyTo.send(replyMessage);
-//                logger.info("Sent submitted transaction: " + submittedTransaction.toString());
-//            } catch (RemoteException e) {
-//                logger.error("Exception sending submitted transaction to client: " + e.getMessage());
-//            }
+            try {
+                replyData.putParcelable("transaction", new io.taucoin.android.interop.Transaction(submittedTransaction));
+                replyMessage.setData(replyData);
+                messenger.send(replyMessage);
+                logger.info("Sent submitted transaction: " + submittedTransaction.toString());
+            } catch (RemoteException e) {
+                logger.error("Exception sending submitted transaction to client: " + e.getMessage());
+            }
         }
     }
 
