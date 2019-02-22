@@ -85,7 +85,7 @@ public class MiningModel implements IMiningModel{
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
             if(entry.getBlockHeight() < blockSynchronized){
-                entry.setBlockSynchronized(blockSynchronized);
+                entry.setBlockHeight(blockSynchronized);
             }
             entry.setBlockSynchronized(blockSynchronized);
             KeyValueDaoUtils.getInstance().update(entry);
