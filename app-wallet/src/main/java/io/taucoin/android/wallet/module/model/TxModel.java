@@ -235,17 +235,12 @@ public class TxModel implements ITxModel {
                 emitter.onError(CodeException.getError());
                 return;
             }
-            String newPrivateKey;
+            String newPrivateKey = keyValue.getPrivkey();
             try {
                 newPrivateKey = Utils.convertWIFPrivkeyIntoPrivkey(keyValue.getPrivkey());
-            } catch (AddressFormatException e) {
-                System.out.println(e.toString());
-                Logger.e(e, "AddressFormatException in createTransaction");
-                emitter.onError(CodeException.getError());
-                return;
+            } catch (AddressFormatException ignore) {
             }
             ECKey key = new ECKey(new BigInteger(newPrivateKey, 16));
-            Logger.i("Compressed key hash:" + Utils.bytesToHexString(key.getCompressedPubKeyHash()));
             KeyStore.getInstance().addKey(key);
             String amount = FmtMicrometer.fmtTxValue(txHistory.getValue());
             HashMap<String, BigInteger> receipts = new HashMap<>();

@@ -6,6 +6,7 @@ import android.os.Message;
 
 import com.github.naturs.logger.Logger;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +71,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 switch (event) {
                     case EVENT_BLOCK:
                         BlockEventData blockEventData = data.getParcelable("data");
+                        handleSynchronizedBlock(blockEventData);
                         logMessage = "Added block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
                         time = blockEventData.registeredTime;
                         addLogEntry(time, logMessage);
@@ -182,6 +184,24 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 isClaimed = false;
         }
         return isClaimed;
+    }
+
+    private void handleSynchronizedBlock(BlockEventData block) {
+        if(block != null){
+            getMiningModel().handleSynchronizedBlock(block, new LogicObserver<MessageEvent.EventCode>() {
+                @Override
+                public void handleData(MessageEvent.EventCode eventCode) {
+                    if(eventCode != null){
+                        if(eventCode == MessageEvent.EventCode.ALL){
+                            EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                            EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                        }else{
+                            EventBusUtil.post(eventCode);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void updateMyMiningBlock(List<BlockEventData> blocks) {

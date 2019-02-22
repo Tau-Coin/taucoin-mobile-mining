@@ -49,7 +49,8 @@ public class MiningInfoDaoUtils {
 
     public List<MiningInfo> queryByPubicKey(String pubicKey) {
         return getMiningInfoDao().queryBuilder()
-                .where(MiningInfoDao.Properties.PublicKey.eq(pubicKey))
+                .where(MiningInfoDao.Properties.PublicKey.eq(pubicKey),
+                        MiningInfoDao.Properties.Valid.eq(1))
                 .orderDesc(MiningInfoDao.Properties.Mid)
                 .list();
     }

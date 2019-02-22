@@ -824,10 +824,10 @@ public class TaucoinRemoteService extends TaucoinService {
             Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT, 0, 0, obj);
             Bundle replyData = new Bundle();
             try {
-                replyData.putParcelable("transaction", new io.taucoin.android.interop.Transaction(submittedTransaction));
+                replyData.putParcelable("transaction", (io.taucoin.android.interop.Transaction)submittedTransaction);
                 replyMessage.setData(replyData);
                 messenger.send(replyMessage);
-                logger.info("Sent submitted transaction: " + submittedTransaction.toString());
+                logger.info("Sent submitted transaction: " + (submittedTransaction != null ? submittedTransaction.toString() : "null"));
             } catch (RemoteException e) {
                 logger.error("Exception sending submitted transaction to client: " + e.getMessage());
             }
