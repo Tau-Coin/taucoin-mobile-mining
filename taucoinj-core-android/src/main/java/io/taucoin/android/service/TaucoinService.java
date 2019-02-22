@@ -85,7 +85,7 @@ public class TaucoinService extends Service {
 
         protected Void doInBackground(Void... args) {
 
-            createTaucoin();
+            createTaucoin(this.privateKeys.size() != 0 ? this.privateKeys.get(0) : "");
             return null;
         }
 
@@ -98,7 +98,7 @@ public class TaucoinService extends Service {
     protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply) {
     }
 
-    protected void createTaucoin() {
+    protected void createTaucoin(String privateKey) {
     }
 
     @Override

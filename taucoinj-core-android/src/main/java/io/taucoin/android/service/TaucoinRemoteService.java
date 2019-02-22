@@ -316,11 +316,14 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     @Override
-    protected void createTaucoin() {
+    protected void createTaucoin(String privateKey) {
 
         System.setProperty("sun.arch.data.model", "32");
         System.setProperty("leveldb.mmap", "false");
 
+        // Import private key
+        CONFIG.importForgerPrikey(TextUtils.isEmpty(privateKey) ?
+                null : Hex.decode(privateKey));
         String databaseFolder = getApplicationInfo().dataDir;
         logger.info("Database folder: {}", databaseFolder);
         CONFIG.setDataBaseDir(databaseFolder);
