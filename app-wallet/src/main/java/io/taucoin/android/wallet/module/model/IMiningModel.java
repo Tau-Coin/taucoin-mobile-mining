@@ -9,7 +9,7 @@ public interface IMiningModel {
     /** update or save mining state */
     void updateMiningState(LogicObserver<Boolean> observer);
     /** update or save current block height */
-    void updateBlockHeight(int blockHeight);
+    void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
     /** update or save current synchronized block */
-    void updateBlockSynchronized(int blockSynchronized);
+    void updateBlockSynchronized(int blockSynchronized, LogicObserver<Boolean> observer);
 }

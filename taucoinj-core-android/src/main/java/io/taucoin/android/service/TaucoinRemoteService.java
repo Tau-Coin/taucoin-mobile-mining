@@ -1084,8 +1084,7 @@ public class TaucoinRemoteService extends TaucoinService {
                 replyData.putByteArray("hash", hash);
             }
             try {
-                replyData.setClassLoader(io.taucoin.android.interop.Block.class.getClassLoader());
-                replyData.putParcelable("block", new io.taucoin.android.interop.Block(block));
+                replyData.putParcelable("block", new io.taucoin.android.service.events.BlockEventData(block));
                 replyMessage.setData(replyData);
                 messenger.send(replyMessage);
                 logger.info("Sent to app block: " + block.toString());
@@ -1107,14 +1106,16 @@ public class TaucoinRemoteService extends TaucoinService {
 
     protected class GetBlockListTask extends AsyncTask<Taucoin, Void, ArrayList<Block>> {
 
-        Message message;
+        Messenger messenger;
+        Object obj;
         long number;
         byte[] hash;
         int limit;
 
         public GetBlockListTask(Message message) {
 
-            this.message = message;
+            this.messenger = message.replyTo;
+            this.obj = message.obj;
             this.number = -1;
             this.hash = null;
             this.limit = 500;
@@ -1157,7 +1158,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         protected void onPostExecute(ArrayList<Block> blockList) {
 
-            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, message.obj);
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, obj);
             Bundle replyData = new Bundle();
             if (number != -1) {
                 replyData.putLong("number", number);
@@ -1166,15 +1167,15 @@ public class TaucoinRemoteService extends TaucoinService {
                 replyData.putByteArray("hash", hash);
             }
             replyData.putInt("limit", limit);
-            ArrayList<io.taucoin.android.interop.Block> parcelBlockList
-                    = new ArrayList<io.taucoin.android.interop.Block>();
+            ArrayList<io.taucoin.android.service.events.BlockEventData> parcelBlockList
+                    = new ArrayList<>();
             for (Block block : blockList) {
-                parcelBlockList.add(new io.taucoin.android.interop.Block(block));
+                parcelBlockList.add(new io.taucoin.android.service.events.BlockEventData(block));
             }
             replyData.putParcelableArrayList("blocks", parcelBlockList);
             replyMessage.setData(replyData);
             try {
-                message.replyTo.send(replyMessage);
+                messenger.send(replyMessage);
                 logger.info("Sent blocks to app");
             } catch (RemoteException e) {
                 logger.error("Exception sending blocks to client: " + e.getMessage());

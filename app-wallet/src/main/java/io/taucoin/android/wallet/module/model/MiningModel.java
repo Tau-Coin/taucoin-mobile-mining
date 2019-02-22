@@ -61,26 +61,31 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void updateBlockHeight(int blockHeight) {
-        Observable.create((ObservableOnSubscribe<MiningInfo>) emitter -> {
+    public void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
             entry.setBlockHeight(blockHeight);
             KeyValueDaoUtils.getInstance().update(entry);
+            emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe();
+                .subscribe(observer);
     }
 
     @Override
-    public void updateBlockSynchronized(int blockSynchronized) {
-        Observable.create((ObservableOnSubscribe<MiningInfo>) emitter -> {
+    public void updateBlockSynchronized(int blockSynchronized, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
+            if(entry.getBlockHeight() < blockSynchronized){
+                entry.setBlockSynchronized(blockSynchronized);
+            }
             entry.setBlockSynchronized(blockSynchronized);
             KeyValueDaoUtils.getInstance().update(entry);
+            emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe();
+                .subscribe(observer);
     }
 }

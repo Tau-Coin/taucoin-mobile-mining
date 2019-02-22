@@ -47,8 +47,4 @@ public class MiningPresenter {
             }
         });
     }
-
-    public void getBlockList() {
-
-    }
 }

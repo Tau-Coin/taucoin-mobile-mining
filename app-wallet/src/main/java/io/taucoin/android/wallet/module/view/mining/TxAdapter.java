@@ -10,26 +10,31 @@ import android.widget.TextView;
 
 import com.mofei.tau.R;
 
+import org.spongycastle.util.encoders.Hex;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnLongClick;
-import io.taucoin.android.wallet.module.bean.TxBean;
 import io.taucoin.android.wallet.util.CopyManager;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.SpanUtils;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.core.Transaction;
 import io.taucoin.foundation.util.StringUtil;
 
 public class TxAdapter extends BaseAdapter {
 
 
-    private List<TxBean> list = new ArrayList<>();
+    private List<Transaction> list = new ArrayList<>();
 
 
-    void setListData(List<TxBean> list) {
-        this.list = list;
+    void setListData(List<Transaction> list) {
+        this.list.clear();
+        this.list.addAll(list);
         notifyDataSetChanged();
     }
 
@@ -58,18 +63,21 @@ public class TxAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        TxBean bean = list.get(position);
+        Transaction bean = list.get(position);
         String title = parent.getContext().getText(R.string.block_transaction_id).toString();
+        String txId = Hex.toHexString(bean.getHash());
         SpannableStringBuilder titleSequence = new SpanUtils()
                 .append(title)
                 .setForegroundColor(ContextCompat.getColor(parent.getContext(), R.color.color_grey_dark))
-                .append(bean.getTxid())
+                .append(txId)
                 .create();
-        viewHolder.tvTitle.setTag(bean.getTxid());
+        viewHolder.tvTitle.setTag(txId);
         viewHolder.tvTitle.setText(titleSequence);
 
         String subheading = parent.getContext().getText(R.string.bloc_transaction_fee).toString();
-        subheading = String.format(subheading, bean.getFee());
+        BigInteger fee = new BigInteger(bean.getFee());
+        String feeStr = FmtMicrometer.fmtFormat(fee.toString());
+        subheading = String.format(subheading, feeStr);
         viewHolder.tvSubheading.setText(subheading);
         return convertView;
     }

@@ -1,0 +1,260 @@
+package io.taucoin.android.wallet.module.presenter;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+
+import com.github.naturs.logger.Logger;
+
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import io.taucoin.android.service.ConnectorHandler;
+import io.taucoin.android.service.TaucoinConnector;
+import io.taucoin.android.service.TaucoinRemoteService;
+import io.taucoin.android.service.events.EventFlag;
+import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.UserUtil;
+import io.taucoin.core.Transaction;
+import io.taucoin.core.Utils;
+import io.taucoin.core.transaction.TransactionOptions;
+import io.taucoin.core.transaction.TransactionVersion;
+import io.taucoin.util.ByteUtil;
+
+public abstract class ConnectorManager implements ConnectorHandler {
+
+    private TaucoinConnector mTaucoinConnector = null;
+
+    @SuppressLint("SimpleDateFormat")
+    private DateFormat mDateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");
+    private String mHandlerIdentifier = UUID.randomUUID().toString();
+    private String mConsoleLog = "";
+    private boolean isTaucoinConnected = false;
+    boolean isInit = false;
+
+    private final static int CONSOLE_LENGTH = 10000;
+    private static final int BOOT_UP_DELAY_INIT_SECONDS = 2;
+
+    public void createRemoteConnector(){
+        if (mTaucoinConnector == null) {
+            addLogEntry("Create Remote Connector...");
+            Context context = MyApplication.getInstance();
+            mTaucoinConnector = new TaucoinConnector(context, TaucoinRemoteService.class);
+            mTaucoinConnector.registerHandler(this);
+            mTaucoinConnector.bindService();
+        }
+    }
+
+    public void cancelRemoteConnector(){
+        if (mTaucoinConnector != null) {
+            addLogEntry("Cancel Remote Connector...");
+            closeTaucoin();
+            mTaucoinConnector.removeHandler(this);
+            mTaucoinConnector.unbindService();
+            mTaucoinConnector = null;
+        }
+    }
+
+    @Override
+    public void onConnectorConnected() {
+        if (!isTaucoinConnected) {
+            addLogEntry("Connector Connected");
+            isTaucoinConnected = true;
+            mTaucoinConnector.addListener(mHandlerIdentifier, EnumSet.allOf(EventFlag.class));
+
+            if(!isInit){
+                init();
+            }
+        }
+    }
+
+    void addLogEntry(String message) {
+        Date date = new Date();
+        addLogEntry(date.getTime(), message);
+    }
+
+    @Override
+    public void onConnectorDisconnected() {
+        addLogEntry("Connector Disconnected");
+        mTaucoinConnector.removeListener(mHandlerIdentifier);
+        isTaucoinConnected = false;
+        isInit = false;
+    }
+
+    @Override
+    public String getID() {
+        return mHandlerIdentifier;
+    }
+
+    void addLogEntry(long timestamp, String message) {
+        Date date = new Date(timestamp);
+        Logger.d("consoleLog=" + message);
+        mConsoleLog += mDateFormatter.format(date) + " -> " + (message.length() > 100 ? message.substring(0, 100) + "..." : message) + "\n";
+
+        int length = mConsoleLog.length();
+        if (length > CONSOLE_LENGTH) {
+            mConsoleLog = mConsoleLog.substring(CONSOLE_LENGTH * ((length / CONSOLE_LENGTH) - 1) + length % CONSOLE_LENGTH);
+        }
+        EventBusUtil.post(MessageEvent.EventCode.CONSOLE_LOG);
+    }
+
+    public void importForgerPrivkey(String privateKey){
+        Logger.d("importForgerPrivkey");
+        mTaucoinConnector.importForgerPrivkey(privateKey);
+    }
+
+    public void importPrivkeyAndInit(String privateKey){
+        Logger.d("importPrivkeyAndInit");
+        ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
+        initializer.schedule(new InitTask(mTaucoinConnector, mHandlerIdentifier, privateKey),
+                BOOT_UP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private class InitTask implements Runnable {
+        private TaucoinConnector taucoinConnector;
+        private String handlerIdentifier;
+        private List<String> privateKeys = new ArrayList<>();
+
+        InitTask(TaucoinConnector taucoinConnector, String handlerIdentifier, String privateKey) {
+            this.taucoinConnector = taucoinConnector;
+            this.handlerIdentifier = handlerIdentifier;
+            this.privateKeys.add(privateKey);
+        }
+
+        @Override
+        public void run() {
+            taucoinConnector.init(handlerIdentifier, privateKeys);
+        }
+    }
+
+    /**
+     * start sync block
+     * */
+    public void startSync(){
+        Logger.d("startSync");
+        mTaucoinConnector.startSync();
+    }
+
+    /**
+     * 1、start sync block
+     * 2、get block height
+     * 3、get block list (update my mining block)
+     * */
+    public void startSyncAll(){
+        Logger.d("startSync");
+        mTaucoinConnector.startSync();
+        getChainHeight();
+        getBlockList();
+    }
+
+    public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
+        Logger.d("submitTransaction");
+        long timeStamp = (new Date().getTime())/1000;
+        byte[] privateKey = Utils.parseAsHexOrBase58(senderPrivateKey);
+        byte[] toAddress = Utils.parseAsHexOrBase58(txToAddress);
+        byte[] amount = (new BigInteger(txAmount)).toByteArray();
+        byte[] fee = (new BigInteger(txFee)).toByteArray();
+
+        Transaction transaction = new Transaction(TransactionVersion.V01.getCode(),
+                TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
+        transaction.sign(privateKey);
+        io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
+        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+    }
+
+    public void startBlockForging(){
+        Logger.d("startBlockForging=-1");
+        startBlockForging(-1);
+    }
+
+    public void startBlockForging(int targetAmount){
+        Logger.d("startBlockForging=" + targetAmount);
+        mTaucoinConnector.startBlockForging(targetAmount);
+    }
+
+    public void stopBlockForging(){
+        Logger.d("stopBlockForging=-1");
+        stopBlockForging(-1);
+    }
+
+    public void stopBlockForging(int targetAmount){
+        Logger.d("stopBlockForging=" + targetAmount);
+        mTaucoinConnector.stopBlockForging(targetAmount);
+    }
+
+    public void getBlockHashList(long start, long limit){
+        Logger.d("getBlockHashList");
+        mTaucoinConnector.getBlockHashList(start, limit);
+    }
+
+    public void getPendingTxs(){
+        Logger.d("getPendingTxs");
+        mTaucoinConnector.getPendingTxs();
+    }
+    /**
+     * get block data by number
+     * */
+    public void getBlockByNumber(long number){
+        Logger.d("getBlockByNumber");
+        mTaucoinConnector.getBlockByNumber(mHandlerIdentifier, number);
+    }
+
+    /**
+     * get block data by number
+     * */
+    public void getBlockList(){
+        Logger.d("getBlockList");
+        int num = 0;
+        int limit = 5;
+        mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+    }
+
+    /**
+     * get chain height (block sync)
+     * */
+    public void getChainHeight(){
+        Logger.d("getChainHeight");
+        mTaucoinConnector.getChainHeight(mHandlerIdentifier);
+    }
+
+    public void closeTaucoin(){
+        Logger.d("closeTaucoin");
+        mTaucoinConnector.closeEthereum();
+    }
+
+    /**
+     * init
+     * 1、import key and init or only import key
+     * 2、start sync block
+     * 3、start block forging
+     * */
+    public void init(){
+        Logger.d("init");
+        if(UserUtil.isImportKey()){
+            String privateKey = MyApplication.getKeyValue().getPrivkey();
+            // import privateKey and init
+            if(isTaucoinConnected){
+                if(isInit){
+                    importForgerPrivkey(privateKey);
+                    startSyncAll();
+                }else{
+                    importPrivkeyAndInit(privateKey);
+                }
+            }else{
+                createRemoteConnector();
+            }
+        }
+    }
+
+
+}

@@ -65,6 +65,7 @@ public class TransmitKey {
     public static class RemoteResult {
         public static final String OK = "OK";
         public static final String FAIL = "Fail";
+        public static final String HEIGHT = "height";
 
     }
 }

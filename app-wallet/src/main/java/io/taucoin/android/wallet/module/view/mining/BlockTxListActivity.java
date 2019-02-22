@@ -1,21 +1,19 @@
 package io.taucoin.android.wallet.module.view.mining;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
 
 import com.mofei.tau.R;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.base.BaseActivity;
-import io.taucoin.android.wallet.module.bean.TxBean;
-import io.taucoin.android.wallet.module.presenter.MiningPresenter;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.widget.ToolbarView;
+import io.taucoin.core.Block;
 
 public class BlockTxListActivity extends BaseActivity {
 
@@ -26,52 +24,37 @@ public class BlockTxListActivity extends BaseActivity {
     @BindView(R.id.refresh_layout)
     SmartRefreshLayout refreshLayout;
 
-    private MiningPresenter mPresenter;
     private TxAdapter mAdapter;
-    private List<TxBean> mDataList = new ArrayList<>();
-
+    private BlockEventData blockEvent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_block_list);
         ButterKnife.bind(this);
-        mPresenter = new MiningPresenter();
         initView();
-        getData();
+        loadData();
     }
 
-    private void getData() {
-        mPresenter.getBlockList();
-        List<TxBean> dataList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            TxBean txBean = new TxBean();
-            txBean.setTxid("02A9AB50632BD35C31ECCDAB986A5462DF2448626F6687DDFADF0EA6036D3A230B");
-            txBean.setFee("0.01");
-            dataList.add(txBean);
+    public void loadData() {
+        Intent intent = getIntent();
+        if(intent != null){
+            intent.setExtrasClassLoader(BlockEventData.class.getClassLoader());
+            blockEvent = intent.getParcelableExtra(TransmitKey.BEAN);
+            if(blockEvent != null && blockEvent.block != null){
+                Block blockBean = blockEvent.block;
+                if(blockBean.getTransactionsList() != null){
+                    mAdapter.setListData(blockBean.getTransactionsList());
+                }
+            }
         }
-        loadData(dataList);
-    }
-
-
-    public void loadData(List<TxBean> data) {
-        if(data != null){
-            mDataList.clear();
-            mDataList.addAll(data);
-            mAdapter.setListData(data);
-        }
-        refreshLayout.setEnableRefresh(false);
-        refreshLayout.setEnableLoadmore(false);
-        refreshLayout.finishRefresh();
     }
 
     private void initView() {
         toolBar.setTitle(R.string.block_transaction);
         mAdapter = new TxAdapter();
         listViewHelp.setAdapter(mAdapter);
-    }
-
-    @Override
-    public void onRefresh(RefreshLayout refreshlayout) {
-        getData();
+        refreshLayout.setEnableRefresh(false);
+        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.finishRefresh();
     }
 }

@@ -183,7 +183,8 @@ public class BlockListActivity extends BaseActivity {
             ProgressManager.closeProgressDialog();
             Bundle bundle = (Bundle) msgEvent.getData();
             if(bundle != null){
-                Block block = bundle.getParcelable("block");
+                bundle.setClassLoader(io.taucoin.android.service.events.BlockEventData.class.getClassLoader());
+                BlockEventData block = bundle.getParcelable("block");
                 if(block != null){
                     Intent intent = new Intent();
                     intent.putExtra(TransmitKey.BEAN, block);

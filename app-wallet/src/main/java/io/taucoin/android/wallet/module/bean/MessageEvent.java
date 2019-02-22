@@ -12,7 +12,8 @@ public class MessageEvent{
         BLOCK_HEIGHT,
         MINING_INFO,
         GET_BLOCK,
-        GET_BLOCK_LIST
+        GET_BLOCK_LIST,
+        CONSOLE_LOG
     }
     private Object data;
 

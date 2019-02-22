@@ -48,7 +48,6 @@ public class MainActivity extends BaseActivity implements IMainView {
         initExitApp();
         UpgradeService.startUpdateService();
 
-        MyApplication.getRemoteConnector().createRemoteConnector();
     }
 
     @Override
