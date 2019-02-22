@@ -21,6 +21,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.android.wallet.widget.ToolbarView;
@@ -58,12 +59,8 @@ public class BlockDetailActivity extends BaseActivity {
             List<Transaction> txList = blockBean.getTransactionsList();
             if(txList != null){
                 tvTotalTransaction.setRightText(txList.size());
-                BigInteger totalFee = new BigInteger("0");
-                for (Transaction transaction : txList) {
-                    BigInteger fee = new BigInteger(transaction.getFee());
-                    totalFee = totalFee.add(fee);
-                }
-                String income = FmtMicrometer.fmtFormat(totalFee.toString());
+                String totalFee = MiningUtil.parseBlockReward(txList);
+                String income = FmtMicrometer.fmtFormat(totalFee);
                 tvMiningIncome.setRightText(income + "TAU");
             }
             String title = getText(R.string.block_no).toString();

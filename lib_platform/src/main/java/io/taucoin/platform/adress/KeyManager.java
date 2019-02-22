@@ -148,8 +148,8 @@ public class KeyManager {
         try {
             try{
                 privateKey = Utils.convertWIFPrivkeyIntoPrivkey(privateKey);
-            } catch (AddressFormatException ae) {
-                Logger.e(ae, "AddressFormatException in KeyManager.generatorPublicKey");
+            } catch (AddressFormatException ignore) {
+
             }
 
             ECKey ecKey = new ECKey(new BigInteger(privateKey, 16));

@@ -20,7 +20,6 @@ import java.util.List;
 import io.taucoin.android.wallet.db.GreenDaoManager;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
 
 /**
  * @version 1.0
@@ -59,18 +58,6 @@ public class KeyValueDaoUtils {
             return list.get(0);
         }
         return null;
-    }
-
-    public KeyValue insertOrReplace(BalanceBean balance) {
-        KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(balance.getPubkey());
-        if(entry == null){
-            entry = new KeyValue();
-        }
-        entry.setUtxo((long) balance.getUtxo());
-        entry.setBalance((long) balance.getCoins());
-        entry.setReward((long) balance.getRewards());
-        getKeyValueDao().insertOrReplace(entry);
-        return entry;
     }
 
     public KeyValue insertOrReplace(KeyValue keyValue) {

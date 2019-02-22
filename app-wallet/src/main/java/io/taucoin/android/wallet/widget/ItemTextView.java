@@ -104,6 +104,12 @@ public class ItemTextView extends RelativeLayout {
         setLeftText("" + text);
     }
 
+    public void setEnable(boolean isEnable) {
+        this.setEnabled(isEnable);
+        int color = isEnable ? R.color.color_grey_dark : R.color.color_grey;
+        viewHolder.tvLeft.setTextColor(getResources().getColor(color));
+    }
+
     public void setLeftText(String leftText) {
         this.leftText = leftText;
         viewHolder.tvLeft.setText(leftText);

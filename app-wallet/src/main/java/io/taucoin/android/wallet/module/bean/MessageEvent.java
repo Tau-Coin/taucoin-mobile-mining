@@ -10,6 +10,7 @@ public class MessageEvent{
         TRANSACTION_IMPORT,
         UPGRADE,
         BLOCK_HEIGHT,
+        MINING_INIT,
         MINING_INFO,
         GET_BLOCK,
         GET_BLOCK_LIST,

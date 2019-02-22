@@ -7,6 +7,7 @@ import android.os.Message;
 import com.github.naturs.logger.Logger;
 
 import java.util.Date;
+import java.util.List;
 
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
@@ -157,19 +158,33 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 break;
             // get block list return
             case TaucoinClientMessage.MSG_BLOCKS:
-//                replyData = message.getData();
-//                updateBlockSynchronized(height);
+                replyData = message.getData();
+                replyData.setClassLoader(BlockEventData.class.getClassLoader());
+                List<BlockEventData> blocks = replyData.getParcelableArrayList(TransmitKey.RemoteResult.BLOCKS);
+                updateMyMiningBlock(blocks);
                 break;
             // get block chain height return
             case TaucoinClientMessage.MSG_CHAIN_HEIGHT:
                 replyData = message.getData();
                 long height =  replyData.getLong(TransmitKey.RemoteResult.HEIGHT);
                 updateBlockSynchronized(height);
+                getBlockList(height);
                 break;
             default:
                 isClaimed = false;
         }
         return isClaimed;
+    }
+
+    private void updateMyMiningBlock(List<BlockEventData> blocks) {
+        if(blocks != null){
+            getMiningModel().updateMyMiningBlock(blocks, new LogicObserver<Boolean>() {
+                @Override
+                public void handleData(Boolean aBoolean) {
+                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                }
+            });
+        }
     }
 
     private void updateBlockSynchronized(long height){

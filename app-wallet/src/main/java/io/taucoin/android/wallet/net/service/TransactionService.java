@@ -20,7 +20,6 @@ import java.util.Map;
 import io.reactivex.Observable;
 
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.UTXOList;
 import io.taucoin.foundation.net.callback.DataResult;
@@ -33,8 +32,8 @@ import retrofit2.http.POST;
  * */
 public interface TransactionService {
 
-    @POST("getNewBalance/")
-    Observable<RetResult<BalanceBean>> getBalance(@Body Map<String,String> email);
+    @POST("getTauBalance/")
+    Observable<RetResult<Integer>> getBalance(@Body Map<String,String> email);
 
     @POST("getUTXOList/")
     Observable<UTXOList> getUTXOList(@Body Map<String,String> address);
@@ -48,6 +47,6 @@ public interface TransactionService {
     @POST("getAddOuts/")
     Observable<DataResult<AddInOutBean>> getAddOuts(@Body Map<String,String> address);
 
-    @POST("getHeight/")
+    @POST("getTauHeight/")
     Observable<HeightResult> getBlockHeight();
 }

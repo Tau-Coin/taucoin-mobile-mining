@@ -42,10 +42,10 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.ScriptPubkey;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.entity.UTXORecord;
+import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.db.util.UTXORecordDaoUtils;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.TxBean;
 import io.taucoin.android.wallet.module.bean.UTXOList;
@@ -67,15 +67,29 @@ import io.taucoin.foundation.util.StringUtil;
 public class TxModel implements ITxModel {
 
     @Override
-    public void getBalance(TAUObserver<RetResult<BalanceBean>> observer) {
-        String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+    public void getBalance(TAUObserver<RetResult<Integer>> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map=new HashMap<>();
-        map.put("pubkey",  publicKey);
+        map.put("address",  address);
         NetWorkManager.createApiService(TransactionService.class)
             .getBalance(map)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .subscribe(observer);
+    }
+
+    @Override
+    public void updateBalance(int balance, LogicObserver<KeyValue> observer) {
+        String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
+            keyValue.setBalance(balance);
+            KeyValueDaoUtils.getInstance().update(keyValue);
+            emitter.onNext(keyValue);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(observer);
     }
 
     @Override

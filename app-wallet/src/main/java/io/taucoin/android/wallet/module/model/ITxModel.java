@@ -17,10 +17,10 @@ package io.taucoin.android.wallet.module.model;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.entity.UTXORecord;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.HeightResult;
@@ -29,7 +29,7 @@ import io.taucoin.foundation.net.callback.RetResult;
 
 public interface ITxModel {
     /** Get balance from the server */
-    void getBalance(TAUObserver<RetResult<BalanceBean>> observer);
+    void getBalance(TAUObserver<RetResult<Integer>> observer);
 
     /** Whether a Pending transaction */
     void isAnyTxPending(LogicObserver<Boolean> observer);
@@ -70,4 +70,6 @@ public interface ITxModel {
     /** get block height from the server */
     void getBlockHeight(LogicObserver<HeightResult> observer);
 
+    /** Update balance from the server */
+    void updateBalance(int balance, LogicObserver<KeyValue> observer);
 }

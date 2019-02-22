@@ -15,17 +15,17 @@
  */
 package io.taucoin.android.wallet.util;
 
-import android.widget.TextView;
-
 import com.github.naturs.logger.Logger;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.widget.ItemTextView;
+import io.taucoin.core.Transaction;
 
 public class MiningUtil {
 
@@ -65,5 +65,16 @@ public class MiningUtil {
         int blockHeight = keyValue.getBlockHeight();
         textView.setRightText(blockHeight);
         Logger.d("UserUtil.setBlockHeight=" + blockHeight);
+    }
+
+    public static String parseBlockReward(List<Transaction> txList) {
+        BigInteger reward = new BigInteger("0");
+        if(txList != null && txList.size() > 0){
+            for (Transaction transaction : txList) {
+                BigInteger fee = new BigInteger(transaction.getFee());
+                reward = reward.add(fee);
+            }
+        }
+        return reward.toString();
     }
 }

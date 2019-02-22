@@ -1,5 +1,6 @@
 package io.taucoin.android.wallet.module.view.main;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -121,8 +122,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case BLOCK_HEIGHT:
                 MiningUtil.setBlockHeight(tvBlockHeight);
                 break;
-            case MINING_INFO:
+            case MINING_INIT:
                 handleMiningView();
+            case MINING_INFO:
+                handleMiningView(false);
                 break;
             default:
                 break;
@@ -138,6 +141,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     @Override
     public void handleMiningView() {
+        handleMiningView(true);
+    }
+
+    public void handleMiningView(boolean isNeedInit) {
         if (UserUtil.isImportKey() && btnMining != null) {
             miningPresenter.getMiningInfo(new LogicObserver<KeyValue>() {
                 @Override
@@ -156,7 +163,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(keyValue));
                         tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(keyValue));
                     }
-                    if(isStart){
+                    tvMiningDetails.setEnable(isStart && !isNeedInit);
+
+                    if(isStart && isNeedInit){
                         MyApplication.getRemoteConnector().init();
                     }
                     btnMining.setText(isStart ? R.string.home_mining_stop : R.string.home_mining_start);

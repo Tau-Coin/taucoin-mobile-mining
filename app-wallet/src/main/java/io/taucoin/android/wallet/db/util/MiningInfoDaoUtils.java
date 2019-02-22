@@ -58,4 +58,15 @@ public class MiningInfoDaoUtils {
         long result = getMiningInfoDao().insertOrReplace(miningInfo);
         return result > -1;
     }
+
+    public MiningInfo queryByNumber(String number) {
+        List<MiningInfo> list = getMiningInfoDao().queryBuilder()
+                .where(MiningInfoDao.Properties.BlockNo.eq(number))
+                .orderDesc(MiningInfoDao.Properties.Mid)
+                .list();
+        if(list != null && list.size() > 0){
+            return list.get(0);
+        }
+        return null;
+    }
 }

@@ -20,18 +20,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
-import io.taucoin.android.interop.Block;
 import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.MiningPresenter;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.ToolbarView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
@@ -93,18 +90,7 @@ public class BlockListActivity extends BaseActivity {
     private void updateListView() {
         if(mKeyValue != null){
             if(mPageNo == 0){
-                // TODO test delete
-                mKeyValue.setBlockSynchronized(10);
                 mDataSize = mKeyValue.getBlockSynchronized();
-                // TODO test delete
-                mKeyValue.getMiningInfos().clear();
-                for (int i = mDataSize - 1; i >= mDataSize - 5; i--) {
-                    if(i%2 == 1){
-                        MiningInfo entry = new MiningInfo();
-                        entry.setBlockNo("" + i);
-                        mKeyValue.getMiningInfos().add(entry);
-                    }
-                }
 
                 if(mKeyValue.getMiningInfos() != null){
                     mAdapter.setListData(mKeyValue.getMiningInfos());
@@ -179,7 +165,6 @@ public class BlockListActivity extends BaseActivity {
     public void onEvent(MessageEvent msgEvent) {
         if(msgEvent != null && msgEvent.getCode() == MessageEvent.EventCode.GET_BLOCK
                 && ProgressManager.isShowing()){
-            ToastUtils.showShortToast("onEventBlock");
             ProgressManager.closeProgressDialog();
             Bundle bundle = (Bundle) msgEvent.getData();
             if(bundle != null){

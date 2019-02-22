@@ -106,7 +106,7 @@ public class UserPresenter {
         ProgressManager.closeProgressDialog();
         mIImportKeyView.gotoKeysActivity();
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION_IMPORT);
-        EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+        EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
     }
 
     private void getAddOuts() {

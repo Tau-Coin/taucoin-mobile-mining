@@ -65,6 +65,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
+    public boolean isInit() {
+        return isInit;
+    }
+
     @Override
     public void onConnectorConnected() {
         if (!isTaucoinConnected) {
@@ -85,10 +89,12 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     @Override
     public void onConnectorDisconnected() {
-        addLogEntry("Connector Disconnected");
-        mTaucoinConnector.removeListener(mHandlerIdentifier);
-        isTaucoinConnected = false;
-        isInit = false;
+        if (mTaucoinConnector != null) {
+            addLogEntry("Connector Disconnected");
+            mTaucoinConnector.removeListener(mHandlerIdentifier);
+            isTaucoinConnected = false;
+            isInit = false;
+        }
     }
 
     @Override
@@ -110,7 +116,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void importForgerPrivkey(String privateKey){
         Logger.d("importForgerPrivkey");
-        mTaucoinConnector.importForgerPrivkey(privateKey);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.importForgerPrivkey(privateKey);
+        }
     }
 
     public void importPrivkeyAndInit(String privateKey){
@@ -133,7 +141,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
         @Override
         public void run() {
-            taucoinConnector.init(handlerIdentifier, privateKeys);
+            if(mTaucoinConnector != null){
+                taucoinConnector.init(handlerIdentifier, privateKeys);
+            }
         }
     }
 
@@ -142,7 +152,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
      * */
     public void startSync(){
         Logger.d("startSync");
-        mTaucoinConnector.startSync();
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.startSync();
+        }
     }
 
     /**
@@ -152,9 +164,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
      * */
     public void startSyncAll(){
         Logger.d("startSync");
-        mTaucoinConnector.startSync();
-        getChainHeight();
-        getBlockList();
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.startSync();
+            getChainHeight();
+        }
     }
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
@@ -169,7 +182,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
                 TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
         transaction.sign(privateKey);
         io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
-        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+        }
     }
 
     public void startBlockForging(){
@@ -179,7 +194,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void startBlockForging(int targetAmount){
         Logger.d("startBlockForging=" + targetAmount);
-        mTaucoinConnector.startBlockForging(targetAmount);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.startBlockForging(targetAmount);
+        }
     }
 
     public void stopBlockForging(){
@@ -189,34 +206,46 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void stopBlockForging(int targetAmount){
         Logger.d("stopBlockForging=" + targetAmount);
-        mTaucoinConnector.stopBlockForging(targetAmount);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.stopBlockForging(targetAmount);
+        }
     }
 
     public void getBlockHashList(long start, long limit){
         Logger.d("getBlockHashList");
-        mTaucoinConnector.getBlockHashList(start, limit);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.getBlockHashList(start, limit);
+        }
     }
 
     public void getPendingTxs(){
         Logger.d("getPendingTxs");
-        mTaucoinConnector.getPendingTxs();
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.getPendingTxs();
+        }
     }
     /**
      * get block data by number
      * */
     public void getBlockByNumber(long number){
         Logger.d("getBlockByNumber");
-        mTaucoinConnector.getBlockByNumber(mHandlerIdentifier, number);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.getBlockByNumber(mHandlerIdentifier, number);
+        }
     }
 
     /**
      * get block data by number
-     * */
-    public void getBlockList(){
+     *
+     * @param height*/
+    public void getBlockList(long height){
+        //TODO To be optimized
         Logger.d("getBlockList");
         int num = 0;
-        int limit = 5;
-        mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+        int limit = (int) height;
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+        }
     }
 
     /**
@@ -224,12 +253,16 @@ public abstract class ConnectorManager implements ConnectorHandler {
      * */
     public void getChainHeight(){
         Logger.d("getChainHeight");
-        mTaucoinConnector.getChainHeight(mHandlerIdentifier);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.getChainHeight(mHandlerIdentifier);
+        }
     }
 
     public void closeTaucoin(){
         Logger.d("closeTaucoin");
-        mTaucoinConnector.closeEthereum();
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.closeEthereum();
+        }
     }
 
     /**
@@ -255,6 +288,4 @@ public abstract class ConnectorManager implements ConnectorHandler {
             }
         }
     }
-
-
 }
