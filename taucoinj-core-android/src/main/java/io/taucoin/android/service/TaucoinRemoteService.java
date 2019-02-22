@@ -256,6 +256,10 @@ public class TaucoinRemoteService extends TaucoinService {
                 getBlockList(message);
                 break;
 
+            case TaucoinServiceMessage.MSG_GET_CHAIN_HEIGHT:
+                getChainHeight(message);
+                break;
+
             default:
                 return false;
         }
