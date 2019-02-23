@@ -25,11 +25,10 @@ import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.net.callback.RetResult;
 
 public interface ITxModel {
     /** Get balance from the server */
-    void getBalance(TAUObserver<RetResult<Integer>> observer);
+    void getBalance(TAUObserver<DataResult<Integer>> observer);
 
     /** Whether a Pending transaction */
     void isAnyTxPending(LogicObserver<Boolean> observer);

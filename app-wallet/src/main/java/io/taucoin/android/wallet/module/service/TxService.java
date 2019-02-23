@@ -44,9 +44,9 @@ import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ResourcesUtil;
+import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.net.callback.RetResult;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -181,7 +181,7 @@ public class TxService extends Service {
     }
 
     private void getBalance(String serviceType) {
-        mTxModel.getBalance( new TAUObserver<RetResult<Integer>>() {
+        mTxModel.getBalance( new TAUObserver<DataResult<Integer>>() {
             @Override
             public void handleError(String msg, int msgCode) {
                 if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
@@ -194,9 +194,9 @@ public class TxService extends Service {
             }
 
             @Override
-            public void handleData(RetResult<Integer> balanceRetBalance) {
+            public void handleData(DataResult<Integer> balanceRetBalance) {
                 super.handleData(balanceRetBalance);
-                int balance = balanceRetBalance.getRet();
+                int balance = balanceRetBalance.getData();
                 Logger.i("getBalance success");
                 if(ActivityManager.getInstance().isTopActivity(MainActivity.class)){
                     ProgressManager.closeProgressDialog();

@@ -33,7 +33,7 @@ import retrofit2.http.POST;
 public interface TransactionService {
 
     @POST("getTauBalance/")
-    Observable<RetResult<Integer>> getBalance(@Body Map<String,String> email);
+    Observable<DataResult<Integer>> getBalance(@Body Map<String,String> email);
 
     @POST("getUTXOList/")
     Observable<UTXOList> getUTXOList(@Body Map<String,String> address);

@@ -62,7 +62,7 @@ import io.taucoin.util.ByteUtil;
 public class TxModel implements ITxModel {
 
     @Override
-    public void getBalance(TAUObserver<RetResult<Integer>> observer) {
+    public void getBalance(TAUObserver<DataResult<Integer>> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map=new HashMap<>();
         map.put("address",  address);
