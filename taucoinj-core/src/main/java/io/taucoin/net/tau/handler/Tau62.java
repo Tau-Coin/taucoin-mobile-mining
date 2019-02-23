@@ -235,6 +235,8 @@ public class Tau62 extends TauHandler {
                 break;
             }
 
+            logger.debug("Set block number {}", header.getNumber());
+            b.setNumber(header.getNumber());
             coveredHeaders.add(header);
             blocks.add(b);
         }
