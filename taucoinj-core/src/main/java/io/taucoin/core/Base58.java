@@ -156,6 +156,18 @@ public class Base58 {
             throw new AddressFormatException("Checksum does not validate");
         return data;
     }
+    public static byte[] decodeAsaddress(String input) throws AddressFormatException{
+        byte[] decoded  = decode(input);
+        if (decoded.length < 4)
+            throw new AddressFormatException("Input too short");
+        byte[] data = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
+        byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
+        byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data), 0, 4);
+        byte[] retdata = Arrays.copyOfRange(decoded, 1, decoded.length - 3);
+        if (!Arrays.equals(checksum, actualChecksum))
+            throw new AddressFormatException("Checksum does not validate,transfer privkey error");
+        return retdata;
+    }
 
     /**
      * Divides a number, represented as an array of bytes each containing a single digit

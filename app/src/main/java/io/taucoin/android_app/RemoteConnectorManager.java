@@ -33,6 +33,7 @@ import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
 
+import io.taucoin.core.Base58;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
@@ -262,8 +263,13 @@ public class RemoteConnectorManager implements ConnectorHandler {
 
     public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
         long timeStamp = (new Date().getTime())/1000;
-        byte[] privateKey = Utils.parseAsHexOrBase58(senderPrivateKey);
-        byte[] toAddress = Utils.parseAsHexOrBase58(txToAddress);
+        byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(senderPrivateKey);
+        byte[] toAddress;
+        if(txToAddress.startsWith("T")) {
+            toAddress = (new io.taucoin.core.VersionedChecksummedBytes(txToAddress)).getBytes();
+        }else{
+            toAddress = Base58.decodeAsaddress(txToAddress);
+        }
         byte[] amount = (new BigInteger(txAmount)).toByteArray();
         byte[] fee = (new BigInteger(txFee)).toByteArray();
 
