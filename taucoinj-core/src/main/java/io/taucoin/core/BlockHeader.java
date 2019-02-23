@@ -32,6 +32,11 @@ public class BlockHeader {
     /* The compressed public key in ECDSA 264 bits */
     private byte[] generatorPublicKey;
 
+    /**
+     * Memory cache only. Just for sync block headers.
+     */
+    private long blockNumber = -1;
+
     public BlockHeader(byte[] encoded) {
         this((RLPList) RLP.decode2(encoded).get(0));
     }
@@ -123,10 +128,28 @@ public class BlockHeader {
 
         return difficulty;
     }
-    //temporary method will be discarded when smooth
+
+    /**
+     * Get memory cache number for block header sync.
+     */
     public long getNumber(){
-        return 0;
+        if (this.blockNumber >= 0) {
+            return this.blockNumber;
+        } else {
+            return 0;
+        }
     }
+
+    /**
+     * Set memory cache number for block header sync.
+     */
+    public void setNumber(long number) {
+        if (number < 0) {
+            return;
+        }
+        this.blockNumber = number;
+    }
+
     //temporary method will be discarded when smooth
     public byte[] getPotBoundary(){
         return null;
