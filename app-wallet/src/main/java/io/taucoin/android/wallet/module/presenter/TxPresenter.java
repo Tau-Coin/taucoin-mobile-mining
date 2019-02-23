@@ -16,172 +16,41 @@
 package io.taucoin.android.wallet.module.presenter;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
 
+import org.spongycastle.util.encoders.Hex;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.db.entity.UTXORecord;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
-import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
-import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
-import io.taucoin.android.wallet.module.view.main.iview.ISendView;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
-import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.core.Transaction;
+import io.taucoin.core.Utils;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.net.callback.RetResult;
+import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
+import sun.misc.BASE64Encoder;
 
 public class TxPresenter {
-    private ISendView mSendView;
     private ISendReceiveView mSendReceiveView;
     private ITxModel mTxModel;
 
-    TxPresenter() {
+    public TxPresenter() {
         mTxModel = new TxModel();
-    }
-
-    public TxPresenter(ISendView sendView) {
-        mTxModel = new TxModel();
-        mSendView = sendView;
     }
 
     public TxPresenter(ISendReceiveView sendView) {
         mTxModel = new TxModel();
         mSendReceiveView = sendView;
-    }
-
-    public void isAnyTxPending() {
-        mTxModel.isAnyTxPending(new LogicObserver<Boolean>() {
-            @Override
-            public void handleData(Boolean isAnyTxPending) {
-//                if(isAnyTxPending){
-//                    TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
-//                    ToastUtils.showShortToast(R.string.send_has_pending);
-//                }else{
-                    mSendView.checkForm();
-//                }
-            }
-        });
-    }
-
-    //First step: update Balance and UTXO
-    public void getBalanceAndUTXO(TransactionHistory tx, LogicObserver<Boolean> logicObserver) {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue == null) {
-            logicObserver.onError();
-            return;
-        }
-        long utxo = keyValue.getUtxo();
-        long balance = keyValue.getBalance();
-        Logger.i("balance=" + balance + "\tutxo=" + utxo);
-        if (utxo <= balance){
-            mTxModel.getUTXOListLocal(new LogicObserver<List<UTXORecord>>() {
-                @Override
-                public void handleError(int code, String msg) {
-                    super.handleError(code, msg);
-                    logicObserver.onNext(false);
-                }
-
-                @Override
-                public void handleData(List<UTXORecord> utxoRecord) {
-                    long sum = 0;
-                    Logger.e("utxoRecord size=" + utxoRecord.size());
-                    for (int i = 0; i < utxoRecord.size(); i++){
-                        long v = utxoRecord.get(i).getValue().longValue();
-                        sum += v;
-                    }
-                    if (utxo == sum){
-                        createTransaction(tx, logicObserver);
-                    }else {
-                        mTxModel.getUTXOList();
-                        logicObserver.onNext(false);
-                    }
-                }
-            });
-        }else {
-            mTxModel.getUTXOList();
-            logicObserver.onNext(false);
-        }
-    }
-    //The second step: Building transactions
-    private void createTransaction(TransactionHistory txHistory, LogicObserver<Boolean> logicObserver) {
-        mTxModel.createTransaction(txHistory, new LogicObserver<String>() {
-            @Override
-            public void handleData(String tx_hex) {
-                sendRawTransaction(tx_hex, txHistory, logicObserver);
-            }
-
-            @Override
-            public void handleError(int code, String msg) {
-                super.handleError(code, msg);
-                ToastUtils.showShortToast(msg);
-                logicObserver.onNext(false);
-            }
-        });
-
-    }
-
-    //The third step: Send the transaction to the trading pool
-    private void sendRawTransaction(String tx_hex, TransactionHistory txHistory, LogicObserver<Boolean> logicObserver) {
-        mTxModel.sendRawTransaction(tx_hex, new TAUObserver<RetResult<String>>(){
-            @Override
-            public void handleData(RetResult<String> stringResResult) {
-                super.handleData(stringResResult);
-                Logger.d("get_txid_after_sendTX=" + stringResResult.getRet());
-                ToastUtils.showShortToast(R.string.send_tx_success);
-                TransactionHistory transactionHistory = new TransactionHistory();
-                transactionHistory.setTxId(txHistory.getTxId());
-                transactionHistory.setResult(TransmitKey.TxResult.CONFIRMING);
-                mTxModel.updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>(){
-
-                    @Override
-                    public void handleData(Boolean aBoolean) {
-                        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
-                        checkRawTransaction();
-                    }
-                });
-                logicObserver.onNext(true);
-
-            }
-
-            @Override
-            public void handleError(String msg, int msgCode) {
-                String result = "Error in network, send failed";
-                if(msgCode == 401){
-                    result = ResourcesUtil.getText(R.string.send_tx_fail);
-                }else if(msgCode == 402){
-                    result = msg;
-                }
-                TransactionHistory transactionHistory = new TransactionHistory();
-                transactionHistory.setTxId(txHistory.getTxId());
-                transactionHistory.setResult(TransmitKey.TxResult.FAILED);
-                transactionHistory.setMessage(result);
-                mTxModel.updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>(){
-
-                    @Override
-                    public void handleData(Boolean aBoolean) {
-                        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
-                    }
-                });
-                logicObserver.onNext(false);
-
-                super.handleError(result, msgCode);
-            }
-        });
-    }
-    //The fourth step: Check to see if the transaction is on the chain
-    private void checkRawTransaction() {
-        TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 
     public void queryTransactionHistory(int pageNo, String time) {
@@ -221,20 +90,47 @@ public class TxPresenter {
         });
     }
 
-    public void sendRawTransaction(TransactionHistory tx, LogicObserver<Boolean> observer){
+    public void handleSendTransaction(TransactionHistory txBean, LogicObserver<Boolean> observer){
+        mTxModel.createTransaction(txBean, new LogicObserver<Transaction>() {
+            @Override
+            public void handleData(Transaction transaction) {
+                sendRawTransaction(transaction, observer);
+            }
+
+            @Override
+            public void handleError(int code, String msg) {
+                observer.handleError(code, msg);
+            }
+        });
+    }
+
+    private void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer){
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null) {
-            observer.onError();
+            observer.onError(CodeException.getError());
             return;
         }
         if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start)){
-            if(MyApplication.getRemoteConnector().isInit() &&
-                    keyValue.getBlockHeight() == keyValue.getBlockSynchronized()){
+            if(MyApplication.getRemoteConnector().isInit()
+                    && keyValue.getBlockSynchronized() > 0
+                    && keyValue.getBlockSynchronized() == keyValue.getBlockHeight()){
+                MyApplication.getRemoteConnector().submitTransaction(transaction);
+            }else{
                 ToastUtils.showShortToast("In Synchronization Block");
             }
-            MyApplication.getRemoteConnector().submitTransaction(keyValue.getPrivkey(), tx);
         }else{
-            ToastUtils.showShortToast("on develop");
+            String txHash = Hex.toHexString(transaction.getEncoded());
+            String txId = Hex.toHexString(transaction.getHash());
+            String hex_after_base64 = null;
+            try {
+                BASE64Encoder base64en = new BASE64Encoder();
+                hex_after_base64 = base64en.encode(txHash.getBytes("utf-8"));
+            } catch (UnsupportedEncodingException ignore) {
+            }
+            if(StringUtil.isNotEmpty(hex_after_base64)){
+                mTxModel.sendRawTransaction(hex_after_base64, txId, observer);
+            }
+            Logger.i("Transactions encrypted by BASE64: " + hex_after_base64);
         }
     }
 }

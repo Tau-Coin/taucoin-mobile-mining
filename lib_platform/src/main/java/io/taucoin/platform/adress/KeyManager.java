@@ -22,6 +22,15 @@ import static io.taucoin.platform.adress.KeyGenerator.debug;
 
 public class KeyManager {
 
+    public static String convertWIFPrivkeyIntoPrivkey(String privateKey){
+        try{
+            privateKey = Utils.convertWIFPrivkeyIntoPrivkey(privateKey);
+        } catch (AddressFormatException ignore) {
+
+        }
+        return privateKey;
+    }
+
     public static Key generatorKey(){
         Key key = new Key();
         key.Reset();
@@ -146,11 +155,7 @@ public class KeyManager {
 
     private static String generatorPublicKey(String privateKey) {
         try {
-            try{
-                privateKey = Utils.convertWIFPrivkeyIntoPrivkey(privateKey);
-            } catch (AddressFormatException ignore) {
-
-            }
+            privateKey = convertWIFPrivkeyIntoPrivkey(privateKey);
 
             ECKey ecKey = new ECKey(new BigInteger(privateKey, 16));
             ECDomainParameters ecParams = ecKey.getEcParams();

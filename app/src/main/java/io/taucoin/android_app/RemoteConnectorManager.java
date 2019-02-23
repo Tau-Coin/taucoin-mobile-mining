@@ -268,7 +268,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
         if(txToAddress.startsWith("T")) {
             toAddress = (new io.taucoin.core.VersionedChecksummedBytes(txToAddress)).getBytes();
         }else{
-            toAddress = Base58.decodeAsaddress(txToAddress);
+            toAddress = Utils.parseAsHexOrBase58(txToAddress);
         }
         byte[] amount = (new BigInteger(txAmount)).toByteArray();
         byte[] fee = (new BigInteger(txFee)).toByteArray();

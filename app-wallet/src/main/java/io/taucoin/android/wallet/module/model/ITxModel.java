@@ -22,6 +22,7 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.entity.UTXORecord;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -47,10 +48,10 @@ public interface ITxModel {
     void getTxPendingList(LogicObserver<List<TransactionHistory>> observer);
 
     /** Create transaction data */
-    void createTransaction(TransactionHistory txHistory, LogicObserver<String> observer);
+    void createTransaction(TransactionHistory txHistory, LogicObserver<Transaction> observer);
 
     /** Send transaction to the server */
-    void sendRawTransaction(String tx_hex, TAUObserver<RetResult<String>> observer);
+    void sendRawTransaction(String txHex, String txId, LogicObserver<Boolean> observer);
 
     /** Update local transaction history */
     void updateTransactionHistory(TransactionHistory txHistory, LogicObserver<Boolean> observer);

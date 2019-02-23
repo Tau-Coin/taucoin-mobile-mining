@@ -192,4 +192,18 @@ public class MiningModel implements IMiningModel{
                 .subscribeOn(Schedulers.io())
                 .subscribe(logicObserver);
     }
+
+    @Override
+    public void updateTransactionHistory(io.taucoin.android.interop.Transaction transaction) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            // TODO send tx fail logic
+            if(transaction != null){
+                String txId = Hex.toHexString(transaction.getHash());
+                MiningUtil.saveTransactionSuccess(txId);
+            }
+            emitter.onNext(true);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
 }

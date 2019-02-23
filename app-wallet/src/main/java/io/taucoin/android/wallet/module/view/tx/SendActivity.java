@@ -61,7 +61,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
         ButterKnife.bind(this);
-        mTxPresenter = new TxPresenter(this);
+        mTxPresenter = new TxPresenter();
         TxService.startTxService(TransmitKey.ServiceType.GET_SEND_DATA);
         initView();
     }
@@ -87,7 +87,7 @@ public class SendActivity extends BaseActivity implements ISendView {
                     @Override
                     public void handleData(View view) {
                         KeyboardUtils.hideSoftInput(SendActivity.this);
-                        mTxPresenter.isAnyTxPending();
+                        checkForm();
                     }
                 });
     }
@@ -157,7 +157,7 @@ public class SendActivity extends BaseActivity implements ISendView {
 
     private void handleSendTransaction(TransactionHistory tx) {
 //        ProgressManager.showProgressDialog(this);
-        mTxPresenter.sendRawTransaction(tx, new LogicObserver<Boolean>() {
+        mTxPresenter.handleSendTransaction(tx, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 ProgressManager.closeProgressDialog();
@@ -172,21 +172,6 @@ public class SendActivity extends BaseActivity implements ISendView {
                 }
             }
         });
-//        mTxPresenter.getBalanceAndUTXO(tx, new LogicObserver<Boolean>() {
-//            @Override
-//            public void handleData(Boolean isSuccess) {
-//                ProgressManager.closeProgressDialog();
-//                if(isSuccess){
-//                    // clear all editText data
-//                    etAddress.getText().clear();
-//                    etAmount.getText().clear();
-//                    etMemo.getText().clear();
-//                    etFee.setText(R.string.send_normal_value);
-//                }else {
-//                    ToastUtils.showShortToast(R.string.send_tx_invalid_error);
-//                }
-//            }
-//        });
     }
 
     private void showSoftInput() {

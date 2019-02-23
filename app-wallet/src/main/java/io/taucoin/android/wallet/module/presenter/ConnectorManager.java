@@ -27,10 +27,6 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.core.Transaction;
-import io.taucoin.core.Utils;
-import io.taucoin.core.transaction.TransactionOptions;
-import io.taucoin.core.transaction.TransactionVersion;
-import io.taucoin.util.ByteUtil;
 
 public abstract class ConnectorManager implements ConnectorHandler {
 
@@ -171,21 +167,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
-    void submitTransaction(String senderPrivateKey, TransactionHistory tx){
-        submitTransaction(senderPrivateKey, tx.getToAddress(), tx.getValue(), tx.getFee());
-    }
-
-    public void submitTransaction(String senderPrivateKey, String txToAddress, String txAmount, String txFee){
+    public void submitTransaction(Transaction transaction){
         Logger.d("submitTransaction");
-        long timeStamp = (new Date().getTime())/1000;
-        byte[] privateKey = Utils.parseAsHexOrBase58(senderPrivateKey);
-        byte[] toAddress = Utils.parseAsHexOrBase58(txToAddress);
-        byte[] amount = (new BigInteger(txAmount)).toByteArray();
-        byte[] fee = (new BigInteger(txFee)).toByteArray();
-
-        Transaction transaction = new Transaction(TransactionVersion.V01.getCode(),
-                TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
-        transaction.sign(privateKey);
         io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
         if(mTaucoinConnector != null){
             mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);

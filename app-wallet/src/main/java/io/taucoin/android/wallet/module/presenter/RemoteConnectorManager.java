@@ -6,7 +6,6 @@ import android.os.Message;
 
 import com.github.naturs.logger.Logger;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.net.p2p.HelloMessage;
@@ -178,7 +176,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 replyData = message.getData();
                 replyData.setClassLoader(Transaction.class.getClassLoader());
                 Transaction transaction = replyData.getParcelable(TransmitKey.RemoteResult.TRANSACTION);
-                ToastUtils.showShortToast("MSG_SUBMIT_TRANSACTION_RESULT");
+                updateTransactionHistory(transaction);
                 break;
             default:
                 isClaimed = false;
@@ -223,5 +221,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
             }
         });
+    }
+
+    private void updateTransactionHistory(Transaction transaction){
+        getMiningModel().updateTransactionHistory(transaction);
     }
 }

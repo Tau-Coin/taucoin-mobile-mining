@@ -16,18 +16,13 @@
 package io.taucoin.android.wallet.module.model;
 
 import com.github.naturs.logger.Logger;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.NetworkParameters;
-import com.google.bitcoin.core.Utils;
-import io.taucoin.android.wallet.core.Wallet;
-import io.taucoin.android.wallet.core.keystore.KeyStore;
-import io.taucoin.android.wallet.core.transactions.CreateTransactionResult;
-import io.taucoin.android.wallet.core.transactions.Transaction;
-import io.taucoin.android.wallet.core.transactions.TransactionFailReason;
+import com.mofei.tau.R;
+
+import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,16 +41,24 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.db.util.UTXORecordDaoUtils;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.TxBean;
 import io.taucoin.android.wallet.module.bean.UTXOList;
 import io.taucoin.android.wallet.module.bean.UtxosBean;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
-import io.taucoin.android.wallet.util.MD5_BASE64Util;
+import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.core.Utils;
+import io.taucoin.core.transaction.TransactionOptions;
+import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.HeightResult;
@@ -63,6 +66,8 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.RetResult;
 import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.platform.adress.KeyManager;
+import io.taucoin.util.ByteUtil;
 
 public class TxModel implements ITxModel {
 
@@ -228,60 +233,81 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void createTransaction(TransactionHistory txHistory, LogicObserver<String> observer) {
-        Observable.create((ObservableOnSubscribe<String>) emitter -> {
+    public void createTransaction(TransactionHistory txHistory, LogicObserver<io.taucoin.core.Transaction> observer) {
+        Observable.create((ObservableOnSubscribe<io.taucoin.core.Transaction>) emitter -> {
             KeyValue keyValue = MyApplication.getKeyValue();
             if(keyValue == null || StringUtil.isEmpty(keyValue.getPrivkey())){
                 emitter.onError(CodeException.getError());
                 return;
             }
-            String newPrivateKey = keyValue.getPrivkey();
-            try {
-                newPrivateKey = Utils.convertWIFPrivkeyIntoPrivkey(keyValue.getPrivkey());
-            } catch (AddressFormatException ignore) {
-            }
-            ECKey key = new ECKey(new BigInteger(newPrivateKey, 16));
-            KeyStore.getInstance().addKey(key);
-            String amount = FmtMicrometer.fmtTxValue(txHistory.getValue());
-            HashMap<String, BigInteger> receipts = new HashMap<>();
-            receipts.put(txHistory.getToAddress(), new BigInteger(amount, 10));
-            Wallet wallet = Wallet.getInstance();
-            Transaction tx = new Transaction(NetworkParameters.mainNet());
-            String fee = txHistory.getFee();
-            CreateTransactionResult result = wallet.createTransaction(receipts, fee, tx);
-            if (result.failReason == TransactionFailReason.NO_ERROR) {
-                Logger.i("Create tx success");
-                Logger.i(tx.toString());
-                txHistory.setTxId(tx.getHashAsString());
-                txHistory.setConfirmations(0);
-                txHistory.setResult("sending");
-                txHistory.setFromAddress(keyValue.getAddress());
-                txHistory.setTime(DateUtil.getCurrentTime());
-                txHistory.setSentOrReceived(TransmitKey.TxType.SEND);
+            long timeStamp = (new Date().getTime())/1000;
+//            String newPrivkey = KeyManager.convertWIFPrivkeyIntoPrivkey(keyValue.getPrivkey());
+//            byte[] privateKey = io.taucoin.core.Utils.parseAsHexOrBase58(newPrivkey);
+//            byte[] toAddress = io.taucoin.core.Utils.parseAsHexOrBase58(txHistory.getToAddress());
+            byte[] amount = (new BigInteger(txHistory.getValue())).toByteArray();
+            byte[] fee = (new BigInteger(txHistory.getFee())).toByteArray();
 
-                insertTransactionHistory(txHistory);
-
-                Logger.i("Transactions converted to hexadecimal strings:"+tx.dumpIntoHexStr());
-                String hex_after_base64= MD5_BASE64Util.EncoderByMd5_BASE64(tx.dumpIntoHexStr());
-                Logger.i("Transactions encrypted by BASE64: " + hex_after_base64);
-                emitter.onNext(hex_after_base64);
-            } else {
-                emitter.onError(CodeException.getError(result.failReason.getMsg()));
+            byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(keyValue.getPrivkey());
+            byte[] toAddress;
+            String txToAddress = txHistory.getToAddress();
+            if(txToAddress.startsWith("T")) {
+                toAddress = (new io.taucoin.core.VersionedChecksummedBytes(txToAddress)).getBytes();
+            }else{
+                toAddress = Utils.parseAsHexOrBase58(txToAddress);
             }
+
+            io.taucoin.core.Transaction transaction = new io.taucoin.core.Transaction(TransactionVersion.V01.getCode(),
+                    TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
+            transaction.sign(privateKey);
+
+            Logger.i("Create tx success");
+            Logger.i(transaction.toString());
+            txHistory.setTxId(Hex.toHexString(transaction.getHash()));
+            txHistory.setConfirmations(0);
+            txHistory.setResult("sending");
+            txHistory.setFromAddress(keyValue.getAddress());
+            txHistory.setTime(DateUtil.getCurrentTime());
+            txHistory.setSentOrReceived(TransmitKey.TxType.SEND);
+
+            insertTransactionHistory(txHistory);
+            emitter.onNext(transaction);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
 
     @Override
-    public void sendRawTransaction(String tx_hex, TAUObserver<RetResult<String>> observer) {
+    public void sendRawTransaction(String txHex, String txId, LogicObserver<Boolean> observer) {
+        Logger.d("txId=" + txId  + "\ttx_hex=" + txHex);
         Map<String,String> map = new HashMap<>();
-        map.put("tx_hex", tx_hex);
+        map.put("tx_hex", txHex);
         NetWorkManager.createApiService(TransactionService.class)
                 .sendRawTransation(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
+                .subscribe(new TAUObserver<RetResult<String>>() {
+                    @Override
+                    public void handleError(String msg, int msgCode) {
+                        String result = "Error in network, send failed";
+                        if(msgCode == 401){
+                            result = ResourcesUtil.getText(R.string.send_tx_fail);
+                        }else if(msgCode == 402){
+                            result = msg;
+                        }
+                        MiningUtil.saveTransactionFail(txId, result);
+                        observer.onNext(false);
+                        super.handleError(result, msgCode);
+                    }
+
+                    @Override
+                    public void handleData(RetResult<String> stringRetResult) {
+                        super.handleData(stringRetResult);
+                        Logger.d("get_tx_id_after_sendTX=" + stringRetResult.getRet());
+                        ToastUtils.showShortToast(R.string.send_tx_success);
+                        MiningUtil.saveTransactionSuccess(txId);
+                        observer.onNext(true);
+                    }
+                });
     }
 
     @Override

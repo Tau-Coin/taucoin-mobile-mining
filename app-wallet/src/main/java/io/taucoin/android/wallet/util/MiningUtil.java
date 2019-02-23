@@ -16,16 +16,24 @@
 package io.taucoin.android.wallet.util;
 
 import com.github.naturs.logger.Logger;
+import com.mofei.tau.R;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
+import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.model.ITxModel;
+import io.taucoin.android.wallet.module.model.TxModel;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.core.Transaction;
+import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class MiningUtil {
 
@@ -76,5 +84,36 @@ public class MiningUtil {
             }
         }
         return reward.toString();
+    }
+
+    public static void saveTransactionFail(String txId, String result) {
+        TransactionHistory transactionHistory = new TransactionHistory();
+        transactionHistory.setTxId(txId);
+        transactionHistory.setResult(TransmitKey.TxResult.FAILED);
+        transactionHistory.setMessage(result);
+        new TxModel().updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
+            @Override
+            public void handleData(Boolean aBoolean) {
+                EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+            }
+        });
+    }
+
+    public static void saveTransactionSuccess(String txId) {
+        TransactionHistory transactionHistory = new TransactionHistory();
+        transactionHistory.setTxId(txId);
+        transactionHistory.setResult(TransmitKey.TxResult.CONFIRMING);
+        ITxModel iTxModel = new TxModel();
+        iTxModel.updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>(){
+
+            @Override
+            public void handleData(Boolean aBoolean) {
+                EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                checkRawTransaction();
+            }
+        });
+    }
+    private static void checkRawTransaction() {
+        TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 }
