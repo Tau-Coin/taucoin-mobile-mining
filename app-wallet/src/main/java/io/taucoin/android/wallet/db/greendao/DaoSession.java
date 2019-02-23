@@ -9,12 +9,10 @@ import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
 import io.taucoin.android.wallet.db.entity.MiningInfo;
-import io.taucoin.android.wallet.db.entity.UTXORecord;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 
 import io.taucoin.android.wallet.db.greendao.MiningInfoDao;
-import io.taucoin.android.wallet.db.greendao.UTXORecordDao;
 import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
 
@@ -28,12 +26,10 @@ import io.taucoin.android.wallet.db.greendao.KeyValueDao;
 public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig miningInfoDaoConfig;
-    private final DaoConfig uTXORecordDaoConfig;
     private final DaoConfig transactionHistoryDaoConfig;
     private final DaoConfig keyValueDaoConfig;
 
     private final MiningInfoDao miningInfoDao;
-    private final UTXORecordDao uTXORecordDao;
     private final TransactionHistoryDao transactionHistoryDao;
     private final KeyValueDao keyValueDao;
 
@@ -44,9 +40,6 @@ public class DaoSession extends AbstractDaoSession {
         miningInfoDaoConfig = daoConfigMap.get(MiningInfoDao.class).clone();
         miningInfoDaoConfig.initIdentityScope(type);
 
-        uTXORecordDaoConfig = daoConfigMap.get(UTXORecordDao.class).clone();
-        uTXORecordDaoConfig.initIdentityScope(type);
-
         transactionHistoryDaoConfig = daoConfigMap.get(TransactionHistoryDao.class).clone();
         transactionHistoryDaoConfig.initIdentityScope(type);
 
@@ -54,29 +47,22 @@ public class DaoSession extends AbstractDaoSession {
         keyValueDaoConfig.initIdentityScope(type);
 
         miningInfoDao = new MiningInfoDao(miningInfoDaoConfig, this);
-        uTXORecordDao = new UTXORecordDao(uTXORecordDaoConfig, this);
         transactionHistoryDao = new TransactionHistoryDao(transactionHistoryDaoConfig, this);
         keyValueDao = new KeyValueDao(keyValueDaoConfig, this);
 
         registerDao(MiningInfo.class, miningInfoDao);
-        registerDao(UTXORecord.class, uTXORecordDao);
         registerDao(TransactionHistory.class, transactionHistoryDao);
         registerDao(KeyValue.class, keyValueDao);
     }
     
     public void clear() {
         miningInfoDaoConfig.clearIdentityScope();
-        uTXORecordDaoConfig.clearIdentityScope();
         transactionHistoryDaoConfig.clearIdentityScope();
         keyValueDaoConfig.clearIdentityScope();
     }
 
     public MiningInfoDao getMiningInfoDao() {
         return miningInfoDao;
-    }
-
-    public UTXORecordDao getUTXORecordDao() {
-        return uTXORecordDao;
     }
 
     public TransactionHistoryDao getTransactionHistoryDao() {

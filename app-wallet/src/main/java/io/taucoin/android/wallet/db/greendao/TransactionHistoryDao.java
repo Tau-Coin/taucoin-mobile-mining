@@ -29,15 +29,15 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         public final static Property SentOrReceived = new Property(2, String.class, "sentOrReceived", false, "SENT_OR_RECEIVED");
         public final static Property FromAddress = new Property(3, String.class, "fromAddress", false, "FROM_ADDRESS");
         public final static Property ToAddress = new Property(4, String.class, "toAddress", false, "TO_ADDRESS");
-        public final static Property Time = new Property(5, String.class, "time", false, "TIME");
-        public final static Property Confirmations = new Property(6, int.class, "confirmations", false, "CONFIRMATIONS");
-        public final static Property Value = new Property(7, String.class, "value", false, "VALUE");
-        public final static Property Result = new Property(8, String.class, "result", false, "RESULT");
-        public final static Property Message = new Property(9, String.class, "message", false, "MESSAGE");
-        public final static Property Blockheight = new Property(10, long.class, "blockheight", false, "BLOCKHEIGHT");
-        public final static Property Blocktime = new Property(11, long.class, "blocktime", false, "BLOCKTIME");
-        public final static Property Memo = new Property(12, String.class, "memo", false, "MEMO");
-        public final static Property Fee = new Property(13, String.class, "fee", false, "FEE");
+        public final static Property CreateTime = new Property(5, String.class, "createTime", false, "CREATE_TIME");
+        public final static Property Amount = new Property(6, String.class, "amount", false, "AMOUNT");
+        public final static Property Memo = new Property(7, String.class, "memo", false, "MEMO");
+        public final static Property Fee = new Property(8, String.class, "fee", false, "FEE");
+        public final static Property Result = new Property(9, String.class, "result", false, "RESULT");
+        public final static Property Message = new Property(10, String.class, "message", false, "MESSAGE");
+        public final static Property BlockNum = new Property(11, long.class, "blockNum", false, "BLOCK_NUM");
+        public final static Property BlockHash = new Property(12, String.class, "blockHash", false, "BLOCK_HASH");
+        public final static Property BlockTime = new Property(13, long.class, "blockTime", false, "BLOCK_TIME");
     }
 
 
@@ -58,15 +58,15 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
                 "\"SENT_OR_RECEIVED\" TEXT," + // 2: sentOrReceived
                 "\"FROM_ADDRESS\" TEXT," + // 3: fromAddress
                 "\"TO_ADDRESS\" TEXT," + // 4: toAddress
-                "\"TIME\" TEXT," + // 5: time
-                "\"CONFIRMATIONS\" INTEGER NOT NULL ," + // 6: confirmations
-                "\"VALUE\" TEXT," + // 7: value
-                "\"RESULT\" TEXT," + // 8: result
-                "\"MESSAGE\" TEXT," + // 9: message
-                "\"BLOCKHEIGHT\" INTEGER NOT NULL ," + // 10: blockheight
-                "\"BLOCKTIME\" INTEGER NOT NULL ," + // 11: blocktime
-                "\"MEMO\" TEXT," + // 12: memo
-                "\"FEE\" TEXT);"); // 13: fee
+                "\"CREATE_TIME\" TEXT," + // 5: createTime
+                "\"AMOUNT\" TEXT," + // 6: amount
+                "\"MEMO\" TEXT," + // 7: memo
+                "\"FEE\" TEXT," + // 8: fee
+                "\"RESULT\" TEXT," + // 9: result
+                "\"MESSAGE\" TEXT," + // 10: message
+                "\"BLOCK_NUM\" INTEGER NOT NULL ," + // 11: blockNum
+                "\"BLOCK_HASH\" TEXT," + // 12: blockHash
+                "\"BLOCK_TIME\" INTEGER NOT NULL );"); // 13: blockTime
     }
 
     /** Drops the underlying database table. */
@@ -104,38 +104,42 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(5, toAddress);
         }
  
-        String time = entity.getTime();
-        if (time != null) {
-            stmt.bindString(6, time);
-        }
-        stmt.bindLong(7, entity.getConfirmations());
- 
-        String value = entity.getValue();
-        if (value != null) {
-            stmt.bindString(8, value);
+        String createTime = entity.getCreateTime();
+        if (createTime != null) {
+            stmt.bindString(6, createTime);
         }
  
-        String result = entity.getResult();
-        if (result != null) {
-            stmt.bindString(9, result);
+        String amount = entity.getAmount();
+        if (amount != null) {
+            stmt.bindString(7, amount);
         }
- 
-        String message = entity.getMessage();
-        if (message != null) {
-            stmt.bindString(10, message);
-        }
-        stmt.bindLong(11, entity.getBlockheight());
-        stmt.bindLong(12, entity.getBlocktime());
  
         String memo = entity.getMemo();
         if (memo != null) {
-            stmt.bindString(13, memo);
+            stmt.bindString(8, memo);
         }
  
         String fee = entity.getFee();
         if (fee != null) {
-            stmt.bindString(14, fee);
+            stmt.bindString(9, fee);
         }
+ 
+        String result = entity.getResult();
+        if (result != null) {
+            stmt.bindString(10, result);
+        }
+ 
+        String message = entity.getMessage();
+        if (message != null) {
+            stmt.bindString(11, message);
+        }
+        stmt.bindLong(12, entity.getBlockNum());
+ 
+        String blockHash = entity.getBlockHash();
+        if (blockHash != null) {
+            stmt.bindString(13, blockHash);
+        }
+        stmt.bindLong(14, entity.getBlockTime());
     }
 
     @Override
@@ -167,38 +171,42 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(5, toAddress);
         }
  
-        String time = entity.getTime();
-        if (time != null) {
-            stmt.bindString(6, time);
-        }
-        stmt.bindLong(7, entity.getConfirmations());
- 
-        String value = entity.getValue();
-        if (value != null) {
-            stmt.bindString(8, value);
+        String createTime = entity.getCreateTime();
+        if (createTime != null) {
+            stmt.bindString(6, createTime);
         }
  
-        String result = entity.getResult();
-        if (result != null) {
-            stmt.bindString(9, result);
+        String amount = entity.getAmount();
+        if (amount != null) {
+            stmt.bindString(7, amount);
         }
- 
-        String message = entity.getMessage();
-        if (message != null) {
-            stmt.bindString(10, message);
-        }
-        stmt.bindLong(11, entity.getBlockheight());
-        stmt.bindLong(12, entity.getBlocktime());
  
         String memo = entity.getMemo();
         if (memo != null) {
-            stmt.bindString(13, memo);
+            stmt.bindString(8, memo);
         }
  
         String fee = entity.getFee();
         if (fee != null) {
-            stmt.bindString(14, fee);
+            stmt.bindString(9, fee);
         }
+ 
+        String result = entity.getResult();
+        if (result != null) {
+            stmt.bindString(10, result);
+        }
+ 
+        String message = entity.getMessage();
+        if (message != null) {
+            stmt.bindString(11, message);
+        }
+        stmt.bindLong(12, entity.getBlockNum());
+ 
+        String blockHash = entity.getBlockHash();
+        if (blockHash != null) {
+            stmt.bindString(13, blockHash);
+        }
+        stmt.bindLong(14, entity.getBlockTime());
     }
 
     @Override
@@ -214,15 +222,15 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // sentOrReceived
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // fromAddress
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // toAddress
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // time
-            cursor.getInt(offset + 6), // confirmations
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // value
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // result
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // message
-            cursor.getLong(offset + 10), // blockheight
-            cursor.getLong(offset + 11), // blocktime
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // memo
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // fee
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // createTime
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // amount
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // memo
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // fee
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // result
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // message
+            cursor.getLong(offset + 11), // blockNum
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // blockHash
+            cursor.getLong(offset + 13) // blockTime
         );
         return entity;
     }
@@ -234,15 +242,15 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         entity.setSentOrReceived(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setFromAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setToAddress(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setConfirmations(cursor.getInt(offset + 6));
-        entity.setValue(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setResult(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setMessage(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setBlockheight(cursor.getLong(offset + 10));
-        entity.setBlocktime(cursor.getLong(offset + 11));
-        entity.setMemo(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setFee(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setCreateTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setAmount(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setMemo(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setFee(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setResult(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setMessage(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setBlockNum(cursor.getLong(offset + 11));
+        entity.setBlockHash(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setBlockTime(cursor.getLong(offset + 13));
      }
     
     @Override

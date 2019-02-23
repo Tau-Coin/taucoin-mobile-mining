@@ -28,14 +28,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property Pubkey = new Property(1, String.class, "pubkey", false, "PUBKEY");
         public final static Property Privkey = new Property(2, String.class, "privkey", false, "PRIVKEY");
         public final static Property Address = new Property(3, String.class, "address", false, "ADDRESS");
-        public final static Property Utxo = new Property(4, long.class, "utxo", false, "UTXO");
-        public final static Property Reward = new Property(5, long.class, "reward", false, "REWARD");
-        public final static Property Balance = new Property(6, long.class, "balance", false, "BALANCE");
-        public final static Property HeaderImage = new Property(7, String.class, "headerImage", false, "HEADER_IMAGE");
-        public final static Property NickName = new Property(8, String.class, "nickName", false, "NICK_NAME");
-        public final static Property MiningState = new Property(9, String.class, "miningState", false, "MINING_STATE");
-        public final static Property BlockHeight = new Property(10, int.class, "blockHeight", false, "BLOCK_HEIGHT");
-        public final static Property BlockSynchronized = new Property(11, int.class, "blockSynchronized", false, "BLOCK_SYNCHRONIZED");
+        public final static Property Balance = new Property(4, long.class, "balance", false, "BALANCE");
+        public final static Property NickName = new Property(5, String.class, "nickName", false, "NICK_NAME");
+        public final static Property MiningState = new Property(6, String.class, "miningState", false, "MINING_STATE");
+        public final static Property BlockHeight = new Property(7, int.class, "blockHeight", false, "BLOCK_HEIGHT");
+        public final static Property BlockSynchronized = new Property(8, int.class, "blockSynchronized", false, "BLOCK_SYNCHRONIZED");
     }
 
 
@@ -55,14 +52,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"PUBKEY\" TEXT," + // 1: pubkey
                 "\"PRIVKEY\" TEXT," + // 2: privkey
                 "\"ADDRESS\" TEXT," + // 3: address
-                "\"UTXO\" INTEGER NOT NULL ," + // 4: utxo
-                "\"REWARD\" INTEGER NOT NULL ," + // 5: reward
-                "\"BALANCE\" INTEGER NOT NULL ," + // 6: balance
-                "\"HEADER_IMAGE\" TEXT," + // 7: headerImage
-                "\"NICK_NAME\" TEXT," + // 8: nickName
-                "\"MINING_STATE\" TEXT," + // 9: miningState
-                "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 10: blockHeight
-                "\"BLOCK_SYNCHRONIZED\" INTEGER NOT NULL );"); // 11: blockSynchronized
+                "\"BALANCE\" INTEGER NOT NULL ," + // 4: balance
+                "\"NICK_NAME\" TEXT," + // 5: nickName
+                "\"MINING_STATE\" TEXT," + // 6: miningState
+                "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 7: blockHeight
+                "\"BLOCK_SYNCHRONIZED\" INTEGER NOT NULL );"); // 8: blockSynchronized
     }
 
     /** Drops the underlying database table. */
@@ -94,26 +88,19 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (address != null) {
             stmt.bindString(4, address);
         }
-        stmt.bindLong(5, entity.getUtxo());
-        stmt.bindLong(6, entity.getReward());
-        stmt.bindLong(7, entity.getBalance());
- 
-        String headerImage = entity.getHeaderImage();
-        if (headerImage != null) {
-            stmt.bindString(8, headerImage);
-        }
+        stmt.bindLong(5, entity.getBalance());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(9, nickName);
+            stmt.bindString(6, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(10, miningState);
+            stmt.bindString(7, miningState);
         }
-        stmt.bindLong(11, entity.getBlockHeight());
-        stmt.bindLong(12, entity.getBlockSynchronized());
+        stmt.bindLong(8, entity.getBlockHeight());
+        stmt.bindLong(9, entity.getBlockSynchronized());
     }
 
     @Override
@@ -139,26 +126,19 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (address != null) {
             stmt.bindString(4, address);
         }
-        stmt.bindLong(5, entity.getUtxo());
-        stmt.bindLong(6, entity.getReward());
-        stmt.bindLong(7, entity.getBalance());
- 
-        String headerImage = entity.getHeaderImage();
-        if (headerImage != null) {
-            stmt.bindString(8, headerImage);
-        }
+        stmt.bindLong(5, entity.getBalance());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(9, nickName);
+            stmt.bindString(6, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(10, miningState);
+            stmt.bindString(7, miningState);
         }
-        stmt.bindLong(11, entity.getBlockHeight());
-        stmt.bindLong(12, entity.getBlockSynchronized());
+        stmt.bindLong(8, entity.getBlockHeight());
+        stmt.bindLong(9, entity.getBlockSynchronized());
     }
 
     @Override
@@ -173,14 +153,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubkey
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // privkey
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // address
-            cursor.getLong(offset + 4), // utxo
-            cursor.getLong(offset + 5), // reward
-            cursor.getLong(offset + 6), // balance
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // headerImage
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // nickName
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // miningState
-            cursor.getInt(offset + 10), // blockHeight
-            cursor.getInt(offset + 11) // blockSynchronized
+            cursor.getLong(offset + 4), // balance
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // nickName
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // miningState
+            cursor.getInt(offset + 7), // blockHeight
+            cursor.getInt(offset + 8) // blockSynchronized
         );
         return entity;
     }
@@ -191,14 +168,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setPubkey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPrivkey(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setUtxo(cursor.getLong(offset + 4));
-        entity.setReward(cursor.getLong(offset + 5));
-        entity.setBalance(cursor.getLong(offset + 6));
-        entity.setHeaderImage(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setNickName(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setMiningState(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setBlockHeight(cursor.getInt(offset + 10));
-        entity.setBlockSynchronized(cursor.getInt(offset + 11));
+        entity.setBalance(cursor.getLong(offset + 4));
+        entity.setNickName(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setMiningState(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBlockHeight(cursor.getInt(offset + 7));
+        entity.setBlockSynchronized(cursor.getInt(offset + 8));
      }
     
     @Override

@@ -10,8 +10,6 @@ import org.greenrobot.greendao.database.Database;
 
 import io.taucoin.android.wallet.db.greendao.DaoMaster;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
-import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
-import io.taucoin.android.wallet.db.greendao.UTXORecordDao;
 import io.taucoin.android.wallet.db.util.MigrationHelper;
 /**
  * Logic for handling database upgrade:
@@ -46,6 +44,6 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
             public void onDropAllTables(Database db, boolean ifExists) {
                 DaoMaster.dropAllTables(db, ifExists);
             }
-        }, TransactionHistoryDao.class, UTXORecordDao.class, KeyValueDao.class);
+        }, KeyValueDao.class);
     }
 }

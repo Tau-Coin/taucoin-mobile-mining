@@ -62,8 +62,7 @@ public class TransactionHistoryDaoUtils {
     public List<TransactionHistory> getTxPendingList(String formAddress) {
         QueryBuilder qb = getTransactionHistoryDao().queryBuilder();
         return getTransactionHistoryDao().queryBuilder()
-        .where(TransactionHistoryDao.Properties.Confirmations.le(TransmitKey.TX_CONFIRMATIONS),
-                TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
+        .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
                 TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.SEND),
                 qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING),
                     TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL)))
@@ -73,7 +72,7 @@ public class TransactionHistoryDaoUtils {
     public TransactionHistory queryTransactionById(String txId) {
         List<TransactionHistory> list = getTransactionHistoryDao().queryBuilder()
                 .where(TransactionHistoryDao.Properties.TxId.eq(txId))
-                .orderDesc(TransactionHistoryDao.Properties.Time)
+                .orderDesc(TransactionHistoryDao.Properties.CreateTime)
                 .list();
         if(list.size() > 0){
             return list.get(0);
@@ -107,13 +106,13 @@ public class TransactionHistoryDaoUtils {
 
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-         db.where(TransactionHistoryDao.Properties.Time.lt(time),
+         db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
                 db.or(db.and(TransactionHistoryDao.Properties.FromAddress.eq(address),
                     TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.SEND)),
                     db.and(TransactionHistoryDao.Properties.ToAddress.eq(address),
                     TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.RECEIVE)))
                 )
-            .orderDesc(TransactionHistoryDao.Properties.Time, TransactionHistoryDao.Properties.Blocktime)
+            .orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
             .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
         return db.list();
     }
@@ -135,10 +134,10 @@ public class TransactionHistoryDaoUtils {
                 db.and(TransactionHistoryDao.Properties.ToAddress.eq(address),
                 TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.RECEIVE)))
         )
-        .orderDesc(TransactionHistoryDao.Properties.Blocktime);
+        .orderDesc(TransactionHistoryDao.Properties.BlockTime);
         List<TransactionHistory> list = db.list();
         if(list.size() > 0){
-            time = list.get(0).getBlocktime();
+            time = list.get(0).getBlockTime();
         }
         return String.valueOf(time);
     }

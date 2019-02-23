@@ -10,6 +10,9 @@ import org.greenrobot.greendao.annotation.Generated;
  *
  * @version 1.0
  * @description:
+ *
+ * @version 2.0
+ * Edited by yang on 19-02-23
  */
 
 @Entity
@@ -26,50 +29,47 @@ public class TransactionHistory {
 
     private String toAddress;
 
-    //private long time;
-    private String time;
+    private String createTime;
 
-    private int confirmations;
+    private String amount;
 
-    private String  value;
+    private String memo;
+
+    private String fee;
 
     private String result;
 
     private String message;
 
-    // blockheight
-    public long blockheight;
+    private long blockNum;
 
-    // blocktime
-    public long blocktime;
+    private String blockHash;
 
-    public String memo;
+    private long blockTime;
 
-    public String fee;
-
-    @Generated(hash = 63079048)
-    public TransactionHistory() {
-    }
-
-    @Generated(hash = 1660871670)
+    @Generated(hash = 579557527)
     public TransactionHistory(Long id, String txId, String sentOrReceived,
-            String fromAddress, String toAddress, String time, int confirmations,
-            String value, String result, String message, long blockheight,
-            long blocktime, String memo, String fee) {
+            String fromAddress, String toAddress, String createTime, String amount,
+            String memo, String fee, String result, String message, long blockNum,
+            String blockHash, long blockTime) {
         this.id = id;
         this.txId = txId;
         this.sentOrReceived = sentOrReceived;
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
-        this.time = time;
-        this.confirmations = confirmations;
-        this.value = value;
-        this.result = result;
-        this.message = message;
-        this.blockheight = blockheight;
-        this.blocktime = blocktime;
+        this.createTime = createTime;
+        this.amount = amount;
         this.memo = memo;
         this.fee = fee;
+        this.result = result;
+        this.message = message;
+        this.blockNum = blockNum;
+        this.blockHash = blockHash;
+        this.blockTime = blockTime;
+    }
+
+    @Generated(hash = 63079048)
+    public TransactionHistory() {
     }
 
     public Long getId() {
@@ -112,60 +112,20 @@ public class TransactionHistory {
         this.toAddress = toAddress;
     }
 
-    public String getTime() {
-        return this.time;
+    public String getCreateTime() {
+        return this.createTime;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public int getConfirmations() {
-        return this.confirmations;
+    public String getAmount() {
+        return this.amount;
     }
 
-    public void setConfirmations(int confirmations) {
-        this.confirmations = confirmations;
-    }
-
-    public String getValue() {
-        return this.value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getResult() {
-        return this.result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public long getBlockheight() {
-        return this.blockheight;
-    }
-
-    public void setBlockheight(long blockheight) {
-        this.blockheight = blockheight;
-    }
-
-    public long getBlocktime() {
-        return this.blocktime;
-    }
-
-    public void setBlocktime(long blocktime) {
-        this.blocktime = blocktime;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 
     public String getMemo() {
@@ -184,4 +144,43 @@ public class TransactionHistory {
         this.fee = fee;
     }
 
+    public String getResult() {
+        return this.result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public long getBlockNum() {
+        return this.blockNum;
+    }
+
+    public void setBlockNum(long blockNum) {
+        this.blockNum = blockNum;
+    }
+
+    public String getBlockHash() {
+        return this.blockHash;
+    }
+
+    public void setBlockHash(String blockHash) {
+        this.blockHash = blockHash;
+    }
+
+    public long getBlockTime() {
+        return this.blockTime;
+    }
+
+    public void setBlockTime(long blockTime) {
+        this.blockTime = blockTime;
+    }
 }

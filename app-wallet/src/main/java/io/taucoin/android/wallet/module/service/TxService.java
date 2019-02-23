@@ -85,20 +85,15 @@ public class TxService extends Service {
                 case TransmitKey.ServiceType.GET_IMPORT_DATA:
                 case TransmitKey.ServiceType.GET_HOME_DATA:
                     getBalance(serviceType);
-                    getUTXOList();
                     if(!mIsChecked){
                         checkRawTransaction();
                     }
                     break;
                 case TransmitKey.ServiceType.GET_SEND_DATA:
                     getBalance(serviceType);
-                    getUTXOList();
                     break;
                 case TransmitKey.ServiceType.GET_BALANCE:
                     getBalance(serviceType);
-                    break;
-                case TransmitKey.ServiceType.GET_UTXO_LIST:
-                    getUTXOList();
                     break;
                 case TransmitKey.ServiceType.GET_RAW_TX:
                     if(!mIsChecked){
@@ -156,7 +151,6 @@ public class TxService extends Service {
                                     if(isOnBlockChain){
                                         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
                                         getBalance(TransmitKey.ServiceType.GET_BALANCE);
-                                        getUTXOList();
                                     }else{
                                         TransactionHistory transactionHistory = new TransactionHistory();
                                         transactionHistory.setTxId(txId);
@@ -225,11 +219,6 @@ public class TxService extends Service {
             }
         });
     }
-
-    private void getUTXOList() {
-        mTxModel.getUTXOList();
-    }
-
 
     private void getBlockHeight(){
         mIsGetBlockHeight = true;

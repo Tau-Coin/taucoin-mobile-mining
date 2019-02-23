@@ -97,13 +97,13 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         groupViewHolder.ivRight.setImageResource(isExpanded ? R.mipmap.icon_up : R.mipmap.icon_down);
 
         boolean isReceiver = isReceiver(tx);
-        String amount = FmtMicrometer.fmtFormat(tx.getValue());
+        String amount = FmtMicrometer.fmtFormat(tx.getAmount());
         amount = isReceiver ? "+" + amount : "-" + amount;
         groupViewHolder.tvAmount.setText(amount);
 
-        String time = DateUtil.formatTime(tx.getTime(), DateUtil.pattern6);
-        if(StringUtil.isEmpty(time) && tx.getBlocktime() > 0){
-            time = DateUtil.formatTime(tx.getBlocktime(), DateUtil.pattern6);
+        String time = DateUtil.formatTime(tx.getCreateTime(), DateUtil.pattern6);
+        if(StringUtil.isEmpty(time) && tx.getBlockTime() > 0){
+            time = DateUtil.formatTime(tx.getBlockTime(), DateUtil.pattern6);
         }
         groupViewHolder.tvTime.setText(time);
         // The user is the sender
@@ -113,7 +113,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         if (isConfirming) {
             color = R.color.color_blue;
         } else if (isSuccess) {
-            color = tx.getConfirmations() > TransmitKey.TX_CONFIRMATIONS ? R.color.color_black : R.color.color_blue;
+//            color = tx.getConfirmations() > TransmitKey.TX_CONFIRMATIONS ? R.color.color_black : R.color.color_blue;
         }
 
         if (StringUtil.isEmpty(tx.getResult())) {

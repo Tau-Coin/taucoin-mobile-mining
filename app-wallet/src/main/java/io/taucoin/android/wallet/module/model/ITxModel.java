@@ -19,7 +19,6 @@ import java.util.List;
 
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.db.entity.UTXORecord;
 import io.taucoin.android.wallet.module.bean.AddInOutBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.core.Transaction;
@@ -34,12 +33,6 @@ public interface ITxModel {
 
     /** Whether a Pending transaction */
     void isAnyTxPending(LogicObserver<Boolean> observer);
-
-    /** Get UTXO list from the server */
-    void getUTXOList();
-
-    /** Get local UTXO list */
-    void getUTXOListLocal(LogicObserver<List<UTXORecord>> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
     void checkRawTransaction(String txId, LogicObserver<Boolean> observer);

@@ -129,7 +129,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         TransactionHistory tx = new TransactionHistory();
         tx.setToAddress(address);
         tx.setMemo(memo);
-        tx.setValue(amount);
+        tx.setAmount(amount);
         tx.setFee(fee);
 
 //        if(Wallet.getInstance().validateTxParameter(tx)){
@@ -142,7 +142,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         View view = LinearLayout.inflate(this, R.layout.view_dialog_send, null);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.tvToAddress.setText(tx.getToAddress());
-        viewHolder.tvToAmount.setText(tx.getValue());
+        viewHolder.tvToAmount.setText(tx.getAmount());
         viewHolder.tvToMemo.setText(tx.getMemo());
         new CommonDialog.Builder(this)
                 .setContentView(view)

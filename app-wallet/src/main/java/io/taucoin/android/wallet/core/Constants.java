@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.taucoin.android.wallet.core.blockchain;
+package io.taucoin.android.wallet.core;
 
 import java.math.BigInteger;
 

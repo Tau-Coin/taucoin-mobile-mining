@@ -173,8 +173,7 @@ public class MiningModel implements IMiningModel{
                                     if(StringUtil.isSame(txId, txHistory.getTxId())){
                                         isUpdate = true;
                                         eventCode = MessageEvent.EventCode.TRANSACTION;
-                                        txHistory.setConfirmations(TransmitKey.TX_CONFIRMATIONS + 1);
-                                        txHistory.setBlocktime(blockTime);
+                                        txHistory.setBlockTime(blockTime);
                                         txHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
                                         TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
                                     }

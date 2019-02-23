@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.taucoin.android.wallet.core.transactions;
+package io.taucoin.android.wallet.core;
 
 public enum TransactionFailReason {
     NO_ERROR(0, "no error"),
