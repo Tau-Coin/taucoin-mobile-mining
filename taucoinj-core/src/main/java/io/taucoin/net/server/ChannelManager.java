@@ -309,4 +309,13 @@ public class ChannelManager {
                 channel.onSyncDone();
         }
     }
+
+    public void shutdown() {
+        // disconnect all channels
+        synchronized (activePeers) {
+            for (Channel channel : activePeers.values()) {
+                channel.disconnect(ReasonCode.PEER_QUITING);
+            }
+        }
+    }
 }

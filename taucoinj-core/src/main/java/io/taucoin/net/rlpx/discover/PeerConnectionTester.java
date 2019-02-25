@@ -112,6 +112,15 @@ public class PeerConnectionTester {
         }
     }
 
+    public void shutdown() {
+       if (peerConnectionPool != null) {
+           peerConnectionPool.shutdownNow();
+           peerConnectionPool = null;
+       }
+
+       reconnectTimer.cancel();
+       reconnectTimer = null;
+    }
 
     /**
      * The same as PriorityBlockQueue but with assumption that elements are mutable

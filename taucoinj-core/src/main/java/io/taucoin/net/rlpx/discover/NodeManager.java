@@ -75,6 +75,9 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     private HTreeMap<Node, NodeStatistics.Persistent> nodeStatsDB;
     private boolean inited = false;
 
+    private Timer statisTimer = null;
+    private Timer taskTimer = null;
+
     @Inject
     public NodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, TaucoinListener ethereumListener) {
 
@@ -90,8 +93,8 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         homeNode.setType(config.getHomeNodeType());
         table = new NodeTable(homeNode, CONFIG.isPublicHomeNode());
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        this.statisTimer = new Timer();
+        statisTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 logger.trace("Statistics:\n {}", dumpAllStatistics());
@@ -116,12 +119,12 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
             logger.info("channel activated");
             peerConnectionManager.init();
 
-            Timer timer = new Timer("NodeManagerTasks");
+            this.taskTimer = new Timer("NodeManagerTasks");
 
             // this task is done asynchronously with some fixed rate
             // to avoid any overhead in the NodeStatistics classes keeping them lightweight
             // (which might be critical since they might be invoked from time critical sections)
-            timer.scheduleAtFixedRate(new TimerTask() {
+            taskTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     processListeners();
@@ -130,7 +133,7 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
 
             if (PERSIST) {
                 dbRead();
-                timer.scheduleAtFixedRate(new TimerTask() {
+                taskTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
                         dbWrite();
@@ -148,6 +151,15 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                 getNodeHandler(node).getNodeStatistics().setPredefined(true);
             }
         }
+    }
+
+    public void shutdown() {
+        if (!inited) return;
+
+        peerConnectionManager.shutdown();
+        statisTimer.cancel();
+        taskTimer.cancel();
+        dbWrite();
     }
 
     private void dbRead() {

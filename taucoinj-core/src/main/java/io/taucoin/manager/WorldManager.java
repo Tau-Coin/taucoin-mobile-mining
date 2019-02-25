@@ -8,6 +8,7 @@ import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.PeerClient;
+import io.taucoin.net.rlpx.discover.UDPListener;
 import io.taucoin.sync.SyncManager;
 import io.taucoin.net.peerdiscovery.PeerDiscovery;
 import io.taucoin.net.rlpx.discover.NodeManager;
@@ -63,6 +64,10 @@ public class WorldManager {
 
     private PendingState pendingState;
 
+    private UDPListener discoveryServer;
+
+    private volatile boolean isDiscoveryRunning = false;
+
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
@@ -100,14 +105,35 @@ public class WorldManager {
         ((CompositeTaucoinListener) this.listener).addListener(listener);
     }
 
+    public void setDiscoveryServer(UDPListener discoveryServer) {
+        this.discoveryServer = discoveryServer;
+    }
+
     public void startPeerDiscovery() {
+        /*
         if (!peerDiscovery.isStarted())
             peerDiscovery.start();
+         */
+        if (isDiscoveryRunning) return;
+
+        syncManager.init();
+        channelManager.init();
+        discoveryServer.init();
+        isDiscoveryRunning = true;
     }
 
     public void stopPeerDiscovery() {
+        /*
         if (peerDiscovery.isStarted())
             peerDiscovery.stop();
+         */
+        if (!isDiscoveryRunning) return;
+
+        if (discoveryServer.isStarted()) {
+            discoveryServer.shutdown();
+        }
+        nodeManager.shutdown();
+        isDiscoveryRunning = false;
     }
 
     public ChannelManager getChannelManager() {
@@ -233,6 +259,8 @@ public class WorldManager {
     @PreDestroy
     public void close() {
         stopPeerDiscovery();
+        channelManager.shutdown();
+        // TODO: SyncManager shutdown
         repository.close();
         blockchain.close();
     }

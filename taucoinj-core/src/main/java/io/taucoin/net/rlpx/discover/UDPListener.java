@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class UDPListener {
@@ -28,6 +29,11 @@ public class UDPListener {
     private NodeManager nodeManager;
 
     SystemProperties config = SystemProperties.CONFIG;
+
+    private Channel channel;
+    private volatile boolean shutdown = false;
+    private volatile boolean initialized = false;
+    private DiscoveryExecutor discoveryExecutor;
 
     @Inject
     public UDPListener(NodeManager nodeManager) {
@@ -63,6 +69,7 @@ public class UDPListener {
                 }
             }.start();
         }
+        initialized = true;
     }
 
     public static Node parseNode(String s) {
@@ -96,10 +103,7 @@ public class UDPListener {
         nodeManager.setBootNodes(bootNodes);
 
         try {
-            DiscoveryExecutor discoveryExecutor = new DiscoveryExecutor(nodeManager);
-            discoveryExecutor.start();
-
-            while(true) {
+            while(!shutdown) {
                 Bootstrap b = new Bootstrap();
                 b.group(group)
                         .channel(NioDatagramChannel.class)
@@ -114,9 +118,16 @@ public class UDPListener {
                             }
                         });
 
-                Channel channel = b.bind(address, port).sync().channel();
+                channel = b.bind(address, port).sync().channel();
+
+                discoveryExecutor = new DiscoveryExecutor(nodeManager);
+                discoveryExecutor.start();
 
                 channel.closeFuture().sync();
+                if (shutdown) {
+                    logger.info("Shutdown discovery UDPListener");
+                    break;
+                }
                 logger.warn("UDP channel closed. Recreating after 5 sec pause...");
                 Thread.sleep(5000);
             }
@@ -124,6 +135,31 @@ public class UDPListener {
             logger.error("{}", e);
         } finally {
             group.shutdownGracefully().sync();
+        }
+    }
+
+    public boolean isStarted() {
+        return initialized;
+    }
+
+    public void shutdown() {
+        logger.info("Closing UDPListener...");
+        shutdown = true;
+        initialized = false;
+        if (channel != null) {
+            try {
+                channel.close().await(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                logger.warn("Problems closing UDPListener", e);
+            }
+        }
+
+        if (discoveryExecutor != null) {
+            try {
+                discoveryExecutor.close();
+            } catch (Exception e) {
+                logger.warn("Problems closing DiscoveryExecutor", e);
+            }
         }
     }
 

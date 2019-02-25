@@ -78,6 +78,7 @@ public class TaucoinImpl implements Taucoin {
         this.pendingState = pendingState;
         this.providerPeer = providerPeer;
         this.discoveryServer = discoveryServer;
+        this.worldManager.setDiscoveryServer(discoveryServer);
         this.peerServer = peerServer;
         this.blockForger = blockForger;
         this.blockForger.setTaucoin(this);
@@ -163,15 +164,12 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public void startPeerDiscovery() {
-        worldManager.getSyncManager().init();
-        worldManager.getChannelManager().init();
-        discoveryServer.init();
-        //worldManager.startPeerDiscovery();
+        worldManager.startPeerDiscovery();
     }
 
     @Override
     public void stopPeerDiscovery() {
-        //worldManager.stopPeerDiscovery();
+        worldManager.stopPeerDiscovery();
     }
 
     @Override

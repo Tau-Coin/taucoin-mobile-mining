@@ -30,5 +30,8 @@ public class DiscoveryExecutor {
 
     }
 
-
+    public void close() {
+        discoverer.shutdownNow();
+        refresher.shutdownNow();
+    }
 }
