@@ -87,6 +87,9 @@ public class SyncManager {
 
     ChannelManager channelManager;
 
+    Thread workerThread = null;
+    ScheduledExecutorService logWorker = null;
+
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, TaucoinListener ethereumListener
                         , PeersPool pool) {
@@ -113,12 +116,14 @@ public class SyncManager {
     public void init() {
 
         // make it asynchronously
-        new Thread(new Runnable() {
+        this.workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 // sync queue
                 queue.init();
+                // peers pool
+                pool.init();
 
                 if (!config.isSyncEnabled()) {
                     logger.info("Sync Manager: OFF");
@@ -158,7 +163,34 @@ public class SyncManager {
                 }
 
             }
-        }).start();
+        });
+
+        workerThread.start();
+    }
+
+    public void stop() {
+        if (worker != null) {
+            worker.shutdownNow();
+            worker = null;
+        }
+        if (logWorker != null) {
+            logWorker.shutdownNow();
+            logWorker = null;
+        }
+        if (workerThread != null) {
+            workerThread.interrupt();
+            workerThread = null;
+        }
+
+        if (queue != null) {
+            queue.stop();
+            queue = null;
+        }
+
+        if (pool != null) {
+            pool.stop();
+            queue = null;
+        }
     }
 
     public void addPeer(Channel peer) {
@@ -461,7 +493,8 @@ public class SyncManager {
     // WORKER
 
     private void startLogWorker() {
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(new Runnable() {
+        this.logWorker = Executors.newSingleThreadScheduledExecutor();
+        logWorker.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 try {

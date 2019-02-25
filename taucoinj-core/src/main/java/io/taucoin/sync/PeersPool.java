@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static io.taucoin.net.tau.TauVersion.V62;
@@ -58,17 +59,19 @@ public class PeersPool implements Iterable<Channel> {
 
     private TaucoinListener ethereumListener;
 
+    private ScheduledExecutorService executor = null;
+
     public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;
         this.ethereumListener = taucoin.getWorldManager().getListener();
     }
     
-	public PeersPool(){
-        init();
+	public PeersPool() {
     }
 
     public void init() {
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
+        this.executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleWithFixedDelay(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -81,6 +84,13 @@ public class PeersPool implements Iterable<Channel> {
                     }
                 }, WORKER_TIMEOUT, WORKER_TIMEOUT, TimeUnit.SECONDS
         );
+    }
+
+    public void stop() {
+        if (executor != null) {
+            executor.shutdownNow();
+            executor = null;
+        }
     }
 
     public void add(Channel peer) {

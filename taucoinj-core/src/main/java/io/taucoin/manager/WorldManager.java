@@ -17,12 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import javax.annotation.PreDestroy;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -255,12 +253,10 @@ public class WorldManager {
 */
     }
 
-
-    @PreDestroy
     public void close() {
         stopPeerDiscovery();
         channelManager.shutdown();
-        // TODO: SyncManager shutdown
+        syncManager.stop();
         repository.close();
         blockchain.close();
     }

@@ -64,6 +64,8 @@ public class SyncQueue {
 
     private MapDBFactory mapDBFactory;
 
+    private Thread worker = null;
+
     public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
         this.blockchain = blockchain;
         this.headerValidator = headerValidator;
@@ -109,8 +111,15 @@ public class SyncQueue {
             }
         };
 
-        Thread t=new Thread (queueProducer);
-        t.start();
+        this.worker = new Thread (queueProducer);
+        worker.start();
+    }
+
+    public void stop() {
+        if (worker != null) {
+            worker.interrupt();
+            worker = null;
+        }
     }
 
     /**
