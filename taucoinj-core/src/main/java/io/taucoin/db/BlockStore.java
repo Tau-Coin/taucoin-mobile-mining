@@ -41,7 +41,7 @@ public interface BlockStore {
 
     void flush();
 
-    void reBranch(Block forkBlock);
+    void reBranch(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks);
 
     void load();
     void setSessionFactory(SessionFactory sessionFactory);

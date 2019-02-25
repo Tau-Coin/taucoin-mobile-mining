@@ -269,7 +269,7 @@ public class InMemoryBlockStore implements BlockStore{
     }
 
     @Override
-    public void reBranch(Block forkBlock) {
+    public void reBranch(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
 
     }
 

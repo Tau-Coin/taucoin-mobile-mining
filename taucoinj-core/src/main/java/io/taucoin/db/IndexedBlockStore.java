@@ -354,7 +354,7 @@ public class IndexedBlockStore implements BlockStore{
     }
 
     @Override
-    public void reBranch(Block forkBlock){
+    public void reBranch(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks){
 
         Block bestBlock = getBestBlock();
 
@@ -366,6 +366,8 @@ public class IndexedBlockStore implements BlockStore{
         if (forkBlock.getNumber() > bestBlock.getNumber()){
 
             while(currentLevel > bestBlock.getNumber()){
+                newBlocks.add(forkLine);
+
                 List<BlockInfo> blocks =  getBlockInfoForLevel(currentLevel);
                 BlockInfo blockInfo = getBlockInfoForHash(blocks, forkLine.getHash());
                 if (blockInfo != null) blockInfo.setMainChain(true);
@@ -378,6 +380,7 @@ public class IndexedBlockStore implements BlockStore{
         if (bestBlock.getNumber() > forkBlock.getNumber()){
 
             while(currentLevel > forkBlock.getNumber()){
+                undoBlocks.add(bestLine);
 
                 List<BlockInfo> blocks =  getBlockInfoForLevel(currentLevel);
                 BlockInfo blockInfo = getBlockInfoForHash(blocks, bestLine.getHash());
@@ -390,6 +393,8 @@ public class IndexedBlockStore implements BlockStore{
 
         // 2. Loop back on each level until common block
         while( !bestLine.isEqual(forkLine) ) {
+            newBlocks.add(forkLine);
+            undoBlocks.add(bestLine);
 
             List<BlockInfo> levelBlocks = getBlockInfoForLevel(currentLevel);
             BlockInfo bestInfo = getBlockInfoForHash(levelBlocks, bestLine.getHash());
@@ -404,7 +409,6 @@ public class IndexedBlockStore implements BlockStore{
 
             --currentLevel;
         }
-
 
     }
 

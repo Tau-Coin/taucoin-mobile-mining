@@ -241,7 +241,19 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             // main branch become this branch
             // cause we proved that total difficulty
             // is greateer
-            blockStore.reBranch(block);
+            List<Block> undoBlocks = new ArrayList<>();
+            List<Block> newBlocks = new ArrayList<>();
+            blockStore.reBranch(block, undoBlocks, newBlocks);
+
+            //broadcast disconnected blocks
+            for(Block undoBlock : undoBlocks) {
+                listener.onBlockDisconnected(undoBlock);
+            }
+
+            //broadcast connected blocks
+            for(int i = newBlocks.size() - 1; i >= 0; i--) {
+                listener.onBlockConnected(newBlocks.get(i));
+            }
 
             // The main repository rebranch
             this.repository = savedState.savedRepo;
@@ -319,6 +331,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             recordBlock(block);
 
             if (add(block)) {
+                listener.onBlockConnected(block);
+
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
