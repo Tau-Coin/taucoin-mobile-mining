@@ -30,6 +30,8 @@ public interface TaucoinListener {
 
     void onBlock(Block block);
 
+    void onBlockConnected(Block block);
+
     void onBlockDisconnected(Block block);
 
     void onPeerDisconnect(String host, long port);

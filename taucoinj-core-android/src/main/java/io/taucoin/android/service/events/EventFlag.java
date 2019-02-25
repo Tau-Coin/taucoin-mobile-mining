@@ -18,6 +18,12 @@ public enum EventFlag {
     EVENT_BLOCK,
 
     /**
+     * onBlockConnected event
+     * The block with max diffculity is connected to main chain.
+     */
+    EVENT_BLOCK_CONNECT,
+
+    /**
      * onBlockDisconnected event
      */
     EVENT_BLOCK_DISCONNECT,

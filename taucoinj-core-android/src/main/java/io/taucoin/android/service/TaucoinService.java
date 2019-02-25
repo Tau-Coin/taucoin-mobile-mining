@@ -128,6 +128,11 @@ public class TaucoinService extends Service {
         }
 
         @Override
+        public void onBlockConnected(io.taucoin.core.Block block) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_CONNECT, new BlockEventData(block));
+        }
+
+        @Override
         public void onBlockDisconnected(io.taucoin.core.Block block) {
             broadcastEvent(EventFlag.EVENT_BLOCK_DISCONNECT, new BlockEventData(block));
         }

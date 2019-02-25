@@ -24,6 +24,10 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     }
 
     @Override
+    public void onBlockConnected(Block block) {
+    }
+
+    @Override
     public void onBlockDisconnected(Block block) {
     }
 

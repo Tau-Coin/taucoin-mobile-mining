@@ -42,6 +42,13 @@ public class CompositeTaucoinListener implements TaucoinListener {
     }
 
     @Override
+    public void onBlockConnected(Block block) {
+        for (TaucoinListener listener : listeners) {
+            listener.onBlockConnected(block);
+        }
+    }
+
+    @Override
     public void onBlockDisconnected(Block block) {
         for (TaucoinListener listener : listeners) {
             listener.onBlockDisconnected(block);
