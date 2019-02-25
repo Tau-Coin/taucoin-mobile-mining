@@ -237,6 +237,10 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public void close() {
+        // Firstly, stop forging anyway.
+        if (blockForger.isForging()) {
+            blockForger.stopForging();
+        }
         worldManager.close();
     }
 
