@@ -36,13 +36,11 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
-import io.taucoin.android.wallet.module.bean.AddInOutBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
-import io.taucoin.android.wallet.module.bean.TxBean;
+import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.DateUtil;
-import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -52,7 +50,6 @@ import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.DataResult;
-import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.RetResult;
 import io.taucoin.foundation.net.exception.CodeException;
@@ -62,7 +59,7 @@ import io.taucoin.util.ByteUtil;
 public class TxModel implements ITxModel {
 
     @Override
-    public void getBalance(TAUObserver<DataResult<Integer>> observer) {
+    public void getBalance(TAUObserver<DataResult<Long>> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map=new HashMap<>();
         map.put("address",  address);
@@ -74,7 +71,7 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void updateBalance(int balance, LogicObserver<KeyValue> observer) {
+    public void updateBalance(long balance, LogicObserver<KeyValue> observer) {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
 
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
@@ -82,17 +79,6 @@ public class TxModel implements ITxModel {
             keyValue.setBalance(balance);
             KeyValueDaoUtils.getInstance().update(keyValue);
             emitter.onNext(keyValue);
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(observer);
-    }
-
-    @Override
-    public void isAnyTxPending(LogicObserver<Boolean> observer) {
-        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            boolean isAnyTxPending = TransactionHistoryDaoUtils.getInstance().isAnyTxPending(address);
-            emitter.onNext(isAnyTxPending);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(observer);
@@ -115,31 +101,40 @@ public class TxModel implements ITxModel {
         Map<String,String> map = new HashMap<>();
         map.put("txid", txId);
         NetWorkManager.createApiService(TransactionService.class)
-            .getRawTransation(map)
+            .getRawTransaction(map)
             .subscribeOn(Schedulers.io())
-            .subscribe(new TAUObserver<RetResult<RawTxBean>>() {
+            .subscribe(new TAUObserver<DataResult<RawTxBean>>() {
                 @Override
-                public void handleData(RetResult<RawTxBean> rawTxBeanResResult) {
+                public void handleData(DataResult<RawTxBean> rawTxBeanResResult) {
                     super.handleData(rawTxBeanResResult);
-                    RawTxBean rawTx = rawTxBeanResResult.getRet();
-                    rawTx.setBlocktime(rawTx.getBlocktime());
-                    TransactionHistory transactionHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
-                    if(transactionHistory != null){
-                        transactionHistory.setTxId(txId);
-                        transactionHistory.setBlockTime(rawTx.getBlocktime());
-                        transactionHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                        TransactionHistoryDaoUtils.getInstance().insertOrReplace(transactionHistory);
-                        if(rawTx.getConfirmations() > TransmitKey.TX_CONFIRMATIONS){
-                            observer.onNext(true);
+                    RawTxBean rawTx = rawTxBeanResResult.getData();
+                    TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
+                    Object isFinish = null;
+                    if(history != null){
+                        KeyValue keyValue = MyApplication.getKeyValue();
+                        if(keyValue != null){
+                            if(keyValue.getBlockHeight() - history.getCreateBlockNum() > TransmitKey.TX_FAIL_LIMIT){
+                                isFinish = false;
+                                history.setMessage(ResourcesUtil.getText(R.string.send_tx_fail_in_pool));
+                                history.setResult(TransmitKey.TxResult.FAILED);
+                            }
+                        }
+
+                        if(rawTx != null && rawTx.getState() > 0){
+                            isFinish = true;
+                            history.setBlockTime(rawTx.getBlockTime());
+                            history.setResult(TransmitKey.TxResult.SUCCESSFUL);
+                        }
+
+                        if(isFinish != null){
+                            TransactionHistoryDaoUtils.getInstance().insertOrReplace(history);
+                            observer.onNext((Boolean) isFinish);
                         }
                     }
                 }
 
                 @Override
                 public void handleError(String msg, int msgCode) {
-                    if(msgCode == 402){
-                        observer.onNext(false);
-                    }
                 }
             });
 
@@ -154,9 +149,6 @@ public class TxModel implements ITxModel {
                 return;
             }
             long timeStamp = (new Date().getTime())/1000;
-//            String newPrivkey = KeyManager.convertWIFPrivkeyIntoPrivkey(keyValue.getPrivkey());
-//            byte[] privateKey = io.taucoin.core.Utils.parseAsHexOrBase58(newPrivkey);
-//            byte[] toAddress = io.taucoin.core.Utils.parseAsHexOrBase58(txHistory.getToAddress());
             byte[] amount = (new BigInteger(txHistory.getAmount())).toByteArray();
             byte[] fee = (new BigInteger(txHistory.getFee())).toByteArray();
 
@@ -176,10 +168,11 @@ public class TxModel implements ITxModel {
             Logger.i("Create tx success");
             Logger.i(transaction.toString());
             txHistory.setTxId(Hex.toHexString(transaction.getHash()));
-            txHistory.setResult("sending");
+            txHistory.setResult(TransmitKey.TxResult.CONFIRMING);
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(DateUtil.getCurrentTime());
-            txHistory.setSentOrReceived(TransmitKey.TxType.SEND);
+            txHistory.setCreateBlockNum(keyValue.getBlockHeight());
+            txHistory.setIsInvalid(1);
 
             insertTransactionHistory(txHistory);
             emitter.onNext(transaction);
@@ -194,7 +187,7 @@ public class TxModel implements ITxModel {
         Map<String,String> map = new HashMap<>();
         map.put("tx_hex", txHex);
         NetWorkManager.createApiService(TransactionService.class)
-                .sendRawTransation(map)
+                .sendRawTransaction(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new TAUObserver<RetResult<String>>() {
@@ -216,7 +209,7 @@ public class TxModel implements ITxModel {
                         super.handleData(stringRetResult);
                         Logger.d("get_tx_id_after_sendTX=" + stringRetResult.getRet());
                         ToastUtils.showShortToast(R.string.send_tx_success);
-                        MiningUtil.saveTransactionSuccess(txId);
+                        MiningUtil.saveTransactionSuccess();
                         observer.onNext(true);
                     }
                 });
@@ -260,7 +253,7 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getAddOuts(TAUObserver<DataResult<AddInOutBean>> observer) {
+    public void getTxRecords(TAUObserver<DataResult<RawTxList>> observer) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null){
             observer.onError(CodeException.getError());
@@ -284,7 +277,7 @@ public class TxModel implements ITxModel {
                     map.put("address", address);
                     map.put("time", time);
                     NetWorkManager.createApiService(TransactionService.class)
-                            .getAddOuts(map)
+                            .getTxRecords(map)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
                             .subscribe(observer);
@@ -294,19 +287,26 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void saveAddOuts(AddInOutBean addInOut, LogicObserver<Boolean> observer) {
+    public void saveTxRecords(RawTxList rawTxList, LogicObserver<Boolean> observer) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            if(null != addInOut){
-                List<TxBean> receives = addInOut.getReceived();
-                if(null != receives && receives.size() > 0){
-                    for (TxBean bean : receives) {
-                        saveAddOutsToDB(bean, TransmitKey.TxType.RECEIVE);
-                    }
-                }
-                List<TxBean> sends = addInOut.getSent();
-                if(null != sends && sends.size() > 0){
-                    for (TxBean bean : sends) {
-                        saveAddOutsToDB(bean, TransmitKey.TxType.SEND);
+            if(null != rawTxList){
+                List<RawTxBean> txList = rawTxList.getRecords();
+                if(null != txList && txList.size() > 0){
+                    for (RawTxBean bean : txList) {
+                        TransactionHistory tx = new TransactionHistory();
+                        tx.setFromAddress(bean.getAddin());
+                        tx.setToAddress(bean.getAddout());
+                        // time and blockTime need set value here!
+                        tx.setCreateTime(String.valueOf(bean.getBlockTime()));
+                        tx.setBlockTime(bean.getBlockTime());
+
+                        tx.setTxId(bean.getTxid());
+                        tx.setAmount(bean.getVout());
+                        tx.setFee(bean.getFee());
+                        tx.setBlockNum(bean.getBlockNum());
+                        tx.setBlockHash(bean.getBlockHash());
+                        tx.setIsInvalid(1);
+                        TransactionHistoryDaoUtils.getInstance().saveTxRecords(tx);
                     }
                 }
             }
@@ -316,27 +316,8 @@ public class TxModel implements ITxModel {
                 .subscribe(observer);
     }
 
-    private void saveAddOutsToDB(TxBean bean, String txType) {
-        TransactionHistory tx = new TransactionHistory();
-        tx.setSentOrReceived(txType);
-        tx.setFromAddress(bean.getAddIn());
-        tx.setToAddress(bean.getAddOut());
-        // time and blockTime need set value here!
-        tx.setCreateTime(bean.getTime());
-        try{
-            long time = Long.valueOf(bean.getTime());
-            tx.setBlockTime(time);
-        }catch (Exception ignore){ }
-
-        tx.setTxId(bean.getTxid());
-        tx.setAmount(FmtMicrometer.fmtAmount(bean.getVout()));
-        tx.setFee(FmtMicrometer.fmtAmount(bean.getFee()));
-        tx.setBlockNum(bean.getBlockHeight());
-        TransactionHistoryDaoUtils.getInstance().saveAddOut(tx);
-    }
-
     @Override
-    public void getBlockHeight(LogicObserver<HeightResult> observer) {
+    public void getBlockHeight(LogicObserver<DataResult<Integer>> observer) {
         NetWorkManager.createApiService(TransactionService.class)
                 .getBlockHeight()
                 .subscribeOn(Schedulers.io())

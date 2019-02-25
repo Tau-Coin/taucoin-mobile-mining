@@ -55,14 +55,14 @@ public class MiningInfoDaoUtils {
                 .list();
     }
 
-    public boolean insertOrReplace(MiningInfo miningInfo) {
+    public synchronized boolean insertOrReplace(MiningInfo miningInfo) {
         long result = getMiningInfoDao().insertOrReplace(miningInfo);
         return result > -1;
     }
 
-    public MiningInfo queryByNumber(String number) {
+    public MiningInfo queryByBlockHash(String blockHash) {
         List<MiningInfo> list = getMiningInfoDao().queryBuilder()
-                .where(MiningInfoDao.Properties.BlockNo.eq(number))
+                .where(MiningInfoDao.Properties.BlockHash.eq(blockHash))
                 .orderDesc(MiningInfoDao.Properties.Mid)
                 .list();
         if(list != null && list.size() > 0){

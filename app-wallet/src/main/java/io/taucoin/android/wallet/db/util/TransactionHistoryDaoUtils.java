@@ -53,19 +53,13 @@ public class TransactionHistoryDaoUtils {
         return daoManager.getDaoSession().getTransactionHistoryDao();
     }
 
-
-    public boolean isAnyTxPending(String formAddress) {
-        long size = getTxPendingList(formAddress).size();
-        return size > 0;
-    }
-
     public List<TransactionHistory> getTxPendingList(String formAddress) {
         QueryBuilder qb = getTransactionHistoryDao().queryBuilder();
         return getTransactionHistoryDao().queryBuilder()
         .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
-                TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.SEND),
                 qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING),
-                    TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL)))
+                        qb.and(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL),
+                                TransactionHistoryDao.Properties.IsInvalid.eq(1))))
         .list();
     }
 
@@ -84,20 +78,21 @@ public class TransactionHistoryDaoUtils {
         getTransactionHistoryDao().insertOrReplace(tx);
     }
 
-    public void saveAddOut(TransactionHistory tx) {
+    public void saveTxRecords(TransactionHistory tx) {
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
         db.where(TransactionHistoryDao.Properties.TxId.eq(tx.getTxId()),
             TransactionHistoryDao.Properties.FromAddress.eq(tx.getFromAddress()),
-            TransactionHistoryDao.Properties.ToAddress.eq(tx.getToAddress()),
-            TransactionHistoryDao.Properties.SentOrReceived.eq(tx.getSentOrReceived())
+            TransactionHistoryDao.Properties.ToAddress.eq(tx.getToAddress())
         );
 
         List<TransactionHistory> list = db.list();
         if(list.size() > 0){
-            TransactionHistory bean = list.get(0);
-            if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
-                bean.setResult(tx.getResult());
-                insertOrReplace(bean);
+            for (TransactionHistory bean : list) {
+                if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
+                    bean.setResult(tx.getResult());
+                    bean.setIsInvalid(tx.getIsInvalid());
+                    insertOrReplace(bean);
+                }
             }
         }else{
             insertOrReplace(tx);
@@ -107,21 +102,12 @@ public class TransactionHistoryDaoUtils {
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
          db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
-                db.or(db.and(TransactionHistoryDao.Properties.FromAddress.eq(address),
-                    TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.SEND)),
-                    db.and(TransactionHistoryDao.Properties.ToAddress.eq(address),
-                    TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.RECEIVE)))
-                )
-            .orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
-            .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
+                 TransactionHistoryDao.Properties.IsInvalid.eq(1),
+                db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
+                    TransactionHistoryDao.Properties.ToAddress.eq(address))
+                ).orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
+                 .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
         return db.list();
-    }
-
-    public void updateOldTxHistory() {
-        QueryBuilder<TransactionHistory> builder = getTransactionHistoryDao().queryBuilder();
-        builder.where(builder.or(TransactionHistoryDao.Properties.FromAddress.eq(""),
-                TransactionHistoryDao.Properties.FromAddress.isNull()));
-        builder.buildDelete().executeDeleteWithoutDetachingEntities();
     }
 
     /** It's your latest time to accept your address here.*/
@@ -129,10 +115,8 @@ public class TransactionHistoryDaoUtils {
         long time = 0L;
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
         db.where(TransactionHistoryDao.Properties.Result.isNull(),
-            db.or(db.and(TransactionHistoryDao.Properties.FromAddress.eq(address),
-                TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.SEND)),
-                db.and(TransactionHistoryDao.Properties.ToAddress.eq(address),
-                TransactionHistoryDao.Properties.SentOrReceived.eq(TransmitKey.TxType.RECEIVE)))
+            db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
+                TransactionHistoryDao.Properties.ToAddress.eq(address))
         )
         .orderDesc(TransactionHistoryDao.Properties.BlockTime);
         List<TransactionHistory> list = db.list();

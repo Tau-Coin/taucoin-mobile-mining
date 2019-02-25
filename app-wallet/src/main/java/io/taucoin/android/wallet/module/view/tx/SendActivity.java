@@ -132,9 +132,9 @@ public class SendActivity extends BaseActivity implements ISendView {
         tx.setAmount(amount);
         tx.setFee(fee);
 
-//        if(Wallet.getInstance().validateTxParameter(tx)){
+        if(Wallet.validateTxParameter(tx)){
             showSureDialog(tx);
-//        }
+        }
     }
 
     private void showSureDialog(TransactionHistory tx) {

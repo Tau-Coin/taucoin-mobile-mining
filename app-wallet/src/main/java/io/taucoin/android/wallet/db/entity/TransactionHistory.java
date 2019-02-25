@@ -23,13 +23,13 @@ public class TransactionHistory {
 
     private String txId;
 
-    private String sentOrReceived;
-
     private String fromAddress;
 
     private String toAddress;
 
     private String createTime;
+
+    private long createBlockNum;
 
     private String amount;
 
@@ -47,17 +47,19 @@ public class TransactionHistory {
 
     private long blockTime;
 
-    @Generated(hash = 579557527)
-    public TransactionHistory(Long id, String txId, String sentOrReceived,
-            String fromAddress, String toAddress, String createTime, String amount,
+    private int isInvalid;
+
+    @Generated(hash = 114833652)
+    public TransactionHistory(Long id, String txId, String fromAddress,
+            String toAddress, String createTime, long createBlockNum, String amount,
             String memo, String fee, String result, String message, long blockNum,
-            String blockHash, long blockTime) {
+            String blockHash, long blockTime, int isInvalid) {
         this.id = id;
         this.txId = txId;
-        this.sentOrReceived = sentOrReceived;
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.createTime = createTime;
+        this.createBlockNum = createBlockNum;
         this.amount = amount;
         this.memo = memo;
         this.fee = fee;
@@ -66,6 +68,7 @@ public class TransactionHistory {
         this.blockNum = blockNum;
         this.blockHash = blockHash;
         this.blockTime = blockTime;
+        this.isInvalid = isInvalid;
     }
 
     @Generated(hash = 63079048)
@@ -86,14 +89,6 @@ public class TransactionHistory {
 
     public void setTxId(String txId) {
         this.txId = txId;
-    }
-
-    public String getSentOrReceived() {
-        return this.sentOrReceived;
-    }
-
-    public void setSentOrReceived(String sentOrReceived) {
-        this.sentOrReceived = sentOrReceived;
     }
 
     public String getFromAddress() {
@@ -118,6 +113,14 @@ public class TransactionHistory {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public long getCreateBlockNum() {
+        return this.createBlockNum;
+    }
+
+    public void setCreateBlockNum(long createBlockNum) {
+        this.createBlockNum = createBlockNum;
     }
 
     public String getAmount() {
@@ -183,4 +186,13 @@ public class TransactionHistory {
     public void setBlockTime(long blockTime) {
         this.blockTime = blockTime;
     }
+
+    public int getIsInvalid() {
+        return this.isInvalid;
+    }
+
+    public void setIsInvalid(int isInvalid) {
+        this.isInvalid = isInvalid;
+    }
+
 }

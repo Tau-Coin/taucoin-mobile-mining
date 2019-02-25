@@ -28,7 +28,4 @@ public interface IUserModel {
 
     /** Get user key and address */
     void getKeyAndAddress(String publicKey, LogicObserver<KeyValue> observer);
-
-    /** Update old version2.0 tx history data */
-    void updateOldTxHistory();
 }

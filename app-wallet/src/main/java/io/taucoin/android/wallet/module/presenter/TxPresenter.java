@@ -26,14 +26,13 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.module.bean.AddInOutBean;
+import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.core.Transaction;
-import io.taucoin.core.Utils;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.exception.CodeException;
@@ -65,9 +64,9 @@ public class TxPresenter {
         });
     }
 
-    public void getAddOuts(LogicObserver<Boolean> observer) {
+    public void getTxRecords(LogicObserver<Boolean> observer) {
         Logger.i("getAddOuts start");
-        mTxModel.getAddOuts(new TAUObserver<DataResult<AddInOutBean>>(){
+        mTxModel.getTxRecords(new TAUObserver<DataResult<RawTxList>>(){
 
             @Override
             public void handleError(String msg, int msgCode) {
@@ -76,12 +75,12 @@ public class TxPresenter {
             }
 
             @Override
-            public void handleData(DataResult<AddInOutBean> listDataResult) {
+            public void handleData(DataResult<RawTxList> listDataResult) {
                 super.handleData(listDataResult);
                 Logger.i("getAddOuts success");
                 if(listDataResult != null && listDataResult.getData() != null){
                     Logger.i("getAddOuts success");
-                    mTxModel.saveAddOuts(listDataResult.getData(), observer);
+                    mTxModel.saveTxRecords(listDataResult.getData(), observer);
                 }else{
                     Logger.i("getAddOuts success = 0");
                     observer.onNext(true);

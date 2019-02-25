@@ -24,6 +24,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
@@ -69,7 +70,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 switch (event) {
                     case EVENT_BLOCK:
                         BlockEventData blockEventData = data.getParcelable("data");
-                        handleSynchronizedBlock(blockEventData);
                         logMessage = "Added block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
                         time = blockEventData.registeredTime;
                         addLogEntry(time, logMessage);
@@ -134,6 +134,20 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         isInit = true;
                         startSyncAll();
                         break;
+                    case EVENT_BLOCK_DISCONNECT:
+                        blockEventData = data.getParcelable("data");
+                        handleSynchronizedBlock(blockEventData, false);
+                        logMessage = "Disconnect block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
+                        time = blockEventData.registeredTime;
+                        addLogEntry(time, logMessage);
+                        break;
+                    case EVENT_BLOCK_CONNECT:
+                        blockEventData = data.getParcelable("data");
+                        handleSynchronizedBlock(blockEventData, true);
+                        logMessage = "Disconnect block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
+                        time = blockEventData.registeredTime;
+                        addLogEntry(time, logMessage);
+                        break;
 
                 }
                 break;
@@ -169,7 +183,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             case TaucoinClientMessage.MSG_CHAIN_HEIGHT:
                 replyData = message.getData();
                 long height =  replyData.getLong(TransmitKey.RemoteResult.HEIGHT);
-                updateBlockSynchronized(height);
+                updateSynchronizedBlockNum(height);
                 getBlockList(height);
                 break;
             case TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
@@ -184,9 +198,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         return isClaimed;
     }
 
-    private void handleSynchronizedBlock(BlockEventData block) {
+    private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {
+        if(!isConnect){
+            TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
+        }
         if(block != null){
-            getMiningModel().handleSynchronizedBlock(block, new LogicObserver<MessageEvent.EventCode>() {
+            getMiningModel().handleSynchronizedBlock(block, isConnect, new LogicObserver<MessageEvent.EventCode>() {
                 @Override
                 public void handleData(MessageEvent.EventCode eventCode) {
                     if(eventCode != null){
@@ -213,9 +230,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         }
     }
 
-    private void updateBlockSynchronized(long height){
+    private void updateSynchronizedBlockNum(long height){
         int blockHeight = (int) height;
-        getMiningModel().updateBlockSynchronized(blockHeight, new LogicObserver<Boolean>() {
+        getMiningModel().updateSynchronizedBlockNum(blockHeight, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean aBoolean) {
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);

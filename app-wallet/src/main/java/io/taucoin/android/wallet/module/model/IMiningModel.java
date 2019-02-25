@@ -16,11 +16,11 @@ public interface IMiningModel {
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
     /** update or save current synchronized block */
-    void updateBlockSynchronized(int blockSynchronized, LogicObserver<Boolean> observer);
+    void updateSynchronizedBlockNum(int blockSynchronized, LogicObserver<Boolean> observer);
     /** update my mining block */
     void updateMyMiningBlock(List<BlockEventData> blocks, LogicObserver<Boolean> logicObserver);
     /** handle synchronized block */
-    void handleSynchronizedBlock(BlockEventData block, LogicObserver<MessageEvent.EventCode> logicObserver);
+    void handleSynchronizedBlock(BlockEventData block, boolean isConnect,  LogicObserver<MessageEvent.EventCode> logicObserver);
     /** handle send transaction return data and updateTransactionHistory*/
     void updateTransactionHistory(Transaction transaction);
 }

@@ -225,7 +225,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
         if(UserUtil.isImportKey() && mTxPresenter != null){
-            mTxPresenter.getAddOuts(new LogicObserver<Boolean>() {
+            mTxPresenter.getTxRecords(new LogicObserver<Boolean>() {
                 @Override
                 public void handleData(Boolean isSuccess) {
                     ProgressManager.closeProgressDialog();

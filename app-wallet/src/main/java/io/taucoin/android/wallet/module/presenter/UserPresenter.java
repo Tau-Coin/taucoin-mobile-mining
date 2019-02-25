@@ -110,7 +110,7 @@ public class UserPresenter {
     }
 
     private void getAddOuts() {
-        mTxPresenter.getAddOuts(new LogicObserver<Boolean>(){
+        mTxPresenter.getTxRecords(new LogicObserver<Boolean>(){
 
             @Override
             public void handleData(Boolean aBoolean) {
@@ -136,12 +136,14 @@ public class UserPresenter {
         String address = null;
         for (String key : keys) {
             if(StringUtil.isNotEmpty(key)){
+                Object object = mapValue.get(key);
+                String value  = object == null ? null : object.toString();
                 if(key.endsWith(TransmitKey.PRIVATE_KEY)){
-                    privateKey = mapValue.get(key).toString();
+                    privateKey = value;
                 }else if(key.endsWith(TransmitKey.PUBLIC_KEY)){
-                    publicKey = mapValue.get(key).toString();
+                    publicKey = value;
                 }else if(key.endsWith(TransmitKey.ADDRESS)){
-                    address = mapValue.get(key).toString();
+                    address = value;
                 }
             }
         }
@@ -165,7 +167,6 @@ public class UserPresenter {
                     SharedPreferencesHelper.getInstance().clear();
                     SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubkey());
                     SharedPreferencesHelper.getInstance().putString(TransmitKey.ADDRESS, keyValue.getAddress());
-                    mUserModel.updateOldTxHistory();
                 }
             });
         }else{

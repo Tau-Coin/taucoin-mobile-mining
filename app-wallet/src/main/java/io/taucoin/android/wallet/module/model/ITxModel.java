@@ -19,19 +19,15 @@ import java.util.List;
 
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.module.bean.AddInOutBean;
+import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
-import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public interface ITxModel {
     /** Get balance from the server */
-    void getBalance(TAUObserver<DataResult<Integer>> observer);
-
-    /** Whether a Pending transaction */
-    void isAnyTxPending(LogicObserver<Boolean> observer);
+    void getBalance(TAUObserver<DataResult<Long>> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
     void checkRawTransaction(String txId, LogicObserver<Boolean> observer);
@@ -55,14 +51,14 @@ public interface ITxModel {
     void queryTransactionHistory(int pageNo, String time, LogicObserver<List<TransactionHistory>> logicObserver);
 
     /** Get the transaction history of the server  */
-    void getAddOuts(TAUObserver<DataResult<AddInOutBean>> observer);
+    void getTxRecords(TAUObserver<DataResult<RawTxList>> observer);
 
     /** Save the transaction history of the server  */
-    void saveAddOuts(AddInOutBean addInOut, LogicObserver<Boolean> observer);
+    void saveTxRecords(RawTxList rawTxList, LogicObserver<Boolean> observer);
 
     /** get block height from the server */
-    void getBlockHeight(LogicObserver<HeightResult> observer);
+    void getBlockHeight(LogicObserver<DataResult<Integer>> observer);
 
     /** Update balance from the server */
-    void updateBalance(int balance, LogicObserver<KeyValue> observer);
+    void updateBalance(long balance, LogicObserver<KeyValue> observer);
 }

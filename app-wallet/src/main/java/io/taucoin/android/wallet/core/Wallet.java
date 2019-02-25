@@ -18,6 +18,7 @@ package io.taucoin.android.wallet.core;
 import com.mofei.tau.R;
 
 import java.math.BigInteger;
+
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
@@ -36,7 +37,7 @@ public class Wallet {
             return false;
         }
         // validate receive address
-        if (StringUtil.isEmpty(tx.getFromAddress())) {
+        if (StringUtil.isEmpty(tx.getToAddress())) {
             ToastUtils.showShortToast(R.string.send_tx_invalid_address);
             return false;
         }
@@ -65,6 +66,7 @@ public class Wallet {
             ToastUtils.showShortToast(R.string.send_tx_invalid_fee);
             return false;
         }
+        tx.setAmount(amountStr);
 
         BigInteger minFee = Constants.DEFAULT_TX_FEE_MIN;
         BigInteger maxFee = Constants.DEFAULT_TX_FEE_MAX;
@@ -77,7 +79,7 @@ public class Wallet {
             ToastUtils.showShortToast(TransactionFailReason.TX_FEE_TOO_LARGE.getMsg());
             return false;
         }
-
+        tx.setFee(feeStr);
         // validate balance is enough
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue != null) {

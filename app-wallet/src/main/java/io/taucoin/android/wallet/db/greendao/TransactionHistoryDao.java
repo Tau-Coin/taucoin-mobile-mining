@@ -26,10 +26,10 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property TxId = new Property(1, String.class, "txId", false, "TX_ID");
-        public final static Property SentOrReceived = new Property(2, String.class, "sentOrReceived", false, "SENT_OR_RECEIVED");
-        public final static Property FromAddress = new Property(3, String.class, "fromAddress", false, "FROM_ADDRESS");
-        public final static Property ToAddress = new Property(4, String.class, "toAddress", false, "TO_ADDRESS");
-        public final static Property CreateTime = new Property(5, String.class, "createTime", false, "CREATE_TIME");
+        public final static Property FromAddress = new Property(2, String.class, "fromAddress", false, "FROM_ADDRESS");
+        public final static Property ToAddress = new Property(3, String.class, "toAddress", false, "TO_ADDRESS");
+        public final static Property CreateTime = new Property(4, String.class, "createTime", false, "CREATE_TIME");
+        public final static Property CreateBlockNum = new Property(5, long.class, "createBlockNum", false, "CREATE_BLOCK_NUM");
         public final static Property Amount = new Property(6, String.class, "amount", false, "AMOUNT");
         public final static Property Memo = new Property(7, String.class, "memo", false, "MEMO");
         public final static Property Fee = new Property(8, String.class, "fee", false, "FEE");
@@ -38,6 +38,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         public final static Property BlockNum = new Property(11, long.class, "blockNum", false, "BLOCK_NUM");
         public final static Property BlockHash = new Property(12, String.class, "blockHash", false, "BLOCK_HASH");
         public final static Property BlockTime = new Property(13, long.class, "blockTime", false, "BLOCK_TIME");
+        public final static Property IsInvalid = new Property(14, int.class, "isInvalid", false, "IS_INVALID");
     }
 
 
@@ -55,10 +56,10 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         db.execSQL("CREATE TABLE " + constraint + "\"TRANSACTION_HISTORY\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TX_ID\" TEXT," + // 1: txId
-                "\"SENT_OR_RECEIVED\" TEXT," + // 2: sentOrReceived
-                "\"FROM_ADDRESS\" TEXT," + // 3: fromAddress
-                "\"TO_ADDRESS\" TEXT," + // 4: toAddress
-                "\"CREATE_TIME\" TEXT," + // 5: createTime
+                "\"FROM_ADDRESS\" TEXT," + // 2: fromAddress
+                "\"TO_ADDRESS\" TEXT," + // 3: toAddress
+                "\"CREATE_TIME\" TEXT," + // 4: createTime
+                "\"CREATE_BLOCK_NUM\" INTEGER NOT NULL ," + // 5: createBlockNum
                 "\"AMOUNT\" TEXT," + // 6: amount
                 "\"MEMO\" TEXT," + // 7: memo
                 "\"FEE\" TEXT," + // 8: fee
@@ -66,7 +67,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
                 "\"MESSAGE\" TEXT," + // 10: message
                 "\"BLOCK_NUM\" INTEGER NOT NULL ," + // 11: blockNum
                 "\"BLOCK_HASH\" TEXT," + // 12: blockHash
-                "\"BLOCK_TIME\" INTEGER NOT NULL );"); // 13: blockTime
+                "\"BLOCK_TIME\" INTEGER NOT NULL ," + // 13: blockTime
+                "\"IS_INVALID\" INTEGER NOT NULL );"); // 14: isInvalid
     }
 
     /** Drops the underlying database table. */
@@ -89,25 +91,21 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(2, txId);
         }
  
-        String sentOrReceived = entity.getSentOrReceived();
-        if (sentOrReceived != null) {
-            stmt.bindString(3, sentOrReceived);
-        }
- 
         String fromAddress = entity.getFromAddress();
         if (fromAddress != null) {
-            stmt.bindString(4, fromAddress);
+            stmt.bindString(3, fromAddress);
         }
  
         String toAddress = entity.getToAddress();
         if (toAddress != null) {
-            stmt.bindString(5, toAddress);
+            stmt.bindString(4, toAddress);
         }
  
         String createTime = entity.getCreateTime();
         if (createTime != null) {
-            stmt.bindString(6, createTime);
+            stmt.bindString(5, createTime);
         }
+        stmt.bindLong(6, entity.getCreateBlockNum());
  
         String amount = entity.getAmount();
         if (amount != null) {
@@ -140,6 +138,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(13, blockHash);
         }
         stmt.bindLong(14, entity.getBlockTime());
+        stmt.bindLong(15, entity.getIsInvalid());
     }
 
     @Override
@@ -156,25 +155,21 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(2, txId);
         }
  
-        String sentOrReceived = entity.getSentOrReceived();
-        if (sentOrReceived != null) {
-            stmt.bindString(3, sentOrReceived);
-        }
- 
         String fromAddress = entity.getFromAddress();
         if (fromAddress != null) {
-            stmt.bindString(4, fromAddress);
+            stmt.bindString(3, fromAddress);
         }
  
         String toAddress = entity.getToAddress();
         if (toAddress != null) {
-            stmt.bindString(5, toAddress);
+            stmt.bindString(4, toAddress);
         }
  
         String createTime = entity.getCreateTime();
         if (createTime != null) {
-            stmt.bindString(6, createTime);
+            stmt.bindString(5, createTime);
         }
+        stmt.bindLong(6, entity.getCreateBlockNum());
  
         String amount = entity.getAmount();
         if (amount != null) {
@@ -207,6 +202,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(13, blockHash);
         }
         stmt.bindLong(14, entity.getBlockTime());
+        stmt.bindLong(15, entity.getIsInvalid());
     }
 
     @Override
@@ -219,10 +215,10 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         TransactionHistory entity = new TransactionHistory( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // txId
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // sentOrReceived
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // fromAddress
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // toAddress
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // createTime
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // fromAddress
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // toAddress
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // createTime
+            cursor.getLong(offset + 5), // createBlockNum
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // amount
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // memo
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // fee
@@ -230,7 +226,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // message
             cursor.getLong(offset + 11), // blockNum
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // blockHash
-            cursor.getLong(offset + 13) // blockTime
+            cursor.getLong(offset + 13), // blockTime
+            cursor.getInt(offset + 14) // isInvalid
         );
         return entity;
     }
@@ -239,10 +236,10 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
     public void readEntity(Cursor cursor, TransactionHistory entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTxId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setSentOrReceived(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setFromAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setToAddress(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCreateTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setFromAddress(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setToAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setCreateTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setCreateBlockNum(cursor.getLong(offset + 5));
         entity.setAmount(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setMemo(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setFee(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
@@ -251,6 +248,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         entity.setBlockNum(cursor.getLong(offset + 11));
         entity.setBlockHash(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setBlockTime(cursor.getLong(offset + 13));
+        entity.setIsInvalid(cursor.getInt(offset + 14));
      }
     
     @Override

@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,9 +41,7 @@ import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
-import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.foundation.net.callback.DataResult;
-import io.taucoin.foundation.net.callback.HeightResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
@@ -104,7 +100,7 @@ public class TxService extends Service {
                     getInfo();
                     break;
                 case TransmitKey.ServiceType.GET_BLOCK_HEIGHT:
-                    if(!mIsGetBlockHeight) getBlockHeight();
+                    getBlockHeight(!mIsGetBlockHeight);
                     break;
                 default:
                     break;
@@ -152,17 +148,8 @@ public class TxService extends Service {
                                         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
                                         getBalance(TransmitKey.ServiceType.GET_BALANCE);
                                     }else{
-                                        TransactionHistory transactionHistory = new TransactionHistory();
-                                        transactionHistory.setTxId(txId);
-                                        transactionHistory.setResult(TransmitKey.TxResult.FAILED);
-                                        transactionHistory.setMessage(ResourcesUtil.getText(R.string.send_tx_fail_in_pool));
-                                        mTxModel.updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>(){
-
-                                            @Override
-                                            public void handleData(Boolean aBoolean) {
-                                                EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
-                                            }
-                                        });
+                                        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                                        getBalance(TransmitKey.ServiceType.GET_BALANCE);
                                     }
                                 }
                             });
@@ -181,7 +168,7 @@ public class TxService extends Service {
     }
 
     private void getBalance(String serviceType) {
-        mTxModel.getBalance( new TAUObserver<DataResult<Integer>>() {
+        mTxModel.getBalance( new TAUObserver<DataResult<Long>>() {
             @Override
             public void handleError(String msg, int msgCode) {
                 if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
@@ -194,9 +181,9 @@ public class TxService extends Service {
             }
 
             @Override
-            public void handleData(DataResult<Integer> balanceRetBalance) {
+            public void handleData(DataResult<Long> balanceRetBalance) {
                 super.handleData(balanceRetBalance);
-                int balance = balanceRetBalance.getData();
+                Long balance = balanceRetBalance.getData();
                 Logger.i("getBalance success");
                 if(ActivityManager.getInstance().isTopActivity(MainActivity.class)){
                     ProgressManager.closeProgressDialog();
@@ -220,21 +207,23 @@ public class TxService extends Service {
         });
     }
 
-    private void getBlockHeight(){
+    private void getBlockHeight(boolean isDelayRefresh){
         mIsGetBlockHeight = true;
-        mTxModel.getBlockHeight(new LogicObserver<HeightResult>(){
+        mTxModel.getBlockHeight(new LogicObserver<DataResult<Integer>>(){
 
             @Override
-            public void handleData(HeightResult result) {
-                if(result != null && result.getHeight() > 0){
-                    Logger.d("getBlockHeight =" + result.getHeight());
+            public void handleData(DataResult<Integer> result) {
+                if(result != null && result.getData() > 0){
+                    Logger.d("getBlockHeight =" + result.getData());
                     KeyValue entry = MyApplication.getKeyValue();
-                    entry.setBlockHeight(result.getHeight());
+                    entry.setBlockHeight(result.getData());
                     KeyValueDaoUtils.getInstance().update(entry);
                     MyApplication.setKeyValue(entry);
                     EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
                 }
-                getBlockHeightDelay();
+                if(isDelayRefresh){
+                    getBlockHeightDelay();
+                }
             }
         });
     }
@@ -245,7 +234,7 @@ public class TxService extends Service {
             .subscribe(new CommonObserver<Long>() {
                 @Override
                 public void onComplete() {
-                    getBlockHeight();
+                    getBlockHeight(true);
                 }
             });
     }

@@ -99,19 +99,9 @@ public class MiningUtil {
         });
     }
 
-    public static void saveTransactionSuccess(String txId) {
-        TransactionHistory transactionHistory = new TransactionHistory();
-        transactionHistory.setTxId(txId);
-        transactionHistory.setResult(TransmitKey.TxResult.CONFIRMING);
-        ITxModel iTxModel = new TxModel();
-        iTxModel.updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>(){
-
-            @Override
-            public void handleData(Boolean aBoolean) {
-                EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
-                checkRawTransaction();
-            }
-        });
+    public static void saveTransactionSuccess() {
+        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+        checkRawTransaction();
     }
     private static void checkRawTransaction() {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);

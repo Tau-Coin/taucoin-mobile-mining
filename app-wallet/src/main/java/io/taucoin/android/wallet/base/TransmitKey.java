@@ -23,7 +23,6 @@ public class TransmitKey {
         public static final String GET_HOME_DATA = "get_home_data";
         public static final String GET_SEND_DATA = "get_send_data";
         public static final String GET_BALANCE = "get_balance";
-        public static final String GET_UTXO_LIST = "get_utxo_list";
         public static final String GET_RAW_TX = "get_raw_tx";
         public static final String GET_INFO = "get_info";
         public static final String GET_BLOCK_HEIGHT = "get_block_height";
@@ -38,17 +37,12 @@ public class TransmitKey {
     public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";
 
     public static final int PAGE_SIZE = 20;
-    public static final int TX_CONFIRMATIONS = 2;
+    public static final int TX_FAIL_LIMIT = 144;
 
     public static class TxResult {
         public static final String FAILED = "Failed";
         public static final String SUCCESSFUL = "Successful";
         public static final String CONFIRMING = "Confirming";
-    }
-
-    public static class TxType {
-        public static final String SEND = "Send";
-        public static final String RECEIVE = "Receive";
     }
 
     public static class MiningState {

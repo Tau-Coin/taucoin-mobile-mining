@@ -20,10 +20,10 @@ import java.math.BigInteger;
 
 public class Constants {
     // 1 COIN
-    private static final BigInteger COIN = new BigInteger("100000000", 10);
+    private static final BigInteger COIN = new BigInteger("100", 10);
 
     // 0.01 COIN
-    private static final BigInteger CENT = new BigInteger("1000000", 10);
+    private static final BigInteger CENT = new BigInteger("1", 10);
 
     // 0.01 COIN
     public static final BigInteger MIN_CHANGE = CENT;
@@ -32,15 +32,8 @@ public class Constants {
     public static final BigInteger MAX_MONEY = new BigInteger("10000000000", 10).multiply(COIN);
 
     //  0.01 COIN
-    public static final BigInteger DEFAULT_TX_FEE_MIN = new BigInteger("1000000", 10);
+    public static final BigInteger DEFAULT_TX_FEE_MIN = new BigInteger("1", 10);
 
-    // TODO New version change < 665.00 coin
     // 1 COIN
-    public static final BigInteger DEFAULT_TX_FEE_MAX = new BigInteger("100000000", 10);
-
-    public static final long MAX_STANDARD_TX_WEIGHT = 400000;
-
-    public static boolean duringMoneyRange(BigInteger money) {
-        return money.compareTo(MIN_CHANGE) >= 0 && money.compareTo(MAX_MONEY) < 0;
-    }
+    public static final BigInteger DEFAULT_TX_FEE_MAX = new BigInteger("66500", 10);
 }

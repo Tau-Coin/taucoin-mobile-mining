@@ -126,12 +126,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     private boolean isReceiver(TransactionHistory tx) {
-        boolean isReceiver = StringUtil.isNotSame(tx.getFromAddress(), address);
-        // Only send to self handler
-        if(!isReceiver && StringUtil.isSame(tx.getFromAddress(), tx.getToAddress())){
-            isReceiver = StringUtil.isSame(tx.getSentOrReceived(), TransmitKey.TxType.RECEIVE);
-        }
-        return isReceiver;
+        return StringUtil.isNotSame(tx.getFromAddress(), address);
     }
 
     @Override
@@ -148,7 +143,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
 
         TransactionHistory tx = historyList.get(groupPosition);
         childViewHolder.tvTransactionId.setText(tx.getTxId());
-        String fee = FmtMicrometer.fmtFormatFee(tx.getFee()) + "TAU";
+        String fee = FmtMicrometer.fmtFormat(tx.getFee()) + "TAU";
         childViewHolder.tvTxFee.setText(fee);
 
         boolean isReceiver = isReceiver(tx);
