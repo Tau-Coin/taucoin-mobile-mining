@@ -33,7 +33,7 @@ public class Tau62 extends TauHandler {
 
     private final static Logger logger = LoggerFactory.getLogger("sync");
 
-    private static final int FORK_COVER_BATCH_SIZE = 192;
+    private static final int FORK_COVER_BATCH_SIZE = 144;
 
     /**
      * Header list sent in GET_BLOC_BODIES message,
