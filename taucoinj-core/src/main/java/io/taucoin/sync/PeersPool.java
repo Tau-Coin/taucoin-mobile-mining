@@ -2,7 +2,7 @@ package io.taucoin.sync;
 
 import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.facade.Taucoin;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.server.Channel;
@@ -56,7 +56,7 @@ public class PeersPool implements Iterable<Channel> {
 
     private Taucoin taucoin;
 
-    private EthereumListener ethereumListener;
+    private TaucoinListener ethereumListener;
 
     public void setTaucoin(Taucoin taucoin) {
         this.taucoin = taucoin;

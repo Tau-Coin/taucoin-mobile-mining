@@ -4,7 +4,7 @@ import io.taucoin.net.tau.TauVersion;
 
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
-import io.taucoin.listener.CompositeEthereumListener;
+import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.SyncManager;
 import io.taucoin.sync.SyncQueue;

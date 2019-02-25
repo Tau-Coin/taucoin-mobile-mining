@@ -113,7 +113,7 @@ public class TaucoinService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    protected class EthereumListener implements io.taucoin.listener.EthereumListener {
+    protected class TaucoinListener implements io.taucoin.listener.TaucoinListener {
 
         @Override
         public void trace(String output) {
@@ -125,6 +125,11 @@ public class TaucoinService extends Service {
         public void onBlock(io.taucoin.core.Block block) {
 
             broadcastEvent(EventFlag.EVENT_BLOCK, new BlockEventData(block));
+        }
+
+        @Override
+        public void onBlockDisconnected(io.taucoin.core.Block block) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_DISCONNECT, new BlockEventData(block));
         }
 
         @Override

@@ -7,7 +7,7 @@ import io.taucoin.core.Transaction;
 import io.taucoin.core.Wallet;
 import io.taucoin.db.BlockStore;
 import io.taucoin.manager.WorldManager;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.forge.BlockForger;
@@ -86,7 +86,7 @@ public interface Taucoin {
 
     BlockStore getBlockStore();
 
-    void addListener(EthereumListener listener);
+    void addListener(TaucoinListener listener);
 
     PeerClient getDefaultPeer();
 

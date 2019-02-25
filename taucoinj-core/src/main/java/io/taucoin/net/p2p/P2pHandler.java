@@ -3,7 +3,7 @@ package io.taucoin.net.p2p;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.MessageQueue;
 import io.taucoin.net.client.Capability;
@@ -75,7 +75,7 @@ public class P2pHandler extends SimpleChannelInboundHandler<P2pMessage> {
     private int ethInbound;
     private int ethOutbound;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     PeerDiscovery peerDiscovery;
 
@@ -83,7 +83,7 @@ public class P2pHandler extends SimpleChannelInboundHandler<P2pMessage> {
     private ScheduledFuture<?> pingTask;
 
     @Inject
-    public P2pHandler(PeerDiscovery peerDiscovery, EthereumListener listener) {
+    public P2pHandler(PeerDiscovery peerDiscovery, TaucoinListener listener) {
         this.peerDiscovery = peerDiscovery;
         this.ethereumListener = listener;
         this.peerDiscoveryMode = false;

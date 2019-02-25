@@ -5,7 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.MessageQueue;
 import io.taucoin.net.client.Capability;
 import io.taucoin.net.tau.handler.TauHandler;
@@ -34,7 +34,7 @@ public class DiscoveryChannel {
 
     private boolean peerDiscoveryMode = false;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     MessageQueue messageQueue;
 
@@ -46,7 +46,7 @@ public class DiscoveryChannel {
 
     @Inject
     public DiscoveryChannel(MessageQueue messageQueue, P2pHandler p2pHandler, TauHandler ethHandler,
-                            EthereumListener listener, Provider<MessageCodec> messageCodecProvider) {
+                            TaucoinListener listener, Provider<MessageCodec> messageCodecProvider) {
         this.messageQueue = messageQueue;
         this.p2pHandler = p2pHandler;
         this.ethHandler = ethHandler;
@@ -115,7 +115,7 @@ public class DiscoveryChannel {
             workerGroup.shutdownGracefully();
 
             if (!peerDiscoveryMode) {
-//                EthereumListener listener =  WorldManager.getInstance().getListener();
+//                TaucoinListener listener =  WorldManager.getInstance().getListener();
 //                listener.onPeerDisconnect(host, port);
             }
 

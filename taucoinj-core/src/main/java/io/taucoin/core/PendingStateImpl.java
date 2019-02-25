@@ -1,6 +1,6 @@
 package io.taucoin.core;
 
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.FastByteComparisons;
 import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class PendingStateImpl implements PendingState {
     */
     private static final Logger logger = LoggerFactory.getLogger("state");
 
-    private EthereumListener listener;
+    private TaucoinListener listener;
     private Repository repository;
     private Blockchain blockchain;
 
@@ -75,7 +75,7 @@ public class PendingStateImpl implements PendingState {
     }
 
     @Inject
-    public PendingStateImpl(EthereumListener listener, Repository repository) {
+    public PendingStateImpl(TaucoinListener listener, Repository repository) {
         this.listener = listener;
         this.repository = repository;
     }

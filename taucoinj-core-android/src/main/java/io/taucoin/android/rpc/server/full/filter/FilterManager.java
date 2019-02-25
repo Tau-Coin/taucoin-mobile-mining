@@ -5,7 +5,7 @@ import net.minidev.json.JSONArray;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
 import io.taucoin.facade.Taucoin;
-import io.taucoin.listener.EthereumListenerAdapter;
+import io.taucoin.listener.TaucoinListenerAdapter;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class FilterManager extends EthereumListenerAdapter {
+public class FilterManager extends TaucoinListenerAdapter {
 
     protected static FilterManager instance = null;
 

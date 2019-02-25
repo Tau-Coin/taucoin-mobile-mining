@@ -3,8 +3,8 @@ package io.taucoin.facade;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.core.PendingState;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
@@ -126,7 +126,7 @@ public class TaucoinImpl implements Taucoin {
     public PeerInfo findOnlinePeer(Set<PeerInfo> excludePeers) {
         logger.info("Looking for online peers...");
 
-        final EthereumListener listener = worldManager.getListener();
+        final TaucoinListener listener = worldManager.getListener();
         listener.trace("Looking for online peer");
 
         worldManager.startPeerDiscovery();
@@ -233,7 +233,7 @@ public class TaucoinImpl implements Taucoin {
     }
 
     @Override
-    public void addListener(EthereumListener listener) {
+    public void addListener(TaucoinListener listener) {
         worldManager.addListener(listener);
     }
 

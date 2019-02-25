@@ -18,6 +18,11 @@ public enum EventFlag {
     EVENT_BLOCK,
 
     /**
+     * onBlockDisconnected event
+     */
+    EVENT_BLOCK_DISCONNECT,
+
+    /**
      * Received message event
      */
     EVENT_RECEIVE_MESSAGE,

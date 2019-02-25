@@ -338,7 +338,7 @@ public class TaucoinRemoteService extends TaucoinService {
                 .build();
 
         taucoin = component.taucoin();
-        taucoin.addListener(new EthereumListener());
+        taucoin.addListener(new TaucoinListener());
         PeersPool peersPool = component.peersPool();
         peersPool.setTaucoin(taucoin);
         ChannelManager channelManager = component.channelManager();

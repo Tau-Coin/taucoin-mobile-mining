@@ -7,7 +7,7 @@ import io.taucoin.crypto.HashUtil;
 import io.taucoin.crypto.SHA3Helper;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.trie.Trie;
 import io.taucoin.trie.TrieImpl;
@@ -89,7 +89,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     Wallet wallet;
 
 
-    private EthereumListener listener;
+    private TaucoinListener listener;
 
 
     private AdminInfo adminInfo;
@@ -122,7 +122,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
                           Wallet wallet, AdminInfo adminInfo,
-                          ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, EthereumListener listener) {
+                          ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.wallet = wallet;

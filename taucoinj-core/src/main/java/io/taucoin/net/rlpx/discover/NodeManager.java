@@ -3,7 +3,7 @@ package io.taucoin.net.rlpx.discover;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.datasource.mapdb.MapDBFactory;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.rlpx.*;
 import io.taucoin.net.rlpx.discover.table.NodeTable;
@@ -50,7 +50,7 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
 
     MapDBFactory mapDBFactory;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     WorldManager worldManager;
 
@@ -76,7 +76,7 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     private boolean inited = false;
 
     @Inject
-    public NodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, EthereumListener ethereumListener) {
+    public NodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, TaucoinListener ethereumListener) {
 
         this.peerConnectionManager = peerConnectionManager;
         this.mapDBFactory = mapDBFactory;

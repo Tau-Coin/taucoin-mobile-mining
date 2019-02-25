@@ -5,9 +5,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListener;
-import io.taucoin.listener.EthereumListenerAdapter;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.net.submit.TransactionExecutor;
 import io.taucoin.net.submit.TransactionTask;
@@ -71,7 +71,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     protected SyncQueue queue;
 
-    protected CompositeEthereumListener ethereumListener;
+    protected CompositeTaucoinListener ethereumListener;
 
     protected Wallet wallet;
 
@@ -98,7 +98,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
     protected byte[] bestHash;
 
     private Block bestBlock;
-    private EthereumListener listener = new EthereumListenerAdapter() {
+    private TaucoinListener listener = new TaucoinListenerAdapter() {
         @Override
         public void onBlock(Block block) {
             bestBlock = block;
@@ -138,7 +138,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
         this.wallet = wallet;
         this.pendingState = pendingState;
         this.channelManager = channelManager;
-        this.ethereumListener = (CompositeEthereumListener)channelManager.getListener();
+        this.ethereumListener = (CompositeTaucoinListener)channelManager.getListener();
 
         maxHashesAsk = config.maxHashesAsk();
         bestBlock = blockchain.getBestBlock();

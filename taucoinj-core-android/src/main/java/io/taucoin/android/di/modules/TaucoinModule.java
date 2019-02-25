@@ -22,8 +22,8 @@ import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.db.RepositoryImpl;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.forge.BlockForger;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
@@ -102,7 +102,7 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    WorldManager provideWorldManager(EthereumListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
+    WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
             , BlockStore blockStore, ChannelManager channelManager, AdminInfo adminInfo, NodeManager nodeManager, SyncManager syncManager
             , PendingState pendingState) {
 
@@ -124,13 +124,13 @@ public class TaucoinModule {
     @Singleton
     io.taucoin.core.Blockchain provideBlockchain(BlockStore blockStore, io.taucoin.core.Repository repository,
                                                    Wallet wallet, AdminInfo adminInfo,
-                                                   ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, EthereumListener listener) {
+                                                   ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
         return new BlockchainImpl(blockStore, repository, wallet, adminInfo, parentHeaderValidator, pendingState, listener);
     }
 
     @Provides
     @Singleton
-    Wallet provideWallet(Repository repository, Provider<Account> accountProvider, EthereumListener listener) {
+    Wallet provideWallet(Repository repository, Provider<Account> accountProvider, TaucoinListener listener) {
         return new Wallet(repository, accountProvider, listener);
     }
 
@@ -179,7 +179,7 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    SyncManager provideSyncManagery(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, EthereumListener taucoinListener
+    SyncManager provideSyncManagery(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, TaucoinListener taucoinListener
             , PeersPool pool) {
         return new SyncManager(blockchain, queue, nodeManager, taucoinListener, pool);
     }
@@ -212,8 +212,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    EthereumListener provideEthereumListener() {
-        return new CompositeEthereumListener();
+    TaucoinListener provideTaucoinListener() {
+        return new CompositeTaucoinListener();
     }
 
     @Provides
@@ -224,13 +224,13 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    ChannelManager provideChannelManager(EthereumListener listener, SyncManager syncManager, PendingState pendingState) {
+    ChannelManager provideChannelManager(TaucoinListener listener, SyncManager syncManager, PendingState pendingState) {
         return new ChannelManager(listener, syncManager, pendingState);
     }
 
     @Provides
     @Singleton
-    NodeManager provideNodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, EthereumListener listener) {
+    NodeManager provideNodeManager(PeerConnectionTester peerConnectionManager, MapDBFactory mapDBFactory, TaucoinListener listener) {
         return new NodeManager(peerConnectionManager, mapDBFactory, listener);
     }
 
@@ -255,7 +255,7 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    PendingState providePendingState(EthereumListener listener, Repository repository) {
+    PendingState providePendingState(TaucoinListener listener, Repository repository) {
         return new PendingStateImpl(listener, repository);
     }
 
@@ -265,17 +265,17 @@ public class TaucoinModule {
     }
 
     @Provides
-    P2pHandler provideP2pHandler(PeerDiscovery peerDiscovery, EthereumListener listener) {
+    P2pHandler provideP2pHandler(PeerDiscovery peerDiscovery, TaucoinListener listener) {
         return new P2pHandler(peerDiscovery, listener);
     }
 
     @Provides
-    MessageCodec provideMessageCodec(EthereumListener listener) {
+    MessageCodec provideMessageCodec(TaucoinListener listener) {
         return new MessageCodec(listener);
     }
 
     @Provides
-    PeerClient providePeerClient(EthereumListener listener, ChannelManager channelManager,
+    PeerClient providePeerClient(TaucoinListener listener, ChannelManager channelManager,
                                  Provider<TauChannelInitializer> taucoinChannelInitializerProvider) {
         return new PeerClient(listener, channelManager, taucoinChannelInitializerProvider);
     }
@@ -283,12 +283,12 @@ public class TaucoinModule {
     @Provides
     @Singleton
     PeerServer providePeerServer(ChannelManager channelManager, TauChannelInitializer taucoinChannelInitializer,
-            EthereumListener listener) {
+            TaucoinListener listener) {
         return new PeerServer(channelManager, taucoinChannelInitializer, listener);
     }
 
     @Provides
-    MessageQueue provideMessageQueue(EthereumListener listener) {
+    MessageQueue provideMessageQueue(TaucoinListener listener) {
         return new MessageQueue(listener);
     }
 

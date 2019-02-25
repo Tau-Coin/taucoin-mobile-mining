@@ -1,7 +1,7 @@
 package io.taucoin.net.server;
 
 import io.taucoin.config.SystemProperties;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -38,10 +38,10 @@ public class PeerServer {
 
     public TauChannelInitializer tauChannelInitializer;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     @Inject
-    public PeerServer(ChannelManager channelManager, TauChannelInitializer tauChannelInitializer, EthereumListener listener) {
+    public PeerServer(ChannelManager channelManager, TauChannelInitializer tauChannelInitializer, TaucoinListener listener) {
         this.channelManager = channelManager;
         this.tauChannelInitializer = tauChannelInitializer;
         this.ethereumListener = listener;

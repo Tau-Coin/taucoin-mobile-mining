@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import org.apache.commons.lang3.tuple.Pair;
 import io.taucoin.config.SystemProperties;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.Capability;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.net.tau.message.TauMessageCodes;
@@ -48,7 +48,7 @@ public class MessageCodec extends MessageToMessageCodec<Frame, Message> {
     private MessageFactory bzzMessageFactory;
     private TauVersion ethVersion;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     private boolean supportChunkedFrames = true;
 
@@ -57,7 +57,7 @@ public class MessageCodec extends MessageToMessageCodec<Frame, Message> {
     AtomicInteger contextIdCounter = new AtomicInteger(1);
 
     @Inject
-    public MessageCodec(EthereumListener listener) {
+    public MessageCodec(TaucoinListener listener) {
         this.ethereumListener = listener;
         init();
     }

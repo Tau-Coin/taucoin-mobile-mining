@@ -4,7 +4,7 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Block;
 import io.taucoin.core.BlockWrapper;
 import io.taucoin.core.Blockchain;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.net.rlpx.discover.DiscoverListener;
 import io.taucoin.net.rlpx.discover.NodeHandler;
@@ -81,14 +81,14 @@ public class SyncManager {
 
     NodeManager nodeManager;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     PeersPool pool;
 
     ChannelManager channelManager;
 
     @Inject
-    public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, EthereumListener ethereumListener
+    public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, TaucoinListener ethereumListener
                         , PeersPool pool) {
         this.blockchain = blockchain;
         this.queue = queue;

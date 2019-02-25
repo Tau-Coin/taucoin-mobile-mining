@@ -9,7 +9,7 @@ import io.taucoin.core.BlockWrapper;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.PendingState;
 import io.taucoin.db.ByteArrayWrapper;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 
 import io.taucoin.net.message.ReasonCode;
 import io.taucoin.sync.SyncManager;
@@ -66,10 +66,10 @@ public class ChannelManager {
     SyncManager syncManager;
 
     private PendingState pendingState;
-    EthereumListener listener;
+    TaucoinListener listener;
 
     @Inject
-    public ChannelManager(EthereumListener listener, SyncManager syncManager, PendingState pendingState) {
+    public ChannelManager(TaucoinListener listener, SyncManager syncManager, PendingState pendingState) {
         this.listener = listener;
         this.syncManager = syncManager;
         this.syncManager.setChannelManager(this);
@@ -150,7 +150,7 @@ public class ChannelManager {
         recentlyDisconnected.put(peer.getInetSocketAddress().getAddress(), new Date());
     }
 
-    public EthereumListener getListener() {
+    public TaucoinListener getListener() {
         return listener;
     }
 

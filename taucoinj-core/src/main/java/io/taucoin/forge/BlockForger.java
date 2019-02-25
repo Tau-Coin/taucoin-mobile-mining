@@ -10,8 +10,8 @@ import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.facade.Taucoin;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListenerAdapter;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.BigIntegers;
@@ -45,7 +45,7 @@ public class BlockForger {
 
     private Taucoin taucoin;
 
-    private CompositeEthereumListener listener;
+    private CompositeTaucoinListener listener;
 
     protected PendingState pendingState;
 
@@ -59,7 +59,7 @@ public class BlockForger {
         this.blockchain = taucoin.getBlockchain();
         this.blockStore = taucoin.getBlockStore();
         this.pendingState = taucoin.getWorldManager().getPendingState();
-        this.listener = (CompositeEthereumListener)taucoin.getWorldManager().getListener();
+        this.listener = (CompositeTaucoinListener)taucoin.getWorldManager().getListener();
     }
 
     private List<ForgerListener> listeners = new CopyOnWriteArrayList<>();
@@ -73,7 +73,7 @@ public class BlockForger {
     private static final int TNO = 50;
 
     public void init() {
-        listener.addListener(new EthereumListenerAdapter() {
+        listener.addListener(new TaucoinListenerAdapter() {
 
             @Override
             public void onBlock(Block block) {

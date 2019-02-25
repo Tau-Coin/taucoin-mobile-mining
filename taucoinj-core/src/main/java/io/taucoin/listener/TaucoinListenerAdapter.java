@@ -13,7 +13,7 @@ import java.util.List;
  * @author Roman Mandeleil
  * @since 08.08.2014
  */
-public class EthereumListenerAdapter implements EthereumListener {
+public class TaucoinListenerAdapter implements TaucoinListener {
 
     @Override
     public void trace(String output) {
@@ -21,6 +21,10 @@ public class EthereumListenerAdapter implements EthereumListener {
 
     @Override
     public void onBlock(Block block) {
+    }
+
+    @Override
+    public void onBlockDisconnected(Block block) {
     }
 
     @Override

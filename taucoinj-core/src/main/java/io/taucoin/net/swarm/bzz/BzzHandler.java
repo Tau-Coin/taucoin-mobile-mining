@@ -2,7 +2,7 @@ package io.taucoin.net.swarm.bzz;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.MessageQueue;
 import io.taucoin.net.swarm.NetStore;
 import io.taucoin.util.Functional;
@@ -28,7 +28,7 @@ public class BzzHandler extends SimpleChannelInboundHandler<BzzMessage>
     BzzProtocol bzzProtocol;
 
     @Inject
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
 
     @Inject
     NetStore netStore;

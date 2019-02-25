@@ -5,8 +5,8 @@ import io.taucoin.core.*;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.sync.SyncManager;
 import io.taucoin.net.peerdiscovery.PeerDiscovery;
@@ -39,7 +39,7 @@ public class WorldManager {
 
     private static final Logger logger = LoggerFactory.getLogger("general");
 
-    private EthereumListener listener;
+    private TaucoinListener listener;
 
     private Blockchain blockchain;
 
@@ -66,7 +66,7 @@ public class WorldManager {
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
-    public WorldManager(EthereumListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
+    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
                         , BlockStore blockStore, ChannelManager channelManager, AdminInfo adminInfo, NodeManager nodeManager, SyncManager syncManager
                         , PendingState pendingState) {
         logger.info("World manager instantiated");
@@ -95,9 +95,9 @@ public class WorldManager {
         pendingState.init();
     }
 
-    public void addListener(EthereumListener listener) {
+    public void addListener(TaucoinListener listener) {
         logger.info("Ethereum listener added");
-        ((CompositeEthereumListener) this.listener).addListener(listener);
+        ((CompositeTaucoinListener) this.listener).addListener(listener);
     }
 
     public void startPeerDiscovery() {
@@ -118,7 +118,7 @@ public class WorldManager {
         return peerDiscovery;
     }
 
-    public EthereumListener getListener() {
+    public TaucoinListener getListener() {
         return listener;
     }
 

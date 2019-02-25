@@ -2,7 +2,7 @@ package io.taucoin.net;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.taucoin.listener.EthereumListener;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.message.Message;
 import io.taucoin.net.message.ReasonCode;
 import io.taucoin.net.p2p.DisconnectMessage;
@@ -47,13 +47,13 @@ public class MessageQueue {
     private Queue<MessageRoundtrip> messageQueue = new ConcurrentLinkedQueue<>();
     private ChannelHandlerContext ctx = null;
 
-    EthereumListener ethereumListener;
+    TaucoinListener ethereumListener;
     boolean hasPing = false;
     private ScheduledFuture<?> timerTask;
     private Channel channel;
 
     @Inject
-    public MessageQueue(EthereumListener listener) {
+    public MessageQueue(TaucoinListener listener) {
         this.ethereumListener = listener;
     }
 

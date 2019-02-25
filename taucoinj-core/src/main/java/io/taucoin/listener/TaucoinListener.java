@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Roman Mandeleil
  * @since 27.07.2014
  */
-public interface EthereumListener {
+public interface TaucoinListener {
 
     void trace(String output);
 
@@ -29,6 +29,8 @@ public interface EthereumListener {
     void onSendMessage(Channel channel, Message message);
 
     void onBlock(Block block);
+
+    void onBlockDisconnected(Block block);
 
     void onPeerDisconnect(String host, long port);
 

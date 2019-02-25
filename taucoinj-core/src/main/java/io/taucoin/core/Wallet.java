@@ -1,9 +1,9 @@
 package io.taucoin.core;
 
 import io.taucoin.crypto.ECKey;
-import io.taucoin.listener.CompositeEthereumListener;
-import io.taucoin.listener.EthereumListener;
-import io.taucoin.listener.EthereumListenerAdapter;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
 import io.taucoin.net.submit.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class Wallet {
     private Map<String, Account> rows = new HashMap<>();
     private long high;
 
-    private CompositeEthereumListener listener;
+    private CompositeTaucoinListener listener;
 
     private List<WalletListener> listeners = new ArrayList<>();
 
@@ -57,15 +57,15 @@ public class Wallet {
     Provider<Account> accountProvider;
 
     @Inject
-    public Wallet(Repository repository, Provider<Account> accountProvider, EthereumListener listener) {
+    public Wallet(Repository repository, Provider<Account> accountProvider, TaucoinListener listener) {
         this.repository = repository;
         this.accountProvider = accountProvider;
-        this.listener = (CompositeEthereumListener)listener;
+        this.listener = (CompositeTaucoinListener)listener;
         init();
     }
     
     private void init() {
-        listener.addListener(new EthereumListenerAdapter() {
+        listener.addListener(new TaucoinListenerAdapter() {
             @Override
             public void onPendingTransactionsReceived(List<Transaction> transactions) {
                 if (!transactions.isEmpty()) {
