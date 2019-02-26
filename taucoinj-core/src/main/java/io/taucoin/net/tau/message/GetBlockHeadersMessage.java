@@ -7,7 +7,7 @@ import io.taucoin.util.RLPList;
 
 import java.math.BigInteger;
 
-import static io.taucoin.crypto.SHA3Helper.DEFAULT_SIZE_BYTES;
+import static io.taucoin.core.BlockHeader.BLOCK_HEADER_HASH_LENGTH;
 import static io.taucoin.util.ByteUtil.byteArrayToInt;
 import static io.taucoin.util.ByteUtil.byteArrayToLong;
 
@@ -92,7 +92,7 @@ public class GetBlockHeadersMessage extends TauMessage {
         // it might be either a hash or number
         if (blockBytes == null) {
             this.blockNumber = 0;
-        } else if (blockBytes.length == DEFAULT_SIZE_BYTES) {
+        } else if (blockBytes.length == BLOCK_HEADER_HASH_LENGTH) {
             this.blockHash = blockBytes;
         } else {
             this.blockNumber = byteArrayToLong(blockBytes);
