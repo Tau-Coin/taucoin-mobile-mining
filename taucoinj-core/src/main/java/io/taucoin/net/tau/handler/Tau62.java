@@ -235,7 +235,7 @@ public class Tau62 extends TauHandler {
                 break;
             }
 
-            logger.debug("Set block number {}", header.getNumber());
+            logger.info("Set block number {}", header.getNumber());
             b.setNumber(header.getNumber());
             coveredHeaders.add(header);
             blocks.add(b);
@@ -372,22 +372,25 @@ public class Tau62 extends TauHandler {
         if (!isNegativeGap()) reverse(received);
 
         ListIterator<BlockHeader> it = received.listIterator();
+        // start downloading hashes from blockNumber of the block with known hash
+        List<BlockHeader> headers = new ArrayList<>();
 
         if (isNegativeGap()) {
 
             BlockWrapper gap = syncManager.getGapBlock();
 
             // gap block didn't come, drop remote peer
-            if (!Arrays.equals(it.next().getHash(), gap.getHash())) {
+            BlockHeader gapHeader = it.next();
+            if (!Arrays.equals(gapHeader.getHash(), gap.getHash())) {
 
                 logger.trace("Peer {}: gap block is missed in response, drop", channel.getPeerIdShort());
                 syncManager.reportBadAction(channel.getNodeId());
                 return;
             }
+
+            headers.add(gapHeader);
         }
 
-        // start downloading hashes from blockNumber of the block with known hash
-        List<BlockHeader> headers = new ArrayList<>();
         while (it.hasNext()) {
             BlockHeader header = it.next();
             logger.info("isBlockExist {}", Hex.toHexString(header.getHash()));

@@ -66,6 +66,8 @@ public class SyncQueue {
 
     private Thread worker = null;
 
+    private byte[] genesisBlockHash = null;
+
     public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
         this.blockchain = blockchain;
         this.headerValidator = headerValidator;
@@ -141,7 +143,10 @@ public class SyncQueue {
 //                    logger.info("No parent on the chain for block.number: {} block.hash: {}", wrapper.getNumber(), wrapper.getBlock().getShortHash());
                     wrapper.importFailed();
                     syncManager.tryGapRecovery(wrapper);
-                    blockQueue.add(wrapper);
+                    // Here not add this block into block queue, because we don't
+                    // know its block number. This node will request block headers
+                    // and block bodies ASAP.
+                    //blockQueue.add(wrapper);
                     noParent = true;
                     sleep(2000);
                 } else {
@@ -354,7 +359,7 @@ public class SyncQueue {
         List<BlockHeader> newHeaders = new ArrayList<BlockHeader>();
         List<BlockHeader> filtered = blockQueue.filterExistingHeaders(headers);
 
-        for (BlockHeader header : headers) {
+        for (BlockHeader header : filtered) {
 
             if (!isValid(header)) {
 
@@ -367,18 +372,17 @@ public class SyncQueue {
             } else {
                 newHeaders.add(header);
             }
-
         }
 
-        if (fillupHeaderNumber(headers)) {
+        if (fillupHeaderNumber(newHeaders)) {
             if (logger.isInfoEnabled()) {
-               for (BlockHeader header : headers) {
+               for (BlockHeader header : newHeaders) {
                    logger.info("compute header number {}:{}",
                            Hex.toHexString(header.getHash()),
                            header.getNumber());
                }
             }
-            headerStore.addBatch(headers);
+            headerStore.addBatch(newHeaders);
         }
 
         if (logger.isDebugEnabled())
@@ -513,6 +517,7 @@ public class SyncQueue {
         if (headers == null || headers.size() == 0) {
             return false;
         }
+        initGenesisBlockHash();
 
         Block firstParent = this.blockchain.getBlockByHash(headers.get(0).getPreviousHeaderHash());
         Block lastParent = this.blockchain.getBlockByHash(headers.get(headers.size() - 1).getPreviousHeaderHash());
@@ -521,10 +526,18 @@ public class SyncQueue {
         long startBlockNumber  = 0;
         long delta;
 
-        if (firstParentNumber >= 0 && lastParentNumber == -1) {
+        if (isGenesisBlockHash(headers.get(0).getHash())) {
+            // If first header is genesis block header, the start block number is 0.
+            startBlockNumber = 0;
+            delta = 1;
+        } else if (isGenesisBlockHash(headers.get(headers.size() - 1).getHash())) {
+            // If last header is genesis block header
+            startBlockNumber = headers.size() - 1;
+            delta = -1;
+        } else if (firstParentNumber >= 0 && lastParentNumber == -1) {
             startBlockNumber = firstParentNumber + 1;
             delta = 1;
-        } else if (lastParentNumber >= 0 && firstParentNumber != -1) {
+        } else if (lastParentNumber >= 0 && firstParentNumber == -1) {
             startBlockNumber = lastParentNumber + headers.size();
             delta = -1;
         } else if (firstParentNumber >= 0 && lastParentNumber >= 0) {
@@ -550,4 +563,14 @@ public class SyncQueue {
         return true;
     }
 
+    private void initGenesisBlockHash() {
+        if (this.genesisBlockHash == null) {
+            Block genesisBlock = this.blockchain.getBlockByNumber(0);
+            this.genesisBlockHash = genesisBlock.getHash();
+        }
+    }
+
+    private boolean isGenesisBlockHash(byte[] hash) {
+        return Arrays.equals(genesisBlockHash, hash);
+    }
 }
