@@ -30,7 +30,6 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
@@ -214,11 +213,12 @@ public class TxService extends Service {
             public void handleData(DataResult<Integer> result) {
                 if(result != null && result.getData() > 0){
                     Logger.d("getBlockHeight =" + result.getData());
-                    KeyValue entry = MyApplication.getKeyValue();
-                    entry.setBlockHeight(result.getData());
-                    KeyValueDaoUtils.getInstance().update(entry);
-                    MyApplication.setKeyValue(entry);
-                    EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+                    mTxModel.updateBlockHeight(result.getData(), new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean keyValue) {
+                            EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+                        }
+                    });
                 }
                 if(isDelayRefresh){
                     getBlockHeightDelay();

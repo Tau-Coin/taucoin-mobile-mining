@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.module.presenter;
 
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.module.model.IMiningModel;
@@ -35,7 +36,7 @@ public class MiningPresenter {
         mMiningModel = new MiningModel();
     }
 
-    public void getMiningInfo(LogicObserver<KeyValue> logicObserver) {
+    public void getMiningInfo(LogicObserver<BlockInfo> logicObserver) {
         mMiningModel.getMiningInfo(logicObserver);
     }
 

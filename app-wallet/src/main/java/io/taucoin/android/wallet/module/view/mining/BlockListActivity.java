@@ -24,7 +24,7 @@ import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.MiningPresenter;
 import io.taucoin.android.wallet.util.ActivityUtil;
@@ -55,7 +55,7 @@ public class BlockListActivity extends BaseActivity {
     private int mDataSize = 0;
     private boolean mIsMe = false;
     private MiningPresenter miningPresenter;
-    private KeyValue mKeyValue;
+    private BlockInfo mBlockInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,10 +69,10 @@ public class BlockListActivity extends BaseActivity {
 
     private void getData() {
         if(mPageNo == 0){
-            miningPresenter.getMiningInfo(new LogicObserver<KeyValue>() {
+            miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
                 @Override
-                public void handleData(KeyValue keyValue) {
-                    mKeyValue = keyValue;
+                public void handleData(BlockInfo blockInfo) {
+                    mBlockInfo = blockInfo;
                     updateListView();
                 }
 
@@ -88,14 +88,14 @@ public class BlockListActivity extends BaseActivity {
     }
 
     private void updateListView() {
-        if(mKeyValue != null){
+        if(mBlockInfo != null){
             if(mPageNo == 0){
-                mDataSize = mKeyValue.getBlockSynchronized();
+                mDataSize = mBlockInfo.getBlockSynchronized();
 
-                if(mKeyValue.getMiningInfos() != null){
-                    mAdapter.setListData(mKeyValue.getMiningInfos());
+                if(mBlockInfo.getMiningInfos() != null){
+                    mAdapter.setListData(mBlockInfo.getMiningInfos());
                     if(mIsMe){
-                        mDataSize = mKeyValue.getMiningInfos().size();
+                        mDataSize = mBlockInfo.getMiningInfos().size();
                     }
                 }
             }

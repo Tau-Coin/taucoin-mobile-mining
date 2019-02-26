@@ -24,6 +24,7 @@ public class DaoMaster extends AbstractDaoMaster {
         MiningInfoDao.createTable(db, ifNotExists);
         TransactionHistoryDao.createTable(db, ifNotExists);
         KeyValueDao.createTable(db, ifNotExists);
+        BlockInfoDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -31,6 +32,7 @@ public class DaoMaster extends AbstractDaoMaster {
         MiningInfoDao.dropTable(db, ifExists);
         TransactionHistoryDao.dropTable(db, ifExists);
         KeyValueDao.dropTable(db, ifExists);
+        BlockInfoDao.dropTable(db, ifExists);
     }
 
     /**
@@ -52,6 +54,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(MiningInfoDao.class);
         registerDaoClass(TransactionHistoryDao.class);
         registerDaoClass(KeyValueDao.class);
+        registerDaoClass(BlockInfoDao.class);
     }
 
     public DaoSession newSession() {

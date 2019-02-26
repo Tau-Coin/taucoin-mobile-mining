@@ -10,11 +10,12 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.events.BlockEventData;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
@@ -28,17 +29,18 @@ import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
     @Override
-    public void getMiningInfo(LogicObserver<KeyValue> observer) {
-        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+    public void getMiningInfo(LogicObserver<BlockInfo> observer) {
+        Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
-            if(keyValue != null){
-                // set mining info
-                List<MiningInfo> list = MiningInfoDaoUtils.getInstance().queryByPubicKey(pubicKey);
-                keyValue.setMiningInfos(list);
+            BlockInfo blockInfo = BlockInfoDaoUtils.getInstance().query();
+            if(blockInfo == null){
+                blockInfo = new BlockInfo();
             }
-            MyApplication.setKeyValue(keyValue);
-            emitter.onNext(keyValue);
+            // set mining info
+            List<MiningInfo> list = MiningInfoDaoUtils.getInstance().queryByPubicKey(pubicKey);
+            blockInfo.setMiningInfos(list);
+
+            emitter.onNext(blockInfo);
         }).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe(observer);
@@ -65,19 +67,6 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer) {
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-            KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
-            entry.setBlockHeight(blockHeight);
-            KeyValueDaoUtils.getInstance().update(entry);
-            emitter.onNext(true);
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(observer);
-    }
-
-    @Override
     public void updateSynchronizedBlockNum(int blockSynchronized, LogicObserver<Boolean> observer) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             updateSynchronizedBlockNum(blockSynchronized);
@@ -88,13 +77,15 @@ public class MiningModel implements IMiningModel{
     }
 
     private void updateSynchronizedBlockNum(int blockSynchronized){
-        String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-        KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
+        BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
+        if(entry == null){
+            entry = new BlockInfo();
+        }
         if(entry.getBlockHeight() < blockSynchronized){
             entry.setBlockHeight(blockSynchronized);
         }
         entry.setBlockSynchronized(blockSynchronized);
-        KeyValueDaoUtils.getInstance().update(entry);
+        BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
     }
 
     @Override
@@ -114,7 +105,7 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private boolean saveMiningInfo(Block block, boolean isConnect) {
+    private void saveMiningInfo(Block block, boolean isConnect) {
         String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
         String number = String.valueOf(block.getNumber());
         String hash = Hex.toHexString(block.getHash());
@@ -144,7 +135,6 @@ public class MiningModel implements IMiningModel{
             entry.setValid(isConnect ? 1 : 0);
             MiningInfoDaoUtils.getInstance().insertOrReplace(entry);
         }
-        return isMine;
     }
 
     private boolean handleSynchronizedTransaction(Block block, boolean isConnect) {
@@ -214,5 +204,28 @@ public class MiningModel implements IMiningModel{
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    @Override
+    public void getMaxBlockNum(long height, LogicObserver<Integer> logicObserver){
+        Observable.create((ObservableOnSubscribe<Integer>) emitter -> {
+           String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+           List<MiningInfo> list = MiningInfoDaoUtils.getInstance().queryByPubicKey(pubicKey);
+           int maxBlockNum = 0;
+           if(list != null && list.size() > 0){
+               for (MiningInfo info : list) {
+                   int blockNo = StringUtil.getIntString(info.getBlockNo());
+                   if(blockNo > maxBlockNum){
+                       maxBlockNum = blockNo;
+                   }
+               }
+           }
+           if(maxBlockNum > height ){
+               maxBlockNum = (int) height;
+           }
+           emitter.onNext(maxBlockNum);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(logicObserver);
     }
 }

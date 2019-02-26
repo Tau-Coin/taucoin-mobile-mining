@@ -111,6 +111,8 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         addLogEntry(time, logMessage);
                         break;
                     case EVENT_SYNC_DONE:
+                        isSync = true;
+                        startBlockForging();
                         eventData = data.getParcelable("data");
                         logMessage = "Sync done";
                         time = eventData.registeredTime;
@@ -133,6 +135,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_ETHEREUM_CREATED:
                         isInit = true;
                         startSyncAll();
+                        EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -159,9 +162,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             case TaucoinClientMessage.MSG_START_SYNC_RESULT:
                 Bundle replyData = message.getData();
                 String result =  replyData.getString(TransmitKey.RESULT);
-                if(StringUtil.isSame(result, TransmitKey.RemoteResult.OK)){
-                    startBlockForging();
-                }
                 logMessage = "start sync result: " + result;
                 addLogEntry(time, logMessage);
                 break;
@@ -224,6 +224,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             getMiningModel().updateMyMiningBlock(blocks, new LogicObserver<Boolean>() {
                 @Override
                 public void handleData(Boolean aBoolean) {
+                    isSyncMe = true;
                     EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 }
             });
@@ -242,5 +243,22 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
 
     private void updateTransactionHistory(Transaction transaction){
         getMiningModel().updateTransactionHistory(transaction);
+    }
+
+    @Override
+    public void getBlockList(int num, long height) {
+        getMiningModel().getMaxBlockNum(height, new LogicObserver<Integer>(){
+
+            @Override
+            public void handleData(Integer integer) {
+                isSyncMe = false;
+                int num = integer;
+                int limit = (int) height - num + 1;
+                if(mTaucoinConnector != null){
+                    mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+                }
+            }
+        });
+
     }
 }

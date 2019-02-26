@@ -80,19 +80,15 @@ public class TransactionHistoryDaoUtils {
 
     public void saveTxRecords(TransactionHistory tx) {
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-        db.where(TransactionHistoryDao.Properties.TxId.eq(tx.getTxId()),
-            TransactionHistoryDao.Properties.FromAddress.eq(tx.getFromAddress()),
-            TransactionHistoryDao.Properties.ToAddress.eq(tx.getToAddress())
-        );
+        db.where(TransactionHistoryDao.Properties.TxId.eq(tx.getTxId()));
 
         List<TransactionHistory> list = db.list();
         if(list.size() > 0){
-            for (TransactionHistory bean : list) {
-                if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
-                    bean.setResult(tx.getResult());
-                    bean.setNotRolled(tx.getNotRolled());
-                    insertOrReplace(bean);
-                }
+            TransactionHistory bean = list.get(0);
+            if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
+                bean.setResult(tx.getResult());
+                bean.setNotRolled(tx.getNotRolled());
+                insertOrReplace(bean);
             }
         }else{
             insertOrReplace(tx);

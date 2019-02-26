@@ -24,6 +24,7 @@ import java.util.List;
 
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.RawTxList;
@@ -110,13 +111,7 @@ public class TxPresenter {
             return;
         }
         if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start)){
-            if(MyApplication.getRemoteConnector().isInit()
-                    && keyValue.getBlockSynchronized() > 0
-                    && keyValue.getBlockSynchronized() == keyValue.getBlockHeight()){
-                MyApplication.getRemoteConnector().submitTransaction(transaction);
-            }else{
-                ToastUtils.showShortToast("In Synchronization Block");
-            }
+            MyApplication.getRemoteConnector().submitTransaction(transaction);
         }else{
             String txHash = Hex.toHexString(transaction.getEncoded());
             String txId = Hex.toHexString(transaction.getHash());
@@ -131,5 +126,10 @@ public class TxPresenter {
             }
             Logger.i("Transactions encrypted by BASE64: " + hex_after_base64);
         }
+    }
+
+    public void getBlockInfo(LogicObserver<BlockInfo> observer) {
+        Logger.i("getAddOuts start");
+        mTxModel.getBlockInfo(observer);
     }
 }

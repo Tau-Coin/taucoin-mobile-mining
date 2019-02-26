@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.model;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.RawTxList;
@@ -61,4 +62,9 @@ public interface ITxModel {
 
     /** Update balance from the server */
     void updateBalance(long balance, LogicObserver<KeyValue> observer);
+
+    /** update or save current block height */
+    void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
+
+    void getBlockInfo(LogicObserver<BlockInfo> observer);
 }

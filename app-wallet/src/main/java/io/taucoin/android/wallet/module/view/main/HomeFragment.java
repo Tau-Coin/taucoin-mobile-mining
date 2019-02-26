@@ -1,6 +1,5 @@
 package io.taucoin.android.wallet.module.view.main;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +20,8 @@ import butterknife.OnClick;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseFragment;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.MiningPresenter;
 import io.taucoin.android.wallet.module.service.TxService;
@@ -31,8 +30,8 @@ import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.manage.ProfileActivity;
 import io.taucoin.android.wallet.module.view.mining.BlockListActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
+import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.UserUtil;
@@ -92,7 +91,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 miningPresenter.updateMiningState();
                 break;
             case R.id.tv_mining_details:
-                ActivityUtil.startActivity(getActivity(), BlockListActivity.class);
+                if(MyApplication.getRemoteConnector().isSyncMe()){
+                    ActivityUtil.startActivity(getActivity(), BlockListActivity.class);
+                }else{
+                    DialogManager.showSureDialog(getActivity(), R.string.bloc_in_synchronization, R.string.common_ok);
+                }
                 break;
             default:
                 break;
@@ -146,25 +149,27 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     public void handleMiningView(boolean isNeedInit) {
         if (UserUtil.isImportKey() && btnMining != null) {
-            miningPresenter.getMiningInfo(new LogicObserver<KeyValue>() {
+            miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
                 @Override
-                public void handleData(KeyValue keyValue) {
+                public void handleData(BlockInfo blockInfo) {
                     boolean isStart = false;
+                    KeyValue keyValue = MyApplication.getKeyValue();
                     if (keyValue != null) {
                         if(StringUtil.isNotEmpty(keyValue.getMiningState())
-                                && keyValue.getBlockHeight() < keyValue.getBlockSynchronized()){
+                                && blockInfo.getBlockHeight() < blockInfo.getBlockSynchronized()){
                             TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
                         }
                         isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                         llMining.setVisibility(StringUtil.isNotEmpty(keyValue.getMiningState()) ? View.VISIBLE : View.GONE);
 
-                        tvBlockHeight.setRightText(keyValue.getBlockHeight());
-                        tvBlockSynchronized.setRightText(keyValue.getBlockSynchronized());
+                        tvBlockHeight.setRightText(blockInfo.getBlockHeight());
+                        tvBlockSynchronized.setRightText(blockInfo.getBlockSynchronized());
 
-                        tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(keyValue));
-                        tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(keyValue));
+                        tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(blockInfo));
+                        tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(blockInfo));
                     }
-                    tvMiningDetails.setEnable(isStart && !isNeedInit);
+                    boolean isInit = MyApplication.getRemoteConnector().isInit();
+                    tvMiningDetails.setEnable(isStart && !isNeedInit && isInit);
 
                     if(isStart && isNeedInit){
                         MyApplication.getRemoteConnector().init();

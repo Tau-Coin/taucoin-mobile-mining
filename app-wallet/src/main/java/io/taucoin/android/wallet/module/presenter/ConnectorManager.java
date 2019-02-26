@@ -30,14 +30,16 @@ import io.taucoin.core.Transaction;
 
 public abstract class ConnectorManager implements ConnectorHandler {
 
-    private TaucoinConnector mTaucoinConnector = null;
+    TaucoinConnector mTaucoinConnector = null;
 
     @SuppressLint("SimpleDateFormat")
     private DateFormat mDateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");
-    private String mHandlerIdentifier = UUID.randomUUID().toString();
+    String mHandlerIdentifier = UUID.randomUUID().toString();
     private String mConsoleLog = "";
     private boolean isTaucoinConnected = false;
     boolean isInit = false;
+    boolean isSync = false;
+    boolean isSyncMe = false;
 
     private final static int CONSOLE_LENGTH = 10000;
     private static final int BOOT_UP_DELAY_INIT_SECONDS = 2;
@@ -64,6 +66,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public boolean isInit() {
         return isInit;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public boolean isSyncMe() {
+        return isSyncMe;
     }
 
     @Override
@@ -225,12 +235,17 @@ public abstract class ConnectorManager implements ConnectorHandler {
     /**
      * get block data by number
      *
-     * @param height*/
+     * @param height
+     * */
+
     public void getBlockList(long height){
-        //TODO To be optimized
-        Logger.d("getBlockList");
-        int num = 0;
-        int limit = (int) height;
+        getBlockList(-1, height);
+    }
+
+    public void getBlockList(int num, long height){
+        Logger.d("getBlockList num=" + num + "\theight=" + height);
+        isSyncMe = false;
+        int limit = (int) height - num + 1;
         if(mTaucoinConnector != null){
             mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
         }

@@ -31,8 +31,6 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property Balance = new Property(4, long.class, "balance", false, "BALANCE");
         public final static Property NickName = new Property(5, String.class, "nickName", false, "NICK_NAME");
         public final static Property MiningState = new Property(6, String.class, "miningState", false, "MINING_STATE");
-        public final static Property BlockHeight = new Property(7, int.class, "blockHeight", false, "BLOCK_HEIGHT");
-        public final static Property BlockSynchronized = new Property(8, int.class, "blockSynchronized", false, "BLOCK_SYNCHRONIZED");
     }
 
 
@@ -54,9 +52,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"ADDRESS\" TEXT," + // 3: address
                 "\"BALANCE\" INTEGER NOT NULL ," + // 4: balance
                 "\"NICK_NAME\" TEXT," + // 5: nickName
-                "\"MINING_STATE\" TEXT," + // 6: miningState
-                "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 7: blockHeight
-                "\"BLOCK_SYNCHRONIZED\" INTEGER NOT NULL );"); // 8: blockSynchronized
+                "\"MINING_STATE\" TEXT);"); // 6: miningState
     }
 
     /** Drops the underlying database table. */
@@ -99,8 +95,6 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (miningState != null) {
             stmt.bindString(7, miningState);
         }
-        stmt.bindLong(8, entity.getBlockHeight());
-        stmt.bindLong(9, entity.getBlockSynchronized());
     }
 
     @Override
@@ -137,8 +131,6 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (miningState != null) {
             stmt.bindString(7, miningState);
         }
-        stmt.bindLong(8, entity.getBlockHeight());
-        stmt.bindLong(9, entity.getBlockSynchronized());
     }
 
     @Override
@@ -155,9 +147,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // address
             cursor.getLong(offset + 4), // balance
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // nickName
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // miningState
-            cursor.getInt(offset + 7), // blockHeight
-            cursor.getInt(offset + 8) // blockSynchronized
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // miningState
         );
         return entity;
     }
@@ -171,8 +161,6 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setBalance(cursor.getLong(offset + 4));
         entity.setNickName(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setMiningState(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setBlockHeight(cursor.getInt(offset + 7));
-        entity.setBlockSynchronized(cursor.getInt(offset + 8));
      }
     
     @Override

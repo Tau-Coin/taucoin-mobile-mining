@@ -81,34 +81,4 @@ public class KeyValueDaoUtils {
         long result = getKeyValueDao().insertOrReplace(keyValue);
         return result > -1;
     }
-
-    public int getMaxBlockHeight() {
-        int maxBlockHeight = 0;
-        List<KeyValue> list = getKeyValueDao().queryBuilder()
-                .orderDesc(KeyValueDao.Properties.Id)
-                .list();
-        if(list != null && list.size() > 0){
-            for (KeyValue keyValue : list) {
-                if(keyValue.getBlockHeight() > maxBlockHeight){
-                    maxBlockHeight = keyValue.getBlockHeight();
-                }
-            }
-        }
-        return maxBlockHeight;
-    }
-
-    public int getMaxBlockSynchronized() {
-        int maxBlockSynchronized = 0;
-        List<KeyValue> list = getKeyValueDao().queryBuilder()
-                .orderDesc(KeyValueDao.Properties.Id)
-                .list();
-        if(list != null && list.size() > 0){
-            for (KeyValue keyValue : list) {
-                if(keyValue.getBlockSynchronized() > maxBlockSynchronized){
-                    maxBlockSynchronized = keyValue.getBlockSynchronized();
-                }
-            }
-        }
-        return maxBlockSynchronized;
-    }
 }

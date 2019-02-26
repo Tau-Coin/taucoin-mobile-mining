@@ -15,7 +15,6 @@
  */
 package io.taucoin.android.wallet.util;
 
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
@@ -23,8 +22,13 @@ import android.widget.TextView;
 import com.github.naturs.logger.Logger;
 import com.mofei.tau.R;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 
 public class UserUtil {
@@ -66,7 +70,18 @@ public class UserUtil {
             setBalance(tvBalance, 0L);
             return;
         }
-        setBalance(tvBalance, keyValue.getBalance());
+        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+            long balance = keyValue.getBalance();
+            balance -= MiningUtil.pendingAmount();
+            emitter.onNext(balance);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<Long>() {
+                @Override
+                public void handleData(Long balance) {
+                    setBalance(tvBalance, balance);
+                }
+            });
     }
 
     private static void setBalance(TextView tvBalance, long balance) {

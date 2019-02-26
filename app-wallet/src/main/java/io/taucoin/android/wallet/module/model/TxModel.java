@@ -32,8 +32,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
@@ -120,7 +122,7 @@ public class TxModel implements ITxModel {
                             }
                         }else{
                             isFinish = true;
-                            int state = MiningUtil.parseTxState(rawTx.getState(), rawTx.getBlockNum());
+                            int state = MiningUtil.parseTxState(rawTx.getNotRolled(), rawTx.getBlockNum());
                             history.setNotRolled(state);
                             history.setBlockNum(rawTx.getBlockNum());
                             history.setBlockHash(rawTx.getBlockHash());
@@ -167,13 +169,15 @@ public class TxModel implements ITxModel {
                     TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
             transaction.sign(privateKey);
 
+            int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
+
             Logger.i("Create tx success");
             Logger.i(transaction.toString());
             txHistory.setTxId(Hex.toHexString(transaction.getHash()));
             txHistory.setResult(TransmitKey.TxResult.CONFIRMING);
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(DateUtil.getCurrentTime());
-            txHistory.setBlockNum(keyValue.getBlockHeight());
+            txHistory.setBlockNum(blockHeight);
             txHistory.setNotRolled(1);
 
             insertTransactionHistory(txHistory);
@@ -307,7 +311,7 @@ public class TxModel implements ITxModel {
                         tx.setFee(bean.getFee());
                         tx.setBlockNum(bean.getBlockNum());
                         tx.setBlockHash(bean.getBlockHash());
-                        tx.setNotRolled(MiningUtil.parseTxState(bean.getState(), bean.getBlockNum()));
+                        tx.setNotRolled(MiningUtil.parseTxState(bean.getNotRolled(), bean.getBlockNum()));
                         TransactionHistoryDaoUtils.getInstance().saveTxRecords(tx);
                     }
                 }
@@ -324,6 +328,31 @@ public class TxModel implements ITxModel {
                 .getBlockHeight()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    @Override
+    public void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
+            if(entry == null){
+                entry = new BlockInfo();
+            }
+            entry.setBlockHeight(blockHeight);
+            BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
+            emitter.onNext(true);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(observer);
+    }
+
+    @Override
+    public void getBlockInfo(LogicObserver<BlockInfo> observer) {
+        Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {
+            BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
+            emitter.onNext(entry);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
 }

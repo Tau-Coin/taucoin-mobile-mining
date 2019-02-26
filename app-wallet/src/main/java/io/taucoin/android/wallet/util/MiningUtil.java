@@ -16,19 +16,22 @@
 package io.taucoin.android.wallet.util;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-import io.taucoin.android.wallet.MyApplication;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
+import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
-import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.ItemTextView;
@@ -37,9 +40,9 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class MiningUtil {
 
-    public static int parseMinedBlocks(KeyValue keyValue) {
-        if(keyValue != null){
-            List<MiningInfo> list= keyValue.getMiningInfos();
+    public static int parseMinedBlocks(BlockInfo blockInfo) {
+        if(blockInfo != null){
+            List<MiningInfo> list= blockInfo.getMiningInfos();
             if(list != null){
                 return list.size();
             }
@@ -47,10 +50,10 @@ public class MiningUtil {
         return 0;
     }
 
-    public static String parseMiningIncome(KeyValue keyValue) {
+    public static String parseMiningIncome(BlockInfo blockInfo) {
         BigDecimal number = new BigDecimal("0");
-        if(keyValue != null){
-            List<MiningInfo> list= keyValue.getMiningInfos();
+        if(blockInfo != null){
+            List<MiningInfo> list= blockInfo.getMiningInfos();
             if(list != null && list.size() > 0){
                 for (MiningInfo bean : list) {
                     try {
@@ -66,13 +69,18 @@ public class MiningUtil {
         if(textView == null){
             return;
         }
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue == null){
-            return;
-        }
-        int blockHeight = keyValue.getBlockHeight();
-        textView.setRightText(blockHeight);
-        Logger.d("UserUtil.setBlockHeight=" + blockHeight);
+        Observable.create((ObservableOnSubscribe<Integer>) emitter -> {
+            int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
+            emitter.onNext(blockHeight);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new LogicObserver<Integer>() {
+                    @Override
+                    public void handleData(Integer blockHeight) {
+                        Logger.d("UserUtil.setBlockHeight=" + blockHeight);
+                        textView.setRightText(blockHeight);
+                    }
+                });
     }
 
     public static String parseBlockReward(List<Transaction> txList) {
@@ -102,6 +110,7 @@ public class MiningUtil {
 
     public static void saveTransactionSuccess() {
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+        EventBusUtil.post(MessageEvent.EventCode.BALANCE);
         checkRawTransaction();
     }
 
@@ -110,13 +119,8 @@ public class MiningUtil {
     }
 
     public static boolean isFinishState(int blockNum) {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue != null){
-            if(keyValue.getBlockHeight() - blockNum > TransmitKey.TX_FAIL_LIMIT){
-                return true;
-            }
-        }
-        return false;
+        int maxBlockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
+        return maxBlockHeight - blockNum > TransmitKey.TX_FAIL_LIMIT;
     }
 
     public static int parseTxState(int state, int blockNum) {
@@ -126,5 +130,20 @@ public class MiningUtil {
             }
         }
         return state;
+    }
+
+    static long pendingAmount() {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        List<TransactionHistory> txPendingList = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
+        BigInteger pendingAmount = new BigInteger("0");
+        if(txPendingList != null && txPendingList.size() > 0){
+            for (TransactionHistory transaction : txPendingList) {
+                BigInteger amount = new BigInteger(transaction.getAmount());
+                pendingAmount = pendingAmount.add(amount);
+                BigInteger fee = new BigInteger(transaction.getFee());
+                pendingAmount = pendingAmount.add(fee);
+            }
+        }
+        return pendingAmount.longValue();
     }
 }

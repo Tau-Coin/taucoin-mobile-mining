@@ -21,7 +21,7 @@ public class RawTxBean {
     private int blockNum;
     private String blockHash;
     private long blockTime;
-    private int state;
+    private int notRolled;
 
     public String getTxid() {
         return txid;
@@ -87,11 +87,11 @@ public class RawTxBean {
         this.blockTime = blockTime;
     }
 
-    public int getState() {
-        return state;
+    public int getNotRolled() {
+        return notRolled;
     }
 
-    public void setState(int state) {
-        this.state = state;
+    public void setNotRolled(int notRolled) {
+        this.notRolled = notRolled;
     }
 }
