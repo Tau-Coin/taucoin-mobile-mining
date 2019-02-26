@@ -23,6 +23,9 @@ import static io.taucoin.util.ByteUtil.toHexString;
  */
 public class BlockHeader {
 
+    /* ripemd160 result length, with 20 bytes */
+    public static final int BLOCK_HEADER_HASH_LENGTH = 20;
+
     /* 8 bits, keeping version is for upgrade to define the transition grace peroid */
     private byte version;
     /* 32 bits, unix time stamp related to block */
