@@ -59,7 +59,7 @@ public class TransactionHistoryDaoUtils {
         .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
                 qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING),
                         qb.and(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL),
-                                TransactionHistoryDao.Properties.IsInvalid.eq(1))))
+                                TransactionHistoryDao.Properties.NotRolled.eq(1))))
         .list();
     }
 
@@ -90,7 +90,7 @@ public class TransactionHistoryDaoUtils {
             for (TransactionHistory bean : list) {
                 if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
                     bean.setResult(tx.getResult());
-                    bean.setIsInvalid(tx.getIsInvalid());
+                    bean.setNotRolled(tx.getNotRolled());
                     insertOrReplace(bean);
                 }
             }
@@ -102,7 +102,7 @@ public class TransactionHistoryDaoUtils {
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
          db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
-                 TransactionHistoryDao.Properties.IsInvalid.eq(1),
+                 TransactionHistoryDao.Properties.NotRolled.eq(1),
                 db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                     TransactionHistoryDao.Properties.ToAddress.eq(address))
                 ).orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)

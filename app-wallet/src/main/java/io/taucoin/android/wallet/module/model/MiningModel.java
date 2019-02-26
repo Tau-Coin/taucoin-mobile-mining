@@ -157,7 +157,7 @@ public class MiningModel implements IMiningModel{
                 TransactionHistory txHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
                 if(txHistory != null){
                     txHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                    txHistory.setIsInvalid(isConnect ? 1 : 0);
+                    txHistory.setNotRolled(isConnect ? 1 : 0);
                     TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
                 }else{
                     if(isConnect){
@@ -165,7 +165,7 @@ public class MiningModel implements IMiningModel{
                         TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
                         if(history != null){
                             history.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                            history.setIsInvalid(1);
+                            history.setNotRolled(1);
                             history.setBlockTime(blockTime);
                             history.setBlockNum(blockNumber);
                             history.setBlockHash(blockHash);

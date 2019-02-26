@@ -51,7 +51,6 @@ import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.net.callback.RetResult;
 import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.util.ByteUtil;
@@ -111,17 +110,20 @@ public class TxModel implements ITxModel {
                     TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
                     Object isFinish = null;
                     if(history != null){
-                        KeyValue keyValue = MyApplication.getKeyValue();
-                        if(keyValue != null){
-                            if(keyValue.getBlockHeight() - history.getCreateBlockNum() > TransmitKey.TX_FAIL_LIMIT){
+                        if(rawTx == null){
+                            boolean isFinishState = MiningUtil.isFinishState((int) history.getBlockNum());
+                            if(isFinishState){
                                 isFinish = false;
+                                history.setNotRolled(-1);
                                 history.setMessage(ResourcesUtil.getText(R.string.send_tx_fail_in_pool));
                                 history.setResult(TransmitKey.TxResult.FAILED);
                             }
-                        }
-
-                        if(rawTx != null && rawTx.getState() > 0){
+                        }else{
                             isFinish = true;
+                            int state = MiningUtil.parseTxState(rawTx.getState(), rawTx.getBlockNum());
+                            history.setNotRolled(state);
+                            history.setBlockNum(rawTx.getBlockNum());
+                            history.setBlockHash(rawTx.getBlockHash());
                             history.setBlockTime(rawTx.getBlockTime());
                             history.setResult(TransmitKey.TxResult.SUCCESSFUL);
                         }
@@ -171,8 +173,8 @@ public class TxModel implements ITxModel {
             txHistory.setResult(TransmitKey.TxResult.CONFIRMING);
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(DateUtil.getCurrentTime());
-            txHistory.setCreateBlockNum(keyValue.getBlockHeight());
-            txHistory.setIsInvalid(1);
+            txHistory.setBlockNum(keyValue.getBlockHeight());
+            txHistory.setNotRolled(1);
 
             insertTransactionHistory(txHistory);
             emitter.onNext(transaction);
@@ -190,7 +192,7 @@ public class TxModel implements ITxModel {
                 .sendRawTransaction(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new TAUObserver<RetResult<String>>() {
+                .subscribe(new TAUObserver<DataResult<String>>() {
                     @Override
                     public void handleError(String msg, int msgCode) {
                         String result = "Error in network, send failed";
@@ -205,9 +207,9 @@ public class TxModel implements ITxModel {
                     }
 
                     @Override
-                    public void handleData(RetResult<String> stringRetResult) {
-                        super.handleData(stringRetResult);
-                        Logger.d("get_tx_id_after_sendTX=" + stringRetResult.getRet());
+                    public void handleData(DataResult<String> dataResult) {
+                        super.handleData(dataResult);
+                        Logger.d("get_tx_id_after_sendTX=" + dataResult.getData());
                         ToastUtils.showShortToast(R.string.send_tx_success);
                         MiningUtil.saveTransactionSuccess();
                         observer.onNext(true);
@@ -305,7 +307,7 @@ public class TxModel implements ITxModel {
                         tx.setFee(bean.getFee());
                         tx.setBlockNum(bean.getBlockNum());
                         tx.setBlockHash(bean.getBlockHash());
-                        tx.setIsInvalid(1);
+                        tx.setNotRolled(MiningUtil.parseTxState(bean.getState(), bean.getBlockNum()));
                         TransactionHistoryDaoUtils.getInstance().saveTxRecords(tx);
                     }
                 }

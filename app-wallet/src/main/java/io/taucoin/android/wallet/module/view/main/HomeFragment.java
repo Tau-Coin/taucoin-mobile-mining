@@ -151,7 +151,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 public void handleData(KeyValue keyValue) {
                     boolean isStart = false;
                     if (keyValue != null) {
-                        if(StringUtil.isNotEmpty(keyValue.getMiningState())){
+                        if(StringUtil.isNotEmpty(keyValue.getMiningState())
+                                && keyValue.getBlockHeight() < keyValue.getBlockSynchronized()){
                             TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
                         }
                         isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);

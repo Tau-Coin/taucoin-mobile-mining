@@ -91,6 +91,7 @@ public class MiningUtil {
         transactionHistory.setTxId(txId);
         transactionHistory.setResult(TransmitKey.TxResult.FAILED);
         transactionHistory.setMessage(result);
+        transactionHistory.setNotRolled(-1);
         new TxModel().updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean aBoolean) {
@@ -103,7 +104,27 @@ public class MiningUtil {
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
         checkRawTransaction();
     }
+
     private static void checkRawTransaction() {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
+    }
+
+    public static boolean isFinishState(int blockNum) {
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue != null){
+            if(keyValue.getBlockHeight() - blockNum > TransmitKey.TX_FAIL_LIMIT){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int parseTxState(int state, int blockNum) {
+        if(state == 1) {
+            if(isFinishState(blockNum)){
+                state = -1;
+            }
+        }
+        return state;
     }
 }

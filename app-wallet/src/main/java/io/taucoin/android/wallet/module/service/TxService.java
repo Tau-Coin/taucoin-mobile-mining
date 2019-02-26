@@ -181,9 +181,9 @@ public class TxService extends Service {
             }
 
             @Override
-            public void handleData(DataResult<Long> balanceRetBalance) {
-                super.handleData(balanceRetBalance);
-                Long balance = balanceRetBalance.getData();
+            public void handleData(DataResult<Long> balanceResult) {
+                super.handleData(balanceResult);
+                Long balance = balanceResult.getData();
                 Logger.i("getBalance success");
                 if(ActivityManager.getInstance().isTopActivity(MainActivity.class)){
                     ProgressManager.closeProgressDialog();
@@ -199,7 +199,6 @@ public class TxService extends Service {
                             }else{
                                 EventBusUtil.post(MessageEvent.EventCode.BALANCE);
                             }
-
                         }
                     }
                 });

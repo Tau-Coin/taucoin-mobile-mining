@@ -29,8 +29,6 @@ public class TransactionHistory {
 
     private String createTime;
 
-    private long createBlockNum;
-
     private String amount;
 
     private String memo;
@@ -46,20 +44,19 @@ public class TransactionHistory {
     private String blockHash;
 
     private long blockTime;
+    // -1 finishState
+    private int notRolled;
 
-    private int isInvalid;
-
-    @Generated(hash = 114833652)
+    @Generated(hash = 329318752)
     public TransactionHistory(Long id, String txId, String fromAddress,
-            String toAddress, String createTime, long createBlockNum, String amount,
-            String memo, String fee, String result, String message, long blockNum,
-            String blockHash, long blockTime, int isInvalid) {
+            String toAddress, String createTime, String amount, String memo,
+            String fee, String result, String message, long blockNum,
+            String blockHash, long blockTime, int notRolled) {
         this.id = id;
         this.txId = txId;
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.createTime = createTime;
-        this.createBlockNum = createBlockNum;
         this.amount = amount;
         this.memo = memo;
         this.fee = fee;
@@ -68,7 +65,7 @@ public class TransactionHistory {
         this.blockNum = blockNum;
         this.blockHash = blockHash;
         this.blockTime = blockTime;
-        this.isInvalid = isInvalid;
+        this.notRolled = notRolled;
     }
 
     @Generated(hash = 63079048)
@@ -113,14 +110,6 @@ public class TransactionHistory {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public long getCreateBlockNum() {
-        return this.createBlockNum;
-    }
-
-    public void setCreateBlockNum(long createBlockNum) {
-        this.createBlockNum = createBlockNum;
     }
 
     public String getAmount() {
@@ -187,12 +176,12 @@ public class TransactionHistory {
         this.blockTime = blockTime;
     }
 
-    public int getIsInvalid() {
-        return this.isInvalid;
+    public int getNotRolled() {
+        return this.notRolled;
     }
 
-    public void setIsInvalid(int isInvalid) {
-        this.isInvalid = isInvalid;
+    public void setNotRolled(int notRolled) {
+        this.notRolled = notRolled;
     }
 
 }

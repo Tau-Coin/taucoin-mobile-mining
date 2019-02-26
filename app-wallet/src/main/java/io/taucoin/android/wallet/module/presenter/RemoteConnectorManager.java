@@ -199,7 +199,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     }
 
     private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {
-        if(!isConnect){
+        if(isConnect){
             TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
         }
         if(block != null){

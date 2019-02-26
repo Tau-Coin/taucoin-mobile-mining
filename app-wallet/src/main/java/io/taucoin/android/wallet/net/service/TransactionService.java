@@ -22,7 +22,6 @@ import io.reactivex.Observable;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.foundation.net.callback.DataResult;
-import io.taucoin.foundation.net.callback.RetResult;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 /**
@@ -37,7 +36,7 @@ public interface TransactionService {
     Observable<DataResult<RawTxBean>> getRawTransaction(@Body Map<String,String> txId);
 
     @POST("sendTauTransation/")
-    Observable<RetResult<String>> sendRawTransaction(@Body Map<String,String> tx_hex);
+    Observable<DataResult<String>> sendRawTransaction(@Body Map<String,String> tx_hex);
 
     @POST("getTxRecords/")
     Observable<DataResult<RawTxList>> getTxRecords(@Body Map<String,String> address);
