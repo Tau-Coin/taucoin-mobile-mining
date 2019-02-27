@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.github.naturs.logger.Logger;
 
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,14 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinConnector;
-import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
-import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.UserUtil;
+import io.taucoin.android.wallet.module.service.RemoteService;
 import io.taucoin.core.Transaction;
 
 public abstract class ConnectorManager implements ConnectorHandler {
@@ -49,7 +46,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         if (mTaucoinConnector == null) {
             addLogEntry("Create Remote Connector...");
             Context context = MyApplication.getInstance();
-            mTaucoinConnector = new TaucoinConnector(context, TaucoinRemoteService.class);
+            mTaucoinConnector = new TaucoinConnector(context, RemoteService.class);
             mTaucoinConnector.registerHandler(this);
             mTaucoinConnector.bindService();
         }

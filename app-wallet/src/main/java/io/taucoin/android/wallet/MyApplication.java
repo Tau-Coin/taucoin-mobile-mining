@@ -23,7 +23,8 @@ import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
-import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.module.service.TauNotificationManager;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
@@ -103,6 +104,11 @@ public class MyApplication extends MultiDexApplication {
         mKeyValue = entry;
     }
 
+    public boolean isBackground(){
+        return mFinalCount == 0;
+    }
+
+    private int mFinalCount;
     private void registerCurrentActivityLifecycleCallbacks() {
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
@@ -111,7 +117,11 @@ public class MyApplication extends MultiDexApplication {
 
             @Override
             public void onActivityStarted(Activity activity) {
-
+                mFinalCount++;
+                // back to front
+                if (mFinalCount == 1) {
+                    TauNotificationManager.getInstance().cancelMiningNotify();
+                }
             }
 
             @Override
@@ -126,7 +136,11 @@ public class MyApplication extends MultiDexApplication {
 
             @Override
             public void onActivityStopped(Activity activity) {
-
+                mFinalCount--;
+                if (mFinalCount == 0) {
+                    // front to back
+                    TauNotificationManager.getInstance().showMiningNotify();
+                }
             }
 
             @Override

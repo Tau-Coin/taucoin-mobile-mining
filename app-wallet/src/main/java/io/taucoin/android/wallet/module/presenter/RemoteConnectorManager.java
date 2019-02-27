@@ -24,6 +24,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
+import io.taucoin.android.wallet.module.service.TauNotificationManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -43,6 +44,18 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             }
         }
         return mMiningModel;
+    }
+
+    @Override
+    public void createRemoteConnector() {
+        super.createRemoteConnector();
+        TauNotificationManager.getInstance().init();
+    }
+
+    @Override
+    public void cancelRemoteConnector() {
+        super.cancelRemoteConnector();
+        TauNotificationManager.getInstance().close();
     }
 
     @Override

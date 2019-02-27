@@ -150,5 +150,7 @@
     <string name="bloc_transaction_fee">Transaction&#160;Fee&#160;&#160;%sTAU</string>
 
     <string name="bloc_in_synchronization">In Synchronization Block</string>
+    <string name="notify_mining">Mining in progress</string>
+    <string name="notify_tip">Stop mining at a click</string>
 
 </resources>
