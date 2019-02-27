@@ -22,7 +22,8 @@ public interface Repository {
      * @return newly created account state
      */
     AccountState createAccount(byte[] addr);
-
+    AccountState createGenesisAccount(final byte[] addr);
+    BigInteger addGenesisBalance(byte[] addr, BigInteger value);
 
     /**
      * @param addr - account to check

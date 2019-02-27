@@ -13,6 +13,7 @@ import io.taucoin.sync.SyncManager;
 import io.taucoin.net.peerdiscovery.PeerDiscovery;
 import io.taucoin.net.rlpx.discover.NodeManager;
 import io.taucoin.net.server.ChannelManager;
+import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -192,12 +193,24 @@ public class WorldManager {
             logger.info("DB is empty - adding Genesis");
 
             Genesis genesis = (Genesis)Genesis.getInstance(config);
+            int count=0;
+            long startTime0 = System.nanoTime();
             for (ByteArrayWrapper key : genesis.getPremine().keySet()) {
                 repository.createAccount(key.getData());
+                //System.out.println("consumption in create account "+(System.currentTimeMillis()-starttime));
                 BigInteger power = repository.increaseforgePower(key.getData());
-                logger.info("address : {} forge power : {}",Hex.toHexString(key.getData()),power);
+                logger.info("address : {} forge power : {} count: {}",Hex.toHexString(key.getData()),power,count);
                 repository.addBalance(key.getData(), genesis.getPremine().get(key).getBalance());
+                count++;
+                if(count>5000){
+                    repository.flushNoReconnect();
+                    count=0;
+                    System.gc();
+                }
             }
+            long endTime0 = System.nanoTime();
+            logger.warn("Import accounts time: {}",((endTime0 - startTime0) / 1000000));
+            logger.warn("total count:{}",count);
             logger.info("genesis block hash: {}",Hex.toHexString(Genesis.getInstance(config).getHash()));
             Object object= blockStore.getClass();
             logger.info("blockStore class : {}",((Class) object).getName());

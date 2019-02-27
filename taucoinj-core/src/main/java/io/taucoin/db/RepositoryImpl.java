@@ -160,7 +160,6 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         });
     }
 
-
     @Override
     public void flush() {
         doWithLockedAccess(new Functional.InvokeWrapper() {
@@ -339,6 +338,16 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         return result;
     }
 
+    public BigInteger addGenesisBalance(byte[] addr, BigInteger value) {
+
+        AccountState account = getAccountStateOrCreateNew(addr);
+
+        BigInteger result = account.addToBalance(value);
+        updateGenesisAccountState(addr, account);
+
+        return result;
+    }
+
     @Override
     public BigInteger getBalance(byte[] addr) {
         AccountState account = getAccountState(addr);
@@ -373,6 +382,9 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
                 worldState.update(addr, accountState.getEncoded());
             }
         });
+    }
+    private void updateGenesisAccountState(final byte[] addr, final AccountState accountState) {
+            worldState.update(addr, accountState.getEncoded());
     }
 
     public BigInteger setforgePower(final byte[] addr, final BigInteger forgePower) {
@@ -420,6 +432,14 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         return accountState;
     }
 
+    //used for me
+    public AccountState createGenesisAccount(final byte[] addr) {
+        AccountState accountState = new AccountState();
+
+        updateGenesisAccountState(addr, accountState);
+
+        return accountState;
+    }
     @Override
     public boolean isExist(byte[] addr) {
         return getAccountState(addr) != null;

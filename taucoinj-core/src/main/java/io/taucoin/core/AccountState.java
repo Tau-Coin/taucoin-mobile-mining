@@ -52,7 +52,7 @@ public class AccountState implements Serializable {
           log.error("create account sate fail{%d}",items.size());
           System.exit(-1);
         }
-        log.info("account state size is {}",items.size());
+        //log.info("account state size is {}",items.size());
         //log.info("forge power in account state is {}",ByteUtil.byteArrayToLong(items.get(0).getRLPData()));
 
         this.forgePower = items.get(0).getRLPData() == null ? BigInteger.ZERO

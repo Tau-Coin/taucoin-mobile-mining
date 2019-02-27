@@ -51,6 +51,14 @@ public class RepositoryTrack implements Repository {
 
         return accountState;
     }
+    @Override
+    public AccountState createGenesisAccount(final byte[] addr){
+        return new AccountState();
+    }
+    @Override
+    public BigInteger addGenesisBalance(byte[] addr, BigInteger value){
+        return BigInteger.ZERO;
+    }
 
     @Override
     public AccountState getAccountState(byte[] addr) {

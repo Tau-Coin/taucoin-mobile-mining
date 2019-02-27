@@ -45,9 +45,10 @@ public class GenesisLoader {
 
             ObjectMapper mapper = new ObjectMapper();
             JavaType type = mapper.getTypeFactory().constructType(GenesisJson.class);
-
+            long timebegin = System.currentTimeMillis();
+            System.out.println("start time is:"+System.currentTimeMillis());
             GenesisJson genesisJson  = new ObjectMapper().readValue(json, type);
-
+            System.out.println("consumption time is:"+(System.currentTimeMillis() - timebegin));
             Genesis genesis = createBlockForJson(genesisJson);
             genesis.setNumber(0);
             //set block signature
@@ -59,8 +60,8 @@ public class GenesisLoader {
 
             Map<ByteArrayWrapper, AccountState> premine = generatePreMine(genesisJson.getAlloc());
             genesis.setPremine(premine);
-
-            byte[] rootHash = generateRootHash(premine);
+            //byte[] rootHash = generateRootHash(premine);
+            System.out.println("state root is:"+genesisJson.getStateroot());
             //genesis.setStateRoot(rootHash);
 
 
