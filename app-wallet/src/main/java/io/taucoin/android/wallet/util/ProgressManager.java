@@ -61,6 +61,7 @@ public class ProgressManager {
             progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
             progress.setContentView(R.layout.dialog_waiting);
             progress.setCanceledOnTouchOutside(isCanCancel);
+            progress.setCancelable(isCanCancel);
             mProgress = progress;
             if(!mWeakReference.get().isFinishing()){
                 progress.show();

@@ -87,7 +87,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ActivityUtil.startActivity(getActivity(), ProfileActivity.class);
                 break;
             case R.id.btn_mining:
-                ProgressManager.showProgressDialog(getActivity(), false);
+                waitStartOrStop();
                 miningPresenter.updateMiningState();
                 break;
             case R.id.tv_mining_details:
@@ -100,6 +100,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             default:
                 break;
         }
+    }
+
+    private void waitStartOrStop() {
+        btnMining.setEnabled(false);
+        btnMining.setBackgroundResource(R.drawable.grey_rect_round_bg);
     }
 
     @Override
@@ -131,7 +136,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 handleMiningView(false);
                 break;
             case MINING_STATE:
-                ProgressManager.closeProgressDialog();
+                btnMining.setEnabled(true);
                 handleMiningView(false);
                 break;
             default:
@@ -177,14 +182,16 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
                     if(isStart && isNeedInit){
                         if(!isInit){
-                            ProgressManager.showProgressDialog(getActivity(), false);
+                            waitStartOrStop();
                         }
                         MyApplication.getRemoteConnector().init();
                     }else if(!isStart){
                         MyApplication.getRemoteConnector().cancelRemoteConnector();
                     }
                     btnMining.setText(isStart ? R.string.home_mining_stop : R.string.home_mining_start);
-                    btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);
+                    if(btnMining.isEnabled()){
+                        btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);
+                    }
                 }
             });
         }

@@ -56,7 +56,7 @@ public class ServiceConnector {
         public void handleMessage(Message message) {
 
             boolean isClaimed = false;
-            if (message.getData() != null) {
+            if (message != null) {
 //                String identifier = ((Bundle) message.obj).getString("identifier");
 //                if (identifier != null) {
 
