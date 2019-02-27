@@ -351,12 +351,17 @@ public class TaucoinRemoteService extends TaucoinService {
     protected void init(Message message) {
 
         if (isTaucoinStarted) {
-            stopJsonRpcServer();
-            closeTaucoin(null);
-            taucoin = null;
-            component = null;
-            isInitialized = false;
-            isConnected = false;
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_EVENT, 0, 0, message.obj);
+            Bundle replyData = new Bundle();
+            replyData.putSerializable("event", EventFlag.EVENT_ETHEREUM_CREATED);
+            replyMessage.setData(replyData);
+            try {
+                message.replyTo.send(replyMessage);
+                logger.info("Taucoin has created.");
+            } catch (RemoteException e) {
+                logger.error("Exception sending taucoin created event: " + e.getMessage());
+            }
+            return;
         }
         Bundle data = message.getData();
         List<String> privateKeys = data.getStringArrayList("privateKeys");

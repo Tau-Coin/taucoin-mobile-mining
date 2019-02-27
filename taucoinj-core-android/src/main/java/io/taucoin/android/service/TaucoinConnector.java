@@ -505,6 +505,7 @@ public class TaucoinConnector extends ServiceConnector {
             return;
 
         Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_CLOSE, 0, 0);
+        msg.replyTo = clientMessenger;
         try {
             serviceMessenger.send(msg);
         } catch (RemoteException e) {
