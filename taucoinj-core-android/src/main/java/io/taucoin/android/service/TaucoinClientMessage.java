@@ -81,4 +81,9 @@ public class TaucoinClientMessage {
      * Send block indexed by starting number or hash to client
      */
     public static final int MSG_BLOCKS = 16;
+
+    /**
+     * Send taucoin close done event to client
+     */
+    public static final int MSG_CLOSE_DONE = 17;
 }
