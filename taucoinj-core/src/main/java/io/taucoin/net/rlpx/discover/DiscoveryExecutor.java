@@ -22,11 +22,11 @@ public class DiscoveryExecutor {
     public void start() {
         discoverer.scheduleWithFixedDelay(
                 new DiscoverTask(nodeManager),
-                1, KademliaOptions.DISCOVER_CYCLE, TimeUnit.SECONDS);
+                10, KademliaOptions.DISCOVER_CYCLE, TimeUnit.SECONDS);
 
         refresher.scheduleWithFixedDelay(
                 new RefreshTask(nodeManager),
-                1, KademliaOptions.BUCKET_REFRESH, TimeUnit.MILLISECONDS);
+                10, KademliaOptions.BUCKET_REFRESH, TimeUnit.MILLISECONDS);
 
     }
 
