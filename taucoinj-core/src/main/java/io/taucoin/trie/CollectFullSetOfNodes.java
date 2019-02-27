@@ -1,6 +1,6 @@
 package io.taucoin.trie;
 
-import org.ethereum.util.Value;
+import io.taucoin.util.Value;
 
 import java.util.HashSet;
 import java.util.Set;

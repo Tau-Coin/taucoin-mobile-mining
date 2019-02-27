@@ -1,10 +1,10 @@
 package io.taucoin.trie;
 
-import org.ethereum.util.Value;
+import io.taucoin.util.Value;
 
 import java.util.List;
 
-import static org.ethereum.util.CompactEncoder.unpackToNibbles;
+import static io.taucoin.util.CompactEncoder.unpackToNibbles;
 
 /*
  * @author Nick Savers

@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import static org.ethereum.config.SystemProperties.CONFIG;
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 /**
  * This class establishes a listener for incoming connections.

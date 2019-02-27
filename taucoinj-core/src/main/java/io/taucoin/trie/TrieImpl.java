@@ -2,10 +2,10 @@ package io.taucoin.trie;
 
 import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.db.ByteArrayWrapper;
-import org.ethereum.util.RLP;
-import org.ethereum.util.RLPItem;
-import org.ethereum.util.RLPList;
-import org.ethereum.util.Value;
+import io.taucoin.util.RLP;
+import io.taucoin.util.RLPItem;
+import io.taucoin.util.RLPList;
+import io.taucoin.util.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -14,10 +14,10 @@ import java.io.*;
 import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
-import static org.ethereum.crypto.HashUtil.EMPTY_TRIE_HASH;
+import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
 import static io.taucoin.util.ByteUtil.*;
-import static org.ethereum.util.CompactEncoder.*;
-import static org.ethereum.util.RLP.calcElementPrefixSize;
+import static io.taucoin.util.CompactEncoder.*;
+import static io.taucoin.util.RLP.calcElementPrefixSize;
 import static org.spongycastle.util.Arrays.concatenate;
 
 /**

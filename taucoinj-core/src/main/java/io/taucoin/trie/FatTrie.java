@@ -1,9 +1,9 @@
 package io.taucoin.trie;
 
-import org.ethereum.crypto.SHA3Helper;
+import io.taucoin.crypto.SHA3Helper;
 import io.taucoin.datasource.KeyValueDataSource;
 
-import static org.ethereum.crypto.SHA3Helper.sha3;
+import static io.taucoin.crypto.SHA3Helper.sha3;
 
 public class FatTrie implements Trie{
 

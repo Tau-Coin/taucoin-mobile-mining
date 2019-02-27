@@ -18,8 +18,8 @@ import android.widget.Toast;
 
 import io.taucoin.android.interop.ITaucoinService;
 import io.taucoin.android.interop.IListener;
-import org.ethereum.config.SystemProperties;
-import org.ethereum.net.rlpx.Node;
+import io.taucoin.config.SystemProperties;
+import io.taucoin.net.rlpx.Node;
 
 import java.io.File;
 import java.util.ArrayList;

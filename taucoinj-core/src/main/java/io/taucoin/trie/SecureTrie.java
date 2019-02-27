@@ -2,7 +2,7 @@ package io.taucoin.trie;
 
 import io.taucoin.datasource.KeyValueDataSource;
 
-import static org.ethereum.crypto.SHA3Helper.sha3;
+import static io.taucoin.crypto.SHA3Helper.sha3;
 import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
 
 public class SecureTrie extends TrieImpl implements Trie {

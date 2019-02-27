@@ -2,7 +2,7 @@ package io.taucoin.trie;
 
 import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.db.ByteArrayWrapper;
-import org.ethereum.util.Value;
+import io.taucoin.util.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.String.format;
 import static io.taucoin.util.ByteUtil.length;
 import static io.taucoin.util.ByteUtil.wrap;
-import static org.ethereum.util.Value.fromRlpEncoded;
+import static io.taucoin.util.Value.fromRlpEncoded;
 
 /**
  * @author Nick Savers
