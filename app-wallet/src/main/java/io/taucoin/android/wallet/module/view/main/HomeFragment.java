@@ -71,7 +71,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         miningPresenter = new MiningPresenter(this);
         initView();
         handleMiningView();
-        ProgressManager.showProgressDialog(getActivity());
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
         return view;
@@ -88,6 +87,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ActivityUtil.startActivity(getActivity(), ProfileActivity.class);
                 break;
             case R.id.btn_mining:
+                ProgressManager.showProgressDialog(getActivity(), false);
                 miningPresenter.updateMiningState();
                 break;
             case R.id.tv_mining_details:
@@ -128,6 +128,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case MINING_INIT:
                 handleMiningView();
             case MINING_INFO:
+                handleMiningView(false);
+                break;
+            case MINING_STATE:
+                ProgressManager.closeProgressDialog();
                 handleMiningView(false);
                 break;
             default:
@@ -172,7 +176,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     tvMiningDetails.setEnable(isStart && !isNeedInit && isInit);
 
                     if(isStart && isNeedInit){
+                        if(!isInit){
+                            ProgressManager.showProgressDialog(getActivity(), false);
+                        }
                         MyApplication.getRemoteConnector().init();
+                    }else if(!isStart){
+                        MyApplication.getRemoteConnector().cancelRemoteConnector();
                     }
                     btnMining.setText(isStart ? R.string.home_mining_stop : R.string.home_mining_start);
                     btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);

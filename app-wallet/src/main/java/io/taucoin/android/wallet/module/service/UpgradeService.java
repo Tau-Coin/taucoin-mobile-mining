@@ -207,7 +207,6 @@ public class UpgradeService extends Service {
             @Override
             public void handleError(String msg, int msgCode) {
                 super.handleError(msg, msgCode);
-                ProgressManager.closeProgressDialog();
                 Logger.d("UpgradeService.checkAppVersion.handleError=" + msg);
                 stopSelf();
             }

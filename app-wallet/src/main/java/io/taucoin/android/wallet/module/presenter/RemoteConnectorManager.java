@@ -135,7 +135,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_ETHEREUM_CREATED:
                         isInit = true;
                         startSyncAll();
-                        EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                        EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -190,7 +190,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 replyData = message.getData();
                 replyData.setClassLoader(Transaction.class.getClassLoader());
                 Transaction transaction = replyData.getParcelable(TransmitKey.RemoteResult.TRANSACTION);
-                updateTransactionHistory(transaction);
+                submitTransactionResult(transaction);
                 break;
             default:
                 isClaimed = false;
@@ -241,7 +241,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         });
     }
 
-    private void updateTransactionHistory(Transaction transaction){
+    private void submitTransactionResult(Transaction transaction){
         getMiningModel().updateTransactionHistory(transaction);
     }
 

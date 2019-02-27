@@ -183,7 +183,7 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void handleSendTransaction(TransactionHistory tx) {
-//        ProgressManager.showProgressDialog(this);
+        ProgressManager.showProgressDialog(this);
         mTxPresenter.handleSendTransaction(tx, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {

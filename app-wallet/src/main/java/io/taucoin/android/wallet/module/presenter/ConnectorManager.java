@@ -25,6 +25,7 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.core.Transaction;
 
@@ -62,6 +63,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.unbindService();
             mTaucoinConnector = null;
         }
+        EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
     }
 
     public boolean isInit() {
@@ -102,6 +104,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             isTaucoinConnected = false;
             isInit = false;
         }
+        EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
     }
 
     @Override

@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.util;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 import android.view.Window;
 
@@ -25,6 +26,8 @@ import com.mofei.tau.R;
 
 import java.lang.ref.WeakReference;
 
+import io.taucoin.android.wallet.base.BaseActivity;
+
 /**
  * Description: Progress Manager
  */
@@ -32,13 +35,23 @@ public class ProgressManager {
 
     private static volatile Dialog mProgress;
 
-    private static WeakReference<FragmentActivity> mWeakReference;
+    private static WeakReference<BaseActivity> mWeakReference;
 
-    public static synchronized Dialog showProgressDialog(FragmentActivity activity){
-        return showProgressDialog(activity, true);
+    private static synchronized void showProgressDialog(BaseActivity activity){
+        activity.mDialog = showProgressDialog(activity, true);
     }
 
-    public static synchronized Dialog showProgressDialog(FragmentActivity activity, boolean isCanCancel){
+    public static synchronized void showProgressDialog(FragmentActivity activity){
+        BaseActivity baseActivity = (BaseActivity) activity;
+        showProgressDialog(baseActivity);
+    }
+
+    public static synchronized void showProgressDialog(FragmentActivity activity, boolean isCanCancel){
+        BaseActivity baseActivity = (BaseActivity) activity;
+        baseActivity.mDialog = showProgressDialog(baseActivity, isCanCancel);
+    }
+
+    private static synchronized Dialog showProgressDialog(BaseActivity activity, boolean isCanCancel){
         closeProgressDialog();
         Logger.d("showProgressDialog");
         mWeakReference = new WeakReference<>(activity);
@@ -54,21 +67,31 @@ public class ProgressManager {
             }else{
                 closeProgressDialog();
             }
+            mProgress.setOnCancelListener(ProgressManager::closeProgressDialog);
         }
         return mProgress;
     }
 
-    public static synchronized void closeProgressDialog(){
-        if(mProgress != null && mProgress.isShowing()){
-            mProgress.cancel();
-            mProgress = null;
+    public static void closeProgressDialog(){
+        if(isShowing()){
+            mProgress.dismiss();
             if(mWeakReference != null){
                 mWeakReference.clear();
+                mWeakReference = null;
             }
+            mProgress = null;
+        }
+        mWeakReference = null;
+        mProgress = null;
+    }
+
+    public static synchronized void closeProgressDialog(DialogInterface dialog){
+        if(dialog != null){
+            dialog.dismiss();
         }
     }
 
-    public static synchronized void closeProgressDialog(FragmentActivity activity){
+    public static synchronized void closeProgressDialog(BaseActivity activity){
         try {
             if(activity != null && mProgress != null && mWeakReference != null){
                 FragmentActivity activityReference = mWeakReference.get();
@@ -82,9 +105,6 @@ public class ProgressManager {
     }
 
     public static synchronized boolean isShowing(){
-        if(mProgress != null && mProgress.isShowing()){
-            return true;
-        }
-        return false;
+        return mProgress != null && mProgress.isShowing();
     }
 }

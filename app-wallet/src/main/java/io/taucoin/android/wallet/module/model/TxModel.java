@@ -92,8 +92,7 @@ public class TxModel implements ITxModel {
         Observable.create((ObservableOnSubscribe<List<TransactionHistory>>) emitter -> {
             List<TransactionHistory> list = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
             emitter.onNext(list);
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+        }).subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
 
@@ -214,7 +213,6 @@ public class TxModel implements ITxModel {
                     public void handleData(DataResult<String> dataResult) {
                         super.handleData(dataResult);
                         Logger.d("get_tx_id_after_sendTX=" + dataResult.getData());
-                        ToastUtils.showShortToast(R.string.send_tx_success);
                         MiningUtil.saveTransactionSuccess();
                         observer.onNext(true);
                     }

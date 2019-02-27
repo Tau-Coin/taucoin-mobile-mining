@@ -35,14 +35,11 @@ import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
-import io.taucoin.android.wallet.module.view.main.MainActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
 
 public class TxService extends Service {
@@ -105,8 +102,6 @@ public class TxService extends Service {
                     break;
             }
             Logger.i("TxService onStartCommand, ServiceType=" + serviceType);
-        }else{
-            ProgressManager.closeProgressDialog();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -174,7 +169,6 @@ public class TxService extends Service {
                         StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
                     getBalance(TransmitKey.ServiceType.GET_BALANCE);
                 }else{
-                    ProgressManager.closeProgressDialog();
                     EventBusUtil.post(MessageEvent.EventCode.BALANCE);
                 }
             }
@@ -184,9 +178,6 @@ public class TxService extends Service {
                 super.handleData(balanceResult);
                 Long balance = balanceResult.getData();
                 Logger.i("getBalance success");
-                if(ActivityManager.getInstance().isTopActivity(MainActivity.class)){
-                    ProgressManager.closeProgressDialog();
-                }
                 mTxModel.updateBalance(balance, new LogicObserver<KeyValue>() {
                     @Override
                     public void handleData(KeyValue entry) {

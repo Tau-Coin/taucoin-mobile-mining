@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.base;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -35,6 +36,8 @@ import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.foundation.util.ActivityManager;
 
 public abstract class BaseActivity extends RxAppCompatActivity implements OnLoadmoreListener, OnRefreshListener {
+
+    public Dialog mDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +73,16 @@ public abstract class BaseActivity extends RxAppCompatActivity implements OnLoad
     @Override
     protected void onPause() {
         super.onPause();
-        ProgressManager.closeProgressDialog(this);
     }
 
     @Override
     protected void onDestroy() {
         try {
+            if(mDialog != null){
+                mDialog.dismiss();
+                mDialog = null;
+            }
+            ProgressManager.closeProgressDialog();
             if(KeyboardUtils.isSoftInputVisible(this)){
                 KeyboardUtils.hideSoftInput(this);
                 // handler InputMethodManager Leak
