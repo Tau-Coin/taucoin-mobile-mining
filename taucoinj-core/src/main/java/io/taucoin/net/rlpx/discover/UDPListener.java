@@ -15,8 +15,10 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
+
 
 @Singleton
 public class UDPListener {
@@ -100,6 +102,7 @@ public class UDPListener {
             }
         }
 
+        Collections.shuffle(bootNodes);
         nodeManager.setBootNodes(bootNodes);
 
         try {
