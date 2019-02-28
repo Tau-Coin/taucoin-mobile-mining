@@ -39,6 +39,12 @@ public class IndexedBlockStore implements BlockStore{
         this.blocks = blocks;
         this.indexDB  = indexDB;
     }
+    @Override
+    public void close(){
+        logger.warn("close block store=================");
+        indexDB.close();
+        blocks.close();
+    }
 
     public Block getBestBlock(){
 

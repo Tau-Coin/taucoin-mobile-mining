@@ -46,5 +46,5 @@ public interface BlockStore {
     void load();
     void setSessionFactory(SessionFactory sessionFactory);
 
-
+    void close();
 }

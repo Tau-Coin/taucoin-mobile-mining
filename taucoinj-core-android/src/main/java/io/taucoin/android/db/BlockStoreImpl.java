@@ -144,4 +144,9 @@ public class BlockStoreImpl implements BlockStore {
     public void setSessionFactory(SessionFactory sessionFactory) {
 
     }
+
+    @Override
+    public void close(){
+
+    }
 }

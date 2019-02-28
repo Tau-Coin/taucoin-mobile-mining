@@ -277,5 +277,10 @@ public class InMemoryBlockStore implements BlockStore{
     public BigInteger getTotalDifficultyForHash(byte[] hash) {
         return null;
     }
+
+    @Override
+    public  void close(){
+
+    }
 }
 
