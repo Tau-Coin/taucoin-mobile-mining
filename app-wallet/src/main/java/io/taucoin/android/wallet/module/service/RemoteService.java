@@ -1,10 +1,12 @@
 package io.taucoin.android.wallet.module.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
@@ -27,7 +29,7 @@ public class RemoteService extends TaucoinRemoteService {
     private NotificationCompat.Builder builder;
     private Notification notification;
 
-    static final int NOTIFICATION_ID = 0x99;
+    public static final int NOTIFICATION_ID = 0x99;
 
     public RemoteService() {
         super();
@@ -68,20 +70,43 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     private void initNotificationManager() {
-        mNotificationManager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+        String channelId = createNotificationChannel();
 
         Intent intent = new Intent(this, NotificationReceiver.class);
         intent.putExtra(TransmitKey.ID, NOTIFICATION_ID);
         int id = (int) (System.currentTimeMillis() / 1000);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder = new NotificationCompat.Builder(this, "default");
+        builder = new NotificationCompat.Builder(this, channelId);
         builder.setContentTitle(getString(R.string.app_name));
         builder.setWhen(System.currentTimeMillis());
         builder.setSmallIcon(getApplicationInfo().icon);
         builder.setContentIntent(pendingIntent);
     }
 
+    public String createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "tauChannelId";
+            CharSequence channelName = "tauChannelName";
+            String channelDescription ="tauChannelDescription";
+            int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, channelImportance);
+            // Set description up to 30 characters
+            notificationChannel.setDescription(channelDescription);
+            // Whether the channel notification uses vibration or not
+            notificationChannel.enableVibration(false);
+            // Setting Display Mode
+            notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.createNotificationChannel(notificationChannel);
+            return channelId;
+        } else {
+            return "default";
+        }
+    }
 
     private void sendMiningNotify(Bundle bundle) {
         if(bundle != null){
