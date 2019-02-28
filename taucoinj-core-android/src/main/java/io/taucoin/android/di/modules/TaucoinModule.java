@@ -149,7 +149,7 @@ public class TaucoinModule {
         File dbFile = new File(blocksIndexFile);
         if (!dbFile.getParentFile().exists()) dbFile.getParentFile().mkdirs();
 
-        DB indexDB = mapDBFactory.createDB(dbFile.getAbsolutePath());
+        DB indexDB = mapDBFactory.createDB("blocks/index");
 
         Map<Long, List<IndexedBlockStore.BlockInfo>> indexMap = indexDB.hashMapCreate("index")
                 .keySerializer(Serializer.LONG)

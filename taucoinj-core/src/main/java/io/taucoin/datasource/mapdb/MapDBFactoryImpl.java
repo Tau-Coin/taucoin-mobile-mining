@@ -9,6 +9,7 @@ import java.io.File;
 
 import javax.inject.Singleton;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static java.lang.System.getProperty;
 
 @Singleton
@@ -30,7 +31,8 @@ public class MapDBFactoryImpl implements MapDBFactory {
     }
 
     private DB createDB(String name, boolean transactional) {
-        File dbFile = new File(name);
+        String database = CONFIG.databaseDir();
+        File dbFile = new File(database + "/" + name);
         if (!dbFile.getParentFile().exists()) dbFile.getParentFile().mkdirs();
         DBMaker.Maker dbMaker = DBMaker.fileDB(dbFile)
                 .closeOnJvmShutdown();
