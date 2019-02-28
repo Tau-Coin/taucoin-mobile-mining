@@ -51,6 +51,7 @@ public class SystemProperties {
     public final static String PROPERTY_LISTEN_PORT = "peer.listen.port";
     public final static String PROPERTY_PEER_ACTIVE = "peer.active";
     public final static String PROPERTY_DB_RESET = "database.reset";
+    public final static int PEER_NUMBER = 3;
 
     /* Testing */
     private final static Boolean DEFAULT_VMTEST_LOAD_LOCAL = false;
@@ -267,7 +268,39 @@ public class SystemProperties {
 
     @ValidateMe
     public List<String> peerDiscoveryIPList() {
-        return config.getStringList("peer.discovery.ip.list");
+        List <String> ipList= config.getStringList("peer.discovery.ip.list");
+        List <String> ipFinal= new ArrayList<String>();
+
+        int maxIndex= ipList.size()- 1;
+        Random random = new Random();
+        int []randIndex = new int[PEER_NUMBER];
+        int index= 0;
+        int randTemp= 0;
+
+        for(int i= 0; i< PEER_NUMBER; i++)
+             randIndex[i]= PEER_NUMBER+ 1;
+
+        while(index< PEER_NUMBER){
+            randTemp= random.nextInt(maxIndex);
+            if(index==0){
+                ipFinal.add(ipList.get(randTemp));
+                randIndex[index]= randTemp;
+                index++;
+            } else {
+                int j= 0;
+                for(; j< randIndex.length; j++){
+                    if(randTemp == randIndex[j])
+                       break;
+                }
+                if(j>= randIndex.length){
+                    ipFinal.add(ipList.get(randTemp));
+                    randIndex[index]= randTemp;
+                    index++;
+                }
+            }
+        }
+
+        return ipFinal;
     }
 
     @ValidateMe
