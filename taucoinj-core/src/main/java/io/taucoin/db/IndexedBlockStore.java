@@ -41,7 +41,7 @@ public class IndexedBlockStore implements BlockStore{
     }
     @Override
     public void close(){
-        logger.warn("close block store=================");
+        logger.info("close block store data base...");
         indexDB.close();
         blocks.close();
     }
