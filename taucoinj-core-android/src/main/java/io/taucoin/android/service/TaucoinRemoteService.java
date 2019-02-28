@@ -112,6 +112,20 @@ public class TaucoinRemoteService extends TaucoinService {
         super.onCreate();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        taucoin.close();
+        isTaucoinStarted = false;
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        taucoin.close();
+        isTaucoinStarted = false;
+    }
+
     protected void broadcastEvent(EventFlag event, EventData data) {
 
         Message message = null;
