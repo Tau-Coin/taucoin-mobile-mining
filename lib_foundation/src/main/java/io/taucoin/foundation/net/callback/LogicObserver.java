@@ -1,7 +1,5 @@
 package io.taucoin.foundation.net.callback;
 
-import com.github.naturs.logger.Logger;
-
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.taucoin.foundation.net.exception.CodeException;

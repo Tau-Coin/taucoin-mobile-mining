@@ -125,6 +125,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.removeListener(mHandlerIdentifier);
             isTaucoinConnected = false;
             isInit = false;
+            closeTaucoin();
         }
     }
 

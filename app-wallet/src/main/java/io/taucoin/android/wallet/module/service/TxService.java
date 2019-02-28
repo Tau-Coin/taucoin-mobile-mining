@@ -198,7 +198,7 @@ public class TxService extends Service {
 
     private void getBlockHeight(boolean isDelayRefresh){
         mIsGetBlockHeight = true;
-        mTxModel.getBlockHeight(new LogicObserver<DataResult<Integer>>(){
+        mTxModel.getBlockHeight(new TAUObserver<DataResult<Integer>>(){
 
             @Override
             public void handleData(DataResult<Integer> result) {
@@ -214,6 +214,10 @@ public class TxService extends Service {
                 if(isDelayRefresh){
                     getBlockHeightDelay();
                 }
+            }
+
+            @Override
+            public void handleError(String msg, int msgCode) {
             }
         });
     }

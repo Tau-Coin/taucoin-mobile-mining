@@ -140,11 +140,11 @@ public class MainActivity extends BaseActivity implements IMainView {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         ProgressManager.closeProgressDialog();
         TxService.stopService();
         UpgradeService.stopUpdateService();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
+        super.onDestroy();
     }
 
     @Override

@@ -58,7 +58,7 @@ public interface ITxModel {
     void saveTxRecords(RawTxList rawTxList, LogicObserver<Boolean> observer);
 
     /** get block height from the server */
-    void getBlockHeight(LogicObserver<DataResult<Integer>> observer);
+    void getBlockHeight(TAUObserver<DataResult<Integer>> observer);
 
     /** Update balance from the server */
     void updateBalance(long balance, LogicObserver<KeyValue> observer);

@@ -29,7 +29,6 @@ public class DialogManager {
     public static void showSureDialog(FragmentActivity activity, String msg, String button){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                .setTitle(R.string.app_upgrade_title)
                 .setMessage(Html.fromHtml(msg))
                 .setPositiveButton(button, null)
                 .setCancelable(false);

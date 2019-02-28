@@ -46,7 +46,6 @@ import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
@@ -321,7 +320,7 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getBlockHeight(LogicObserver<DataResult<Integer>> observer) {
+    public void getBlockHeight(TAUObserver<DataResult<Integer>> observer) {
         NetWorkManager.createApiService(TransactionService.class)
                 .getBlockHeight()
                 .subscribeOn(Schedulers.io())

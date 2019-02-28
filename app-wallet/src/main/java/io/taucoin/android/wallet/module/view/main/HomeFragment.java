@@ -35,6 +35,7 @@ import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.ItemTextView;
+import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -61,7 +62,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @BindView(R.id.tv_mining_details)
     ItemTextView tvMiningDetails;
     @BindView(R.id.tv_mining_msg)
-    TextView tvMiningMsg;
+    LoadingTextView tvMiningMsg;
 
     private MiningPresenter miningPresenter;
 
@@ -154,10 +155,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 String msg = getString(msgReid);
                 if(msgReid == R.string.mining_in_progress){
                     msg += "\n" + getString(R.string.mining_generation_rate);
+                    tvMiningMsg.setNormalText(msg);
+                }else{
+                    tvMiningMsg.setLoadingText(msg);
                 }
-                tvMiningMsg.setText(msg);
             }else{
-                tvMiningMsg.setText(R.string.mining_generation_rate);
+                tvMiningMsg.setNormalText(R.string.mining_generation_rate);
             }
         }
     }
@@ -208,9 +211,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);
                     }
                     if(!isStart){
-                        tvMiningMsg.setText(R.string.mining_generation_rate);
+                        tvMiningMsg.setNormalText(R.string.mining_generation_rate);
                         if(!btnMining.isEnabled()){
-                            tvMiningMsg.setText(R.string.mining_generation_rate);
+                            tvMiningMsg.setNormalText(R.string.mining_generation_rate);
                         }
                     }
                 }
