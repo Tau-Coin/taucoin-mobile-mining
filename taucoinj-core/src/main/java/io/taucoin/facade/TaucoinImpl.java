@@ -21,6 +21,7 @@ import io.taucoin.net.submit.NewBlockHeaderTask;
 import io.taucoin.net.submit.TransactionExecutor;
 import io.taucoin.net.submit.TransactionTask;
 import io.taucoin.util.ByteUtil;
+import org.apache.commons.collections4.list.TransformedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -30,12 +31,11 @@ import javax.inject.Provider;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 
@@ -48,7 +48,8 @@ public class TaucoinImpl implements Taucoin {
 
     private static final Logger logger = LoggerFactory.getLogger("facade");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
-
+    public static final String TRANSACTION_SUBMITFAIL = "sorry,submit transaction fail";
+    public static final String TRANSACTION_SUBMITSUCCESS = "submit transaction success,wait to confirm";
     protected WorldManager worldManager;
 
     protected AdminInfo adminInfo;
@@ -274,21 +275,25 @@ public class TaucoinImpl implements Taucoin {
 
 
     @Override
-    public boolean submitTransaction(Transaction transaction) {
+    public Transaction submitTransaction(Transaction transaction) {
 
         boolean submitResult = pendingState.addPendingTransaction(transaction);
+        Transaction retval = null;
         if (submitResult) {
             TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
 
-            final Future<List<Transaction>> listFuture =
-                    TransactionExecutor.instance.submitTransaction(transactionTask);
+            Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
 
-//            return new FutureAdapter<Transaction, List<Transaction>>(listFuture) {
-//                @Override
-//                protected Transaction adapt(List<Transaction> adapteeResult) throws ExecutionException {
-//                    return adapteeResult.get(0);
+            try {
+                 retval = listFuture.get().get(0);
+                 retval.TRANSACTION_STATUS = TRANSACTION_SUBMITSUCCESS;
+            }catch (Exception e){
+
+            }
+            return retval;
         }
-        return submitResult;
+        retval = transaction;
+        return retval;
     }
 
     @Override

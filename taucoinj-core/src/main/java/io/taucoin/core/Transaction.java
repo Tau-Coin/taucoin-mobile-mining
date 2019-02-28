@@ -34,6 +34,9 @@ import static io.taucoin.util.TimeUtils.timeNows;
 public class Transaction implements Comparable<Transaction>{
 
     private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
+    public String TRANSACTION_STATUS = "" ;
+    public static final String TRANSACTION_SUCCESS = "transaction success!";
+    public static final String TRANSACTION_INSUFFCIENT ="less sufficient funds,transaction fail";
 
     /* version is for upgrade to define the transition grace peroid */
     private byte version;
@@ -74,6 +77,9 @@ public class Transaction implements Comparable<Transaction>{
      * from the RLP-encoded data */
     private boolean parsed = false;
 
+    public Transaction() {
+
+    }
     public Transaction(byte[] rawData) {
         this.rlpEncoded = rawData;
         parsed = false;
@@ -187,6 +193,12 @@ public class Transaction implements Comparable<Transaction>{
         byte[] plainMsg = this.getEncoded();
         return HashUtil.sha3(plainMsg);
     }
+
+    //get txid for wallet
+    public String getTxid() {
+        return Hex.toHexString(getHash());
+    }
+    
     // transaction except to signature
     public byte[] getRawHash() {
         if (!parsed) rlpParse();

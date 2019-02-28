@@ -166,12 +166,14 @@ public class PendingStateImpl implements PendingState {
         if(!tx.verify()) {
             if (logger.isWarnEnabled())
                 logger.warn("Invalid transaction in structure");
+            tx.TRANSACTION_STATUS = "Invalid transaction in structure";
 			return false;
         }
 
         if(!tx.checkTime()) {
             if (logger.isWarnEnabled())
                 logger.warn("Invalid transaction in time");
+            tx.TRANSACTION_STATUS = "Invalid transaction in time";
 			return false;
         }
         

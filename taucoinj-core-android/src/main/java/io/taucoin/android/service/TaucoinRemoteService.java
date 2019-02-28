@@ -813,23 +813,7 @@ public class TaucoinRemoteService extends TaucoinService {
         }
 
         protected Transaction doInBackground(Taucoin... args) {
-
-            logger.info("doInBackground=======");
-            boolean submitedTransaction = false;
-            Transaction ret;
-            try {
-                submitedTransaction = taucoin.submitTransaction(transaction);
-            } catch (Exception e) {
-                logger.error("Exception submitting transaction: " + e.getMessage());
-            }
-            if(submitedTransaction){
-                ret = transaction;
-                logger.info("Submit transaction to taucoin success {}",Hex.toHexString(ret.getHash()));
-            }else{
-                ret = null;
-                logger.info("Submit transaction to taucoin fail");
-            }
-            return ret;
+            return taucoin.submitTransaction(transaction);
         }
 
         protected void onPostExecute(Transaction submittedTransaction) {
