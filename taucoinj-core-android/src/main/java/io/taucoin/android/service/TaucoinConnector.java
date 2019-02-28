@@ -752,4 +752,49 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    public void sendMiningNotify(String object) {
+        if (!isBound)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_SEND_MINING_NOTIFY, 0, 0);
+        msg.replyTo = clientMessenger;
+        Bundle data = new Bundle();
+        data.putString("data", object);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(sendMiningNotify) to service: " + e.getMessage());
+        }
+    }
+
+    public void cancelMiningNotify() {
+        if (!isBound)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_MINING_NOTIFY, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(cancelMiningNotify) to service: " + e.getMessage());
+        }
+    }
+
+    public void sendBlockNotify(String object) {
+        if (!isBound)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_SEND_BLOCK_NOTIFY, 0, 0);
+        msg.replyTo = clientMessenger;
+        Bundle data = new Bundle();
+        data.putString("data", object);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(sendBlockNotify) to service: " + e.getMessage());
+        }
+    }
+
 }

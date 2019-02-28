@@ -26,6 +26,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
@@ -147,5 +148,17 @@ public class MiningUtil {
             }
         }
         return pendingAmount.longValue();
+    }
+
+    public static int getMiningMsg(){
+        int msg = R.string.mining_in_progress;
+        boolean isInit = MyApplication.getRemoteConnector().isInit();
+        boolean isSync = MyApplication.getRemoteConnector().isSync();
+        if(!isInit){
+            msg = R.string.mining_init_data;
+        }else if(!isSync){
+            msg = R.string.mining_sync_block;
+        }
+        return msg;
     }
 }

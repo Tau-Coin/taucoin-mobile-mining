@@ -96,6 +96,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
         return isSyncMe;
     }
 
+    public boolean isTaucoinConnected() {
+        return isTaucoinConnected;
+    }
+
     @Override
     public void onConnectorConnected() {
         if (!isTaucoinConnected) {

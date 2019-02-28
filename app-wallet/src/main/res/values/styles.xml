@@ -114,6 +114,11 @@
         <item name="android:textColor">@color/color_black</item>
     </style>
 
+    <style name="style_middle_blue">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_blue</item>
+    </style>
+
     <style name="style_normal_blue">
         <item name="android:textSize">@dimen/dimen_size_16</item>
         <item name="android:textColor">@color/color_blue</item>

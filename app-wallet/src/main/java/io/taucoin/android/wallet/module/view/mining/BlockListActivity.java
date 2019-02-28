@@ -120,6 +120,10 @@ public class BlockListActivity extends BaseActivity {
 
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
+        if(refreshlayout == null){
+            mAdapter = new BlockAdapter();
+            listViewHelp.setAdapter(mAdapter);
+        }
         mPageNo = 0;
         getData();
     }

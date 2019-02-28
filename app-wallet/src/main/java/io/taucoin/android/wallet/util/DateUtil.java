@@ -35,6 +35,7 @@ public class DateUtil {
     /**
      * yyyy-MM-dd HH:mm:ss
      */
+    public static final String pattern0 = "HH:mm";
     public static final String pattern1 = "mm:ss";
     public static final String pattern2 = "MM-dd";
     public static final String pattern3 = "yyyy-MM";

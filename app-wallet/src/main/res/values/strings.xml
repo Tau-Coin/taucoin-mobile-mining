@@ -149,8 +149,11 @@
     <string name="block_transaction_id">Transaction&#160;ID&#160;&#160;</string>
     <string name="bloc_transaction_fee">Transaction&#160;Fee&#160;&#160;%sTAU</string>
 
-    <string name="bloc_in_synchronization">In Synchronization Block</string>
-    <string name="notify_mining">Mining in progress</string>
-    <string name="notify_tip">Stop mining at a click</string>
+    <string name="bloc_in_synchronization">Synchronizing Block Data</string>
+    <string name="mining_init_data">Initializing Database</string>
+    <string name="mining_sync_block">Synchronizing Block Data</string>
+    <string name="mining_in_progress">Mining in progress</string>
+    <string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>
+    <string name="mining_new_block">You have mined a new block. Income: %sTAU</string>
 
 </resources>

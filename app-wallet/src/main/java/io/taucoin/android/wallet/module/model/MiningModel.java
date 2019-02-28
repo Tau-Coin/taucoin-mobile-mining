@@ -10,6 +10,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.events.BlockEventData;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
@@ -24,6 +25,7 @@ import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
+import io.taucoin.facade.TaucoinImpl;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -97,7 +99,7 @@ public class MiningModel implements IMiningModel{
                 }
                 Block block = blockEvent.block;
 
-                saveMiningInfo(block, true);
+                saveMiningInfo(block, true, false);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -105,13 +107,13 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private void saveMiningInfo(Block block, boolean isConnect) {
+    private void saveMiningInfo(Block block, boolean isConnect, boolean isSendNotify) {
         String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
         String number = String.valueOf(block.getNumber());
         String hash = Hex.toHexString(block.getHash());
         String generatorPublicKey = Hex.toHexString(block.getGeneratorPublicKey());
         MiningInfo entry = MiningInfoDaoUtils.getInstance().queryByBlockHash(hash);
-        boolean isMine = StringUtil.isSame(pubicKey, generatorPublicKey);
+        boolean isMine = StringUtil.isSame(pubicKey.toLowerCase(), generatorPublicKey);
         if(entry == null){
             if(isMine && isConnect){
                 entry = new MiningInfo();
@@ -130,6 +132,9 @@ public class MiningModel implements IMiningModel{
                 entry.setTotal(total);
                 entry.setReward(reward);
                 MiningInfoDaoUtils.getInstance().insertOrReplace(entry);
+                if(isSendNotify){
+                    MyApplication.getRemoteConnector().sendBlockNotify(reward);
+                }
             }
         }else{
             entry.setValid(isConnect ? 1 : 0);
@@ -140,7 +145,7 @@ public class MiningModel implements IMiningModel{
     private boolean handleSynchronizedTransaction(Block block, boolean isConnect) {
         List<Transaction> txList = block.getTransactionsList();
         String blockHash = Hex.toHexString(block.getHash());
-        long blockNumber = block.getNumber();
+        long blockNumber = block.getNumber() + 1;
         if(txList != null && txList.size() > 0){
             for (Transaction transaction : txList) {
                 String txId = Hex.toHexString(transaction.getHash());
@@ -177,8 +182,8 @@ public class MiningModel implements IMiningModel{
                 Block block = blockEvent.block;
                 if(block != null){
                     long blockNumber = block.getNumber();
-                    updateSynchronizedBlockNum((int) blockNumber);
-                    saveMiningInfo(block, isConnect);
+                    updateSynchronizedBlockNum((int) blockNumber + 1);
+                    saveMiningInfo(block, isConnect, true);
 
                     boolean isUpdate = handleSynchronizedTransaction(block, isConnect);
                     if(isUpdate){
@@ -195,10 +200,13 @@ public class MiningModel implements IMiningModel{
     @Override
     public void updateTransactionHistory(io.taucoin.android.interop.Transaction transaction) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            // TODO send tx fail logic
             if(transaction != null){
-                String txId = Hex.toHexString(transaction.getHash());
-                MiningUtil.saveTransactionSuccess();
+                String txId = transaction.getTxid();
+                if(StringUtil.isSame(transaction.TRANSACTION_STATUS, TaucoinImpl.TRANSACTION_SUBMITSUCCESS)){
+                    MiningUtil.saveTransactionSuccess();
+                }else{
+                    MiningUtil.saveTransactionFail(txId, transaction.TRANSACTION_STATUS);
+                }
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())

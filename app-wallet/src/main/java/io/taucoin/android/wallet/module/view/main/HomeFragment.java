@@ -33,7 +33,6 @@ import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
-import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -61,6 +60,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ItemTextView tvMiningIncome;
     @BindView(R.id.tv_mining_details)
     ItemTextView tvMiningDetails;
+    @BindView(R.id.tv_mining_msg)
+    TextView tvMiningMsg;
 
     private MiningPresenter miningPresenter;
 
@@ -89,6 +90,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case R.id.btn_mining:
                 waitStartOrStop();
                 miningPresenter.updateMiningState();
+                TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
                 break;
             case R.id.tv_mining_details:
                 if(MyApplication.getRemoteConnector().isSyncMe()){
@@ -144,6 +146,22 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
+    private void showMiningMsg() {
+        MyApplication.getRemoteConnector().sendMiningNotify();
+        if(tvMiningMsg != null){
+            if(UserUtil.isImportKey()){
+                int msgReid = MiningUtil.getMiningMsg();
+                String msg = getString(msgReid);
+                if(msgReid == R.string.mining_in_progress){
+                    msg += "\n" + getString(R.string.mining_generation_rate);
+                }
+                tvMiningMsg.setText(msg);
+            }else{
+                tvMiningMsg.setText(R.string.mining_generation_rate);
+            }
+        }
+    }
+
     @Override
     public void initView() {
         refreshLayout.setEnableLoadmore(false);
@@ -157,6 +175,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public void handleMiningView(boolean isNeedInit) {
+        showMiningMsg();
         if (UserUtil.isImportKey() && btnMining != null) {
             miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
                 @Override
@@ -164,10 +183,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     boolean isStart = false;
                     KeyValue keyValue = MyApplication.getKeyValue();
                     if (keyValue != null) {
-                        if(StringUtil.isNotEmpty(keyValue.getMiningState())
-                                && blockInfo.getBlockHeight() < blockInfo.getBlockSynchronized()){
-                            TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
-                        }
                         isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                         llMining.setVisibility(StringUtil.isNotEmpty(keyValue.getMiningState()) ? View.VISIBLE : View.GONE);
 
@@ -192,6 +207,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     if(btnMining.isEnabled()){
                         btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);
                     }
+                    if(!isStart){
+                        tvMiningMsg.setText(R.string.mining_generation_rate);
+                        if(!btnMining.isEnabled()){
+                            tvMiningMsg.setText(R.string.mining_generation_rate);
+                        }
+                    }
                 }
             });
         }
@@ -200,6 +221,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
         TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
 
         if (!UserUtil.isImportKey()) {
             refreshLayout.finishRefresh(1000);

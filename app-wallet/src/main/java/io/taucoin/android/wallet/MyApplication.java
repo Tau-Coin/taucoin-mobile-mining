@@ -23,8 +23,6 @@ import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
-import io.taucoin.android.wallet.module.service.TauNotificationManager;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
@@ -120,7 +118,7 @@ public class MyApplication extends MultiDexApplication {
                 mFinalCount++;
                 // back to front
                 if (mFinalCount == 1) {
-                    TauNotificationManager.getInstance().cancelMiningNotify();
+                    MyApplication.getRemoteConnector().cancelMiningNotify();
                 }
             }
 
@@ -139,7 +137,7 @@ public class MyApplication extends MultiDexApplication {
                 mFinalCount--;
                 if (mFinalCount == 0) {
                     // front to back
-                    TauNotificationManager.getInstance().showMiningNotify();
+                    MyApplication.getRemoteConnector().sendMiningNotify();
                 }
             }
 
