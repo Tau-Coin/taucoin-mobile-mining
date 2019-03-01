@@ -231,6 +231,11 @@ public class SystemProperties {
     }
 
     @ValidateMe
+    public boolean peerConnectionTestEnabled() {
+        return config.getBoolean("peer.discovery.connection.test");
+    }
+
+    @ValidateMe
     public int peerDiscoveryWorkers() {
         return config.getInt("peer.discovery.workers");
     }

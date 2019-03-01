@@ -43,6 +43,7 @@ public class ChannelManager {
     private static final int inboundConnectionBanTimeout = 10 * 1000;
 
     private List<Channel> newPeers = new CopyOnWriteArrayList<>();
+    private final Map<ByteArrayWrapper, Channel> newPeersMap = Collections.synchronizedMap(new HashMap<ByteArrayWrapper, Channel>());
     private final Map<ByteArrayWrapper, Channel> activePeers = Collections.synchronizedMap(new HashMap<ByteArrayWrapper, Channel>());
 
     private ScheduledExecutorService mainWorker = Executors.newSingleThreadScheduledExecutor();
@@ -142,6 +143,7 @@ public class ChannelManager {
         logger.info("New peers processed: " + processed + ", active peers added: " + addCnt + ", total active peers: " + activePeers.size());
 
         newPeers.removeAll(processed);
+        newPeers.clear();
     }
 
     private void disconnect(Channel peer, ReasonCode reason) {
@@ -292,6 +294,15 @@ public class ChannelManager {
 
     public void add(Channel peer) {
         newPeers.add(peer);
+        newPeersMap.put(peer.getNodeIdWrapper(), peer);
+    }
+
+    public boolean isPeerExist(byte[] nodeId) {
+        if (nodeId == null) {
+            return false;
+        }
+        ByteArrayWrapper key = new ByteArrayWrapper(nodeId);
+        return newPeersMap.containsKey(key) || activePeers.containsKey(key);
     }
 
     public void notifyDisconnect(Channel channel) {
@@ -300,6 +311,7 @@ public class ChannelManager {
         syncManager.onDisconnect(channel);
         activePeers.values().remove(channel);
         newPeers.remove(channel);
+        newPeersMap.values().remove(channel);
     }
 
     public void onSyncDone() {

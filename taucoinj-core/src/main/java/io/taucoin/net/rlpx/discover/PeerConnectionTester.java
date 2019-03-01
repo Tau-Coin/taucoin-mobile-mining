@@ -102,7 +102,7 @@ public class PeerConnectionTester {
     }
 
     public void nodeStatusChanged(final NodeHandler nodeHandler) {
-        if (peerConnectionPool.isShutdown()) return;
+        if (peerConnectionPool.isShutdown() || !config.peerConnectionTestEnabled()) return;
         if (connectedCandidates.size() < NodeManager.MAX_NODES
                 && !connectedCandidates.containsKey(nodeHandler)
                 && !nodeHandler.getNode().isDiscoveryNode()) {
