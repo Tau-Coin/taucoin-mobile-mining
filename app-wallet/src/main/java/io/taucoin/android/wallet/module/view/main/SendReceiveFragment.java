@@ -37,11 +37,13 @@ import io.taucoin.android.wallet.module.view.tx.SendActivity;
 import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EmptyLayout;
+import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DrawablesUtil;
 import io.taucoin.foundation.util.StringUtil;
@@ -64,6 +66,8 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     LinearLayout llTip;
     @BindView(R.id.tv_address)
     TextView tvAddress;
+    @BindView(R.id.tv_mining_msg)
+    LoadingTextView tvMiningMsg;
 
     private TxPresenter mTxPresenter;
     private HistoryExpandableListAdapter mAdapter;
@@ -85,12 +89,14 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         UserUtil.setAddress(tvAddress);
+        waitStartOrStop();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UserUtil.setAddress(tvAddress);
+        waitStartOrStop();
     }
 
     @Override
@@ -100,6 +106,26 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         }
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.BALANCE));
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.TRANSACTION));
+    }
+
+    private void waitStartOrStop() {
+        tvMiningMsg.setVisibility(View.GONE);
+        btnSend.setEnabled(true);
+        btnSend.setBackgroundColor(getResources().getColor(R.color.color_yellow));
+        if(UserUtil.isImportKey()){
+            KeyValue keyValue = MyApplication.getKeyValue();
+            boolean isMiner = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
+            boolean isInit = MyApplication.getRemoteConnector().isInit();
+            boolean isSync = MyApplication.getRemoteConnector().isSync();
+            if(isMiner){
+                tvMiningMsg.setVisibility(View.VISIBLE);
+                if(!isInit || !isSync){
+                    btnSend.setEnabled(false);
+                    btnSend.setBackgroundColor(getResources().getColor(R.color.color_grey));
+                    tvMiningMsg.setLoadingText(MiningUtil.getMiningMsg());
+                }
+            }
+        }
     }
 
     @Override
@@ -202,6 +228,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                 break;
             case TRANSACTION_IMPORT:
                 startRefresh();
+                break;
+            case MINING_INIT:
+            case MINING_INFO:
+            case MINING_STATE:
+                waitStartOrStop();
                 break;
             default:
                 break;

@@ -27,7 +27,8 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     private boolean isLoading = false;
     private int pointNum = 0;
     private String text = "";
-    private static BaseHandler mHandler;
+    private BaseHandler mHandler;
+    private Thread mThread;
 
     public LoadingTextView(Context context) {
         this(context, null);
@@ -46,11 +47,11 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         setLoadingText(getResources().getString(reid));
     }
 
-    public void setLoadingText(String text){
+    public synchronized void setLoadingText(String text){
         this.text = text;
         pointNum = 0;
         if(!isLoading){
-            startLoadingDelay();
+            mHandler.sendEmptyMessage(0);
         }
         isLoading = true;
     }
@@ -58,11 +59,12 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     @Override
     public void handleMessage(Message message) {
         if(isLoading){
+            initData();
             startLoadingDelay();
         }
     }
 
-    private void startLoadingDelay() {
+    private void initData() {
         if(pointNum > 3){
             pointNum = 0;
         }
@@ -77,18 +79,23 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
             loadingText += "...";
         }
         setText(loadingText, mBufferType);
+    }
 
-        new Thread(() -> {
-            if(isLoading){
-                pointNum ++;
-                try {
-                    Thread.sleep(300);
-                    mHandler.sendEmptyMessage(0);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+    private synchronized void startLoadingDelay() {
+        if(mThread == null){
+            mThread = new Thread(() -> {
+                if(isLoading){
+                    try {
+                        Thread.sleep(380);
+                        pointNum ++;
+                        mHandler.sendEmptyMessage(0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
+            });
+        }
+        mThread.start();
     }
 
     public void setNormalText(String text) {

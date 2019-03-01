@@ -102,11 +102,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
                 break;
             case R.id.tv_mining_details:
-                if(MyApplication.getRemoteConnector().isSyncMe()){
-                    ActivityUtil.startActivity(getActivity(), BlockListActivity.class);
-                }else{
-                    DialogManager.showSureDialog(getActivity(), R.string.bloc_in_synchronization, R.string.common_ok);
-                }
+                ActivityUtil.startActivity(getActivity(), BlockListActivity.class);
                 break;
             default:
                 break;
@@ -205,7 +201,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(blockInfo));
                     }
                     boolean isInit = MyApplication.getRemoteConnector().isInit();
-                    tvMiningDetails.setEnable(isStart && !isNeedInit && isInit);
+                    boolean isSyncMe = MyApplication.getRemoteConnector().isSyncMe();
+                    tvMiningDetails.setEnable(isStart && !isNeedInit && isInit && isSyncMe);
 
                     if(isStart && isNeedInit){
                         if(!isInit){
