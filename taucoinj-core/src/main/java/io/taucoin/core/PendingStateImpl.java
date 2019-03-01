@@ -199,8 +199,7 @@ public class PendingStateImpl implements PendingState {
             if (!isCovers(senderBalance, expendList.get(senderTmp))) {
                 if (logger.isWarnEnabled())
                     logger.warn("No enough balance: Require: {}, Sender's balance: {}", expendList.get(senderTmp), senderBalance);
-
-                // TODO: save reason for failure
+                tx.TRANSACTION_STATUS = "sorry,No enough balance";
                 return false;
             }
         }
@@ -211,6 +210,7 @@ public class PendingStateImpl implements PendingState {
                 redceivedTxs.put(hash, null);
                 return true;
             } else {
+                tx.TRANSACTION_STATUS = "repeated transaction,can't be accepted";
                 return false;
             }
         }

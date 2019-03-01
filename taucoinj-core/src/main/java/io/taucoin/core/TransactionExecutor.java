@@ -65,8 +65,8 @@ public class TransactionExecutor {
         basicTxFee = toBI(tx.transactionCost()).longValue();
         if (basicTxFee < 0 ) {
             if (logger.isWarnEnabled())
-                logger.warn("Not enough gas for transaction execution: Require: {} Got: {}", basicTxFee);
-            // TODO: save reason for failure
+                logger.warn("Not enough fee for transaction execution: Require: {} Got: {}", basicTxFee);
+            tx.TRANSACTION_STATUS = "Not enough fee for transaction";
             return;
         }
 
@@ -77,8 +77,7 @@ public class TransactionExecutor {
 
             if (logger.isWarnEnabled())
                 logger.warn("No enough balance: Require: {}, Sender's balance: {}", totalCost, senderBalance);
-
-            // TODO: save reason for failure
+            tx.TRANSACTION_STATUS = "No enough balance";
             return;
         }
 
