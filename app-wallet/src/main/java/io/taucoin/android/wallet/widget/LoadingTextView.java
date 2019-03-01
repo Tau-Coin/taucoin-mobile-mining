@@ -82,19 +82,17 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     }
 
     private synchronized void startLoadingDelay() {
-        if(mThread == null){
-            mThread = new Thread(() -> {
-                if(isLoading){
-                    try {
-                        Thread.sleep(380);
-                        pointNum ++;
-                        mHandler.sendEmptyMessage(0);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        mThread = new Thread(() -> {
+            if(isLoading){
+                try {
+                    Thread.sleep(380);
+                    pointNum ++;
+                    mHandler.sendEmptyMessage(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            });
-        }
+            }
+        });
         mThread.start();
     }
 

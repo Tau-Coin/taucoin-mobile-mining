@@ -60,7 +60,10 @@ public class RemoteService extends TaucoinRemoteService {
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        cancelMiningNotify();
+        if(mNotificationManager != null){
+            mNotificationManager.cancelAll();
+        }
         super.onDestroy();
     }
 
@@ -97,6 +100,7 @@ public class RemoteService extends TaucoinRemoteService {
             // Whether the channel notification uses vibration or not
             notificationChannel.enableVibration(false);
             // Setting Display Mode
+            notificationChannel.setSound(null, null);
             notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             mNotificationManager.createNotificationChannel(notificationChannel);
             return channelId;
@@ -120,13 +124,16 @@ public class RemoteService extends TaucoinRemoteService {
         remoteViews.setTextViewText(R.id.tv_msg, getString(R.string.app_name));
         remoteViews.setTextViewText(R.id.tv_tip, msg);
         builder.setCustomContentView(remoteViews);
+        builder.setSmallIcon(getApplicationInfo().icon);
+        builder.setSound(null);
         notification = builder.build();
         notification.flags = Notification.FLAG_AUTO_CANCEL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(NOTIFICATION_ID, notification);
-        }else{
-            mNotificationManager.notify(NOTIFICATION_ID, notification);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForeground(NOTIFICATION_ID, notification);
+//        }else{
+//            mNotificationManager.notify(NOTIFICATION_ID, notification);
+//        }
+        startForeground(NOTIFICATION_ID, notification);
     }
 
     private void sendBlockNotify(Bundle bundle) {
@@ -149,14 +156,14 @@ public class RemoteService extends TaucoinRemoteService {
         long time = new Date().getTime();
         remoteViews.setTextViewText(R.id.tv_time, DateUtil.format(time, DateUtil.pattern0));
         builder.setCustomContentView(remoteViews);
+        builder.setSound(null);
         notification = builder.build();
+        notification.defaults |= Notification.DEFAULT_SOUND;
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         mNotificationManager.notify(notifyId, notification);
     }
 
     private void cancelMiningNotify(){
-        if (mNotificationManager != null){
-            mNotificationManager.cancel(NOTIFICATION_ID);
-        }
+        stopForeground(true);
     }
 }

@@ -64,9 +64,11 @@ public abstract class BaseActivity extends RxAppCompatActivity implements OnLoad
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         ProgressManager.closeProgressDialog();
-        Intent intent = new Intent();
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        ActivityUtil.startActivity(intent, this, SplashActivity.class);
+        if(!this.getClass().equals(SplashActivity.class)){
+            Intent intent = new Intent();
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            ActivityUtil.startActivity(intent, this, SplashActivity.class);
+        }
         super.onRestoreInstanceState(savedInstanceState);
     }
 

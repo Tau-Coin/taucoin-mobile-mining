@@ -15,8 +15,6 @@
  */
 package io.taucoin.android.wallet.module.presenter;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
@@ -43,7 +41,6 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
-import io.taucoin.android.wallet.module.service.RemoteService;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
@@ -309,9 +306,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
      * */
     public void cancelMiningNotify(){
         Logger.d("cancelMiningNotify");
-        Context context = MyApplication.getInstance();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(RemoteService.NOTIFICATION_ID);
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.cancelMiningNotify();
+        }
     }
 
     /**
