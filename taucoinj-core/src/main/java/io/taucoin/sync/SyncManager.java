@@ -41,7 +41,7 @@ public class SyncManager {
 
     private final static Logger logger = LoggerFactory.getLogger("sync");
 
-    private static final long WORKER_TIMEOUT = secondsToMillis(1);
+    private static final long WORKER_TIMEOUT = secondsToMillis(3);
     private static final long PEER_STUCK_TIMEOUT = secondsToMillis(60);
     private static final long GAP_RECOVERY_TIMEOUT = secondsToMillis(2);
 
@@ -535,6 +535,10 @@ public class SyncManager {
         for (Channel peer : removed) {
             pool.ban(peer);
         }
+    }
+
+    public boolean isNeedMorePeers() {
+        return config.syncPeerCount() - pool.activeCount() > 0;
     }
 
     private void fillUpPeersPool() {

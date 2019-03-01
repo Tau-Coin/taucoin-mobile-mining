@@ -31,6 +31,10 @@ public class DiscoverTask implements Runnable {
 
     @Override
     public void run() {
+        if (!nodeManager.isNeedMoreSyncPeers()) {
+            logger.info("Enough peers, ignore discovery");
+            return;
+        }
         discover(nodeId, 0, new ArrayList<Node>());
     }
 

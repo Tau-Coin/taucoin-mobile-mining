@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * The instance of this class responsible for discovery messages exchange with the specified Node
  * It also manages itself regarding inclusion/eviction from Kademlia table
@@ -84,7 +86,9 @@ public class NodeHandler {
     public NodeHandler(Node node, NodeManager nodeManager) {
         this.node = node;
         this.nodeManager = nodeManager;
-        changeState(State.Discovered);
+        if (node.getPort() == CONFIG.listenPort()) {
+            changeState(State.Discovered);
+        }
     }
 
     public InetSocketAddress getInetSocketAddress() {
