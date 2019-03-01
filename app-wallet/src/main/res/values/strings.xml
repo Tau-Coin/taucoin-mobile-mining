@@ -155,5 +155,7 @@
     <string name="mining_in_progress">Mining in progress</string>
     <string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>
     <string name="mining_new_block">You have mined a new block. Income: %sTAU</string>
+    <string name="mining_import_private_key">Please stop mining first</string>
+    <string name="mining_generate_private_key">Please stop mining first</string>
 
 </resources>

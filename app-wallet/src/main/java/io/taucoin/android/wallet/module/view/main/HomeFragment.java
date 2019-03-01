@@ -1,5 +1,6 @@
 package io.taucoin.android.wallet.module.view.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,10 +79,17 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UserUtil.setNickName(tvNick);
+    }
+
     @OnClick({R.id.tv_nick, R.id.btn_mining, R.id.tv_mining_details})
     public void onClick(View view) {
         if (!UserUtil.isImportKey()) {
-            ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+            Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
+            startActivityForResult(intent, 100);
             return;
         }
         switch (view.getId()) {
@@ -187,7 +195,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     KeyValue keyValue = MyApplication.getKeyValue();
                     if (keyValue != null) {
                         isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
-                        llMining.setVisibility(StringUtil.isNotEmpty(keyValue.getMiningState()) ? View.VISIBLE : View.GONE);
+                        boolean isMiner = StringUtil.isNotEmpty(keyValue.getMiningState());
+                        llMining.setVisibility(isMiner ? View.VISIBLE : View.GONE);
 
                         tvBlockHeight.setRightText(blockInfo.getBlockHeight());
                         tvBlockSynchronized.setRightText(blockInfo.getBlockSynchronized());

@@ -18,7 +18,6 @@ import java.util.Date;
 
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.TaucoinRemoteService;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.foundation.util.StringUtil;
@@ -61,7 +60,7 @@ public class RemoteService extends TaucoinRemoteService {
 
     @Override
     public void onDestroy() {
-        cancelMiningNotify();
+        stopForeground(true);
         super.onDestroy();
     }
 
@@ -70,6 +69,7 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     private void initNotificationManager() {
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = createNotificationChannel();
 
         Intent intent = new Intent(this, NotificationReceiver.class);
@@ -85,7 +85,6 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     public String createNotificationChannel() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "tauChannelId";
             CharSequence channelName = "tauChannelName";
@@ -99,8 +98,6 @@ public class RemoteService extends TaucoinRemoteService {
             notificationChannel.enableVibration(false);
             // Setting Display Mode
             notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(notificationChannel);
             return channelId;
         } else {
@@ -118,9 +115,6 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     private void sendMiningNotify(String msg) {
-        if(!MyApplication.getInstance().isBackground()){
-            return;
-        }
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_mining);
         remoteViews.setImageViewResource(R.id.iv_logo, getApplicationInfo().icon);
         remoteViews.setTextViewText(R.id.tv_msg, getString(R.string.app_name));
@@ -128,7 +122,11 @@ public class RemoteService extends TaucoinRemoteService {
         builder.setCustomContentView(remoteViews);
         notification = builder.build();
         notification.flags = Notification.FLAG_AUTO_CANCEL;
-        mNotificationManager.notify(NOTIFICATION_ID, notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(NOTIFICATION_ID, notification);
+        }else{
+            mNotificationManager.notify(NOTIFICATION_ID, notification);
+        }
     }
 
     private void sendBlockNotify(Bundle bundle) {

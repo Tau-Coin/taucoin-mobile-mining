@@ -103,7 +103,7 @@ public class MyApplication extends MultiDexApplication {
     }
 
     public boolean isBackground(){
-        return mFinalCount == 0;
+        return mFinalCount <= 0;
     }
 
     private int mFinalCount;

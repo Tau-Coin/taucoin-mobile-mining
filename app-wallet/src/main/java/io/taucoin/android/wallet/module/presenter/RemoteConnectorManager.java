@@ -297,7 +297,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
      * */
     public void sendMiningNotify(){
         Logger.d("sendMiningNotify");
-        if(mTaucoinConnector != null){
+        if(mTaucoinConnector != null && MyApplication.getInstance().isBackground()){
             int msgReid = MiningUtil.getMiningMsg();
             String msg = MyApplication.getInstance().getString(msgReid);
             mTaucoinConnector.sendMiningNotify(msg);

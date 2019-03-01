@@ -50,6 +50,10 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_import_key)
     void onImportKeyClick() {
+        if(MyApplication.getRemoteConnector().isInit()){
+            ToastUtils.showShortToast(R.string.mining_import_private_key);
+            return;
+        }
         Intent intent = new Intent(this, ImportKeyActivity.class);
         startActivity(intent);
         this.finish();
@@ -57,6 +61,10 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_generate_key)
     public void onBtnGenerateClicked() {
+        if(MyApplication.getRemoteConnector().isInit()){
+            ToastUtils.showShortToast(R.string.mining_generate_private_key);
+            return;
+        }
         mUserPresenter.showSureDialog(this);
     }
 

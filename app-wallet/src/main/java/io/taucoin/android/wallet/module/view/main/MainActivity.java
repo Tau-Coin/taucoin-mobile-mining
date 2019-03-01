@@ -151,7 +151,7 @@ public class MainActivity extends BaseActivity implements IMainView {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         for (Fragment fragment: mFragments) {
-            if(fragment != null && fragment.isVisible()){
+            if(fragment != null){
                 fragment.onActivityResult(requestCode, resultCode, data);
             }
         }

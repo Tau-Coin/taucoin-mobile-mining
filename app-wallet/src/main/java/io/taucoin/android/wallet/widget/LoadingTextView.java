@@ -82,7 +82,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
             if(isLoading){
                 pointNum ++;
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(300);
                     mHandler.sendEmptyMessage(0);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
