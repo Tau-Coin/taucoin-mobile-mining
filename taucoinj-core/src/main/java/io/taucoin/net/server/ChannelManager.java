@@ -143,7 +143,9 @@ public class ChannelManager {
         logger.info("New peers processed: " + processed + ", active peers added: " + addCnt + ", total active peers: " + activePeers.size());
 
         newPeers.removeAll(processed);
-        newPeers.clear();
+        for (Channel channel : processed) {
+            newPeersMap.values().remove(channel);
+        }
     }
 
     private void disconnect(Channel peer, ReasonCode reason) {

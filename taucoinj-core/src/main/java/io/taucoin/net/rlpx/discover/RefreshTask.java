@@ -30,6 +30,10 @@ public class RefreshTask extends DiscoverTask {
 
     @Override
     public void run() {
+        if (!super.nodeManager.isNeedMoreSyncPeers()) {
+            logger.info("Enough peers, ignore discovery");
+            return;
+        }
         discover(getNodeId(), 0, new ArrayList<Node>());
     }
 }
