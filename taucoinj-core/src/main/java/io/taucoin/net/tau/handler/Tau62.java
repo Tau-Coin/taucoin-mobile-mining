@@ -155,8 +155,10 @@ public class Tau62 extends TauHandler {
 
         // treat empty headers response as end of header sync
         if (received.isEmpty()) {
+            syncStats.setEmptyHashesGot();
             changeState(DONE_HASH_RETRIEVING);
         } else {
+            syncStats.setHashesGot();
             syncStats.addHashes(received.size());
 
             if (syncState == HASH_RETRIEVING && !commonAncestorFound) {

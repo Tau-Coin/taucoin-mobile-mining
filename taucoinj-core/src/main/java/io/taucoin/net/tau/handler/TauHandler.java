@@ -379,8 +379,14 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
         );
 
         if (newState == HASH_RETRIEVING) {
-            syncStats.reset();
-            startHashRetrieving();
+            if (syncStats.isEmptyHashesGotTimeout()) {
+                syncStats.reset();
+                startHashRetrieving();
+            } else {
+                loggerSync.info("Peer {} ignore hash retrieving, please wait {}s.",
+                        channel.getPeerIdShort(), syncStats.secondsSinceLastEmptyHashes());
+                changeState(DONE_HASH_RETRIEVING);
+            }
         }
         if (newState == BLOCK_RETRIEVING) {
             syncStats.reset();

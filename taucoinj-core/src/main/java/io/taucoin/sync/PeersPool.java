@@ -47,7 +47,7 @@ public class PeersPool implements Iterable<Channel> {
     private static final long DEFAULT_BAN_TIMEOUT = minutesToMillis(1);
     private static final long CONNECTION_TIMEOUT = secondsToMillis(30);
 
-    private static final int MIN_PEERS_COUNT = 3;
+    private static final int MIN_PEERS_COUNT = 2;
 
     private final Map<ByteArrayWrapper, Channel> activePeers = new HashMap<>();
     private final Set<Channel> bannedPeers = new HashSet<>();
@@ -154,7 +154,7 @@ public class PeersPool implements Iterable<Channel> {
             if (count62 >= MIN_PEERS_COUNT) return best62;
             if (count61 >= MIN_PEERS_COUNT) return best61;
 
-            if (isIn20PercentRange(best62.getTotalDifficulty(), best61.getTotalDifficulty())) {
+            if (isMoreThan(best62.getTotalDifficulty(), best61.getTotalDifficulty())) {
                 return best62;
             } else {
                 return best61;
