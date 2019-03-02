@@ -22,6 +22,7 @@ public class Transaction extends io.taucoin.core.Transaction implements Parcelab
     public void writeToParcel(Parcel parcel, int i) {
 
         parcel.writeByteArray(getEncoded());
+        parcel.writeString(TRANSACTION_STATUS);
     }
 
     public static final Parcelable.Creator<Transaction> CREATOR = new Parcelable.Creator<Transaction>() {
@@ -38,7 +39,7 @@ public class Transaction extends io.taucoin.core.Transaction implements Parcelab
     };
 
     private Transaction(Parcel in) {
-
         super(in.createByteArray());
+        TRANSACTION_STATUS = in.readString();
     }
 }

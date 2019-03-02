@@ -110,14 +110,14 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         boolean isSuccess = StringUtil.isSame(TransmitKey.TxResult.SUCCESSFUL, tx.getResult());
         boolean isConfirming = StringUtil.isSame(TransmitKey.TxResult.CONFIRMING, tx.getResult());
         int color = R.color.color_red;
-        if (isConfirming) {
-            color = R.color.color_blue;
-        } else if (isSuccess) {
-//            color = tx.getConfirmations() > TransmitKey.TX_CONFIRMATIONS ? R.color.color_black : R.color.color_blue;
-        }
-
-        if (StringUtil.isEmpty(tx.getResult())) {
-            color = R.color.color_black;
+        if(tx.getNotRolled() > 0){
+            if (isConfirming) {
+                color = R.color.color_blue;
+            } else if (isSuccess) {
+                color = R.color.color_black;
+            }else if (StringUtil.isEmpty(tx.getResult())) {
+                color = R.color.color_black;
+            }
         }
         int textColor = ContextCompat.getColor(parent.getContext(), color);
         groupViewHolder.tvAmount.setTextColor(textColor);

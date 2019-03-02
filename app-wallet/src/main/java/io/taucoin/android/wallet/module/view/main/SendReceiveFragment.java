@@ -117,13 +117,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             boolean isMiner = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
             boolean isInit = MyApplication.getRemoteConnector().isInit();
             boolean isSync = MyApplication.getRemoteConnector().isSync();
-            if(isMiner){
+            if(isMiner && (!isInit || !isSync)){
                 tvMiningMsg.setVisibility(View.VISIBLE);
-                if(!isInit || !isSync){
-                    btnSend.setEnabled(false);
-                    btnSend.setBackgroundColor(getResources().getColor(R.color.color_grey));
-                    tvMiningMsg.setLoadingText(MiningUtil.getMiningMsg());
-                }
+                btnSend.setEnabled(false);
+                btnSend.setBackgroundColor(getResources().getColor(R.color.color_grey));
+                tvMiningMsg.setLoadingText(MiningUtil.getMiningMsg());
             }
         }
     }

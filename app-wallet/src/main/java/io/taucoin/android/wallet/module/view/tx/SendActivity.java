@@ -133,8 +133,7 @@ public class SendActivity extends BaseActivity implements ISendView {
                 @Override
                 public void handleData(BlockInfo blockInfo) {
                     if(MyApplication.getRemoteConnector().isSync()
-                        && blockInfo.getBlockSynchronized() > 0
-                        && blockInfo.getBlockSynchronized() == blockInfo.getBlockHeight()){
+                        && blockInfo.getBlockSynchronized() > 0){
                         checkForm();
                     }else{
                         DialogManager.showSureDialog(SendActivity.this, R.string.bloc_in_synchronization, R.string.common_ok);

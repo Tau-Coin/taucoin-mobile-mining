@@ -23,6 +23,7 @@ import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
 import io.taucoin.facade.TaucoinImpl;
@@ -202,10 +203,14 @@ public class MiningModel implements IMiningModel{
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             if(transaction != null){
                 String txId = transaction.getTxid();
-                if(StringUtil.isSame(transaction.TRANSACTION_STATUS, TaucoinImpl.TRANSACTION_SUBMITSUCCESS)){
+                String result = transaction.TRANSACTION_STATUS;
+                if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITSUCCESS)){
                     MiningUtil.saveTransactionSuccess();
                 }else{
-                    MiningUtil.saveTransactionFail(txId, transaction.TRANSACTION_STATUS);
+                    if(StringUtil.isNotEmpty(result)){
+                        ToastUtils.showShortToast(result);
+                    }
+                    MiningUtil.saveTransactionFail(txId, result);
                 }
             }
             emitter.onNext(true);
