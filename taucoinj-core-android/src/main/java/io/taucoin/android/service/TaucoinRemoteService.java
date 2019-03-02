@@ -122,7 +122,9 @@ public class TaucoinRemoteService extends TaucoinService {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        taucoin.close();
+        if (taucoin != null) {
+            taucoin.close();
+        }
         isTaucoinStarted = false;
     }
 
