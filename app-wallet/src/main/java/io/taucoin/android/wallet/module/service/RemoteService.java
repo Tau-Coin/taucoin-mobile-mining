@@ -59,11 +59,21 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        cancelAll();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        cancelAll();
+    }
+
+    @Override
     public void onDestroy() {
         cancelMiningNotify();
-        if(mNotificationManager != null){
-            mNotificationManager.cancelAll();
-        }
+        cancelAll();
         super.onDestroy();
     }
 
@@ -165,5 +175,11 @@ public class RemoteService extends TaucoinRemoteService {
 
     private void cancelMiningNotify(){
         stopForeground(true);
+    }
+
+    private void cancelAll(){
+        if(mNotificationManager != null){
+            mNotificationManager.cancelAll();
+        }
     }
 }

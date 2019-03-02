@@ -202,7 +202,9 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     private void dbWrite() {
         synchronized (this) {
             for (NodeHandler handler : nodeHandlerMap.values()) {
-                nodeStatsDB.put(handler.getNode(), handler.getNodeStatistics().getPersistent());
+                if(nodeStatsDB != null){
+                    nodeStatsDB.put(handler.getNode(), handler.getNodeStatistics().getPersistent());
+                }
             }
         }
         db.commit();

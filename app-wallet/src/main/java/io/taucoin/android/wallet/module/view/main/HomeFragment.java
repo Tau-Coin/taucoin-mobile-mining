@@ -31,7 +31,6 @@ import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.manage.ProfileActivity;
 import io.taucoin.android.wallet.module.view.mining.BlockListActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
-import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.UserUtil;
@@ -235,5 +234,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         if (!UserUtil.isImportKey()) {
             refreshLayout.finishRefresh(1000);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if(tvMiningMsg != null){
+            tvMiningMsg.closeLoading();
+        }
+        super.onDestroy();
     }
 }

@@ -278,4 +278,12 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     public void finishLoadMore() {
         refreshLayout.finishLoadmore();
     }
+
+    @Override
+    public void onDestroy() {
+        if(tvMiningMsg != null){
+            tvMiningMsg.closeLoading();
+        }
+        super.onDestroy();
+    }
 }
