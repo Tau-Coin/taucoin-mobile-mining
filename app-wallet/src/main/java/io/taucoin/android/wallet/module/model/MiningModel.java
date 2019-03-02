@@ -21,6 +21,7 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
@@ -150,25 +151,15 @@ public class MiningModel implements IMiningModel{
         if(txList != null && txList.size() > 0){
             for (Transaction transaction : txList) {
                 String txId = Hex.toHexString(transaction.getHash());
+                long blockTime = new BigInteger(transaction.getTime()).longValue();
                 TransactionHistory txHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
                 if(txHistory != null){
                     txHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
                     txHistory.setNotRolled(isConnect ? 1 : 0);
+                    txHistory.setBlockTime(blockTime);
+                    txHistory.setBlockNum(blockNumber);
+                    txHistory.setBlockHash(blockHash);
                     TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
-                }else{
-                    if(isConnect){
-                        long blockTime = new BigInteger(transaction.getTime()).longValue();
-                        TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
-                        if(history != null){
-                            history.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                            history.setNotRolled(1);
-                            history.setBlockTime(blockTime);
-                            history.setBlockNum(blockNumber);
-                            history.setBlockHash(blockHash);
-
-                            TransactionHistoryDaoUtils.getInstance().insertOrReplace(history);
-                        }
-                    }
                 }
             }
         }
@@ -212,6 +203,7 @@ public class MiningModel implements IMiningModel{
                     }
                     MiningUtil.saveTransactionFail(txId, result);
                 }
+                EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())

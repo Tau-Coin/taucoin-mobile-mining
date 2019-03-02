@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import com.mofei.tau.R;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.OnTouch;
 import io.reactivex.ObservableOnSubscribe;
 import io.taucoin.android.wallet.MyApplication;
@@ -29,6 +32,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
@@ -37,6 +41,7 @@ import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
@@ -189,15 +194,34 @@ public class SendActivity extends BaseActivity implements ISendView {
                 ProgressManager.closeProgressDialog();
                 if(isSuccess){
                     // clear all editText data
-                    etAddress.getText().clear();
-                    etAmount.getText().clear();
-                    etMemo.getText().clear();
-                    etFee.setText(R.string.send_normal_value);
+                    clearAllForm();
                 }else {
                     ToastUtils.showShortToast(R.string.send_tx_invalid_error);
                 }
             }
         });
+    }
+    @Override
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MessageEvent object) {
+        if (object == null) {
+            return;
+        }
+        switch (object.getCode()) {
+            case CLEAR_SEND:
+                clearAllForm();
+                break;
+        }
+    }
+
+    private void clearAllForm() {
+        if(etAddress == null){
+            return;
+        }
+        etAddress.getText().clear();
+        etAmount.getText().clear();
+        etMemo.getText().clear();
+        etFee.setText(R.string.send_normal_value);
     }
 
     private void showSoftInput() {

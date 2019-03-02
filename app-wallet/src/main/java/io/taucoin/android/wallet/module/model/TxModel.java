@@ -308,6 +308,7 @@ public class TxModel implements ITxModel {
                         tx.setFee(bean.getFee());
                         tx.setBlockNum(bean.getBlockNum());
                         tx.setBlockHash(bean.getBlockHash());
+                        tx.setResult(TransmitKey.TxResult.SUCCESSFUL);
                         tx.setNotRolled(MiningUtil.parseTxState(bean.getNotRolled(), bean.getBlockNum()));
                         TransactionHistoryDaoUtils.getInstance().saveTxRecords(tx);
                     }

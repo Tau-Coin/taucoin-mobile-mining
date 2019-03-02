@@ -316,7 +316,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
      * */
     public void sendBlockNotify(String reward){
         Logger.d("sendBlockNotify");
-        if(mTaucoinConnector != null){
+        if(mTaucoinConnector != null && isSync()){
             reward = FmtMicrometer.fmtAmount(reward);
             String msg = MyApplication.getInstance().getString(R.string.mining_new_block);
             msg = String.format(msg, reward);

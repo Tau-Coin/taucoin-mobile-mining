@@ -15,7 +15,8 @@ public class MessageEvent{
         MINING_STATE,
         GET_BLOCK,
         GET_BLOCK_LIST,
-        CONSOLE_LOG
+        CONSOLE_LOG,
+        CLEAR_SEND
     }
     private Object data;
 

@@ -115,8 +115,6 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
                 color = R.color.color_blue;
             } else if (isSuccess) {
                 color = R.color.color_black;
-            }else if (StringUtil.isEmpty(tx.getResult())) {
-                color = R.color.color_black;
             }
         }
         int textColor = ContextCompat.getColor(parent.getContext(), color);

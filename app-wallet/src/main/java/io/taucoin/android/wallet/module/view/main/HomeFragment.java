@@ -150,7 +150,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
-    private void showMiningMsg() {
+    private synchronized void showMiningMsg() {
         MyApplication.getRemoteConnector().sendMiningNotify();
         if(tvMiningMsg != null){
             if(UserUtil.isImportKey()){
@@ -180,7 +180,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         handleMiningView(true);
     }
 
-    public void handleMiningView(boolean isNeedInit) {
+    public synchronized void handleMiningView(boolean isNeedInit) {
         showMiningMsg();
         if (UserUtil.isImportKey() && btnMining != null) {
             miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
