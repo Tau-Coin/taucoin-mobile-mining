@@ -114,8 +114,8 @@ public class TaucoinRemoteService extends TaucoinService {
 
     @Override
     public void onDestroy() {
+        // super.onDestroy will call taucoin.close()
         super.onDestroy();
-        taucoin.close();
         isTaucoinStarted = false;
     }
 

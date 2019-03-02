@@ -207,8 +207,10 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                 }
             }
         }
-        db.commit();
-        logger.info("Write Node statistics to DB: " + nodeStatsDB.size() + " nodes.");
+        if (db != null) {
+            db.commit();
+        }
+        logger.info("Write Node statistics to DB: " + (nodeStatsDB != null ? nodeStatsDB.size() : 0) + " nodes.");
     }
 
     public void setMessageSender(Functional.Consumer<DiscoveryEvent> messageSender) {
