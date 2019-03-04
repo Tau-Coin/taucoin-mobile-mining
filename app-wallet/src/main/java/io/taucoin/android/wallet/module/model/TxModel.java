@@ -167,15 +167,12 @@ public class TxModel implements ITxModel {
                     TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
             transaction.sign(privateKey);
 
-            int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
-
             Logger.i("Create tx success");
             Logger.i(transaction.toString());
             txHistory.setTxId(Hex.toHexString(transaction.getHash()));
             txHistory.setResult(TransmitKey.TxResult.CONFIRMING);
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(DateUtil.getCurrentTime());
-            txHistory.setBlockNum(blockHeight);
             txHistory.setNotRolled(1);
 
             insertTransactionHistory(txHistory);
@@ -296,21 +293,24 @@ public class TxModel implements ITxModel {
                 List<RawTxBean> txList = rawTxList.getRecords();
                 if(null != txList && txList.size() > 0){
                     for (RawTxBean bean : txList) {
-                        TransactionHistory tx = new TransactionHistory();
-                        tx.setFromAddress(bean.getAddin());
-                        tx.setToAddress(bean.getAddout());
-                        // time and blockTime need set value here!
-                        tx.setCreateTime(String.valueOf(bean.getBlockTime()));
-                        tx.setBlockTime(bean.getBlockTime());
+                        TransactionHistory tx = TransactionHistoryDaoUtils.getInstance().queryTransactionById(bean.getTxid());
+                        if(tx == null){
+                            tx = new TransactionHistory();
+                            tx.setFromAddress(bean.getAddin());
+                            tx.setToAddress(bean.getAddout());
+                            // createTime and blockTime need set value here!
+                            tx.setCreateTime(String.valueOf(bean.getBlockTime()));
 
-                        tx.setTxId(bean.getTxid());
-                        tx.setAmount(bean.getVout());
-                        tx.setFee(bean.getFee());
+                            tx.setTxId(bean.getTxid());
+                            tx.setAmount(bean.getVout());
+                            tx.setFee(bean.getFee());
+                        }
+                        tx.setBlockTime(bean.getBlockTime());
                         tx.setBlockNum(bean.getBlockNum());
                         tx.setBlockHash(bean.getBlockHash());
                         tx.setResult(TransmitKey.TxResult.SUCCESSFUL);
                         tx.setNotRolled(MiningUtil.parseTxState(bean.getNotRolled(), bean.getBlockNum()));
-                        TransactionHistoryDaoUtils.getInstance().saveTxRecords(tx);
+                        TransactionHistoryDaoUtils.getInstance().insertOrReplace(tx);
                     }
                 }
             }

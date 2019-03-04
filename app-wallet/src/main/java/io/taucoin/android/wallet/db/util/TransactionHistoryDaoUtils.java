@@ -20,8 +20,6 @@ import io.taucoin.android.wallet.db.GreenDaoManager;
 import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.foundation.util.StringUtil;
-
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
@@ -78,27 +76,10 @@ public class TransactionHistoryDaoUtils {
         getTransactionHistoryDao().insertOrReplace(tx);
     }
 
-    public void saveTxRecords(TransactionHistory tx) {
-        QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-        db.where(TransactionHistoryDao.Properties.TxId.eq(tx.getTxId()));
-
-        List<TransactionHistory> list = db.list();
-        if(list.size() > 0){
-            TransactionHistory bean = list.get(0);
-            if(StringUtil.isNotSame(bean.getResult(), tx.getResult())){
-                bean.setResult(tx.getResult());
-                bean.setNotRolled(tx.getNotRolled());
-                insertOrReplace(bean);
-            }
-        }else{
-            insertOrReplace(tx);
-        }
-    }
-
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
          db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
-                 TransactionHistoryDao.Properties.NotRolled.eq(1),
+                 TransactionHistoryDao.Properties.NotRolled.notEq(0),
                 db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                     TransactionHistoryDao.Properties.ToAddress.eq(address))
                 ).orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
@@ -110,7 +91,7 @@ public class TransactionHistoryDaoUtils {
     public String getNewestTxTime(String address) {
         long time = 0L;
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-        db.where(TransactionHistoryDao.Properties.Result.isNull(),
+        db.where(TransactionHistoryDao.Properties.CreateTime.eq(TransactionHistoryDao.Properties.BlockTime),
             db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                 TransactionHistoryDao.Properties.ToAddress.eq(address))
         )

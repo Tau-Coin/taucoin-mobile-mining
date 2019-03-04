@@ -75,6 +75,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         handleMiningView();
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
         return view;
     }
 

@@ -118,7 +118,7 @@ public class MyApplication extends MultiDexApplication {
                 mFinalCount++;
                 // back to front
                 if (mFinalCount == 1) {
-                    MyApplication.getRemoteConnector().cancelMiningNotify();
+//                    MyApplication.getRemoteConnector().cancelMiningNotify();
                 }
             }
 
@@ -137,7 +137,7 @@ public class MyApplication extends MultiDexApplication {
                 mFinalCount--;
                 if (mFinalCount == 0) {
                     // front to back
-                    MyApplication.getRemoteConnector().sendMiningNotify();
+//                    MyApplication.getRemoteConnector().sendMiningNotify();
                 }
             }
 

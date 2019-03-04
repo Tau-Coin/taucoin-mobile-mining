@@ -27,12 +27,13 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
-import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -91,6 +92,34 @@ public class TxPresenter {
     }
 
     public void handleSendTransaction(TransactionHistory txBean, LogicObserver<Boolean> observer){
+        mTxModel.getBlockHeight(new TAUObserver<DataResult<Integer>>() {
+            @Override
+            public void handleError(String msg, int msgCode) {
+                observer.handleData(false);
+            }
+
+            @Override
+            public void handleData(DataResult<Integer> result) {
+                super.handleData(result);
+                if(result != null && result.getData() > 0){
+                    Logger.d("getBlockHeight =" + result.getData());
+                    mTxModel.updateBlockHeight(result.getData(), new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean keyValue) {
+                            EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+                        }
+                    });
+
+                    txBean.setBlockNum(result.getData());
+                    createTransaction(txBean, observer);
+                }else{
+                    observer.onNext(false);
+                }
+            }
+        });
+    }
+
+    private void createTransaction(TransactionHistory txBean, LogicObserver<Boolean> observer){
         mTxModel.createTransaction(txBean, new LogicObserver<Transaction>() {
             @Override
             public void handleData(Transaction transaction) {

@@ -110,7 +110,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         boolean isSuccess = StringUtil.isSame(TransmitKey.TxResult.SUCCESSFUL, tx.getResult());
         boolean isConfirming = StringUtil.isSame(TransmitKey.TxResult.CONFIRMING, tx.getResult());
         int color = R.color.color_red;
-        if(tx.getNotRolled() > 0){
+        if(tx.getNotRolled() != 0){
             if (isConfirming) {
                 color = R.color.color_blue;
             } else if (isSuccess) {
