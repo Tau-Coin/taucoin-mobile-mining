@@ -23,4 +23,5 @@ public class Constants {
 
     public static final BigInteger SECP256K1N = new BigInteger("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16);
     public static final BigInteger SECP256K1N_HALF = SECP256K1N.divide(BigInteger.valueOf(2));
+    public static final String BURN_COIN_ADDR = "0000000000000000000000000000000000000000";
 }
