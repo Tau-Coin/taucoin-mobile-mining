@@ -386,6 +386,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
                 loggerSync.info("Peer {} ignore hash retrieving, please wait {}s.",
                         channel.getPeerIdShort(), syncStats.secondsSinceLastEmptyHashes());
                 changeState(DONE_HASH_RETRIEVING);
+                return;
             }
         }
         if (newState == BLOCK_RETRIEVING) {

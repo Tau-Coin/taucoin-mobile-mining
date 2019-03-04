@@ -417,8 +417,6 @@ public class SyncManager {
             queue.clearHeaders();
         }
 
-        master.changeSyncState(HASH_RETRIEVING);
-
         if (logger.isInfoEnabled()) logger.info(
                 "Peer {}: {} initiated, lastHashToAsk [{}], askLimit [{}]",
                 master.getPeerIdShort(),
@@ -426,6 +424,8 @@ public class SyncManager {
                 Hex.toHexString(master.getLastHashToAsk()),
                 master.getMaxHashesAsk()
         );
+
+        master.changeSyncState(HASH_RETRIEVING);
     }
 
     boolean hasBlockHashes() {
@@ -481,7 +481,7 @@ public class SyncManager {
                         if (lackSize <= 0) {
                             return;
                         }
-                        pool.connect(handler.getNode());
+                        //pool.connect(handler.getNode());
                     }
 
                     @Override
