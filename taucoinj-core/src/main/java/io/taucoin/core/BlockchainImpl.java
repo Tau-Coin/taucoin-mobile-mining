@@ -306,6 +306,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             BigInteger cumulativeDifficulty = ProofOfTransaction.
                     calculateCumulativeDifficulty(lastCumulativeDifficulty, baseTarget);
             block.setCumulativeDifficulty(cumulativeDifficulty);
+            BigInteger curTotalFee = preBlock.getCumulativeFee();
+            for(Transaction tr: block.getTransactionsList()){
+                curTotalFee.add(new BigInteger(tr.getFee()));
+            }
+            block.setCumulativeFee(curTotalFee);
         }
 
         if (logger.isInfoEnabled())
@@ -387,10 +392,15 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 config.getForgerPubkey(),
                 option,
                 txs);
+        BigInteger curTotalfee = parent.getCumulativeFee();
+        for(Transaction tr: txs){
+            curTotalfee.add(new BigInteger(tr.getFee()));
+        }
         block.setNumber(parent.getNumber() + 1);
         block.setBaseTarget(baseTarget);
         block.setGenerationSignature(generationSignature);
         block.setCumulativeDifficulty(cumulativeDifficulty);
+        block.setCumulativeFee(curTotalfee);
         block.sign(config.getForgerPrikey());
 
 //        pushState(parent.getHash());

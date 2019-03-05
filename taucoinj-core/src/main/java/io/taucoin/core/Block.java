@@ -41,6 +41,7 @@ public class Block {
     private BigInteger baseTarget; //this is uint64 type so here we should use compact type
     private byte[] generationSignature;
     private BigInteger cumulativeDifficulty = BigInteger.ZERO; //this is total chain difficulty
+    private BigInteger cumulativeFee = BigInteger.ZERO;
 
     // Store stateRoot into just local block not network block.
     private byte[] stateRoot;
@@ -155,21 +156,24 @@ public class Block {
             byte[] cyBytes = block.get(4).getRLPData();
             this.cumulativeDifficulty = cyBytes == null ? BigInteger.ZERO
                     : new BigInteger(1, cyBytes);
+            byte[] culFee  = block.get(5).getRLPData();
+            this.cumulativeFee = culFee == null ? BigInteger.ZERO
+                    : new BigInteger(1,culFee);
 
-            RLPList items = (RLPList) RLP.decode2(block.get(5).getRLPData()).get(0);
+            RLPList items = (RLPList) RLP.decode2(block.get(6).getRLPData()).get(0);
             logger.info("items size is {}",items.size());
             // Parse blockSignature
             byte[] r = items.get(0).getRLPData();
             byte[] s = items.get(1).getRLPData();
             this.blockSignature = ECDSASignature.fromComponents(r, s);
             // Parse option
-            this.option = block.get(6).getRLPData()[0];
+            this.option = block.get(7).getRLPData()[0];
 
-            this.stateRoot = block.get(7).getRLPData();
+            this.stateRoot = block.get(8).getRLPData();
 
-            if(block.size() > 8) {
+            if(block.size() > 9) {
                 // Parse Transactions
-                RLPList txTransactions = (RLPList) block.get(8);
+                RLPList txTransactions = (RLPList) block.get(9);
                 // here may need original trie
                 this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
             }
@@ -286,6 +290,14 @@ public class Block {
     public BigInteger getCumulativeDifficulty() {
         if (!parsed) parseRLP();
         return this.cumulativeDifficulty;
+    }
+
+    public BigInteger getCumulativeFee() {
+        return cumulativeFee;
+    }
+
+    public void setCumulativeFee(BigInteger cumulativeFee) {
+        this.cumulativeFee = cumulativeFee;
     }
 
     /**
@@ -494,6 +506,7 @@ public class Block {
         byte[] baseTarget = RLP.encodeBigInteger(this.baseTarget == null ? BigInteger.valueOf(0x0ffffffff): this.baseTarget);
         byte[] generationSignature = RLP.encodeElement(this.generationSignature);
         byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty == null ? BigInteger.valueOf(0xffffff):this.cumulativeDifficulty);
+        byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);
         byte[] signature = getSignatureEncoded();
         byte[] option = getOptionEncoded();
         byte[] stateRootEncoded = RLP.encodeElement(this.stateRoot);
@@ -504,6 +517,7 @@ public class Block {
         body.add(baseTarget);
         body.add(generationSignature);
         body.add(cumulativeDifficulty);
+        body.add(cumulativeFee);
         body.add(signature);
         body.add(option);
         body.add(stateRootEncoded);

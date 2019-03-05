@@ -166,8 +166,15 @@ public class BlockForger {
         bestBlock = blockchain.getBestBlock();
         baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
+        BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
         if (forgingPower.longValue() < 0) {
             logger.error("Forging Power < 0!!!");
+            return false;
+        }
+        long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
+        logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
+        if (balance.longValue() < hisAverageFee){
+            logger.error("balance less than history average fee");
             return false;
         }
 
