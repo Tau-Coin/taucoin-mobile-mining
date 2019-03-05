@@ -17,7 +17,7 @@
         android:id="@+id/balance_text"
         style="@style/style_tau_black"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:background="@color/color_white"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center|center_vertical"

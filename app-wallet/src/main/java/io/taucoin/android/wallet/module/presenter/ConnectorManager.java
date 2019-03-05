@@ -308,6 +308,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
                     importForgerPrivkey(privateKey);
                     startSyncAll();
                 }else{
+                    MyApplication.getRemoteConnector().sendMiningNotify();
                     importPrivkeyAndInit(privateKey);
                 }
             }else{
