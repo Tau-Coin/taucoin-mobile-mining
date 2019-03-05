@@ -7,7 +7,7 @@ package io.taucoin.sync;
  * @since 20.08.2015
  */
 public class SyncStatistics {
-    private static final long EMPTY_HASHES_GOT_TIMEOUT = 300 * 1000;
+    private static final long EMPTY_HASHES_GOT_TIMEOUT = 600 * 1000;
 
     private long updatedAt;
     private long blocksCount;
