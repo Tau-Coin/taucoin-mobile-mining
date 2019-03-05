@@ -107,11 +107,10 @@ public class TxPresenter {
                         @Override
                         public void handleData(Boolean keyValue) {
                             EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+
+                            createTransaction(txBean, observer);
                         }
                     });
-
-                    txBean.setBlockNum(result.getData());
-                    createTransaction(txBean, observer);
                 }else{
                     observer.onNext(false);
                 }

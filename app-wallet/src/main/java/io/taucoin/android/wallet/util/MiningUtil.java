@@ -137,7 +137,7 @@ public class MiningUtil {
 
     static long pendingAmount() {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        List<TransactionHistory> txPendingList = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
+        List<TransactionHistory> txPendingList = TransactionHistoryDaoUtils.getInstance().getPendingAmountList(address);
         BigInteger pendingAmount = new BigInteger("0");
         if(txPendingList != null && txPendingList.size() > 0){
             for (TransactionHistory transaction : txPendingList) {

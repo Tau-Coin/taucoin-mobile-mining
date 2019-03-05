@@ -167,6 +167,7 @@ public class TxModel implements ITxModel {
                     TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
             transaction.sign(privateKey);
 
+            int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
             Logger.i("Create tx success");
             Logger.i(transaction.toString());
             txHistory.setTxId(Hex.toHexString(transaction.getHash()));
@@ -174,6 +175,7 @@ public class TxModel implements ITxModel {
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(DateUtil.getCurrentTime());
             txHistory.setNotRolled(1);
+            txHistory.setBlockNum(blockHeight);
 
             insertTransactionHistory(txHistory);
             emitter.onNext(transaction);
@@ -336,7 +338,10 @@ public class TxModel implements ITxModel {
             if(entry == null){
                 entry = new BlockInfo();
             }
-            entry.setBlockHeight(blockHeight);
+
+            if(blockHeight > entry.getBlockHeight()){
+                entry.setBlockHeight(blockHeight);
+            }
             BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())

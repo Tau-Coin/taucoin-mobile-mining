@@ -52,13 +52,20 @@ public class TransactionHistoryDaoUtils {
     }
 
     public List<TransactionHistory> getTxPendingList(String formAddress) {
-        QueryBuilder qb = getTransactionHistoryDao().queryBuilder();
-        return getTransactionHistoryDao().queryBuilder()
-        .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
+        QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
+        return qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
                 qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING),
                         qb.and(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL),
                                 TransactionHistoryDao.Properties.NotRolled.eq(1))))
         .list();
+    }
+
+    public List<TransactionHistory> getPendingAmountList(String formAddress) {
+        return getTransactionHistoryDao().queryBuilder()
+                .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
+                        TransactionHistoryDao.Properties.NotRolled.notEq(0),
+                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING))
+                .list();
     }
 
     public TransactionHistory queryTransactionById(String txId) {
