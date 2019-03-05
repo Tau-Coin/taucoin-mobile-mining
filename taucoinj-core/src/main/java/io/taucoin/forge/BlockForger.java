@@ -249,7 +249,7 @@ public class BlockForger {
         miningBlock = null;
 
         // broadcast the block
-        logger.debug("Importing newly mined block " + newBlock.getShortHash() + " ...");
+        logger.debug("Importing newly mined block:{} fee is: {}",newBlock.getShortHash(),newBlock.getCumulativeFee());
         ImportResult importResult =  taucoin.addNewMinedBlock(newBlock);
         logger.debug("Mined block import result is " + importResult + " : " + newBlock.getShortHash());
     }
