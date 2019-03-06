@@ -129,7 +129,7 @@ public class SyncQueue {
      */
     private void produceQueue() {
 
-        while (1==1){
+        while (!Thread.interrupted()){
 
             BlockWrapper wrapper = null;
             try {

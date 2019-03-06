@@ -67,7 +67,10 @@ public class TaucoinService extends Service {
             jsonRpcServerThread.interrupt();
             jsonRpcServerThread = null;
         }
-        taucoin.close();
+        if (taucoin != null) {
+            taucoin.close();
+            taucoin = null;
+        }
     }
 
     protected class InitializeTask extends AsyncTask<Void, Void, Void> {

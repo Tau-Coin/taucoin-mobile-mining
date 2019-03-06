@@ -42,9 +42,11 @@ public class IndexedBlockStore implements BlockStore{
     @Override
     public void close(){
         logger.info("close block store data base...");
-        if(indexDB != null && blocks != null) {
+        if (indexDB != null && blocks != null) {
             indexDB.close();
+            indexDB = null;
             blocks.close();
+            blocks = null;
         }
     }
 

@@ -124,6 +124,7 @@ public class TaucoinRemoteService extends TaucoinService {
         super.onTaskRemoved(rootIntent);
         if (taucoin != null) {
             taucoin.close();
+            taucoin = null;
         }
         isTaucoinStarted = false;
     }
@@ -751,7 +752,10 @@ public class TaucoinRemoteService extends TaucoinService {
      */
     protected void closeTaucoin(Message message) {
 
-        taucoin.close();
+        if (taucoin != null) {
+            taucoin.close();
+            taucoin = null;
+        }
         isTaucoinStarted = false;
 
         Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_DONE, 0, 0);
