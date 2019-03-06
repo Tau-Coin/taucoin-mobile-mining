@@ -293,6 +293,7 @@ public class Block {
     }
 
     public BigInteger getCumulativeFee() {
+        if (!parsed) parseRLP();
         return cumulativeFee;
     }
 
