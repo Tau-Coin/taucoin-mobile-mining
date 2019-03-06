@@ -87,17 +87,20 @@ public class TaucoinModule {
     static Taucoin taucoin = null;
 
     static BlockStore sBlockStore = null;
+    static boolean isStarted = false;
 
     public TaucoinModule(Context context) {
 
         this.context = context;
         this.storeAllBlocks = false;
+        isStarted = true;
     }
 
     public TaucoinModule(Context context,boolean storeAllBlocks) {
 
         this.context = context;
         this.storeAllBlocks = storeAllBlocks;
+        isStarted = true;
     }
 
     @Provides
@@ -361,5 +364,16 @@ public class TaucoinModule {
             TauHandlerFactory tauHandlerFactory, HandshakeHandler handshakeHandler) {
         return new Channel(msgQueue, p2pHandler, messageCodec, nodeManager,
                 tauHandlerFactory, handshakeHandler);
+    }
+
+    public static void close() {
+        if (!isStarted) {
+            return;
+        }
+
+        worldManager = null;
+        taucoin = null;
+        sBlockStore = null;
+        isStarted = false;
     }
 }

@@ -116,6 +116,7 @@ public class TaucoinRemoteService extends TaucoinService {
     public void onDestroy() {
         // super.onDestroy will call taucoin.close()
         super.onDestroy();
+        TaucoinModule.close();
         isTaucoinStarted = false;
     }
 
@@ -126,6 +127,7 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.close();
             taucoin = null;
         }
+        TaucoinModule.close();
         isTaucoinStarted = false;
     }
 
@@ -756,6 +758,7 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.close();
             taucoin = null;
         }
+        TaucoinModule.close();
         isTaucoinStarted = false;
 
         Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_DONE, 0, 0);
