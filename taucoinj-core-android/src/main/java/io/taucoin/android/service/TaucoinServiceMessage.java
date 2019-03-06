@@ -134,4 +134,19 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_GET_BLOCKS = 26;
 
+    /**
+     * Send mining notify event
+     */
+    public static final int MSG_SEND_MINING_NOTIFY = 27;
+
+    /**
+     * Send close mining notify event
+     */
+    public static final int MSG_CLOSE_MINING_NOTIFY = 28;
+
+    /**
+     * Send block notify event
+     */
+    public static final int MSG_SEND_BLOCK_NOTIFY = 29;
+
 }

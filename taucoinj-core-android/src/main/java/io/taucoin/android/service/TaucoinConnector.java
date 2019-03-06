@@ -756,7 +756,7 @@ public class TaucoinConnector extends ServiceConnector {
         if (!isBound)
             return;
 
-        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_SEND_MINING_NOTIFY, 0, 0);
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_SEND_MINING_NOTIFY, 0, 0);
         msg.replyTo = clientMessenger;
         Bundle data = new Bundle();
         data.putString("data", object);
@@ -772,7 +772,7 @@ public class TaucoinConnector extends ServiceConnector {
         if (!isBound)
             return;
 
-        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_MINING_NOTIFY, 0, 0);
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_CLOSE_MINING_NOTIFY, 0, 0);
         msg.replyTo = clientMessenger;
         try {
             serviceMessenger.send(msg);
@@ -785,7 +785,7 @@ public class TaucoinConnector extends ServiceConnector {
         if (!isBound)
             return;
 
-        Message msg = Message.obtain(null, TaucoinClientMessage.MSG_SEND_BLOCK_NOTIFY, 0, 0);
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_SEND_BLOCK_NOTIFY, 0, 0);
         msg.replyTo = clientMessenger;
         Bundle data = new Bundle();
         data.putString("data", object);

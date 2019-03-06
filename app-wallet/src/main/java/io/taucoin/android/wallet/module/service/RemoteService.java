@@ -16,8 +16,8 @@ import com.mofei.tau.R;
 
 import java.util.Date;
 
-import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.TaucoinRemoteService;
+import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.foundation.util.StringUtil;
@@ -43,13 +43,13 @@ public class RemoteService extends TaucoinRemoteService {
     @Override
     protected boolean handleMessage(Message message) {
         switch (message.what) {
-            case TaucoinClientMessage.MSG_SEND_MINING_NOTIFY:
+            case TaucoinServiceMessage.MSG_SEND_MINING_NOTIFY:
                 sendMiningNotify(message.getData());
                 break;
-            case TaucoinClientMessage.MSG_CLOSE_MINING_NOTIFY:
+            case TaucoinServiceMessage.MSG_CLOSE_MINING_NOTIFY:
                 cancelMiningNotify();
                 break;
-            case TaucoinClientMessage.MSG_SEND_BLOCK_NOTIFY:
+            case TaucoinServiceMessage.MSG_SEND_BLOCK_NOTIFY:
                 sendBlockNotify(message.getData());
                 break;
             default:
