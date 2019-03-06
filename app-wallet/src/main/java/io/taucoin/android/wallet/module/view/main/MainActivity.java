@@ -143,7 +143,7 @@ public class MainActivity extends BaseActivity implements IMainView {
         ProgressManager.closeProgressDialog();
         TxService.stopService();
         UpgradeService.stopUpdateService();
-        MyApplication.getRemoteConnector().cancelRemoteConnector();
+        MyApplication.getRemoteConnector().cancelAllConnector();
         super.onDestroy();
     }
 

@@ -45,7 +45,10 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.net.message.ReasonCode;
+import io.taucoin.net.p2p.DisconnectMessage;
 import io.taucoin.net.p2p.HelloMessage;
 
 public class RemoteConnectorManager extends ConnectorManager implements ConnectorHandler {
@@ -123,9 +126,17 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         break;
                     case EVENT_RECEIVE_MESSAGE:
                         messageEventData = data.getParcelable("data");
-                        logMessage = "Received message: " + messageEventData.messageClass.getName();
+                        String className = messageEventData.messageClass.getSimpleName();
+                        logMessage = "Received message: " + className;
                         time = messageEventData.registeredTime;
                         addLogEntry(time, logMessage);
+
+                        if ("DisconnectMessage".equals(className)) {
+                            DisconnectMessage disconnectMessage = new DisconnectMessage(messageEventData.message);
+                            if (disconnectMessage.getReason() == ReasonCode.DUPLICATE_PEER) {
+                                ToastUtils.showShortToast("DisconnectMessage");
+                            }
+                        }
                         break;
                     case EVENT_SEND_MESSAGE:
                         messageEventData = data.getParcelable("data");

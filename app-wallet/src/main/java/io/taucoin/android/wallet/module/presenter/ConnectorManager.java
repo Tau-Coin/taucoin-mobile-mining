@@ -67,6 +67,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
+    public void cancelAllConnector(){
+        if (mTaucoinConnector != null) {
+            addLogEntry("Cancel Remote Connector...");
+            closeTaucoin();
+            cancelLocalConnector();
+        }
+    }
+
     public void cancelRemoteConnector(){
         if (mTaucoinConnector != null) {
             addLogEntry("Cancel Remote Connector...");
@@ -81,6 +89,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector = null;
         }
         isInit = false;
+        isSync = false;
+        isSyncMe = false;
         isTaucoinConnected = false;
     }
 
@@ -125,6 +135,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.removeListener(mHandlerIdentifier);
             isTaucoinConnected = false;
             isInit = false;
+            isSync = false;
+            isSyncMe = false;
         }
     }
 
