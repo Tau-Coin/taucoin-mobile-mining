@@ -133,6 +133,7 @@ public class MainActivity extends BaseActivity implements IMainView {
                 if (v == 1) {
                     ToastUtils.showLongToast(R.string.main_exit);
                 } else if (v == 2) {
+                    MyApplication.getRemoteConnector().cancelRemoteConnector();
                     ActivityManager.getInstance().finishAll();
                 }
             });

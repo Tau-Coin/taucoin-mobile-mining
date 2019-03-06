@@ -68,6 +68,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
 
     @Override
     public void cancelRemoteConnector() {
+        cancelMiningNotify();
         super.cancelRemoteConnector();
     }
 
@@ -75,6 +76,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     public void onConnectorConnected() {
         super.onConnectorConnected();
         mMiningModel = null;
+    }
+
+    @Override
+    public void onConnectorDisconnected() {
+        cancelMiningNotify();
+        super.onConnectorDisconnected();
     }
 
     @SuppressWarnings("ConstantConditions")
