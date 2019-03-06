@@ -129,7 +129,7 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                 public void run() {
                     processListeners();
                 }
-            }, LISTENER_REFRESH_RATE, LISTENER_REFRESH_RATE);
+            }, LISTENER_REFRESH_RATE + 10000, LISTENER_REFRESH_RATE);
 
             if (PERSIST) {
                 dbRead();
