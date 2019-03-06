@@ -42,8 +42,10 @@ public class IndexedBlockStore implements BlockStore{
     @Override
     public void close(){
         logger.info("close block store data base...");
-        indexDB.close();
-        blocks.close();
+        if(indexDB != null && blocks != null) {
+            indexDB.close();
+            blocks.close();
+        }
     }
 
     public Block getBestBlock(){

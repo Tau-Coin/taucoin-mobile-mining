@@ -174,7 +174,7 @@ public class BlockForger {
         long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
         logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
         if (balance.longValue() < hisAverageFee){
-            logger.error("balance less than history average fee");
+            logger.info("balance less than history average fee");
             return false;
         }
 

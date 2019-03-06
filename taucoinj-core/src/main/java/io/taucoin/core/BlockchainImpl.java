@@ -760,6 +760,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     @Override
     public void close() {
+        blockStore.close();
     }
 
     @Override
