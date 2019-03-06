@@ -352,7 +352,7 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                     return false;
                 }
 
-                if (handler.getNodeStatistics().isPredefined()) return true;
+                if (handler.getNodeStatistics().isPredefined()) return false;
 
                 if (handler.getNodeStatistics().getEthTotalDifficulty() == null) {
                     return false;
