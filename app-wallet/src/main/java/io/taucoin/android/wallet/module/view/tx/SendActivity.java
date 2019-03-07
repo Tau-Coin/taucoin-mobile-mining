@@ -169,11 +169,11 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void showSureDialog(TransactionHistory tx) {
-
+        String amount = etAmount.getText().toString().trim();
         View view = LinearLayout.inflate(this, R.layout.view_dialog_send, null);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.tvToAddress.setText(tx.getToAddress());
-        viewHolder.tvToAmount.setText(tx.getAmount());
+        viewHolder.tvToAmount.setText(amount);
         viewHolder.tvToMemo.setText(tx.getMemo());
         new CommonDialog.Builder(this)
                 .setContentView(view)

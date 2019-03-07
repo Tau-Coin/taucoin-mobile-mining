@@ -21,15 +21,18 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Is it the root of the task stack?
+        Logger.d("SplashActivity.onCreate");
         if (!this.isTaskRoot()) {
             Intent intent = getIntent();
             if (intent != null) {
                 String action = intent.getAction();
                 if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN.equals(action)) {
+                    Logger.d("SplashActivity immediate finish");
                     finish();
                 }
             }
         } else {
+            Logger.d("SplashActivity show");
             // Open for the first time
             setContentView(R.layout.activity_splash);
 

@@ -133,18 +133,23 @@ public class MainActivity extends BaseActivity implements IMainView {
                 if (v == 1) {
                     ToastUtils.showLongToast(R.string.main_exit);
                 } else if (v == 2) {
-                    MyApplication.getRemoteConnector().cancelRemoteConnector();
                     ActivityManager.getInstance().finishAll();
                 }
             });
     }
 
-    @Override
-    protected void onDestroy() {
+    private void appExit(){
         ProgressManager.closeProgressDialog();
         TxService.stopService();
         UpgradeService.stopUpdateService();
-        MyApplication.getRemoteConnector().cancelAllConnector();
+        MyApplication.getRemoteConnector().cancelRemoteConnector();
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        appExit();
         super.onDestroy();
     }
 

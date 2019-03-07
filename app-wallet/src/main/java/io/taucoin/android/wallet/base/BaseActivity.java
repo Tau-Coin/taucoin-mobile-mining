@@ -16,9 +16,9 @@
 package io.taucoin.android.wallet.base;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 
+import com.github.naturs.logger.Logger;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -27,8 +27,6 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import org.greenrobot.eventbus.Subscribe;
 
 import io.taucoin.android.wallet.module.bean.MessageEvent;
-import io.taucoin.android.wallet.module.view.SplashActivity;
-import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.KeyboardUtils;
@@ -58,17 +56,19 @@ public abstract class BaseActivity extends RxAppCompatActivity implements OnLoad
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Logger.d("Recycled by the system--onSaveInstanceState");
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         ProgressManager.closeProgressDialog();
-        if(!this.getClass().equals(SplashActivity.class)){
-            Intent intent = new Intent();
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            ActivityUtil.startActivity(intent, this, SplashActivity.class);
-        }
+        Logger.d("Recycled by the system--onRestoreInstanceState");
+//        if(!this.getClass().equals(SplashActivity.class)){
+//            Intent intent = new Intent();
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            ActivityUtil.startActivity(intent, this, SplashActivity.class);
+//        }
         super.onRestoreInstanceState(savedInstanceState);
     }
 

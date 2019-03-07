@@ -48,7 +48,6 @@ public class ActivityManager {
             }
         }
         mActivityList.clear();
-        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     public Activity getTopActivity() {
