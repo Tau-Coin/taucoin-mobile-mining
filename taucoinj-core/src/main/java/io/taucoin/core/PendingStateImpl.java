@@ -276,8 +276,7 @@ public class PendingStateImpl implements PendingState {
 
     private void clearWire(List<Transaction> txs) {
         for (Transaction tx : txs) {
-            if (logger.isInfoEnabled() && wireTransactions.contains(tx)){
-                logger.info("Clear wire transaction, hash: [{}]", Hex.toHexString(tx.getHash()));
+            if (wireTransactions.contains(tx)){
                 wireTransactions.remove(tx);
             }
 
@@ -287,8 +286,7 @@ public class PendingStateImpl implements PendingState {
 
     private void clearPendingState(List<Transaction> txs) {
             for (Transaction tx : txs){
-                if (logger.isInfoEnabled() && pendingStateTransactions.contains(tx)){
-                    logger.info("Clear pending state transaction, hash: [{}]", Hex.toHexString(tx.getHash()));
+                if (pendingStateTransactions.contains(tx)){
                     pendingStateTransactions.remove(tx);
                 }
         }
