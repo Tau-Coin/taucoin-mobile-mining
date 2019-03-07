@@ -1,0 +1,109 @@
+<configuration>
+    <!-- Create a logcat appender -->
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%msg</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="core" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="net" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="discover" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="db" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="peerdiscovery" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="io.netty" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="wire" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="wallet" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="dump" level="OFF">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="trie" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="block" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="blockqueue" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="general" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="peermonitor" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="main" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="state" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="repository" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="blockchain" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="txs" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="forge" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="execute" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="hsqldb.db" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="test" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="logcat" />
+    </root>
+
+</configuration>
+
