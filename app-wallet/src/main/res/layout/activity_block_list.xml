@@ -20,7 +20,7 @@
         android:id="@+id/rl_filter"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="50dp">
+        android:layout_height="46dp">
 
         <TextView
             android:id="@+id/tv_filter"
