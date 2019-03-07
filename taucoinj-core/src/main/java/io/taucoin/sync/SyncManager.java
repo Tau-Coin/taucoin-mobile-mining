@@ -477,7 +477,7 @@ public class SyncManager {
                                 handler.getNodeStatistics().getEthTotalDifficulty(),
                                 highestKnownDifficulty
                         );
-                        int lackSize = config.syncPeerCount() - pool.activeCount();
+                        int lackSize = config.syncPeerCount() - channelManager.getAllPeersCount();
                         if (lackSize <= 0) {
                             return;
                         }
@@ -542,7 +542,7 @@ public class SyncManager {
     }
 
     private void fillUpPeersPool() {
-        int lackSize = config.syncPeerCount() - pool.activeCount();
+        int lackSize = config.syncPeerCount() - channelManager.getAllPeersCount();
         if(lackSize <= 0) {
             return;
         }

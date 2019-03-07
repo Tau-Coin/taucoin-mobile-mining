@@ -307,6 +307,11 @@ public class ChannelManager {
         return newPeersMap.containsKey(key) || activePeers.containsKey(key);
     }
 
+    // Total acount of penging and active peers
+    public int getAllPeersCount() {
+        return newPeersMap.size() + activePeers.size();
+    }
+
     public void notifyDisconnect(Channel channel) {
         logger.debug("Peer {}: notifies about disconnect", channel.getPeerIdShort());
         channel.onDisconnect();
