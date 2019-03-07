@@ -3,6 +3,7 @@ package io.taucoin.android.wallet.module.view.main;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.CompoundButton;
@@ -159,6 +160,16 @@ public class MainActivity extends BaseActivity implements IMainView {
         for (Fragment fragment: mFragments) {
             if(fragment != null){
                 fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for (Fragment fragment: mFragments) {
+            if(fragment != null){
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
     }

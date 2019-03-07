@@ -1,13 +1,17 @@
 package io.taucoin.android.wallet.module.view.main;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.mofei.tau.BuildConfig;
 import com.mofei.tau.R;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -33,11 +37,13 @@ import io.taucoin.android.wallet.module.view.mining.BlockListActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.foundation.util.permission.EasyPermissions;
 
 public class HomeFragment extends BaseFragment implements IHomeView {
 
@@ -97,6 +103,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ActivityUtil.startActivity(getActivity(), ProfileActivity.class);
                 break;
             case R.id.btn_mining:
+                requestWriteLOgPermissions();
                 waitStartOrStop();
                 miningPresenter.updateMiningState();
                 TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
@@ -238,10 +245,42 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        requestWriteLOgPermissions();
+    }
+
+    @Override
     public void onDestroy() {
         if(tvMiningMsg != null){
             tvMiningMsg.closeLoading();
         }
         super.onDestroy();
+    }
+
+    private void requestWriteLOgPermissions() {
+        if(BuildConfig.DEBUG){
+            String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            EasyPermissions.requestPermissions(getActivity(),
+                    this.getString(R.string.permission_tip_upgrade_denied),
+                    PermissionUtils.REQUEST_PERMISSIONS_STORAGE, permission);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PermissionUtils.REQUEST_PERMISSIONS_STORAGE:
+                if (grantResults.length > 0) {
+                    if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                        PermissionUtils.checkUserBanPermission(getActivity(), permissions[0], R.string.permission_tip_upgrade_never_ask_again);
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 }
