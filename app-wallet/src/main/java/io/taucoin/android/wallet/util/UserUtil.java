@@ -73,6 +73,7 @@ public class UserUtil {
         Observable.create((ObservableOnSubscribe<Long>) emitter -> {
             long balance = keyValue.getBalance();
             balance -= MiningUtil.pendingAmount();
+            balance = balance < 0 ? 0 : balance;
             emitter.onNext(balance);
         }).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

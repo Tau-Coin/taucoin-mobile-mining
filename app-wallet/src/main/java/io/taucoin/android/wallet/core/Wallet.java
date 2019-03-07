@@ -100,6 +100,7 @@ public class Wallet {
             KeyValue keyValue = MyApplication.getKeyValue();
             long balance = keyValue.getBalance();
             balance -= MiningUtil.pendingAmount();
+            balance = balance < 0 ? 0 : balance;
             emitter.onNext(balance);
         }).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
