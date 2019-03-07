@@ -209,8 +209,8 @@ public class WorldManager {
                 }
             }
             long endTime0 = System.nanoTime();
-            logger.warn("Import accounts time: {}",((endTime0 - startTime0) / 1000000));
-            logger.warn("total count:{}",count);
+            logger.info("Import accounts time: {}",((endTime0 - startTime0) / 1000000));
+            logger.info("total count:{}",count);
             logger.info("genesis block hash: {}",Hex.toHexString(Genesis.getInstance(config).getHash()));
             Object object= blockStore.getClass();
             logger.info("blockStore class : {}",((Class) object).getName());
