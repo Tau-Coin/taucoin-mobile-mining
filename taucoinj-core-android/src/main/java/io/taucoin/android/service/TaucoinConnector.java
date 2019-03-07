@@ -781,6 +781,19 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    public void cancelMiningProgress() {
+        if (!isBound)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(cancelMiningProgress) to service: " + e.getMessage());
+        }
+    }
+
     public void sendBlockNotify(String object) {
         if (!isBound)
             return;

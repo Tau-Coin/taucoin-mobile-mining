@@ -48,6 +48,9 @@ public class RemoteService extends TaucoinRemoteService {
                 break;
             case TaucoinServiceMessage.MSG_CLOSE_MINING_NOTIFY:
                 cancelMiningNotify();
+                break;
+            case TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS:
+                cancelMiningNotify();
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(0);
                 break;

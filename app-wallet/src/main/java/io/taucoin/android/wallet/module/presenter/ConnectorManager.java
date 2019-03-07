@@ -67,18 +67,18 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
-    public void cancelAllConnector(){
-        if (mTaucoinConnector != null) {
-            addLogEntry("Cancel Remote Connector...");
-            closeTaucoin();
-            cancelLocalConnector();
-        }
-    }
-
     public void cancelRemoteConnector(){
         if (mTaucoinConnector != null) {
             addLogEntry("Cancel Remote Connector...");
             closeTaucoin();
+        }
+    }
+
+    public void cancelRemoteProgress(){
+        Logger.d("cancelRemoteProgress");
+        closeTaucoin();
+        if(mTaucoinConnector != null){
+            mTaucoinConnector.cancelMiningProgress();
         }
     }
 

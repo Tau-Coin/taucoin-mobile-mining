@@ -149,4 +149,9 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_SEND_BLOCK_NOTIFY = 29;
 
+    /**
+     * Command to the service to close mining progress
+     */
+    public static final int MSG_CLOSE_MINING_PROGRESS = 30;
+
 }

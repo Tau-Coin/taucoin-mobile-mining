@@ -1,7 +1,6 @@
 package io.taucoin.android.wallet.module.view.tx;
 
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.view.View;
@@ -18,7 +17,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.OnTouch;
 import io.reactivex.ObservableOnSubscribe;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.core.Wallet;
 
 import java.util.concurrent.TimeUnit;
@@ -29,24 +27,19 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.db.entity.BlockInfo;
-import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
-import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
-import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.StringUtil;
 
 public class SendActivity extends BaseActivity implements ISendView {
 
@@ -98,7 +91,7 @@ public class SendActivity extends BaseActivity implements ISendView {
                     @Override
                     public void handleData(View view) {
                         KeyboardUtils.hideSoftInput(SendActivity.this);
-                        checkMiningState();
+                        checkForm();
                     }
                 });
     }
@@ -130,26 +123,6 @@ public class SendActivity extends BaseActivity implements ISendView {
         }
     }
 
-
-    private void checkMiningState() {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start)){
-            mTxPresenter.getBlockInfo(new LogicObserver<BlockInfo>() {
-                @Override
-                public void handleData(BlockInfo blockInfo) {
-                    if(MyApplication.getRemoteConnector().isSync()
-                        && blockInfo.getBlockSynchronized() > 0){
-                        checkForm();
-                    }else{
-                        DialogManager.showSureDialog(SendActivity.this, R.string.bloc_in_synchronization, R.string.common_ok);
-                    }
-                }
-            });
-        }else {
-            checkForm();
-        }
-    }
-
     @Override
     public void checkForm() {
         String address = etAddress.getText().toString().trim();
@@ -163,9 +136,14 @@ public class SendActivity extends BaseActivity implements ISendView {
         tx.setAmount(amount);
         tx.setFee(fee);
 
-        if(Wallet.validateTxParameter(tx)){
-            showSureDialog(tx);
-        }
+        Wallet.validateTxParameter(tx, new LogicObserver<Boolean>() {
+            @Override
+            public void handleData(Boolean isSuccess) {
+                if(isSuccess){
+                    showSureDialog(tx);
+                }
+            }
+        });
     }
 
     private void showSureDialog(TransactionHistory tx) {

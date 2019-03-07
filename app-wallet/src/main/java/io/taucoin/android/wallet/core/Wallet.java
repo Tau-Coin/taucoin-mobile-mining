@@ -19,11 +19,17 @@ import com.mofei.tau.R;
 
 import java.math.BigInteger;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.platform.adress.KeyManager;
 
@@ -32,23 +38,27 @@ public class Wallet {
     /**
      * validate transaction parameter
      */
-    public synchronized static boolean validateTxParameter(TransactionHistory tx) {
+    public synchronized static void validateTxParameter(TransactionHistory tx, LogicObserver<Boolean> logicObserver) {
         if (tx == null) {
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         // validate receive address
         if (StringUtil.isEmpty(tx.getToAddress())) {
             ToastUtils.showShortToast(R.string.send_tx_invalid_address);
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         if (!KeyManager.validateAddress(tx.getToAddress())) {
             ToastUtils.showShortToast(R.string.send_tx_invalid_address);
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         // validate transaction amount
         if (StringUtil.isEmpty(tx.getAmount())) {
             ToastUtils.showShortToast(R.string.send_tx_invalid_amount);
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         BigInteger minAmount = Constants.MIN_CHANGE;
         BigInteger maxAmount = Constants.MAX_MONEY;
@@ -56,15 +66,18 @@ public class Wallet {
         BigInteger amount = new BigInteger(amountStr, 10);
         if (amount.compareTo(minAmount) < 0) {
             ToastUtils.showShortToast(TransactionFailReason.AMOUNT_TO_SMALL.getMsg());
-            return false;
+            logicObserver.onNext(false);
+            return;
         } else if (amount.compareTo(maxAmount) >= 0) {
             ToastUtils.showShortToast(TransactionFailReason.AMOUNT_TO_LARGE.getMsg());
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         // validate transaction fee
         if (StringUtil.isEmpty(tx.getFee())) {
             ToastUtils.showShortToast(R.string.send_tx_invalid_fee);
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         tx.setAmount(amountStr);
 
@@ -74,22 +87,33 @@ public class Wallet {
         BigInteger fee = new BigInteger(feeStr, 10);
         if (fee.compareTo(minFee) < 0) {
             ToastUtils.showShortToast(TransactionFailReason.TX_FEE_TOO_SMALL.getMsg());
-            return false;
+            logicObserver.onNext(false);
+            return;
         } else if (fee.compareTo(maxFee) > 0) {
             ToastUtils.showShortToast(TransactionFailReason.TX_FEE_TOO_LARGE.getMsg());
-            return false;
+            logicObserver.onNext(false);
+            return;
         }
         tx.setFee(feeStr);
         // validate balance is enough
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if (keyValue != null) {
-            String balanceStr = String.valueOf(keyValue.getBalance());
-            BigInteger balance = new BigInteger(balanceStr, 10);
-            if (balance.compareTo(amount.add(fee)) < 0) {
-                ToastUtils.showShortToast(TransactionFailReason.NO_ENOUGH_COINS.getMsg());
-                return false;
-            }
-        }
-        return true;
+        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+            KeyValue keyValue = MyApplication.getKeyValue();
+            long balance = keyValue.getBalance();
+            balance -= MiningUtil.pendingAmount();
+            emitter.onNext(balance);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<Long>() {
+                @Override
+                public void handleData(Long balance) {
+                    BigInteger balanceBig = new BigInteger(balance.toString(), 10);
+                    if (balanceBig.compareTo(amount.add(fee)) < 0) {
+                        ToastUtils.showShortToast(TransactionFailReason.NO_ENOUGH_COINS.getMsg());
+                        logicObserver.onNext(false);
+                    }else{
+                        logicObserver.onNext(true);
+                    }
+                }
+            });
     }
 }
