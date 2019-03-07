@@ -3,7 +3,7 @@
         <include resource="assets/logback-console.xml"/>
     </includes>
 
-    <property name="LOG_DIR" value="/data/data/com.mofei.tau/files" />
+    <property name="LOG_DIR" value="/sdcard/Android/data/com.mofei.tau/files" />
 
     <!-- Create a file appender for DEBUG-level messages -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
