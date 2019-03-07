@@ -276,20 +276,21 @@ public class PendingStateImpl implements PendingState {
 
     private void clearWire(List<Transaction> txs) {
         for (Transaction tx : txs) {
-            if (logger.isInfoEnabled() && wireTransactions.contains(tx))
+            if (logger.isInfoEnabled() && wireTransactions.contains(tx)){
                 logger.info("Clear wire transaction, hash: [{}]", Hex.toHexString(tx.getHash()));
+                wireTransactions.remove(tx);
+            }
 
             removeExpendList(tx);
-            wireTransactions.remove(tx);
         }
     }
 
     private void clearPendingState(List<Transaction> txs) {
             for (Transaction tx : txs){
-                if (logger.isInfoEnabled() && pendingStateTransactions.contains(tx))
+                if (logger.isInfoEnabled() && pendingStateTransactions.contains(tx)){
                     logger.info("Clear pending state transaction, hash: [{}]", Hex.toHexString(tx.getHash()));
-            removeExpendList(tx);
-            pendingStateTransactions.remove(tx);
+                    pendingStateTransactions.remove(tx);
+                }
         }
     }
 
@@ -311,7 +312,7 @@ public class PendingStateImpl implements PendingState {
         synchronized (expendList) {
             String senderTmp= ByteUtil.toHexString(tx.getSender());
             if(expendList.containsKey(senderTmp)) {
-                expendList.put(senderTmp, expendList.get(senderTmp).add(tx.getTotoalCost()));
+                expendList.put(senderTmp, expendList.get(senderTmp).add(tx.getTotoalCost().negate()));
             }
         }
     }
