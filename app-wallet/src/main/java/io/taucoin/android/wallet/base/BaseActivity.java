@@ -27,6 +27,7 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import org.greenrobot.eventbus.Subscribe;
 
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.KeyboardUtils;
@@ -89,6 +90,7 @@ public abstract class BaseActivity extends RxAppCompatActivity implements OnLoad
                 KeyboardUtils.hideSoftInput(this);
                 // handler InputMethodManager Leak
                 KeyboardUtils.fixInputMethodManagerLeak(this);
+                FixMemLeak.fixLeak(this);
             }
         }catch (Exception ignore){
 
