@@ -198,13 +198,11 @@ public class MiningModel implements IMiningModel{
             if(transaction != null){
                 String txId = transaction.getTxid();
                 String result = transaction.TRANSACTION_STATUS;
-                MessageEvent msg = new MessageEvent();
-                msg.setCode(MessageEvent.EventCode.CLEAR_SEND);
                 if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITSUCCESS) ||
                         StringUtil.isSame(result, TaucoinImpl.TRANSACTION_RELAYTOREMOTE)){
                     MiningUtil.saveTransactionSuccess();
                     EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
-                }if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITFAIL)){
+                }else if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITFAIL)){
                     new TxPresenter().sendRawTransaction(transaction, new LogicObserver<Boolean>() {
                         @Override
                         public void handleData(Boolean isSuccess) {

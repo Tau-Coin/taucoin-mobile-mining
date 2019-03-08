@@ -141,7 +141,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         if ("DisconnectMessage".equals(className)) {
                             DisconnectMessage disconnectMessage = new DisconnectMessage(messageEventData.message);
                             if (disconnectMessage.getReason() == ReasonCode.DUPLICATE_PEER) {
-                                ToastUtils.showShortToast("DisconnectMessage");
+//                                ToastUtils.showShortToast("DisconnectMessage");
                             }
                         }
                         break;
