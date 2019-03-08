@@ -160,6 +160,8 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         statisTimer.cancel();
         taskTimer.cancel();
         dbWrite();
+        dbClose();
+        inited = false;
     }
 
     private void dbRead() {
@@ -191,8 +193,10 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
         } catch (Exception e) {
             try {
                 logger.error("Error reading db. Recreating from scratch:", e);
-                db.delete("nodeStats");
-                nodeStatsDB = db.hashMap("nodeStats");
+                if (db != null) {
+                    db.delete("nodeStats");
+                    nodeStatsDB = db.hashMap("nodeStats");
+                }
             } catch (Exception e1) {
                 logger.error("DB recreation has been failed. Node statistics persistence disabled. The problem needs to be fixed manually.", e1);
             }
@@ -211,6 +215,15 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
             db.commit();
         }
         logger.info("Write Node statistics to DB: " + (nodeStatsDB != null ? nodeStatsDB.size() : 0) + " nodes.");
+    }
+
+    private void dbClose() {
+        if (db != null) {
+            db.close();
+            db = null;
+        }
+
+        nodeStatsDB = null;
     }
 
     public void setMessageSender(Functional.Consumer<DiscoveryEvent> messageSender) {
