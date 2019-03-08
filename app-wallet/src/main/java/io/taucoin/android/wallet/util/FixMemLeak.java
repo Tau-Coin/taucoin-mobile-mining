@@ -1,6 +1,7 @@
 package io.taucoin.android.wallet.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
@@ -10,6 +11,11 @@ public class FixMemLeak {
     private static boolean hasField = true;
 
     public static void fixLeak(Context context) {
+        fixHuaWeiLeak(context);
+        fixSamSungLeak(context);
+    }
+
+    private static void fixHuaWeiLeak(Context context) {
         if (!hasField) {
             return;
         }
@@ -34,6 +40,17 @@ public class FixMemLeak {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+        }
+    }
+    private static void fixSamSungLeak(Context context) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.MANUFACTURER.equals("samsung")) {
+                Object systemService = context.getSystemService(Class.forName("com.samsung.android.content.clipboard.SemClipboardManager"));
+                Field mContext = systemService.getClass().getDeclaredField("mContext");
+                mContext.setAccessible(true);
+                mContext.set(systemService, null);
+            }
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException ignore) {
         }
     }
 }

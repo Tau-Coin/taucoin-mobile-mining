@@ -37,7 +37,6 @@ public class ItemTextView extends RelativeLayout {
     private String rightText;
     private int rightTextColor;
     private int rightImage;
-    private int imageRotation;
     private ViewHolder viewHolder;
 
     public ItemTextView(Context context) {
@@ -57,7 +56,6 @@ public class ItemTextView extends RelativeLayout {
     private void initData(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ItemTextView);
         this.rightImage = a.getResourceId(R.styleable.ItemTextView_itemRightImage, -1);
-        this.imageRotation = a.getInt(R.styleable.ItemTextView_itemImageRotation, 0);
         this.leftText = a.getString(R.styleable.ItemTextView_itemLeftText);
         this.leftTextColor = a.getColor(R.styleable.ItemTextView_itemLeftTextColor, getResources().getColor(R.color.color_grey_dark));
         this.rightText = a.getString(R.styleable.ItemTextView_itemRightText);
@@ -71,7 +69,6 @@ public class ItemTextView extends RelativeLayout {
         viewHolder = new ViewHolder(view);
         if (rightImage != -1) {
             viewHolder.ivRight.setImageResource(rightImage);
-            viewHolder.ivRight.setRotation(imageRotation);
         }
         viewHolder.ivRight.setVisibility(rightImage != -1 ? View.VISIBLE : View.GONE);
         if (StringUtil.isNotEmpty(rightText)) {

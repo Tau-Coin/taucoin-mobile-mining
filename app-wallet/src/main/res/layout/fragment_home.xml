@@ -138,8 +138,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="46dp"
                         android:layout_marginTop="1dp"
-                        app:itemRightImage="@mipmap/icon_up"
-                        app:itemImageRotation="90"
+                        app:itemRightImage="@mipmap/icon_arrow"
                         app:itemLeftText="@string/home_mining_details" />
 
                 </LinearLayout>

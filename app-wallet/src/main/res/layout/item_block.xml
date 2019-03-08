@@ -15,8 +15,7 @@
         android:gravity="center_vertical"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="5dp"
-        app:itemRightImage="@mipmap/icon_up"
-        app:itemImageRotation="90"
+        app:itemRightImage="@mipmap/icon_arrow"
         android:lineSpacingExtra="5dp"/>
 
     <View
