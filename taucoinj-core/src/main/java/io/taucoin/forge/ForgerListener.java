@@ -9,6 +9,7 @@ public interface ForgerListener {
     void forgingStarted();
     void forgingStopped();
     void blockForgingStarted(Block block);
+    void nextBlockForgedInternal(long internal);
     void blockForged(Block block);
     void blockForgingCanceled(Block block);
 }

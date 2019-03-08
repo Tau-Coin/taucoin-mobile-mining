@@ -198,6 +198,7 @@ public class BlockForger {
         if (timeNow < timePreBlock + timeInterval) {
             long sleepTime = timePreBlock + timeInterval - timeNow;
             logger.debug("Sleeping " + sleepTime + " s before importing...");
+            fireNextBlockForgedInternal(sleepTime);
             synchronized (blockchain.getLockObject()) {
                 try {
                     blockchain.getLockObject().wait(sleepTime * 1000);
@@ -294,6 +295,12 @@ public class BlockForger {
         }
     }
 
+    protected void fireNextBlockForgedInternal(long internal) {
+        for (ForgerListener l : listeners) {
+            l.nextBlockForgedInternal(internal);
+        }
+    }
+
     // Forge task implementation.
     private static class ForgeTask implements Runnable, ForgerListener {
 
@@ -344,6 +351,11 @@ public class BlockForger {
         @Override
         public void blockForgingStarted(Block block) {
             logger.info("Block forging started...");
+        }
+
+        @Override
+        public void nextBlockForgedInternal(long internal) {
+            logger.info("Next block forged wait itme {}s", internal);
         }
 
         @Override
