@@ -31,8 +31,11 @@ import com.mofei.tau.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.taucoin.android.wallet.module.view.main.MainActivity;
+import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.KeyboardUtils;
+import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
 
 public class ToolbarView extends RelativeLayout {
@@ -109,13 +112,23 @@ public class ToolbarView extends RelativeLayout {
         @OnClick(R.id.iv_left_back)
         void leftBack() {
             try {
-                ((FragmentActivity)getContext()).finish();
-                KeyboardUtils.hideSoftInput((FragmentActivity)getContext());
+                FragmentActivity activity = (FragmentActivity)getContext();
+                if(activity instanceof MainActivity){
+                    showCloseAppDialog(activity);
+                }else{
+                    activity.finish();
+                    KeyboardUtils.hideSoftInput((FragmentActivity)getContext());
+                }
             }catch (Exception ignore){}
         }
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
+    }
+
+    private void showCloseAppDialog(FragmentActivity activity) {
+        DialogManager.showSureDialog(activity, R.string.common_exit, R.string.common_cancel, R.string.common_done,
+                v -> ActivityManager.getInstance().finishAll());
     }
 }

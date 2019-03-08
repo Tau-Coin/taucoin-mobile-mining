@@ -15,9 +15,11 @@
         <ImageButton
             android:id="@+id/iv_left_back"
             style="?attr/toolbarNavigationButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_gravity="center"
+            android:layout_marginStart="7dp"
+            android:layout_centerVertical="true"
             android:background="#00000000"
             android:contentDescription="@null"
             android:src="@mipmap/icon_back_back" />

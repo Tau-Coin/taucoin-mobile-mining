@@ -9,6 +9,7 @@
     <io.taucoin.android.wallet.widget.ToolbarView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_back_back"
         app:titleText="@string/main_manage" />
 
     <RelativeLayout
