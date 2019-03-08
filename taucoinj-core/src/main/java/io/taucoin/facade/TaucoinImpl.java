@@ -20,6 +20,7 @@ import io.taucoin.net.submit.NewBlockHeaderBroadcaster;
 import io.taucoin.net.submit.NewBlockHeaderTask;
 import io.taucoin.net.submit.TransactionExecutor;
 import io.taucoin.net.submit.TransactionTask;
+import io.taucoin.sync.SyncManager;
 import io.taucoin.util.ByteUtil;
 import org.apache.commons.collections4.list.TransformedList;
 import org.slf4j.Logger;
@@ -48,8 +49,9 @@ public class TaucoinImpl implements Taucoin {
 
     private static final Logger logger = LoggerFactory.getLogger("facade");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
-    public static final String TRANSACTION_SUBMITFAIL = "sorry,submit transaction fail";
+    public static final String TRANSACTION_RELAYTOREMOTE = "transaction has been relayed to remote peer";
     public static final String TRANSACTION_SUBMITSUCCESS = "submit transaction success,wait to confirm";
+    public static final String TRANSACTION_SUBMITFAIL = "submission failure, please relay to rpc";
     protected WorldManager worldManager;
 
     protected AdminInfo adminInfo;
@@ -276,21 +278,39 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public Transaction submitTransaction(Transaction transaction) {
-
-        boolean submitResult = pendingState.addPendingTransaction(transaction);
         Transaction retval = null;
-        if (submitResult) {
-            TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
+        SyncManager syncManager = worldManager.getSyncManager();
+        if(syncManager.isSyncDone()) {
+            boolean submitResult = pendingState.addPendingTransaction(transaction);
+            if (submitResult) {
+                TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
 
-            Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
+                Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
 
-            try {
-                 retval = listFuture.get().get(0);
-                 retval.TRANSACTION_STATUS = TRANSACTION_SUBMITSUCCESS;
-            }catch (Exception e){
+                try {
+                    retval = listFuture.get().get(0);
+                    retval.TRANSACTION_STATUS = TRANSACTION_SUBMITSUCCESS;
+                } catch (Exception e) {
 
+                }
+                return retval;
             }
-            return retval;
+        }else {
+            if(channelManager.getAllPeersCount() > 0){
+                TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
+
+                Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
+
+                try {
+                    retval = listFuture.get().get(0);
+                    retval.TRANSACTION_STATUS = TRANSACTION_RELAYTOREMOTE;
+                } catch (Exception e) {
+
+                }
+                return retval;
+            }else {
+                transaction.TRANSACTION_STATUS = TRANSACTION_SUBMITFAIL;
+            }
         }
         retval = transaction;
         return retval;
