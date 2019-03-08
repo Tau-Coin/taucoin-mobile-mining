@@ -32,6 +32,7 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
+import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
@@ -212,6 +213,8 @@ public class SendActivity extends BaseActivity implements ISendView {
     protected void onDestroy() {
         if(KeyboardUtils.isSoftInputVisible(this)){
             KeyboardUtils.hideSoftInput(this);
+            // handler InputMethodManager Leak
+            FixMemLeak.fixLeak(this);
         }
         KeyboardUtils.unregisterSoftInputChangedListener(this);
         super.onDestroy();

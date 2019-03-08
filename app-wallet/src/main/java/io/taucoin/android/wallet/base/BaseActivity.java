@@ -30,7 +30,6 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.foundation.util.ActivityManager;
 
@@ -86,12 +85,7 @@ public abstract class BaseActivity extends RxAppCompatActivity implements OnLoad
                 mDialog = null;
             }
             ProgressManager.closeProgressDialog();
-            if(KeyboardUtils.isSoftInputVisible(this)){
-                KeyboardUtils.hideSoftInput(this);
-                // handler InputMethodManager Leak
-                KeyboardUtils.fixInputMethodManagerLeak(this);
-                FixMemLeak.fixLeak(this);
-            }
+            FixMemLeak.fixLeak(this);
         }catch (Exception ignore){
 
         }
