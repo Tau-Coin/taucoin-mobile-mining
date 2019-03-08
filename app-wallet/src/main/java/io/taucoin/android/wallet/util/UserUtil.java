@@ -92,6 +92,21 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
+    public static void setPower(TextView tvPower) {
+        if(tvPower == null){
+            return;
+        }
+        long power = 0L;
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue != null){
+            power = keyValue.getPower();
+        }
+        String powerStr = MyApplication.getInstance().getResources().getString(R.string.common_power);
+        powerStr = String.format(powerStr, FmtMicrometer.fmtPower(power));
+        tvPower.setText(Html.fromHtml(powerStr));
+        Logger.d("UserUtil.setPower=" + powerStr);
+    }
+
     public static boolean isImportKey() {
         KeyValue keyValue = MyApplication.getKeyValue();
         return  keyValue != null;

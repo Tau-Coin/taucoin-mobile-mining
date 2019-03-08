@@ -200,6 +200,11 @@
         <item name="android:textColor">@color/color_black</item>
     </style>
 
+    <style name="style_power_black">
+        <item name="android:textSize">@dimen/dimen_size_20</item>
+        <item name="android:textColor">@color/color_black</item>
+    </style>
+
 
     <style name="dialog_normal" parent="android:Theme.Holo.Dialog.MinWidth">
         <item name="android:windowFrame">@null</item>

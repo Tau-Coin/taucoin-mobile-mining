@@ -1,5 +1,7 @@
 package io.taucoin.android.wallet.module.model;
 
+import com.mofei.tau.R;
+
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -21,6 +23,7 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -200,15 +203,26 @@ public class MiningModel implements IMiningModel{
                 if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITSUCCESS) ||
                         StringUtil.isSame(result, TaucoinImpl.TRANSACTION_RELAYTOREMOTE)){
                     MiningUtil.saveTransactionSuccess();
+                    EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
                 }if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITFAIL)){
-                    msg.setData(transaction);
+                    new TxPresenter().sendRawTransaction(transaction, new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean isSuccess) {
+                            if(isSuccess){
+                                // clear all editText data
+                                EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
+                            }else {
+                                ToastUtils.showShortToast(R.string.send_tx_invalid_error);
+                            }
+                        }
+                    });
                 }else{
                     if(StringUtil.isNotEmpty(result)){
                         ToastUtils.showShortToast(result);
                     }
                     MiningUtil.saveTransactionFail(txId, result);
+                    EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
                 }
-                EventBusUtil.post(msg);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())

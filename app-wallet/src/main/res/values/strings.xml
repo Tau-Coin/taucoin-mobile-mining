@@ -9,6 +9,7 @@
     <string name="common_ok">OK</string>
     <string name="common_done">Done</string>
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font> TAU]]> </Data></string>
+    <string name="common_power" formatted="false"><Data><![CDATA[Mining power: <font color="#f19322">%s</font>]]> </Data></string>
 
     <string name="splash_title">TAU mWallet 1.0</string>
     <string name="splash_subheading">Mobile &#038; Decentral\nProof of Transaction</string>

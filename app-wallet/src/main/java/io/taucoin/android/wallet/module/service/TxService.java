@@ -30,6 +30,7 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
@@ -162,7 +163,7 @@ public class TxService extends Service {
     }
 
     private void getBalance(String serviceType) {
-        mTxModel.getBalance( new TAUObserver<DataResult<Long>>() {
+        mTxModel.getBalance(new TAUObserver<DataResult<BalanceBean>>() {
             @Override
             public void handleError(String msg, int msgCode) {
                 if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
@@ -174,24 +175,26 @@ public class TxService extends Service {
             }
 
             @Override
-            public void handleData(DataResult<Long> balanceResult) {
+            public void handleData(DataResult<BalanceBean> balanceResult) {
                 super.handleData(balanceResult);
-                Long balance = balanceResult.getData();
+                BalanceBean balance = balanceResult.getData();
                 Logger.i("getBalance success");
-                mTxModel.updateBalance(balance, new LogicObserver<KeyValue>() {
-                    @Override
-                    public void handleData(KeyValue entry) {
-                        MyApplication.setKeyValue(entry);
-                        if(entry != null){
-                            if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
-                                    StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
-                                EventBusUtil.post(MessageEvent.EventCode.ALL);
-                            }else{
-                                EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+                if(balance != null){
+                    mTxModel.updateBalance(balance, new LogicObserver<KeyValue>() {
+                        @Override
+                        public void handleData(KeyValue entry) {
+                            MyApplication.setKeyValue(entry);
+                            if(entry != null){
+                                if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
+                                        StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
+                                    EventBusUtil.post(MessageEvent.EventCode.ALL);
+                                }else{
+                                    EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }

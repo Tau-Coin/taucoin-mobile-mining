@@ -38,6 +38,7 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
+import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
@@ -59,7 +60,7 @@ import io.taucoin.util.ByteUtil;
 public class TxModel implements ITxModel {
 
     @Override
-    public void getBalance(TAUObserver<DataResult<Long>> observer) {
+    public void getBalance(TAUObserver<DataResult<BalanceBean>> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map=new HashMap<>();
         map.put("address",  address);
@@ -71,13 +72,18 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void updateBalance(long balance, LogicObserver<KeyValue> observer) {
+    public void updateBalance(BalanceBean balancebean, LogicObserver<KeyValue> observer) {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
 
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
-            keyValue.setBalance(balance);
-            KeyValueDaoUtils.getInstance().update(keyValue);
+            try {
+                BigInteger balance = new BigInteger(balancebean.getBalance());
+                BigInteger power = new BigInteger(balancebean.getForgepower());
+                keyValue.setBalance(balance.longValue());
+                keyValue.setPower(power.longValue());
+                KeyValueDaoUtils.getInstance().update(keyValue);
+            }catch (Exception ignore){}
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

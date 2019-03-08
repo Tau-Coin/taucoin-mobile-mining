@@ -29,8 +29,9 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property Privkey = new Property(2, String.class, "privkey", false, "PRIVKEY");
         public final static Property Address = new Property(3, String.class, "address", false, "ADDRESS");
         public final static Property Balance = new Property(4, long.class, "balance", false, "BALANCE");
-        public final static Property NickName = new Property(5, String.class, "nickName", false, "NICK_NAME");
-        public final static Property MiningState = new Property(6, String.class, "miningState", false, "MINING_STATE");
+        public final static Property Power = new Property(5, long.class, "power", false, "POWER");
+        public final static Property NickName = new Property(6, String.class, "nickName", false, "NICK_NAME");
+        public final static Property MiningState = new Property(7, String.class, "miningState", false, "MINING_STATE");
     }
 
 
@@ -51,8 +52,9 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"PRIVKEY\" TEXT," + // 2: privkey
                 "\"ADDRESS\" TEXT," + // 3: address
                 "\"BALANCE\" INTEGER NOT NULL ," + // 4: balance
-                "\"NICK_NAME\" TEXT," + // 5: nickName
-                "\"MINING_STATE\" TEXT);"); // 6: miningState
+                "\"POWER\" INTEGER NOT NULL ," + // 5: power
+                "\"NICK_NAME\" TEXT," + // 6: nickName
+                "\"MINING_STATE\" TEXT);"); // 7: miningState
     }
 
     /** Drops the underlying database table. */
@@ -85,15 +87,16 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(4, address);
         }
         stmt.bindLong(5, entity.getBalance());
+        stmt.bindLong(6, entity.getPower());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(6, nickName);
+            stmt.bindString(7, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(7, miningState);
+            stmt.bindString(8, miningState);
         }
     }
 
@@ -121,15 +124,16 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(4, address);
         }
         stmt.bindLong(5, entity.getBalance());
+        stmt.bindLong(6, entity.getPower());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(6, nickName);
+            stmt.bindString(7, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(7, miningState);
+            stmt.bindString(8, miningState);
         }
     }
 
@@ -146,8 +150,9 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // privkey
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // address
             cursor.getLong(offset + 4), // balance
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // nickName
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // miningState
+            cursor.getLong(offset + 5), // power
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // nickName
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // miningState
         );
         return entity;
     }
@@ -159,8 +164,9 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setPrivkey(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setBalance(cursor.getLong(offset + 4));
-        entity.setNickName(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setMiningState(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setPower(cursor.getLong(offset + 5));
+        entity.setNickName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setMiningState(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override

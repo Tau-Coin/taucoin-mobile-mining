@@ -40,7 +40,6 @@ import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
-import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class SendActivity extends BaseActivity implements ISendView {
@@ -191,13 +190,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         }
         switch (object.getCode()) {
             case CLEAR_SEND:
-                Object data = object.getData();
-                if(data != null && mTxPresenter != null){
-                    Transaction transaction = (Transaction) data;
-                    mTxPresenter.sendRawTransaction(transaction, sendLogicObserver);
-                }else{
-                    clearAllForm();
-                }
+                clearAllForm();
                 break;
         }
     }

@@ -51,6 +51,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvNick;
     @BindView(R.id.tv_balance)
     TextView tvBalance;
+    @BindView(R.id.tv_power)
+    TextView tvPower;
     @BindView(R.id.btn_mining)
     Button btnMining;
     @BindView(R.id.refresh_layout)
@@ -130,6 +132,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         switch (object.getCode()) {
             case ALL:
                 UserUtil.setBalance(tvBalance);
+                UserUtil.setPower(tvPower);
                 UserUtil.setNickName(tvNick);
                 break;
             case BALANCE:
@@ -137,6 +140,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     refreshLayout.finishRefresh();
                 }
                 UserUtil.setBalance(tvBalance);
+                UserUtil.setPower(tvPower);
                 break;
             case NICKNAME:
                 UserUtil.setNickName(tvNick);
