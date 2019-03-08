@@ -132,13 +132,14 @@ public class TxPresenter {
         });
     }
 
-    private void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer){
+    public void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer){
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null) {
             observer.onError(CodeException.getError());
             return;
         }
-        if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start)){
+        if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start) &&
+            MyApplication.getRemoteConnector().isInit()){
             MyApplication.getRemoteConnector().submitTransaction(transaction);
         }else{
             String txHash = Hex.toHexString(transaction.getEncoded());

@@ -173,7 +173,6 @@ public class RemoteService extends TaucoinRemoteService {
         builder.setCustomContentView(remoteViews);
         builder.setSound(null);
         notification = builder.build();
-        notification.defaults |= Notification.DEFAULT_SOUND;
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         mNotificationManager.notify(notifyId, notification);
     }

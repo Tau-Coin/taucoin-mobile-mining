@@ -47,25 +47,10 @@
         android:text="@string/tx_send"
         android:textAllCaps="false" />
 
-    <io.taucoin.android.wallet.widget.LoadingTextView
-        android:visibility="gone"
-        android:layout_below="@+id/btn_send"
-        android:id="@+id/tv_mining_msg"
-        style="@style/style_middle_blue"
-        android:layout_width="match_parent"
-        android:textAllCaps="false"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginStart="10dp"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center_horizontal"
-        android:text=""
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:visibility="gone"
         android:id="@+id/ll_tip"
-        android:layout_below="@+id/tv_mining_msg"
+        android:layout_below="@+id/btn_send"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/color_white"

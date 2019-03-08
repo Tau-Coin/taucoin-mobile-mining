@@ -40,6 +40,7 @@ import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
+import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class SendActivity extends BaseActivity implements ISendView {
@@ -165,20 +166,22 @@ public class SendActivity extends BaseActivity implements ISendView {
 
     }
 
+    private LogicObserver<Boolean> sendLogicObserver = new LogicObserver<Boolean>() {
+        @Override
+        public void handleData(Boolean isSuccess) {
+            ProgressManager.closeProgressDialog();
+            if(isSuccess){
+                // clear all editText data
+                clearAllForm();
+            }else {
+                ToastUtils.showShortToast(R.string.send_tx_invalid_error);
+            }
+        }
+    };
+
     private void handleSendTransaction(TransactionHistory tx) {
         ProgressManager.showProgressDialog(this);
-        mTxPresenter.handleSendTransaction(tx, new LogicObserver<Boolean>() {
-            @Override
-            public void handleData(Boolean isSuccess) {
-                ProgressManager.closeProgressDialog();
-                if(isSuccess){
-                    // clear all editText data
-                    clearAllForm();
-                }else {
-                    ToastUtils.showShortToast(R.string.send_tx_invalid_error);
-                }
-            }
-        });
+        mTxPresenter.handleSendTransaction(tx, sendLogicObserver);
     }
     @Override
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -188,7 +191,13 @@ public class SendActivity extends BaseActivity implements ISendView {
         }
         switch (object.getCode()) {
             case CLEAR_SEND:
-                clearAllForm();
+                Object data = object.getData();
+                if(data != null && mTxPresenter != null){
+                    Transaction transaction = (Transaction) data;
+                    mTxPresenter.sendRawTransaction(transaction, sendLogicObserver);
+                }else{
+                    clearAllForm();
+                }
                 break;
         }
     }

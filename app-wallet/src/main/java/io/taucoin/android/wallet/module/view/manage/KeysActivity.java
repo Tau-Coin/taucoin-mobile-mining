@@ -13,11 +13,13 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
 import io.taucoin.android.wallet.module.view.manage.iview.IImportKeyView;
 import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.foundation.util.StringUtil;
 
 public class KeysActivity extends BaseActivity implements IImportKeyView {
@@ -50,9 +52,12 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_import_key)
     void onImportKeyClick() {
-        if(MyApplication.getRemoteConnector().isInit()){
-            ToastUtils.showShortToast(R.string.mining_import_private_key);
-            return;
+        if(UserUtil.isImportKey()){
+            KeyValue KeyValue = MyApplication.getKeyValue();
+            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
+                ToastUtils.showShortToast(R.string.mining_import_private_key);
+                return;
+            }
         }
         Intent intent = new Intent(this, ImportKeyActivity.class);
         startActivity(intent);
