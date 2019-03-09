@@ -72,6 +72,8 @@ public class BlockForger {
 
     private static final int TNO = 50;
 
+    private long nextBlockForgedTimePoint = 0;
+
     public void init() {
         listener.addListener(new TaucoinListenerAdapter() {
 
@@ -101,6 +103,10 @@ public class BlockForger {
 
     public void startForging(long amount) {
         if (isForging()) {
+            long timeNow = System.currentTimeMillis() / 1000;
+            if (nextBlockForgedTimePoint > timeNow) {
+                fireNextBlockForgedInternal(nextBlockForgedTimePoint - timeNow);
+            }
             return;
         }
 
@@ -196,7 +202,8 @@ public class BlockForger {
         logger.info("Block forged time {}", timePreBlock + timeInterval);
 
         if (timeNow < timePreBlock + timeInterval) {
-            long sleepTime = timePreBlock + timeInterval - timeNow;
+            nextBlockForgedTimePoint = timePreBlock + timeInterval;
+            long sleepTime = nextBlockForgedTimePoint - timeNow;
             logger.debug("Sleeping " + sleepTime + " s before importing...");
             fireNextBlockForgedInternal(sleepTime);
             synchronized (blockchain.getLockObject()) {
