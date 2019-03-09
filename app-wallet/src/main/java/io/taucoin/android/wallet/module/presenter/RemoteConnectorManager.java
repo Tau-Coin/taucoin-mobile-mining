@@ -173,7 +173,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         addLogEntry(time, logMessage);
                         break;
                     // import key and init return
-                    case EVENT_ETHEREUM_CREATED:
+                    case EVENT_TAUCOIN_CREATED:
                         isInit = true;
                         startSyncAll();
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);

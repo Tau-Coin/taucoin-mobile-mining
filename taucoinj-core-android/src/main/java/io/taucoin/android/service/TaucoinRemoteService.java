@@ -327,7 +327,7 @@ public class TaucoinRemoteService extends TaucoinService {
             if (replyTo != null && reply != null) {
                 Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_EVENT, 0, 0, reply);
                 Bundle replyData = new Bundle();
-                replyData.putSerializable("event", EventFlag.EVENT_ETHEREUM_CREATED);
+                replyData.putSerializable("event", EventFlag.EVENT_TAUCOIN_CREATED);
                 replyMessage.setData(replyData);
                 try {
                     replyTo.send(replyMessage);
@@ -372,7 +372,7 @@ public class TaucoinRemoteService extends TaucoinService {
         if (isTaucoinStarted) {
             Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_EVENT, 0, 0, message.obj);
             Bundle replyData = new Bundle();
-            replyData.putSerializable("event", EventFlag.EVENT_ETHEREUM_CREATED);
+            replyData.putSerializable("event", EventFlag.EVENT_TAUCOIN_EXIST);
             replyMessage.setData(replyData);
             try {
                 message.replyTo.send(replyMessage);
@@ -984,10 +984,12 @@ public class TaucoinRemoteService extends TaucoinService {
         Bundle replyData = new Bundle();
 
         if (taucoin != null) {
+            if (taucoin.getWorldManager().getSyncManager().isSyncDone()) {
+                replyData.putSerializable("event", EventFlag.EVENT_SYNC_DONE);
+            } else {
+                replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);
+            }
             taucoin.startPeerDiscovery();
-            replyData.putString("result", "OK");
-        } else {
-            replyData.putString("result", "Fail");
         }
 
         replyMessage.setData(replyData);

@@ -68,6 +68,19 @@ public enum EventFlag {
      */
     EVENT_VM_TRACE_CREATED,
 
-    EVENT_ETHEREUM_CREATED
+    /**
+     * Create taucoin blockchain successfully
+     */
+    EVENT_TAUCOIN_CREATED,
+
+    /**
+     * Taucoin blockchain has been created previously.
+     */
+    EVENT_TAUCOIN_EXIST,
+
+    /**
+     * Start sync blocks evnet.
+     */
+    EVENT_START_SYNC
 
 }
