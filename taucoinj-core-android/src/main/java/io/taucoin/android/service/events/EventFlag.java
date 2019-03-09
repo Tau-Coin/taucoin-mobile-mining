@@ -81,6 +81,16 @@ public enum EventFlag {
     /**
      * Start sync blocks evnet.
      */
-    EVENT_START_SYNC
+    EVENT_START_SYNC,
+
+    /**
+     * Start sync blocks but has sync done.
+     */
+    EVENT_HAS_SYNC_DONE,
+
+    /**
+     * Next block forged time internal event.
+     */
+    EVENT_BLOCK_FORGED_TIME_INTERNAL
 
 }

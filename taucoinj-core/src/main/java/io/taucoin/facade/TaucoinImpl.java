@@ -280,7 +280,7 @@ public class TaucoinImpl implements Taucoin {
     public Transaction submitTransaction(Transaction transaction) {
         Transaction retval = null;
         SyncManager syncManager = worldManager.getSyncManager();
-        if(syncManager.isSyncDone()) {
+        if (syncManager.isSyncDone()) {
             boolean submitResult = pendingState.addPendingTransaction(transaction);
             if (submitResult) {
                 TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
@@ -295,8 +295,8 @@ public class TaucoinImpl implements Taucoin {
                 }
                 return retval;
             }
-        }else {
-            if(channelManager.getAllPeersCount() > 0){
+        } else {
+            if (channelManager.getAllPeersCount() > 0) {
                 TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
 
                 Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
@@ -308,7 +308,7 @@ public class TaucoinImpl implements Taucoin {
 
                 }
                 return retval;
-            }else {
+            } else {
                 transaction.TRANSACTION_STATUS = TRANSACTION_SUBMITFAIL;
             }
         }

@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.manager.BlockLoader;
+import io.taucoin.android.service.events.BlockForgedInternalEventData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.TraceEventData;
@@ -362,6 +363,7 @@ public class TaucoinRemoteService extends TaucoinService {
         peersPool.setTaucoin(taucoin);
         ChannelManager channelManager = component.channelManager();
         //channelManager.setTaucoin(taucoin);
+        taucoin.getBlockForger().addListener(new TaucoinForgerListener());
 
         // You can also add some other initialization logic.
     }
@@ -985,7 +987,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         if (taucoin != null) {
             if (taucoin.getWorldManager().getSyncManager().isSyncDone()) {
-                replyData.putSerializable("event", EventFlag.EVENT_SYNC_DONE);
+                replyData.putSerializable("event", EventFlag.EVENT_HAS_SYNC_DONE);
             } else {
                 replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);
             }
@@ -1225,6 +1227,29 @@ public class TaucoinRemoteService extends TaucoinService {
          } catch (RemoteException e) {
              logger.error("Exception sending chain height to client: " + e.getMessage());
          }
-     }
+    }
+
+    protected class TaucoinForgerListener implements io.taucoin.forge.ForgerListener {
+        @Override
+        public void forgingStarted() {}
+
+        @Override
+        public void forgingStopped() {}
+
+        @Override
+        public void blockForgingStarted(Block block) {}
+
+        @Override
+        public void nextBlockForgedInternal(long internal) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_FORGED_TIME_INTERNAL,
+                   new BlockForgedInternalEventData(internal));
+        }
+
+        @Override
+        public void blockForged(Block block) {}
+
+        @Override
+        public void blockForgingCanceled(Block block) {}
+    }
 
 }
