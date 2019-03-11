@@ -162,7 +162,7 @@ public class Transaction implements Comparable<Transaction>{
     public synchronized boolean checkTime() {
         //get current unix time
         long diffTime = timeNows()- toBI(timeStamp).longValue();
-        if (diffTime > TTIME){
+        if (diffTime > byteArrayToLong(expireTime)){
             return false;
 		}
         return true;
@@ -312,8 +312,8 @@ public class Transaction implements Comparable<Transaction>{
                 ", option=" + ByteUtil.toHexString(new byte[]{option}) +
                 ", time=" + ByteUtil.byteArrayToLong(timeStamp) +
                 ", receiveAddress=" + ByteUtil.toHexString(toAddress) +
-                ", amount=" + "0x" + ByteUtil.toHexString(amount) +
-                ", fee=" + "0x" + ByteUtil.byteArrayToLong(fee) +
+                ", amount="  + ByteUtil.byteArrayToLong(amount) +
+                ", fee=" + ByteUtil.byteArrayToLong(fee) +
                 ", expireTime="+  ByteUtil.byteArrayToInt(expireTime)+
                 ", signatureV=" + (signature == null ? "" : signature.v) +
                 ", signatureR=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.r))) +
