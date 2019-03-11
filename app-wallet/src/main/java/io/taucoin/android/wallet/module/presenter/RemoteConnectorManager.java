@@ -29,6 +29,7 @@ import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
+import io.taucoin.android.service.events.BlockForgedInternalEventData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.MessageEventData;
@@ -151,6 +152,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         time = messageEventData.registeredTime;
                         addLogEntry(time, logMessage);
                         break;
+                    case EVENT_HAS_SYNC_DONE:
                     case EVENT_SYNC_DONE:
                         isSync = true;
                         startBlockForging();
@@ -174,6 +176,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         break;
                     // import key and init return
                     case EVENT_TAUCOIN_CREATED:
+                    case EVENT_TAUCOIN_EXIST:
                         isInit = true;
                         startSyncAll();
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
@@ -191,6 +194,16 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         logMessage = "Disconnect block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
                         time = blockEventData.registeredTime;
                         addLogEntry(time, logMessage);
+                        break;
+
+                    case EVENT_BLOCK_FORGED_TIME_INTERNAL:
+                        BlockForgedInternalEventData blockForgedInternal = data.getParcelable("data");
+                        logMessage = "Block forged internal " + blockForgedInternal.blockForgedInternal;
+                        addLogEntry(time, logMessage);
+                        MessageEvent messageEvent = new MessageEvent();
+                        messageEvent.setData(blockForgedInternal.blockForgedInternal);
+                        messageEvent.setCode(MessageEvent.EventCode.FORGED_TIME);
+                        EventBusUtil.post(messageEvent);
                         break;
 
                 }

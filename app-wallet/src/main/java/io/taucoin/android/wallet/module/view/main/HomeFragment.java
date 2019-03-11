@@ -157,20 +157,36 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 btnMining.setEnabled(true);
                 handleMiningView(false);
                 break;
+            case FORGED_TIME:
+                if(object.getData() != null){
+                    long time = (long) object.getData();
+                    showMiningMsg(time);
+                }
+                break;
             default:
                 break;
         }
     }
 
-    private synchronized void showMiningMsg() {
+    private void showMiningMsg(){
+        showMiningMsg(-1);
+    }
+
+    private synchronized void showMiningMsg(long time) {
         MyApplication.getRemoteConnector().sendMiningNotify();
         if(tvMiningMsg != null){
             if(UserUtil.isImportKey()){
                 int msgReid = MiningUtil.getMiningMsg();
                 String msg = getString(msgReid);
                 if(msgReid == R.string.mining_in_progress){
-                    msg += "\n" + getString(R.string.mining_generation_rate);
-                    tvMiningMsg.setNormalText(msg);
+                    msg += "\n";
+                    if(time > 0){
+                        msg += getString(R.string.mining_mining_internal);
+                        tvMiningMsg.setLoadingText(msg, time);
+                    }else{
+                        msg += getString(R.string.mining_generation_rate);
+                        tvMiningMsg.setNormalText(msg);
+                    }
                 }else{
                     tvMiningMsg.setLoadingText(msg);
                 }

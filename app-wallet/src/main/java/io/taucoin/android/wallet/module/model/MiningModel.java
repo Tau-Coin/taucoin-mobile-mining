@@ -88,9 +88,6 @@ public class MiningModel implements IMiningModel{
         if(entry == null){
             entry = new BlockInfo();
         }
-        if(entry.getBlockHeight() < blockSynchronized){
-            entry.setBlockHeight(blockSynchronized);
-        }
         entry.setBlockSynchronized(blockSynchronized);
         BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
     }

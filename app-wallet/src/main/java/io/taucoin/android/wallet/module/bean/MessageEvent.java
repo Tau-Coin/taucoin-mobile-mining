@@ -16,7 +16,8 @@ public class MessageEvent{
         GET_BLOCK,
         GET_BLOCK_LIST,
         CONSOLE_LOG,
-        CLEAR_SEND
+        CLEAR_SEND,
+        FORGED_TIME
     }
     private Object data;
 

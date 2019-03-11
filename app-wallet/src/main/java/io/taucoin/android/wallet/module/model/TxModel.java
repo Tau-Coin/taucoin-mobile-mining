@@ -344,10 +344,7 @@ public class TxModel implements ITxModel {
             if(entry == null){
                 entry = new BlockInfo();
             }
-
-            if(blockHeight > entry.getBlockHeight()){
-                entry.setBlockHeight(blockHeight);
-            }
+            entry.setBlockHeight(blockHeight);
             BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())

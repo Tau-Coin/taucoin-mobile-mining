@@ -25,7 +25,8 @@ import io.taucoin.android.wallet.base.BaseHandler;
 public class LoadingTextView extends AppCompatTextView implements BaseHandler.HandleCallBack{
     private BufferType mBufferType = BufferType.NORMAL;
     private boolean isLoading = false;
-    private int pointNum = 0;
+    private long pointNum = 0;
+    private boolean isTime = false;
     private String text = "";
     private BaseHandler mHandler;
     private Thread mThread;
@@ -43,13 +44,21 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         mHandler = new BaseHandler(this);
     }
 
-    public void setLoadingText(int reid) {
-        setLoadingText(getResources().getString(reid));
+    public void setLoadingText(String text, long time) {
+        this.text = text;
+        this.pointNum = time;
+        isTime = true;
+        if(!isLoading){
+            mHandler.sendEmptyMessage(0);
+        }
+        isLoading = true;
     }
 
     public synchronized void setLoadingText(String text){
         this.text = text;
         pointNum = 0;
+        isTime = false;
+
         if(!isLoading){
             mHandler.sendEmptyMessage(0);
         }
@@ -59,9 +68,29 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     @Override
     public void handleMessage(Message message) {
         if(isLoading){
-            initData();
+            if(isTime){
+                initTime();
+            }else{
+                initData();
+            }
             startLoadingDelay();
         }
+    }
+
+    private void initTime() {
+        if(pointNum < 0){
+            pointNum = 0;
+            isLoading = false;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(text);
+        long min = pointNum / (60 * 60);
+        long second = pointNum % 60;
+        stringBuilder.append(min);
+        stringBuilder.append("m");
+        stringBuilder.append(second);
+        stringBuilder.append("s");
+        setText(stringBuilder.toString(), mBufferType);
     }
 
     private void initData() {
@@ -85,8 +114,13 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         mThread = new Thread(() -> {
             if(isLoading){
                 try {
-                    Thread.sleep(380);
-                    pointNum ++;
+                    int delayTime = isTime ? 1000 : 380;
+                    Thread.sleep(delayTime);
+                    if(isTime){
+                        pointNum --;
+                    }else{
+                        pointNum ++;
+                    }
                     mHandler.sendEmptyMessage(0);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
