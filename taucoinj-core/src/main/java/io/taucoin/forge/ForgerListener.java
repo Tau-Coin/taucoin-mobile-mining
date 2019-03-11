@@ -7,7 +7,7 @@ import io.taucoin.core.Block;
  */
 public interface ForgerListener {
     void forgingStarted();
-    void forgingStopped();
+    void forgingStopped(String outcome);
     void blockForgingStarted(Block block);
     void nextBlockForgedInternal(long internal);
     void blockForged(Block block);

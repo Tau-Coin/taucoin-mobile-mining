@@ -91,6 +91,10 @@ public enum EventFlag {
     /**
      * Next block forged time internal event.
      */
-    EVENT_BLOCK_FORGED_TIME_INTERNAL
+    EVENT_BLOCK_FORGED_TIME_INTERNAL,
+    /**
+     * forge exit event
+     */
+    EVENT_BLOCK_FORGE_STOP
 
 }

@@ -13,10 +13,7 @@ import android.text.TextUtils;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.manager.BlockLoader;
-import io.taucoin.android.service.events.BlockForgedInternalEventData;
-import io.taucoin.android.service.events.EventData;
-import io.taucoin.android.service.events.EventFlag;
-import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.android.service.events.*;
 import io.taucoin.config.MainNetParams;
 import io.taucoin.core.Block;
 import io.taucoin.core.DumpedPrivateKey;
@@ -1234,7 +1231,9 @@ public class TaucoinRemoteService extends TaucoinService {
         public void forgingStarted() {}
 
         @Override
-        public void forgingStopped() {}
+        public void forgingStopped(String outcome) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_FORGE_STOP,new BlockForgeExceptionStopEvent(outcome));
+        }
 
         @Override
         public void blockForgingStarted(Block block) {}
