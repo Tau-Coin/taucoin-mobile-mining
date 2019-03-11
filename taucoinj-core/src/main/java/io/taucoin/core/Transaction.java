@@ -47,6 +47,8 @@ public class Transaction implements Comparable<Transaction>{
     /* used for transaction validation eg expire or deny reentrance */
     private byte[] timeStamp;
 
+    /* used for transaction expire time setting*/
+    private byte[] expireTime = shortToBytes((short)TTIME);
 
     /* the address of the destination account
      * 20 bytes, this is SHA256-ripemd 160 on a public key */
@@ -60,7 +62,7 @@ public class Transaction implements Comparable<Transaction>{
 
     /* 520 bytes,the elliptic curve signature
      * (including public key recovery bits) */
-    private ECDSASignature signature;
+    private ECDSASignature signature = null;
     
     private byte[] sendAddress;
     
@@ -86,8 +88,25 @@ public class Transaction implements Comparable<Transaction>{
     }
 
     /* creation tx
-     * [ version, option, timeStamp, toAddress, amount, fee, signature(v, r, s) ]
+     * [ version, option, timeStamp, toAddress, amount, fee, expireTime, signature(v, r, s) ]
      */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime) {
+        this.version = version;
+        this.option = option;
+        this.timeStamp = timeStamp;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.fee = fee;
+        this.expireTime = expireTime;
+
+        if (toAddress == null) {
+            //burn some money
+            this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
+        }
+
+        parsed = true;
+    }
+    /* this expire time is default 144*5*60*/
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee) {
         this.version = version;
         this.option = option;
@@ -95,6 +114,7 @@ public class Transaction implements Comparable<Transaction>{
         this.toAddress = toAddress;
         this.amount = amount;
         this.fee = fee;
+        this.expireTime = shortToBytes((short)TTIME);
 
         if (toAddress == null) {
             //burn some money
@@ -104,7 +124,15 @@ public class Transaction implements Comparable<Transaction>{
         parsed = true;
     }
 
-    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee, byte[] r, byte[] s, byte v) {
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime, byte[] r, byte[] s, byte v) {
+        this(version, option, timeStamp, toAddress, amount, fee,expireTime);
+
+        ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
+        signature.v = v;
+        this.signature = signature;
+    }
+
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] r, byte[] s, byte v) {
         this(version, option, timeStamp, toAddress, amount, fee);
 
         ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
@@ -154,11 +182,13 @@ public class Transaction implements Comparable<Transaction>{
         this.toAddress = transaction.get(3).getRLPData();
         this.amount = transaction.get(4).getRLPData();
         this.fee = transaction.get(5).getRLPData();
+        this.expireTime = transaction.get(6).getRLPData();
+
         // only parse signature in case tx is signed
-        if (transaction.get(6).getRLPData() != null) {
-            byte v = transaction.get(6).getRLPData()[0];
-            byte[] r = transaction.get(7).getRLPData();
-            byte[] s = transaction.get(8).getRLPData();
+        if (transaction.get(7).getRLPData() != null) {
+            byte v = transaction.get(7).getRLPData()[0];
+            byte[] r = transaction.get(8).getRLPData();
+            byte[] s = transaction.get(9).getRLPData();
             this.signature = ECDSASignature.fromComponents(r, s, v);
         } else {
             logger.debug("RLP encoded tx is not signed!");
@@ -280,10 +310,11 @@ public class Transaction implements Comparable<Transaction>{
         return "TransactionData [" +
                 "  version=" + ByteUtil.toHexString(new byte[]{version}) +
                 ", option=" + ByteUtil.toHexString(new byte[]{option}) +
-                ", time=" + ByteUtil.toHexString(timeStamp) +
+                ", time=" + ByteUtil.byteArrayToLong(timeStamp) +
                 ", receiveAddress=" + ByteUtil.toHexString(toAddress) +
                 ", amount=" + "0x" + ByteUtil.toHexString(amount) +
-                ", fee=" + "0x" + ByteUtil.toHexString(fee) +
+                ", fee=" + "0x" + ByteUtil.byteArrayToLong(fee) +
+                ", expireTime="+  ByteUtil.byteArrayToInt(expireTime)+
                 ", signatureV=" + (signature == null ? "" : signature.v) +
                 ", signatureR=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.r))) +
                 ", signatureS=" + (signature == null ? "" : ByteUtil.toHexString(BigIntegers.asUnsignedByteArray(signature.s))) +
@@ -304,9 +335,10 @@ public class Transaction implements Comparable<Transaction>{
         byte[] toAddress = RLP.encodeElement(this.toAddress);
         byte[] amount = RLP.encodeElement(this.amount);
         byte[] fee = RLP.encodeElement(this.fee);
+        byte[] expireTime = RLP.encodeElement(this.expireTime);
 
         rlpRaw = RLP.encodeList(version, option, timeStamp, toAddress,
-                amount, fee);
+                amount, fee,expireTime);
         return rlpRaw;
     }
 
@@ -320,6 +352,7 @@ public class Transaction implements Comparable<Transaction>{
         byte[] toAddress = RLP.encodeElement(this.toAddress);
         byte[] amount = RLP.encodeElement(this.amount);
         byte[] fee = RLP.encodeElement(this.fee);
+        byte[] expireTime = RLP.encodeElement(this.expireTime);
 
         byte[] v, r, s;
 
@@ -334,7 +367,7 @@ public class Transaction implements Comparable<Transaction>{
         }
 
         this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee, v, r, s);
+                toAddress, amount, fee,expireTime, v, r, s);
 
         this.hash = this.getHash();
 

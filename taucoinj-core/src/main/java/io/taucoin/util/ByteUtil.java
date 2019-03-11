@@ -103,6 +103,16 @@ public class ByteUtil {
     }
 
     /**
+     * Converts a short value into a byte array.
+     *
+     * @param val - short value to convert
+     * @return <code>byte[]</code> of length 2, representing the short value
+     */
+    public static byte[] shortToBytes(short val) {
+        return ByteBuffer.allocate(2).putShort(val).array();
+    }
+
+    /**
      * Converts a long value into a byte array.
      *
      * @param val - long value to convert
