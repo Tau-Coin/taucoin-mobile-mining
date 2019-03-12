@@ -34,6 +34,7 @@
 
     <declare-styleable name="ToolbarView">
         <attr name="leftBackImage" format="reference" />
+        <attr name="leftImagePadding" format="dimension" />
         <attr name="titleText" format="string" />
         <attr name="titleBackground" format="color" />
     </declare-styleable>

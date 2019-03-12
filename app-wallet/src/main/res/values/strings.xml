@@ -8,9 +8,11 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_ok">OK</string>
     <string name="common_done">Done</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font> TAU]]> </Data></string>
     <string name="common_power" formatted="false"><Data><![CDATA[Mining power: <font color="#f19322">%s</font>]]> </Data></string>
-    <string name="common_exit" formatted="false">Are you sure you want to shut down the application and the mining will stop at the same time?</string>
+    <string name="common_exit" formatted="false">\nDo you want to stop mining?\n</string>
 
     <string name="splash_title">TAU mWallet 1.0</string>
     <string name="splash_subheading">Mobile &#038; Decentral\nProof of Transaction</string>
@@ -154,7 +156,7 @@
     <string name="mining_sync_block">Synchronizing Block Data</string>
     <string name="mining_in_progress">Mining in progress</string>
     <string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>
-    <string name="mining_mining_internal">Current block mining internal: %s.</string>
+    <string name="mining_mining_internal">Expected block time: %s</string>
     <string name="mining_new_block">You have mined a new block. Income: %sTAU</string>
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>

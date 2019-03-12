@@ -179,12 +179,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 int msgReid = MiningUtil.getMiningMsg();
                 String msg = getString(msgReid);
                 if(msgReid == R.string.mining_in_progress){
-                    msg += "\n";
                     if(time > 0){
+                        msg += "\n";
                         msg += getString(R.string.mining_mining_internal);
                         tvMiningMsg.setLoadingText(msg, time);
                     }else{
-                        msg += getString(R.string.mining_generation_rate);
                         tvMiningMsg.setNormalText(msg);
                     }
                 }else{

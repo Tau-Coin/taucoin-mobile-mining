@@ -32,7 +32,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.taucoin.android.wallet.module.view.main.MainActivity;
-import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.foundation.util.ActivityManager;
@@ -42,6 +41,7 @@ public class ToolbarView extends RelativeLayout {
     private String titleText;
     private int titleBackground;
     private int leftImage;
+    private int leftImagePadding;
     private ViewHolder viewHolder;
     private int statusBarHeight;
 
@@ -63,6 +63,7 @@ public class ToolbarView extends RelativeLayout {
     private void initData(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ToolbarView);
         this.leftImage = a.getResourceId(R.styleable.ToolbarView_leftBackImage, -1);
+        this.leftImagePadding = a.getDimensionPixelSize(R.styleable.ToolbarView_leftImagePadding, -1);
         this.titleText = a.getString(R.styleable.ToolbarView_titleText);
         this.titleBackground = a.getColor(R.styleable.ToolbarView_titleBackground, -1);
         a.recycle();
@@ -80,6 +81,10 @@ public class ToolbarView extends RelativeLayout {
 
         if (leftImage != -1) {
             viewHolder.ivLeftBack.setImageResource(leftImage);
+            if(leftImagePadding != -1){
+                int padding = leftImagePadding;
+                viewHolder.ivLeftBack.setPadding(padding, padding, padding, padding);
+            }
         } else {
             viewHolder.ivLeftBack.setVisibility(INVISIBLE);
         }
@@ -128,7 +133,16 @@ public class ToolbarView extends RelativeLayout {
     }
 
     private void showCloseAppDialog(FragmentActivity activity) {
-        DialogManager.showSureDialog(activity, R.string.common_exit, R.string.common_cancel, R.string.common_done,
-                v -> ActivityManager.getInstance().finishAll());
+        View view = LinearLayout.inflate(activity, R.layout.view_dialog_keys, null);
+        TextView tvMsg = view.findViewById(R.id.tv_msg);
+        tvMsg.setText(R.string.common_exit);
+        new CommonDialog.Builder(getContext())
+                .setContentView(view)
+                .setButtonWidth(240)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.cancel();
+                    ActivityManager.getInstance().finishAll();
+                }).setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
+                .create().show();
     }
 }

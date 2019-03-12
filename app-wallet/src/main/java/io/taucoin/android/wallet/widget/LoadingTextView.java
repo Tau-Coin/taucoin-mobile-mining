@@ -86,10 +86,17 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         stringBuilder.append(text);
         long min = pointNum / (60 * 60);
         long second = pointNum % 60;
+
+        stringBuilder.append(": ");
+        if(min < 10){
+            stringBuilder.append(0);
+        }
         stringBuilder.append(min);
-        stringBuilder.append("m");
+        stringBuilder.append(":");
+        if(second < 10){
+            stringBuilder.append(0);
+        }
         stringBuilder.append(second);
-        stringBuilder.append("s");
         setText(stringBuilder.toString(), mBufferType);
     }
 
