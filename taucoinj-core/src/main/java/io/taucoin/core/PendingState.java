@@ -47,4 +47,9 @@ public interface PendingState extends io.taucoin.facade.PendingState{
 
 	//PendingState Contains Tx
     boolean pendingStateContains(Transaction tx);
+
+    /**
+     * Fires inner logic related to main sync done event
+     */
+    void onSyncDone();
 }

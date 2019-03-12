@@ -51,11 +51,11 @@ public class TransactionExecutor {
      * will be ready to run the transaction at the end
      * set readyToExecute = true
      */
-    public void init() {
+    public boolean init() {
 
         if (localCall) {
             readyToExecute = true;
-            return;
+            return true;
         }
 
 		// Check In Transaction Amount
@@ -67,7 +67,7 @@ public class TransactionExecutor {
             if (logger.isWarnEnabled())
                 logger.warn("Not enough fee for transaction execution: Require: {} Got: {}", basicTxFee);
             tx.TRANSACTION_STATUS = "Not enough fee for transaction";
-            return;
+            return false;
         }
 
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
@@ -78,10 +78,10 @@ public class TransactionExecutor {
             if (logger.isWarnEnabled())
                 logger.warn("No enough balance: Require: {}, Sender's balance: {}", totalCost, senderBalance);
             tx.TRANSACTION_STATUS = "No enough balance";
-            return;
+            return false;
         }
-
         readyToExecute = true;
+        return true;
     }
 
     /**

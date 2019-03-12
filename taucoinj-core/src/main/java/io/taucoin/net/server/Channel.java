@@ -65,7 +65,7 @@ public class Channel {
 
     private TauHandlerFactory ethHandlerFactory;
 
-    private Tau eth = new TauAdapter();
+    private Tau tau = new TauAdapter();
 
     private InetSocketAddress inetSocketAddress;
 
@@ -176,7 +176,7 @@ public class Channel {
 
         handler.activate();
 
-        eth = handler;
+        tau = handler;
     }
 
     private MessageFactory createTauMessageFactory(TauVersion version) {
@@ -210,15 +210,15 @@ public class Channel {
     }
 
     public boolean isProtocolsInitialized() {
-        return eth.hasStatusPassed();
+        return tau.hasStatusPassed();
     }
 
     public void onDisconnect() {
     }
 
     public void onSyncDone() {
-        eth.enableTransactions();
-        eth.onSyncDone();
+        tau.enableTransactions();
+        tau.onSyncDone();
     }
 
     public boolean isDiscoveryMode() {
@@ -263,15 +263,15 @@ public class Channel {
     }
 
     public Tau getTauHandler() {
-        return eth;
+        return tau;
     }
 
     public boolean hasEthStatusSucceeded() {
-        return eth.hasStatusSucceeded();
+        return tau.hasStatusSucceeded();
     }
 
     public void logSyncStats() {
-        eth.logSyncStats();
+        tau.logSyncStats();
     }
 
     public BigInteger getTotalDifficulty() {
@@ -279,55 +279,55 @@ public class Channel {
     }
 
     public void changeSyncState(SyncStateName newState) {
-        eth.changeState(newState);
+        tau.changeState(newState);
     }
 
     public boolean hasBlocksLack() {
-        return eth.hasBlocksLack();
+        return tau.hasBlocksLack();
     }
 
     public void setMaxHashesAsk(int maxHashesAsk) {
-        eth.setMaxHashesAsk(maxHashesAsk);
+        tau.setMaxHashesAsk(maxHashesAsk);
     }
 
     public int getMaxHashesAsk() {
-        return eth.getMaxHashesAsk();
+        return tau.getMaxHashesAsk();
     }
 
     public void setLastHashToAsk(byte[] lastHashToAsk) {
-        eth.setLastHashToAsk(lastHashToAsk);
+        tau.setLastHashToAsk(lastHashToAsk);
     }
 
     public byte[] getLastHashToAsk() {
-        return eth.getLastHashToAsk();
+        return tau.getLastHashToAsk();
     }
 
     public byte[] getBestKnownHash() {
-        return eth.getBestKnownHash();
+        return tau.getBestKnownHash();
     }
 
     public SyncStatistics getSyncStats() {
-        return eth.getStats();
+        return tau.getStats();
     }
 
     public boolean isHashRetrievingDone() {
-        return eth.isHashRetrievingDone();
+        return tau.isHashRetrievingDone();
     }
 
     public boolean isHashRetrieving() {
-        return eth.isHashRetrieving();
+        return tau.isHashRetrieving();
     }
 
     public boolean isIdle() {
-        return eth.isIdle();
+        return tau.isIdle();
     }
 
     public void prohibitTransactionProcessing() {
-        eth.disableTransactions();
+        tau.disableTransactions();
     }
 
     /**
-     * Sames as {@link #sendTransactions(List)} but input list is randomly sliced to
+     * Sames as {@link #sendTransactionsCapped(List)}} but input list is randomly sliced to
      * contain not more than {@link #MAX_SAFE_TXS} if needed
      * @param txs   List of txs to send
      */
@@ -338,23 +338,23 @@ public class Channel {
         } else {
             slicedTxs = CollectionUtils.truncateRand(txs, MAX_SAFE_TXS);
         }
-        eth.sendTransaction(slicedTxs);
+        tau.sendTransaction(slicedTxs);
     }
 
     public void sendTransaction(List<Transaction> tx) {
-        eth.sendTransaction(tx);
+        tau.sendTransaction(tx);
     }
 
     public void sendNewBlock(Block block) {
-        eth.sendNewBlock(block);
+        tau.sendNewBlock(block);
     }
 
     public void sendNewBlockHeader(BlockHeader header) {
-        eth.sendNewBlockHeader(header);
+        tau.sendNewBlockHeader(header);
     }
 
     public TauVersion getTauVersion() {
-        return eth.getVersion();
+        return tau.getVersion();
     }
 
     @Override

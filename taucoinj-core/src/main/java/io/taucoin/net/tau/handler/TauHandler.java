@@ -519,6 +519,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
     @Override
     public void onSyncDone() {
         syncDone = true;
+        pendingState.onSyncDone();
     }
 
     public StatusMessage getHandshakeStatusMessage() {

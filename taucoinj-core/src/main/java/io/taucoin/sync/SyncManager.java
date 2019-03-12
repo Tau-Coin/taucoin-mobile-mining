@@ -81,7 +81,7 @@ public class SyncManager {
 
     NodeManager nodeManager;
 
-    TaucoinListener ethereumListener;
+    TaucoinListener taucoinListener;
 
     PeersPool pool;
 
@@ -91,13 +91,13 @@ public class SyncManager {
     ScheduledExecutorService logWorker = null;
 
     @Inject
-    public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, TaucoinListener ethereumListener
+    public SyncManager(Blockchain blockchain, SyncQueue queue, NodeManager nodeManager, TaucoinListener taucoinListener
                         , PeersPool pool) {
         this.blockchain = blockchain;
         this.queue = queue;
         this.queue.setSyncManager(this);
         this.nodeManager = nodeManager;
-        this.ethereumListener = ethereumListener;
+        this.taucoinListener = taucoinListener;
         this.pool = pool;
 
         syncStates.put(SyncStateName.IDLE, new IdleState());
@@ -343,7 +343,7 @@ public class SyncManager {
 
     private void onSyncDone() {
         channelManager.onSyncDone();
-        ethereumListener.onSyncDone();
+        taucoinListener.onSyncDone();
         logger.info("Main synchronization is finished");
     }
 
