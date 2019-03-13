@@ -73,6 +73,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     LoadingTextView tvMiningMsg;
 
     private MiningPresenter miningPresenter;
+    private long time = -1;
 
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -105,6 +106,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ActivityUtil.startActivity(getActivity(), ProfileActivity.class);
                 break;
             case R.id.btn_mining:
+                time = -1;
                 requestWriteLOgPermissions();
                 waitStartOrStop();
                 miningPresenter.updateMiningState();
@@ -159,8 +161,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case FORGED_TIME:
                 if(object.getData() != null){
-                    long time = (long) object.getData();
-                    showMiningMsg(time);
+                    time = (long) object.getData();
+                    showMiningMsg();
                 }
                 break;
             default:
@@ -168,18 +170,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
-    private void showMiningMsg(){
-        showMiningMsg(-1);
-    }
-
-    private synchronized void showMiningMsg(long time) {
+    private synchronized void showMiningMsg() {
         MyApplication.getRemoteConnector().sendMiningNotify();
         if(tvMiningMsg != null){
             if(UserUtil.isImportKey()){
                 int msgReid = MiningUtil.getMiningMsg();
                 String msg = getString(msgReid);
                 if(msgReid == R.string.mining_in_progress){
-                    if(time > 0){
+                    if(time > -1){
                         msg += "\n";
                         msg += getString(R.string.mining_mining_internal);
                         tvMiningMsg.setLoadingText(msg, time);
