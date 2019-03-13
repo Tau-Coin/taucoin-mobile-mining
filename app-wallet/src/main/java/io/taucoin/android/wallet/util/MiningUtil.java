@@ -153,11 +153,8 @@ public class MiningUtil {
     public static int getMiningMsg(){
         int msg = R.string.mining_in_progress;
         boolean isInit = MyApplication.getRemoteConnector().isInit();
-        boolean isSync = MyApplication.getRemoteConnector().isSync();
         if(!isInit){
             msg = R.string.mining_init_data;
-        }else if(!isSync){
-            msg = R.string.mining_sync_block;
         }
         return msg;
     }

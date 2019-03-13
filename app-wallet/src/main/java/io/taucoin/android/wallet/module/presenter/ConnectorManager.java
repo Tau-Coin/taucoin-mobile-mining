@@ -51,11 +51,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
     private String mConsoleLog = "";
     private boolean isTaucoinConnected = false;
     boolean isInit = false;
-    boolean isSync = false;
     boolean isSyncMe = false;
 
     private final static int CONSOLE_LENGTH = 10000;
     private static final int BOOT_UP_DELAY_INIT_SECONDS = 2;
+    private static final int BOOT_UP_DELAY_FORGE_SECONDS = 20;
 
     public void createRemoteConnector(){
         if (mTaucoinConnector == null) {
@@ -89,7 +89,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector = null;
         }
         isInit = false;
-        isSync = false;
         isSyncMe = false;
         isTaucoinConnected = false;
     }
@@ -98,16 +97,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
         return isInit;
     }
 
-    public boolean isSync() {
-        return isSync;
-    }
-
     public boolean isSyncMe() {
         return isSyncMe;
-    }
-
-    public boolean isTaucoinConnected() {
-        return isTaucoinConnected;
     }
 
     @Override
@@ -135,7 +126,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.removeListener(mHandlerIdentifier);
             isTaucoinConnected = false;
             isInit = false;
-            isSync = false;
             isSyncMe = false;
         }
     }
@@ -190,6 +180,23 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
+    private class ForgingTask implements Runnable {
+        private TaucoinConnector taucoinConnector;
+        private int targetAmount;
+
+        ForgingTask(TaucoinConnector taucoinConnector, int targetAmount) {
+            this.taucoinConnector = taucoinConnector;
+            this.targetAmount = targetAmount;
+        }
+
+        @Override
+        public void run() {
+            if(mTaucoinConnector != null){
+                taucoinConnector.startBlockForging(targetAmount);
+            }
+        }
+    }
+
     /**
      * start sync block
      * */
@@ -228,9 +235,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void startBlockForging(int targetAmount){
         Logger.d("startBlockForging=" + targetAmount);
-        if(mTaucoinConnector != null){
-            mTaucoinConnector.startBlockForging(targetAmount);
-        }
+        ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
+        initializer.schedule(new ForgingTask(mTaucoinConnector, targetAmount),
+                BOOT_UP_DELAY_FORGE_SECONDS, TimeUnit.SECONDS);
     }
 
     public void stopBlockForging(){

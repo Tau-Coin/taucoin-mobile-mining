@@ -46,11 +46,10 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.net.message.ReasonCode;
-import io.taucoin.net.p2p.DisconnectMessage;
 import io.taucoin.net.p2p.HelloMessage;
+
+import static io.taucoin.android.service.events.EventFlag.EVENT_TAUCOIN_CREATED;
 
 public class RemoteConnectorManager extends ConnectorManager implements ConnectorHandler {
 
@@ -139,12 +138,13 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         time = messageEventData.registeredTime;
                         addLogEntry(time, logMessage);
 
-                        if ("DisconnectMessage".equals(className)) {
-                            DisconnectMessage disconnectMessage = new DisconnectMessage(messageEventData.message);
-                            if (disconnectMessage.getReason() == ReasonCode.DUPLICATE_PEER) {
-//                                ToastUtils.showShortToast("DisconnectMessage");
-                            }
-                        }
+//                        if ("DisconnectMessage".equals(className)) {
+//                            DisconnectMessage disconnectMessage = new DisconnectMessage(messageEventData.message);
+//                            if (disconnectMessage.getReason() == ReasonCode.DUPLICATE_PEER) {
+//                                // TODO Multiple private key question
+////                                ToastUtils.showShortToast("DisconnectMessage");
+//                            }
+//                        }
                         break;
                     case EVENT_SEND_MESSAGE:
                         messageEventData = data.getParcelable("data");
@@ -154,8 +154,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         break;
                     case EVENT_HAS_SYNC_DONE:
                     case EVENT_SYNC_DONE:
-                        isSync = true;
-                        startBlockForging();
+//                        startBlockForging();
                         eventData = data.getParcelable("data");
                         logMessage = "Sync done";
                         time = eventData.registeredTime;
@@ -179,6 +178,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_TAUCOIN_EXIST:
                         isInit = true;
                         startSyncAll();
+                        if(event == EVENT_TAUCOIN_CREATED){
+                            startBlockForging();
+                        }
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                         break;
                     case EVENT_BLOCK_DISCONNECT:
@@ -335,7 +337,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     /**
      * cancel mining notify
      * */
-    public void cancelMiningNotify(){
+    private void cancelMiningNotify(){
         Logger.d("cancelMiningNotify");
         if(mTaucoinConnector != null){
             mTaucoinConnector.cancelMiningNotify();
@@ -347,7 +349,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
      * */
     public void sendBlockNotify(String reward){
         Logger.d("sendBlockNotify");
-        if(mTaucoinConnector != null && isSync()){
+        if(mTaucoinConnector != null){
             reward = FmtMicrometer.fmtAmount(reward);
             String msg = MyApplication.getInstance().getString(R.string.mining_new_block);
             msg = String.format(msg, reward);
