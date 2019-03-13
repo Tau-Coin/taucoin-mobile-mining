@@ -11,7 +11,7 @@
     <string name="common_yes">Yes</string>
     <string name="common_no">No</string>
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font> TAU]]> </Data></string>
-    <string name="common_power" formatted="false"><Data><![CDATA[Mining power: <font color="#f19322">%s</font>]]> </Data></string>
+    <string name="common_power" formatted="false"><Data><![CDATA[Power: <font color="#f19322">%s</font>]]> </Data></string>
     <string name="common_exit" formatted="false">\nDo you want to stop mining?\n</string>
 
     <string name="splash_title">TAU mWallet 1.0</string>
