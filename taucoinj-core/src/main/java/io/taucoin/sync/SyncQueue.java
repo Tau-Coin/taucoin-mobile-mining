@@ -374,16 +374,7 @@ public class SyncQueue {
             }
         }
 
-        if (fillupHeaderNumber(newHeaders)) {
-            if (logger.isInfoEnabled()) {
-               for (BlockHeader header : newHeaders) {
-                   logger.info("compute header number {}:{}",
-                           Hex.toHexString(header.getHash()),
-                           header.getNumber());
-               }
-            }
-            headerStore.addBatch(newHeaders);
-        }
+        headerStore.addBatch(newHeaders);
 
         if (logger.isDebugEnabled())
             logger.debug("{} headers filtered out, {} added", headers.size() - filtered.size(), filtered.size());
@@ -513,64 +504,33 @@ public class SyncQueue {
         return true;
     }
 
-    private boolean fillupHeaderNumber(List<BlockHeader> headers) {
+    public static void fillupHeadersNumber(List<BlockHeader> headers,
+            long startNumber, long lastNumber) {
         if (headers == null || headers.size() == 0) {
-            return false;
+            logger.error("Can't fillup headers number due to empty block headers");
+            return;
         }
-        initGenesisBlockHash();
+        if (startNumber < 0 || lastNumber < 0) {
+            logger.error("Can't fillup headers number due to number {} {}", startNumber, lastNumber);
+            return;
+        }
 
-        Block firstParent = this.blockchain.getBlockByHash(headers.get(0).getPreviousHeaderHash());
-        Block lastParent = this.blockchain.getBlockByHash(headers.get(headers.size() - 1).getPreviousHeaderHash());
-        long firstParentNumber = firstParent != null ? firstParent.getNumber() : -1;
-        long lastParentNumber  = lastParent  != null ? lastParent.getNumber()  : -1;
-        long startBlockNumber  = 0;
+        logger.info("fillup number start {} {} last {} {}", startNumber, Hex.toHexString(headers.get(0).getHash()),
+                lastNumber, Hex.toHexString(headers.get(headers.size() - 1).getHash()));
+
         long delta;
-
-        if (isGenesisBlockHash(headers.get(0).getHash())) {
-            // If first header is genesis block header, the start block number is 0.
-            startBlockNumber = 0;
+        long start = startNumber;
+        if (startNumber <= lastNumber) {
             delta = 1;
-        } else if (isGenesisBlockHash(headers.get(headers.size() - 1).getHash())) {
-            // If last header is genesis block header
-            startBlockNumber = headers.size() - 1;
-            delta = -1;
-        } else if (firstParentNumber >= 0 && lastParentNumber == -1) {
-            startBlockNumber = firstParentNumber + 1;
-            delta = 1;
-        } else if (lastParentNumber >= 0 && firstParentNumber == -1) {
-            startBlockNumber = lastParentNumber + headers.size();
-            delta = -1;
-        } else if (firstParentNumber >= 0 && lastParentNumber >= 0) {
-            if (firstParentNumber <= lastParentNumber) {
-                startBlockNumber = firstParentNumber + 1;
-                delta = 1;
-            } else {
-                startBlockNumber = lastParentNumber + headers.size();
-                delta = -1;
-            }
         } else {
-            logger.error("fatal error, can't fillup header number {} {}",
-                    Hex.toHexString(headers.get(0).getHash()),
-                    Hex.toHexString(headers.get(headers.size() - 1).getHash()));
-            return false;
+            delta = -1;
         }
 
         for (BlockHeader header : headers) {
-            header.setNumber(startBlockNumber);
-            startBlockNumber += delta;
+            header.setNumber(start);
+            start += delta;
         }
 
-        return true;
-    }
-
-    private void initGenesisBlockHash() {
-        if (this.genesisBlockHash == null) {
-            Block genesisBlock = this.blockchain.getBlockByNumber(0);
-            this.genesisBlockHash = genesisBlock.getHash();
-        }
-    }
-
-    private boolean isGenesisBlockHash(byte[] hash) {
-        return Arrays.equals(genesisBlockHash, hash);
+        assert headers.get(headers.size() - 1).getNumber() == lastNumber;
     }
 }

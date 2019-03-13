@@ -319,7 +319,9 @@ public class IndexedBlockStore implements BlockStore{
         List<BlockHeader> headers = new ArrayList<>(blocks.size());
 
         for (Block b : blocks) {
-            headers.add(b.getHeader());
+            BlockHeader header = b.getHeader();
+            header.setNumber(b.getNumber());
+            headers.add(header);
         }
 
         return headers;
