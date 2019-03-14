@@ -13,7 +13,7 @@ public class Constants {
     //forge block time interval
     public static final int BLOCKTIMEINTERVAL = 300;
     //block time drift
-    public static final int MAX_TIMEDRIFT = 60; // allow up to 60 s clock difference
+    public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
 
     public static final String GENESIS_BLOCK_HASH = "0e19e167b7160f7ce173dbe8dbf50d2266365907";
 

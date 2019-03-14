@@ -109,6 +109,22 @@ public class TransactionExecutor {
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
     }
 
+    public void undoTransaction() {
+        // add sender balance
+        BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
+        logger.info("Tx sender is "+Hex.toHexString(tx.getSender()));
+        track.addBalance(tx.getSender(), totalCost);
+
+        // Subtract receiver balance
+        track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
+
+        // Transfer fees to miner
+        track.addBalance(coinbase, toBI(tx.transactionCost()).negate());
+
+        // Increase forge power.
+        track.reduceForgePower(tx.getSender());
+    }
+
 	/**
 	 * Set Miner Address
 	 */

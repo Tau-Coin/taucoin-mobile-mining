@@ -85,6 +85,12 @@ public class AccountState implements Serializable {
         setDirty(true);
     }
 
+    public void reduceForgePower() {
+        rlpEncoded = null;
+        this.forgePower = forgePower.subtract(BigInteger.ONE);
+        setDirty(true);
+    }
+
     public BigInteger getBalance() {
         return balance;
     }
@@ -96,10 +102,11 @@ public class AccountState implements Serializable {
         return this.balance;
     }
 
-    public void subFromBalance(BigInteger value) {
+    public BigInteger subFromBalance(BigInteger value) {
         if (value.signum() != 0) rlpEncoded = null;
         this.balance = balance.subtract(value);
         setDirty(true);
+        return this.balance;
     }
 
     public byte[] getEncoded() {

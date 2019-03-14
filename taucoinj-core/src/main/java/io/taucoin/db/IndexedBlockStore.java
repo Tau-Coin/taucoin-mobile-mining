@@ -368,8 +368,7 @@ public class IndexedBlockStore implements BlockStore{
     }
 
     @Override
-    public void reBranch(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks){
-
+    public void getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
         Block bestBlock = getBestBlock();
 
         long maxLevel = Math.max(bestBlock.getNumber(), forkBlock.getNumber());
@@ -382,12 +381,6 @@ public class IndexedBlockStore implements BlockStore{
             while(currentLevel > bestBlock.getNumber()){
                 newBlocks.add(forkLine);
 
-                List<BlockInfo> blocks =  getBlockInfoForLevel(currentLevel);
-                BlockInfo blockInfo = getBlockInfoForHash(blocks, forkLine.getHash());
-                if (blockInfo != null) {
-                    blockInfo.setMainChain(true);
-                    updateBlockInfoForLevel(currentLevel, blocks);
-                }
                 forkLine = getBlockByHash(forkLine.getPreviousHeaderHash());
                 --currentLevel;
             }
@@ -399,40 +392,42 @@ public class IndexedBlockStore implements BlockStore{
             while(currentLevel > forkBlock.getNumber()){
                 undoBlocks.add(bestLine);
 
-                List<BlockInfo> blocks =  getBlockInfoForLevel(currentLevel);
-                BlockInfo blockInfo = getBlockInfoForHash(blocks, bestLine.getHash());
-                if (blockInfo != null) {
-                    blockInfo.setMainChain(false);
-                    updateBlockInfoForLevel(currentLevel, blocks);
-                }
                 bestLine = getBlockByHash(bestLine.getPreviousHeaderHash());
                 --currentLevel;
             }
         }
-
 
         // 2. Loop back on each level until common block
         while( !bestLine.isEqual(forkLine) ) {
             newBlocks.add(forkLine);
             undoBlocks.add(bestLine);
 
-            List<BlockInfo> levelBlocks = getBlockInfoForLevel(currentLevel);
-            BlockInfo bestInfo = getBlockInfoForHash(levelBlocks, bestLine.getHash());
-            if (bestInfo != null) bestInfo.setMainChain(false);
-
-            BlockInfo forkInfo = getBlockInfoForHash(levelBlocks, forkLine.getHash());
-            if (forkInfo != null) forkInfo.setMainChain(true);
-
-            if (bestInfo != null || forkInfo != null) {
-                updateBlockInfoForLevel(currentLevel, levelBlocks);
-            }
-
             bestLine = getBlockByHash(bestLine.getPreviousHeaderHash());
             forkLine = getBlockByHash(forkLine.getPreviousHeaderHash());
 
             --currentLevel;
         }
+    }
 
+    @Override
+    public void reBranchBlocks(List<Block> undoBlocks, List<Block> newBlocks) {
+        for (Block block : undoBlocks) {
+            List<BlockInfo> blocks =  getBlockInfoForLevel(block.getNumber());
+            BlockInfo blockInfo = getBlockInfoForHash(blocks, block.getHash());
+            if (blockInfo != null) {
+                blockInfo.setMainChain(false);
+                updateBlockInfoForLevel(block.getNumber(), blocks);
+            }
+        }
+
+        for (Block block : newBlocks) {
+            List<BlockInfo> blocks =  getBlockInfoForLevel(block.getNumber());
+            BlockInfo blockInfo = getBlockInfoForHash(blocks, block.getHash());
+            if (blockInfo != null) {
+                blockInfo.setMainChain(true);
+                updateBlockInfoForLevel(block.getNumber(), blocks);
+            }
+        }
     }
 
 

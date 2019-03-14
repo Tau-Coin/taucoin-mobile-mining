@@ -33,10 +33,6 @@ public class RepositoryTrack implements Repository {
 
     Repository repository;
 
-    public RepositoryTrack() {
-        this.repository = new RepositoryDummy();
-    }
-
     public RepositoryTrack(Repository repository) {
         this.repository = repository;
     }
@@ -120,6 +116,23 @@ public class RepositoryTrack implements Repository {
         return accountState.getforgePower();
     }
 
+    @Override
+    public BigInteger reduceForgePower(byte[] addr) {
+
+        AccountState accountState = getAccountState(addr);
+
+        if (accountState == null)
+            accountState = createAccount(addr);
+
+        BigInteger savePower = accountState.getforgePower();
+        accountState.reduceForgePower();
+
+        logger.trace("reduce forgePower addr: [{}], from: [{}], to: [{}]", Hex.toHexString(addr),
+                savePower, accountState.getforgePower());
+
+        return accountState.getforgePower();
+    }
+
     public BigInteger setforgePower(byte[] addr, BigInteger bigInteger) {
         AccountState accountState = getAccountState(addr);
 
@@ -164,20 +177,9 @@ public class RepositoryTrack implements Repository {
         return newBalance;
     }
 
-    @Override
-    public Set<byte[]> getAccountsKeys() {
-        throw new UnsupportedOperationException();
-        //return null;
-    }
-
 
     public Set<ByteArrayWrapper> getFullAddressSet() {
         return cacheAccounts.keySet();
-    }
-
-    @Override
-    public void dumpState(Block block, long gasUsed, int txNumber, byte[] txHash) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -196,22 +198,11 @@ public class RepositoryTrack implements Repository {
     }
 
     @Override
-    public void flushNoReconnect() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void commit() {
 
         repository.updateBatch(cacheAccounts);
         cacheAccounts.clear();
         logger.debug("committed changes");
-    }
-
-
-    @Override
-    public void syncToRoot(byte[] root) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -229,12 +220,6 @@ public class RepositoryTrack implements Repository {
         }
     }
 
-    @Override // that's the idea track is here not for root calculations
-    public byte[] getRoot() {
-        throw new UnsupportedOperationException();
-    }
-
-
     @Override
     public boolean isClosed() {
         throw new UnsupportedOperationException();
@@ -247,11 +232,6 @@ public class RepositoryTrack implements Repository {
 
     @Override
     public void reset() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Repository getSnapshotTo(byte[] root) {
         throw new UnsupportedOperationException();
     }
 

@@ -224,7 +224,12 @@ public class InMemoryBlockStore implements BlockStore {
     }
 
     @Override
-    public void reBranch(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
+    public void getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
+
+    }
+
+    @Override
+    public void reBranchBlocks(List<Block> undoBlocks, List<Block> newBlocks) {
 
     }
 

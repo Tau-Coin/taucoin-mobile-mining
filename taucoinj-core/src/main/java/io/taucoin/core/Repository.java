@@ -56,6 +56,14 @@ public interface Repository {
     BigInteger increaseforgePower(byte[] addr);
 
     /**
+     * Reduce the account forgePower of the given account by one
+     *
+     * @param addr of the account
+     * @return forge power
+     */
+    BigInteger reduceForgePower(byte[] addr);
+
+    /**
      * Get current forgePower of a given account
      *
      * @param addr of the account
@@ -82,24 +90,6 @@ public interface Repository {
     BigInteger addBalance(byte[] addr, BigInteger value);
 
     /**
-     * @return Returns set of all the account addresses
-     */
-    Set<byte[]> getAccountsKeys();
-
-
-    /**
-     * Dump the full state of the current repository into a file with JSON format
-     * It contains all the account, their attributes and
-     *
-     * @param block of the current state
-     * @param trFee the amount of trFee used in the block until that point
-     * @param txNumber is the number of the transaction for which the dump has to be made
-     * @param txHash is the hash of the given transaction.
-     * If null, the block state post coinbase is dumped.
-     */
-    void dumpState(Block block, long trFee, int txNumber, byte[] txHash);
-
-    /**
      * Save a snapshot and start tracking future changes
      *
      * @return the tracker repository
@@ -107,9 +97,6 @@ public interface Repository {
     Repository startTracking();
 
     void flush();
-
-    void flushNoReconnect();
-
 
     /**
      * Store all the temporary changes made
@@ -122,14 +109,6 @@ public interface Repository {
      * to a snapshot of the repository
      */
     void rollback();
-
-    /**
-     * Return to one of the previous snapshots
-     * by moving the root.
-     *
-     * @param root - new root
-     */
-    void syncToRoot(byte[] root);
 
     /**
      * Check to see if the current repository has an open connection to the database
@@ -150,11 +129,5 @@ public interface Repository {
 
     void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates);
 
-
-    byte[] getRoot();
-
     void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts);
-
-    Repository getSnapshotTo(byte[] root);
-
 }

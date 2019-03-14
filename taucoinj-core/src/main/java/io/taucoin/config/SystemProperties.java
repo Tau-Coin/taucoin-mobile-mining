@@ -451,11 +451,6 @@ public class SystemProperties {
     }
 
     @ValidateMe
-    public String rootHashStart() {
-        return config.hasPath("root.hash.start") ? config.getString("root.hash.start") : null;
-    }
-
-    @ValidateMe
     public List<String> peerCapabilities() {
         return config.getStringList("peer.capabilities");
     }

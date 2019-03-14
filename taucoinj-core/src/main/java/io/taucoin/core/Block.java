@@ -43,9 +43,6 @@ public class Block {
     private BigInteger cumulativeDifficulty = BigInteger.ZERO; //this is total chain difficulty
     private BigInteger cumulativeFee = BigInteger.ZERO;
 
-    // Store stateRoot into just local block not network block.
-    private byte[] stateRoot;
-
     /* Transactions */
     private List<Transaction> transactionsList = new CopyOnWriteArrayList<>();
 
@@ -156,6 +153,7 @@ public class Block {
             byte[] cyBytes = block.get(4).getRLPData();
             this.cumulativeDifficulty = cyBytes == null ? BigInteger.ZERO
                     : new BigInteger(1, cyBytes);
+
             byte[] culFee  = block.get(5).getRLPData();
             this.cumulativeFee = culFee == null ? BigInteger.ZERO
                     : new BigInteger(1,culFee);
@@ -169,11 +167,9 @@ public class Block {
             // Parse option
             this.option = block.get(7).getRLPData()[0];
 
-            this.stateRoot = block.get(8).getRLPData();
-
-            if(block.size() > 9) {
+            if(block.size() > 8) {
                 // Parse Transactions
-                RLPList txTransactions = (RLPList) block.get(9);
+                RLPList txTransactions = (RLPList) block.get(8);
                 // here may need original trie
                 this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
             }
@@ -291,7 +287,6 @@ public class Block {
         if (!parsed) parseRLP();
         return this.cumulativeDifficulty;
     }
-
     public BigInteger getCumulativeFee() {
         if (!parsed) parseRLP();
         return cumulativeFee;
@@ -299,24 +294,6 @@ public class Block {
 
     public void setCumulativeFee(BigInteger cumulativeFee) {
         this.cumulativeFee = cumulativeFee;
-    }
-
-    /**
-     * Set block state root.
-     *
-     * This method is often called when connecting block into blockchain successfully.
-     * @param //Repository Trie state root.
-     */
-    public void setStateRoot(byte[] stateRoot) {
-        this.stateRoot = stateRoot;
-    }
-
-    /**
-     * Get block state root.
-     */
-    public byte[] getStateRoot() {
-        if (!parsed) parseRLP();
-        return this.stateRoot;
     }
 
     public List<Transaction> getTransactionsList() {
@@ -510,7 +487,6 @@ public class Block {
         byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);
         byte[] signature = getSignatureEncoded();
         byte[] option = getOptionEncoded();
-        byte[] stateRootEncoded = RLP.encodeElement(this.stateRoot);
         byte[] transactions = getTransactionsEncoded();
 
         List<byte[]> body = new ArrayList<>();
@@ -521,7 +497,6 @@ public class Block {
         body.add(cumulativeFee);
         body.add(signature);
         body.add(option);
-        body.add(stateRootEncoded);
         body.add(transactions);
 
         return body;
