@@ -221,7 +221,7 @@ public class WorldManager {
             BigInteger totalDifficulty = blockStore.getTotalDifficulty();
             blockchain.setTotalDifficulty(totalDifficulty);
 
-            logger.info("*** Loaded up to block [{}] totalDifficulty [{}] with stateRoot [{}]",
+            logger.info("*** Loaded up to block [{}] totalDifficulty [{}] with best block hash [{}]",
                     blockchain.getBestBlock().getNumber(),
                     blockchain.getTotalDifficulty().toString(),
                     Hex.toHexString(blockchain.getBestBlock().getHash()));
