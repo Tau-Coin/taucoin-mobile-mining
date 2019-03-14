@@ -259,6 +259,10 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                 ethereumListener.onNodeDiscovered(ret.getNode());
             }
             logger.info(" +++ Found real nodeId for discovery endpoint {}", n);
+        } else if (!ret.getNode().getHexId().equals(n.getHexId())) {
+            // Peer nodeId changed
+            logger.info("NodeId changed old {} new {}", ret, n);
+            ret.node = n;
         }
 
         return ret;
