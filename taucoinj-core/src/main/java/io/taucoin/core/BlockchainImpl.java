@@ -344,6 +344,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             recordBlock(block);
 
             if (add(block)) {
+                listener.onBlockConnected(block);
                 //notify
                 synchronized (lock) {
                     lock.notify();
