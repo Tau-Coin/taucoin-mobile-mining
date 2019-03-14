@@ -61,6 +61,7 @@ public class NotifyManager {
     private NotificationCompat.Builder mBuilder;
     private Service mService;
     private NotifyData mNotifyData;
+    private ResManager mResManager;
 
     @SuppressLint("StaticFieldLeak")
     private static NotifyManager mInstance;
@@ -127,25 +128,31 @@ public class NotifyManager {
         }
     }
 
-    public void initNotify() {
+    void initNotify() {
         mNotifyData = new NotifyData();
         mNotifyData.miningState = TransmitKey.MiningState.Stop;
         sendNotify();
+        mResManager = new ResManager();
+        mResManager.startResThread(new ResManager.ResCallBack(){
+
+            @Override
+            void updateCpuAndMemory(String cpuInfo, String memoryInfo) {
+                mNotifyData.cpuUsage = cpuInfo;
+                mNotifyData.memorySize = memoryInfo;
+                sendNotify();
+            }
+
+            @Override
+            void updateDataSize(String dataInfo) {
+                mNotifyData.dataSize = dataInfo;
+                sendNotify();
+            }
+        });
     }
 
     public void sendNotify(String miningState) {
         if(mNotifyData != null){
             mNotifyData.miningState = miningState;
-            sendNotify();
-        }
-
-    }
-
-    public void sendNotify(String cpuUsage, String memorySize, String dataSize) {
-        if(mNotifyData != null){
-            mNotifyData.cpuUsage = cpuUsage;
-            mNotifyData.memorySize = memorySize;
-            mNotifyData.dataSize = dataSize;
             sendNotify();
         }
 
@@ -223,6 +230,9 @@ public class NotifyManager {
         }
         if(mNotificationManager != null){
             mNotificationManager.cancelAll();
+        }
+        if(mResManager != null){
+            mResManager.stopResThread();
         }
         mService.stopForeground(true);
         mService = null;

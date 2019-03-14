@@ -159,6 +159,11 @@
         <item name="android:textColor">@color/color_grey_light</item>
     </style>
 
+    <style name="style_small_grey_dark">
+        <item name="android:textSize">@dimen/dimen_size_12</item>
+        <item name="android:textColor">@color/color_grey_dark</item>
+    </style>
+
     <style name="style_middle_grey_dark">
         <item name="android:textSize">@dimen/dimen_size_14</item>
         <item name="android:textColor">@color/color_grey_dark</item>

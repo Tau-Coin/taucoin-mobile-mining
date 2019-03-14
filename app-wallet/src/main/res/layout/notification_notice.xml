@@ -14,8 +14,7 @@
 
         <RelativeLayout
             android:id="@+id/app_logo"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="60dp"
             android:layout_height="match_parent">
 
             <ImageView
@@ -24,16 +23,10 @@
                 android:layout_height="50dp"
                 android:layout_marginEnd="10dp"
                 android:layout_centerInParent="true"
-                android:layout_gravity="center"
                 android:src="@mipmap/icon_notify_logo"
                 android:contentDescription="@null" />
 
         </RelativeLayout>
-
-        <TextView
-            android:layout_width="1dp"
-            android:background="@color/color_main_line"
-            android:layout_height="50dp"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -58,12 +51,12 @@
                 android:indeterminateDrawable="@drawable/rotate_image_view" />
 
             <TextView
-                style="@style/style_middle_grey_dark"
+                style="@style/style_small_grey_dark"
                 android:id="@+id/tv_mining"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
@@ -90,13 +83,13 @@
                 android:contentDescription="@null" />
 
             <TextView
-                style="@style/style_middle_grey_dark"
+                style="@style/style_small_grey_dark"
                 android:layout_below="@+id/iv_cpu"
                 android:id="@+id/tv_cpu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:layout_centerHorizontal="true"
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
@@ -124,13 +117,13 @@
                 android:contentDescription="@null" />
 
             <TextView
-                style="@style/style_middle_grey_dark"
+                style="@style/style_small_grey_dark"
                 android:layout_below="@+id/iv_memory"
                 android:id="@+id/tv_memory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:layout_centerHorizontal="true"
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
@@ -158,13 +151,13 @@
                 android:contentDescription="@null" />
 
             <TextView
-                style="@style/style_middle_grey_dark"
+                style="@style/style_small_grey_dark"
                 android:layout_below="@+id/iv_data"
                 android:id="@+id/tv_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:layout_centerHorizontal="true"
                 android:ellipsize="end"
                 android:gravity="center_horizontal"

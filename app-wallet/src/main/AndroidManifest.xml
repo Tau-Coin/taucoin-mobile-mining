@@ -26,6 +26,8 @@
     (also known as Wi-Fi Round-Trip-Time (RTT), so that your application can take advantage
     of the indoor positioning function. -->
     <uses-feature android:name="android.hardware.wifi.rtt" android:required="false"/>
+    <!--Allow programs to access package size-->
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE"/>
 
     <application
         android:name="io.taucoin.android.wallet.MyApplication"
