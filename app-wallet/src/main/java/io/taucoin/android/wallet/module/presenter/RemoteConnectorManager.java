@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.os.Message;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
 
 import java.util.Date;
 import java.util.List;
@@ -37,15 +36,13 @@ import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.FmtMicrometer;
-import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.net.p2p.HelloMessage;
 
@@ -67,21 +64,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     }
 
     @Override
-    public void cancelRemoteConnector() {
-        cancelMiningNotify();
-        super.cancelRemoteConnector();
-    }
-
-    @Override
     public void onConnectorConnected() {
         super.onConnectorConnected();
         mMiningModel = null;
-    }
-
-    @Override
-    public void onConnectorDisconnected() {
-        cancelMiningNotify();
-        super.onConnectorDisconnected();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -176,6 +161,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     // import key and init return
                     case EVENT_TAUCOIN_CREATED:
                     case EVENT_TAUCOIN_EXIST:
+                        NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Start);
                         isInit = true;
                         startSyncAll();
                         if(event == EVENT_TAUCOIN_CREATED){
@@ -249,6 +235,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 submitTransactionResult(transaction);
                 break;
             case TaucoinClientMessage.MSG_CLOSE_DONE:
+                NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Stop);
                 cancelLocalConnector();
                 EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                 break;
@@ -320,40 +307,5 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             }
         });
 
-    }
-
-    /**
-     * send mining notify
-     * */
-    public void sendMiningNotify(){
-        Logger.d("sendMiningNotify");
-        if(mTaucoinConnector != null){
-            int msgReid = MiningUtil.getMiningMsg();
-            String msg = MyApplication.getInstance().getString(msgReid);
-            mTaucoinConnector.sendMiningNotify(msg);
-        }
-    }
-
-    /**
-     * cancel mining notify
-     * */
-    private void cancelMiningNotify(){
-        Logger.d("cancelMiningNotify");
-        if(mTaucoinConnector != null){
-            mTaucoinConnector.cancelMiningNotify();
-        }
-    }
-
-    /**
-     * send block notify
-     * */
-    public void sendBlockNotify(String reward){
-        Logger.d("sendBlockNotify");
-        if(mTaucoinConnector != null){
-            reward = FmtMicrometer.fmtAmount(reward);
-            String msg = MyApplication.getInstance().getString(R.string.mining_new_block);
-            msg = String.format(msg, reward);
-            mTaucoinConnector.sendBlockNotify(msg);
-        }
     }
 }

@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.presenter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Parcelable;
 
 import com.github.naturs.logger.Logger;
 
@@ -36,6 +37,7 @@ import io.taucoin.android.service.TaucoinConnector;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
@@ -61,7 +63,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
         if (mTaucoinConnector == null) {
             addLogEntry("Create Remote Connector...");
             Context context = MyApplication.getInstance();
-            mTaucoinConnector = new TaucoinConnector(context, RemoteService.class);
+            Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
+            mTaucoinConnector = new TaucoinConnector(context, RemoteService.class, parcelable);
             mTaucoinConnector.registerHandler(this);
             mTaucoinConnector.bindService();
         }
@@ -327,7 +330,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
                     importForgerPrivkey(privateKey);
                     startSyncAll();
                 }else{
-                    MyApplication.getRemoteConnector().sendMiningNotify();
                     importPrivkeyAndInit(privateKey);
                 }
             }else{

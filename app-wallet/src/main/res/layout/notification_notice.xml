@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@color/color_white"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/app_logo"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_logo"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/icon_notify_logo"
+                android:contentDescription="@null" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="1dp"
+            android:background="@color/color_main_line"
+            android:layout_height="50dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/iv_mining"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@mipmap/icon_end"
+                android:contentDescription="@null" />
+
+            <ProgressBar
+                android:id="@+id/iv_mining_loading"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/rotate_image_view" />
+
+            <TextView
+                style="@style/style_middle_grey_dark"
+                android:id="@+id/tv_mining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="mining" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="1dp"
+            android:background="@color/color_main_line"
+            android:layout_height="50dp"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_cpu"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/icon_notify_cpu"
+                android:contentDescription="@null" />
+
+            <TextView
+                style="@style/style_middle_grey_dark"
+                android:layout_below="@+id/iv_cpu"
+                android:id="@+id/tv_cpu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerHorizontal="true"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="0%" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="1dp"
+            android:background="@color/color_main_line"
+            android:layout_height="50dp"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_memory"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/icon_notify_memory"
+                android:contentDescription="@null" />
+
+            <TextView
+                style="@style/style_middle_grey_dark"
+                android:layout_below="@+id/iv_memory"
+                android:id="@+id/tv_memory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerHorizontal="true"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="0B" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="1dp"
+            android:background="@color/color_main_line"
+            android:layout_height="50dp"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_data"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/icon_notify_data"
+                android:contentDescription="@null" />
+
+            <TextView
+                style="@style/style_middle_grey_dark"
+                android:layout_below="@+id/iv_data"
+                android:id="@+id/tv_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerHorizontal="true"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="0B" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

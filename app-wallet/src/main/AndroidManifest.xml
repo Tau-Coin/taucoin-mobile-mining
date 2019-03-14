@@ -81,11 +81,6 @@
             android:exported="false"
             android:process=":taucoin_service" />
 
-        <receiver
-            android:name="io.taucoin.android.wallet.module.service.NotificationReceiver"
-            android:exported="false">
-        </receiver>
-
         <service
             android:name="io.taucoin.android.wallet.module.service.TxService"
             android:priority="1000"

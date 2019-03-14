@@ -48,6 +48,7 @@ public class TransmitKey {
     public static class MiningState {
         public static final String Start = "Start";
         public static final String Stop = "Stop";
+        public static final String LOADING = "Loading";
     }
 
     public static final String BEAN = "bean";

@@ -12,7 +12,6 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.events.BlockEventData;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
@@ -24,6 +23,7 @@ import io.taucoin.android.wallet.db.util.MiningInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -135,7 +135,7 @@ public class MiningModel implements IMiningModel{
                 entry.setReward(reward);
                 MiningInfoDaoUtils.getInstance().insertOrReplace(entry);
                 if(isSendNotify){
-                    MyApplication.getRemoteConnector().sendBlockNotify(reward);
+                    NotifyManager.getInstance().sendBlockNotify(reward);
                 }
             }
         }else{

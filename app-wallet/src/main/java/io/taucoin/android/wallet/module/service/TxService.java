@@ -66,6 +66,8 @@ public class TxService extends Service {
         mAppModel = new AppModel();
         mIsChecked = false;
         mIsGetBlockHeight = false;
+        NotifyManager.getInstance().initNotificationManager(this);
+        NotifyManager.getInstance().initNotify();
         Logger.i("TxService onCreate");
     }
 
@@ -73,7 +75,12 @@ public class TxService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(intent != null && keyValue != null){
+            String action = intent.getAction();
             String serviceType = intent.getStringExtra(TransmitKey.SERVICE_TYPE);
+            if(StringUtil.isNotEmpty(action)){
+                NotifyManager.getInstance().handlerNotifyClickEvent(action, serviceType);
+                return super.onStartCommand(intent, flags, startId);
+            }
             switch (serviceType){
                 case TransmitKey.ServiceType.GET_IMPORT_DATA:
                 case TransmitKey.ServiceType.GET_HOME_DATA:
@@ -239,7 +246,14 @@ public class TxService extends Service {
     @Override
     public void onDestroy() {
         Logger.i("TxService onDestroy");
+        NotifyManager.getInstance().cancelNotify();
         super.onDestroy();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        NotifyManager.getInstance().cancelNotify();
+        super.onTaskRemoved(rootIntent);
     }
 
     public static void startTxService(String serviceType){

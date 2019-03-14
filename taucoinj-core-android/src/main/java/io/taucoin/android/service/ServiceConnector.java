@@ -12,6 +12,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 
 import java.util.ArrayList;
 
@@ -43,6 +44,8 @@ public class ServiceConnector {
     protected Messenger clientMessenger = null;
 
     protected ArrayList<ConnectorHandler> handlers = new ArrayList<>();
+
+    Parcelable parcelableData;
 
     /** Handles incoming messages from service. */
     class IncomingHandler extends Handler {
@@ -119,6 +122,7 @@ public class ServiceConnector {
 
         if (serviceConnection != null) {
             Intent intent = new Intent(context, serviceClass);
+            intent.putExtra("bean", parcelableData);
             context.getApplicationContext().startService(intent);
             return context.getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         } else {

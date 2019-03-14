@@ -3,6 +3,7 @@ package io.taucoin.android.service;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.Parcelable;
 import android.os.RemoteException;
 
 import io.taucoin.android.service.events.EventFlag;
@@ -23,6 +24,11 @@ public class TaucoinConnector extends ServiceConnector {
     public TaucoinConnector(Context context, Class serviceClass) {
 
         super(context, serviceClass);
+    }
+
+    public TaucoinConnector(Context context, Class serviceClass, Parcelable parcelable) {
+        this(context, serviceClass);
+        parcelableData = parcelable;
     }
 
     public void init(String identifier, List<String> privateKeys) {

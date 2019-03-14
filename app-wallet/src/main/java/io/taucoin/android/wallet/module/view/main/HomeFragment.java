@@ -29,6 +29,7 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.MiningPresenter;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.IHomeView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
@@ -106,11 +107,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ActivityUtil.startActivity(getActivity(), ProfileActivity.class);
                 break;
             case R.id.btn_mining:
-                time = -1;
-                requestWriteLOgPermissions();
-                waitStartOrStop();
-                miningPresenter.updateMiningState();
-                TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
+                starOrStopMining(false);
                 break;
             case R.id.tv_mining_details:
                 ActivityUtil.startActivity(getActivity(), BlockListActivity.class);
@@ -120,7 +117,18 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
+    private void starOrStopMining(boolean isNotice) {
+        if(!isNotice){
+            requestWriteLOgPermissions();
+            miningPresenter.updateMiningState();
+        }
+        time = -1;
+        waitStartOrStop();
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
+    }
+
     private void waitStartOrStop() {
+        NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.LOADING);
         btnMining.setEnabled(false);
         btnMining.setBackgroundResource(R.drawable.grey_rect_round_bg);
     }
@@ -165,13 +173,15 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     showMiningMsg();
                 }
                 break;
+            case NOTIFY_MINING:
+                starOrStopMining(true);
+                break;
             default:
                 break;
         }
     }
 
     private synchronized void showMiningMsg() {
-        MyApplication.getRemoteConnector().sendMiningNotify();
         if(tvMiningMsg != null){
             if(UserUtil.isImportKey()){
                 int msgReid = MiningUtil.getMiningMsg();
