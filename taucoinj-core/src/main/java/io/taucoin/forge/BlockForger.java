@@ -190,7 +190,7 @@ public class BlockForger {
 
         generationSignature = ProofOfTransaction.
                 calculateNextBlockGenerationSignature(bestBlock.getGenerationSignature(), CONFIG.getForgerPubkey());
-        logger.info("generationSignature {}", new BigInteger(generationSignature));
+        logger.info("generationSignature {}", Hex.toHexString(generationSignature));
 
         BigInteger hit = ProofOfTransaction.calculateRandomHit(generationSignature);
         logger.info("hit {}", hit.longValue());
