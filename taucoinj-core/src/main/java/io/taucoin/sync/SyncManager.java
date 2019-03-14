@@ -189,7 +189,7 @@ public class SyncManager {
 
         if (pool != null) {
             pool.stop();
-            queue = null;
+            pool = null;
         }
     }
 
@@ -405,6 +405,11 @@ public class SyncManager {
     }
 
     void startMaster(Channel master) {
+        if (pool == null || queue == null) {
+            logger.warn("Sync manager has been stopped");
+            return;
+        }
+
         pool.changeState(IDLE);
 
         masterVersion = master.getTauVersion();
