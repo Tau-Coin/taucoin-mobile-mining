@@ -74,10 +74,10 @@ public class TxService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         KeyValue keyValue = MyApplication.getKeyValue();
-        if(intent != null && keyValue != null){
+        if(intent != null){
             String action = intent.getAction();
             String serviceType = intent.getStringExtra(TransmitKey.SERVICE_TYPE);
-            if(StringUtil.isNotEmpty(action)){
+            if(StringUtil.isNotEmpty(action) || keyValue == null){
                 NotifyManager.getInstance().handlerNotifyClickEvent(action, serviceType);
                 return super.onStartCommand(intent, flags, startId);
             }

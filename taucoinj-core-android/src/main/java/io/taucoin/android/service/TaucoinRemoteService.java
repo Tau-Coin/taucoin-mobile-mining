@@ -764,7 +764,6 @@ public class TaucoinRemoteService extends TaucoinService {
         try {
             message.replyTo.send(replyMessage);
             logger.info("Sent taucoin close reply message");
-            stopSelf();
         } catch (RemoteException e) {
             logger.error("Exception sending taucoin close reply message to client: " + e.getMessage());
         }

@@ -16,6 +16,7 @@
 package io.taucoin.android.wallet.module.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.PendingIntent;
@@ -41,6 +42,7 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.view.SplashActivity;
 import io.taucoin.android.wallet.module.view.main.MainActivity;
+import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
@@ -228,7 +230,15 @@ public class NotifyManager {
     }
 
     void handlerNotifyClickEvent(String action, String serviceType){
+        if(StringUtil.isEmpty(action)){
+            return;
+        }
         Logger.d("notify_onClock=\taction:" + action + "\tserviceType=" + serviceType);
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue == null){
+            gotoImportKeyActivity();
+            return;
+        }
         switch (action){
             case ACTION_NOTIFICATION_ONGOING:
                 gotoMainActivity();
@@ -242,6 +252,27 @@ public class NotifyManager {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void gotoImportKeyActivity() {
+        Context contextApp = MyApplication.getInstance();
+        if(ActivityManager.getInstance().getActivitySize() > 0){
+            Logger.d("Notification immediate enter MainActivity");
+            Intent intentMain = new Intent(contextApp, ImportKeyActivity.class);
+            intentMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Activity activity = ActivityManager.getInstance().currentActivity();
+            if(activity != null){
+                intentMain = new Intent(activity, ImportKeyActivity.class);
+                activity.startActivityForResult(intentMain, 100);
+            }else {
+                contextApp.startActivity(intentMain);
+            }
+        }else{
+            Logger.d("Notification restart app");
+            Intent intentSplash = new Intent(contextApp, SplashActivity.class);
+            intentSplash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            contextApp.startActivity(intentSplash);
         }
     }
 
