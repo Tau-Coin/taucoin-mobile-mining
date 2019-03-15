@@ -45,6 +45,7 @@ import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
@@ -158,7 +159,7 @@ public class NotifyManager {
     }
 
     private synchronized void sendNotify() {
-        if(mService == null || mNotifyData == null){
+        if(mService == null || mNotifyData == null || !PermissionUtils.isNotificationEnabled()){
             return;
         }
         RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_notice);
@@ -201,7 +202,7 @@ public class NotifyManager {
     }
 
     public void sendBlockNotify(String reward) {
-        if(mService == null){
+        if(mService == null || !PermissionUtils.isNotificationEnabled()){
             return;
         }
         reward = FmtMicrometer.fmtAmount(reward);

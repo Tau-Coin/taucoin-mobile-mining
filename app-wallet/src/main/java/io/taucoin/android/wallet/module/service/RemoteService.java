@@ -32,6 +32,7 @@ import com.mofei.tau.R;
 import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.foundation.util.StringUtil;
 
 public class RemoteService extends TaucoinRemoteService {
@@ -125,7 +126,7 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     private void initNotify(NotifyManager.NotifyData mNotifyData) {
-        if(mNotifyData == null){
+        if(mNotifyData == null || !PermissionUtils.isNotificationEnabled()){
             return;
         }
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_notice);

@@ -134,7 +134,7 @@ public class ToastUtils {
                 sToast.setGravity(mGravity, 0, 0);
             }
             sToast.setDuration(duration);
-            if(isNotificationEnabled()){
+            if(PermissionUtils.isNotificationEnabled()){
                 sToast.show();
             }else {
                 showSystemToast();
@@ -173,12 +173,6 @@ public class ToastUtils {
         }catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static boolean isNotificationEnabled() {
-        Context context = MyApplication.getInstance();
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-        return notificationManagerCompat.areNotificationsEnabled();
     }
 
     private static void cancel() {
