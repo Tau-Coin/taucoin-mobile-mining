@@ -94,14 +94,7 @@ public class PendingStateImpl implements PendingState {
 
     // Return Transaction Received From Network
     public List<Transaction> getWireTransactions() {
-
-        List<Transaction> txs = new ArrayList<>();
-
-        for (Transaction tx : wireTransactions) {
-            txs.add(tx);
-        }
-
-        return txs;
+        return wireTransactions;
     }
 
     public Block getBestBlock() {
@@ -218,7 +211,9 @@ public class PendingStateImpl implements PendingState {
     @Override
     public boolean addPendingTransaction(Transaction tx) {
         if (addNewTxIfNotExist(tx)) {
-            pendingStateTransactions.add(tx);
+            synchronized (this) {
+                pendingStateTransactions.add(tx);
+            }
             return isValid(tx);
         }
 
@@ -254,10 +249,10 @@ public class PendingStateImpl implements PendingState {
                     removeExpendList(tx);
                     outdated.add(tx);
 			    }
+
+		    if(!outdated.isEmpty())
+                wireTransactions.removeAll(outdated);
         }
-		if(!outdated.isEmpty())
-            wireTransactions.removeAll(outdated);
-        
         outdated.clear();
 
         //clear pending transactions
@@ -267,27 +262,31 @@ public class PendingStateImpl implements PendingState {
                     removeExpendList(tx);
                     outdated.add(tx);
                 }
-        }
-		if(!outdated.isEmpty())
-            pendingStateTransactions.removeAll(outdated);
 
+		    if(!outdated.isEmpty())
+                pendingStateTransactions.removeAll(outdated);
+        }
     }
 
     private void clearWire(List<Transaction> txs) {
-        for (Transaction tx : txs) {
-            if (wireTransactions.contains(tx)){
-                wireTransactions.remove(tx);
-            }
+        synchronized (wireTransactions) {
+            for (Transaction tx : txs) {
+                if (wireTransactions.contains(tx)){
+                    wireTransactions.remove(tx);
+                }
 
-            removeExpendList(tx);
+                removeExpendList(tx);
+            }
         }
     }
 
     private void clearPendingState(List<Transaction> txs) {
+        synchronized (wireTransactions) {
             for (Transaction tx : txs){
                 if (pendingStateTransactions.contains(tx)){
                     pendingStateTransactions.remove(tx);
                 }
+            }
         }
     }
 
