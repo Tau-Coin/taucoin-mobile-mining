@@ -60,7 +60,7 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="mining" />
+                android:text="Mining" />
 
         </LinearLayout>
 

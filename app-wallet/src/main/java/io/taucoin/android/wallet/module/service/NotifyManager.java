@@ -40,7 +40,6 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.MiningModel;
-import io.taucoin.android.wallet.module.view.SplashActivity;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
@@ -266,10 +265,9 @@ public class NotifyManager {
     }
 
     private void gotoImportKeyActivity() {
-        Context contextApp = MyApplication.getInstance();
-        if(ActivityManager.getInstance().getActivitySize() > 0){
-            Logger.d("Notification immediate enter MainActivity");
-            ActivityUtil.moveTaskToFront(contextApp);
+        Logger.d("Notification immediate enter MainActivity");
+        boolean isSuccess = ActivityUtil.moveTaskToFront();
+        if(isSuccess){
             Activity activity = ActivityManager.getInstance().currentActivity();
             if(activity != null){
                 Intent intentImportKey = new Intent(activity, ImportKeyActivity.class);
@@ -277,23 +275,18 @@ public class NotifyManager {
             }
         }else{
             Logger.d("Notification restart app");
-            Intent intentSplash = new Intent(contextApp, SplashActivity.class);
-            intentSplash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            contextApp.startActivity(intentSplash);
+            ActivityUtil.restartAppTask();
         }
     }
 
     private void gotoMainActivity() {
-        Context contextApp = MyApplication.getInstance();
-        if(contextApp != null && MyApplication.getInstance().isBackground()){
-            if(ActivityManager.getInstance().getActivitySize() > 0){
-                Logger.d("Notification immediate enter moveTaskToFront");
-                ActivityUtil.moveTaskToFront(contextApp);
-            }else{
+        MyApplication contextApp = MyApplication.getInstance();
+        if(contextApp != null && contextApp.isBackground()){
+            Logger.d("Notification immediate enter moveTaskToFront");
+            boolean isSuccess = ActivityUtil.moveTaskToFront();
+            if(!isSuccess){
                 Logger.d("Notification restart app");
-                Intent intentSplash = new Intent(contextApp, SplashActivity.class);
-                intentSplash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                contextApp.startActivity(intentSplash);
+                ActivityUtil.restartAppTask();
             }
         }
     }

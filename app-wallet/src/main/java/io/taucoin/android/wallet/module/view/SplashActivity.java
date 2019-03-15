@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
+import io.taucoin.android.wallet.util.ActivityUtil;
 
 public class SplashActivity extends BaseActivity {
 
@@ -29,6 +30,7 @@ public class SplashActivity extends BaseActivity {
                 if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN.equals(action)) {
                     Logger.d("SplashActivity immediate finish");
                     finish();
+                    ActivityUtil.moveTaskToFront();
                 }
             }
         } else {

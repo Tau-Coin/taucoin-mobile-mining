@@ -25,6 +25,9 @@ import com.github.naturs.logger.Logger;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.module.view.SplashActivity;
+
 /**
  * Description: Activity tools
  * Author:yang
@@ -52,18 +55,29 @@ public class ActivityUtil {
         fragment.startActivity(intent);
     }
 
-    public static void moveTaskToFront(Context context){
+    public static boolean moveTaskToFront(){
+        boolean isSuccess = false;
         try {
+            Context context = MyApplication.getInstance();
             android.app.ActivityManager mAm = (android.app.ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningTaskInfo> taskList = mAm.getRunningTasks(100);
             for (android.app.ActivityManager.RunningTaskInfo rti : taskList) {
                 if (rti.topActivity.getPackageName().equals(context.getPackageName())) {
                     mAm.moveTaskToFront(rti.id, 0);
+                    isSuccess = true;
                     break;
                 }
             }
         }catch (Exception e){
             Logger.e("task switch err!", e);
         }
+        return isSuccess;
+    }
+
+    public static void restartAppTask(){
+        Context context = MyApplication.getInstance();
+        Intent intentSplash = new Intent(context, SplashActivity.class);
+        intentSplash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intentSplash);
     }
 }
