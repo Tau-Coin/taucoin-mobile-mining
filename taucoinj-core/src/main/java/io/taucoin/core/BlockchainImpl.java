@@ -669,14 +669,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             logger.error("Too many transactions, block number {}", block.getNumber());
             return false;
         }
-        if (!txs.isEmpty()) {
-            for (Transaction tx: txs) {
-                if (!verifyTransactionTime(tx, block)) {
-                    logger.error("Block contains expiration transaction, block number {}", block.getNumber());
-                    return false;
-                }
-            }
-        }
 
         return true;
     }
@@ -693,6 +685,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         if (!block.isGenesis()) {
             if (!verifyBlockSimply(block))
                 return false;
+
+            List<Transaction> txs = block.getTransactionsList();
+            if (!txs.isEmpty()) {
+                for (Transaction tx: txs) {
+                    if (!verifyTransactionTime(tx, block)) {
+                        logger.error("Block contains expiration transaction, block number {}", block.getNumber());
+                        return false;
+                    }
+                }
+            }
 
             if (!verifyProofOfTransaction(block, repo)) {
                 logger.error("Verify ProofOfTransaction fail, block number {}", block.getNumber());
