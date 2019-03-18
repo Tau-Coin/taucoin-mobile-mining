@@ -52,10 +52,10 @@ import io.taucoin.foundation.util.StringUtil;
 
 public class NotifyManager {
 
-    static final String ACTION_NOTIFICATION_MINING = "tau.intent.action.notify.mining";
-    static final String ACTION_NOTIFICATION_ONGOING = "tau.intent.action.notify.ongoing";
+    private static final String ACTION_NOTIFICATION_MINING = "tau.intent.action.notify.mining";
+    private static final String ACTION_NOTIFICATION_ONGOING = "tau.intent.action.notify.ongoing";
 
-    static final int NOTIFICATION_ID = 0x99;
+    private static final int NOTIFICATION_ID = 0x99;
 
     private android.app.NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
@@ -84,29 +84,35 @@ public class NotifyManager {
     void initNotificationManager(Service service) {
         mService = service;
         mNotificationManager = (android.app.NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-        String channelId = createNotificationChannel();
+        mBuilder = createNotificationBuilder(service, mNotificationManager);
+    }
+
+    NotificationCompat.Builder createNotificationBuilder(Service service, android.app.NotificationManager notificationManager) {
+        String channelId = createNotificationChannel(notificationManager);
 
         Intent intent = new Intent(service, TxService.class);
         intent.setAction(ACTION_NOTIFICATION_ONGOING);
         int id = (int) (System.currentTimeMillis() / 1000);
         PendingIntent pendingIntent = PendingIntent.getService(service, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mBuilder = new NotificationCompat.Builder(service, channelId);
-        mBuilder.setContentTitle(service.getString(R.string.app_name));
-        mBuilder.setWhen(System.currentTimeMillis());
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(service, channelId);
+        builder.setContentTitle(service.getString(R.string.app_name));
+        builder.setWhen(System.currentTimeMillis());
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
-            mBuilder.setSmallIcon(R.mipmap.icon_notify_logo);
+            builder.setSmallIcon(R.mipmap.icon_notify_logo);
         }else{
-            mBuilder.setSmallIcon(service.getApplicationInfo().icon);
+            builder.setSmallIcon(service.getApplicationInfo().icon);
         }
-        mBuilder.setContentIntent(pendingIntent);
-        mBuilder.setOngoing(true);
-        mBuilder.setPriority(Notification.PRIORITY_MAX);
-        mBuilder.setSound(null);
+        builder.setContentIntent(pendingIntent);
+        builder.setOngoing(true);
+        builder.setPriority(Notification.PRIORITY_MAX);
+        builder.setSound(null);
+
+        return builder;
     }
 
 
-    private String createNotificationChannel() {
+    private String createNotificationChannel(android.app.NotificationManager notificationManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "tauChannelId";
             CharSequence channelName = "tauChannelName";
@@ -121,7 +127,7 @@ public class NotifyManager {
             // Setting Display Mode
             notificationChannel.setSound(null, null);
             notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-            mNotificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.createNotificationChannel(notificationChannel);
             return channelId;
         } else {
             return "default";
@@ -158,25 +164,32 @@ public class NotifyManager {
 
     }
 
-    private synchronized void sendNotify() {
-        if(mService == null || mNotifyData == null || !PermissionUtils.isNotificationEnabled()){
+    private synchronized void sendNotify(){
+        if(mService == null){
             return;
         }
-        RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_notice);
-        if(StringUtil.isNotEmpty(mNotifyData.cpuUsage)){
-            remoteViews.setTextViewText(R.id.tv_cpu, mNotifyData.cpuUsage);
+        sendNotify(mService, mBuilder, mNotifyData);
+    }
+
+    synchronized void sendNotify(Service service, NotificationCompat.Builder builder, NotifyManager.NotifyData notifyData) {
+        if(service == null || notifyData == null || !PermissionUtils.isNotificationEnabled()){
+            return;
         }
-        if(StringUtil.isNotEmpty(mNotifyData.memorySize)){
-            remoteViews.setTextViewText(R.id.tv_memory, mNotifyData.memorySize);
+        RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.notification_notice);
+        if(StringUtil.isNotEmpty(notifyData.cpuUsage)){
+            remoteViews.setTextViewText(R.id.tv_cpu, notifyData.cpuUsage);
         }
-        if(StringUtil.isNotEmpty(mNotifyData.dataSize)){
-            remoteViews.setTextViewText(R.id.tv_data, mNotifyData.dataSize);
+        if(StringUtil.isNotEmpty(notifyData.memorySize)){
+            remoteViews.setTextViewText(R.id.tv_memory, notifyData.memorySize);
+        }
+        if(StringUtil.isNotEmpty(notifyData.dataSize)){
+            remoteViews.setTextViewText(R.id.tv_data, notifyData.dataSize);
         }
         int miningState = R.mipmap.icon_end;
         boolean isLoading = false;
-        if(StringUtil.isSame(mNotifyData.miningState, TransmitKey.MiningState.Start)){
+        if(StringUtil.isSame(notifyData.miningState, TransmitKey.MiningState.Start)){
             miningState = R.mipmap.icon_start;
-        }else if(StringUtil.isSame(mNotifyData.miningState, TransmitKey.MiningState.LOADING)){
+        }else if(StringUtil.isSame(notifyData.miningState, TransmitKey.MiningState.LOADING)){
             isLoading = true;
         }
         remoteViews.setImageViewResource(R.id.iv_mining, miningState);
@@ -184,21 +197,21 @@ public class NotifyManager {
         remoteViews.setViewVisibility(R.id.iv_mining_loading, isLoading ? View.VISIBLE : View.GONE);
         remoteViews.setViewVisibility(R.id.iv_mining, !isLoading ? View.VISIBLE : View.GONE);
 
-        mBuilder.setCustomContentView(remoteViews);
-        Intent intent = new Intent(mService, TxService.class);
+        builder.setCustomContentView(remoteViews);
+        Intent intent = new Intent(service, TxService.class);
         intent.setAction(ACTION_NOTIFICATION_MINING);
-        intent.putExtra(TransmitKey.SERVICE_TYPE, mNotifyData.miningState);
+        intent.putExtra(TransmitKey.SERVICE_TYPE, notifyData.miningState);
         PendingIntent pendingIntent;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            pendingIntent = PendingIntent.getForegroundService(mService, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            pendingIntent = PendingIntent.getForegroundService(service, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }else{
-            pendingIntent = PendingIntent.getService(mService, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            pendingIntent = PendingIntent.getService(service, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         remoteViews.setOnClickPendingIntent(R.id.iv_mining, pendingIntent);
 
-        Notification mNotification = mBuilder.build();
+        Notification mNotification = builder.build();
         mNotification.flags = Notification.FLAG_NO_CLEAR;
-        mService.startForeground(NOTIFICATION_ID, mNotification);
+        service.startForeground(NOTIFICATION_ID, mNotification);
     }
 
     public void sendBlockNotify(String reward) {
