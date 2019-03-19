@@ -238,8 +238,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     AdvancedDeviceUtils.adjustDetailedTracing(newBlock.getNumber());
                 }
 
-                //TODO:check it again when repository commit and roll back; TransactionExecutor track cache
-                processBlock(newBlock);
+                if (!processBlock(newBlock, cacheTrack)) {
+                    isValid = false;
+                    break;
+                }
 
                 cacheTrack.commit();
             }
@@ -429,7 +431,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             System.exit(-1);
         }
 
-        //TODO:check it again
         if (!isValid(block, repository)) {
             logger.warn("Invalid block with number: {}", block.getNumber());
             return false;
@@ -447,8 +448,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
         }
 
-        //TODO:check it again when repository commit and roll back; TransactionExecutor track cache
-        processBlock(block);
+        if (!processBlock(block, track)) {
+            track.rollback();
+            return false;
+        }
 
         track.commit();
 
@@ -705,41 +708,54 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return true;
     }
 
-    private void processBlock(Block block) {
+    private boolean processBlock(Block block, Repository repo) {
 
         if (!block.isGenesis()) {
             if (!config.blockChainOnly()) {
 //                wallet.addTransactions(block.getTransactionsList());
-                applyBlock(block);
+                return applyBlock(block, repo);
 //                wallet.processBlock(block);
             }
         }
+        return true;
     }
 
-    private void applyBlock(Block block) {
+    private boolean applyBlock(Block block, Repository repo) {
 
         logger.info("applyBlock: block: [{}] tx.list: [{}]", block.getNumber(), block.getTransactionsList().size());
         long saveTime = System.nanoTime();
 
+        Repository cacheTrack;
+        boolean isValid = true;
         for (Transaction tx : block.getTransactionsList()) {
             stateLogger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
-            TransactionExecutor executor = new TransactionExecutor(tx, track);
+            cacheTrack = repo.startTracking();
+            TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack);
             ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
-            executor.init();
+            if (!executor.init()) {
+                isValid = false;
+                cacheTrack.rollback();
+                logger.error("Transaction [{}] is invalid.", tx.getHash());
+                break;
+            }
             executor.setCoinbase(key.getAddress());
             executor.executeFinal();
 
-//            track.commit();
+            cacheTrack.commit();
+        }
+
+        if (!isValid) {
+            return false;
         }
 
         updateTotalDifficulty(block);
 
-//        track.commit();
-
         long totalTime = System.nanoTime() - saveTime;
         adminInfo.addBlockExecTime(totalTime);
         logger.info("block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
+
+        return true;
     }
 
     @Override

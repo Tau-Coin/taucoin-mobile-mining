@@ -21,18 +21,13 @@ import static io.taucoin.util.ByteUtil.toHexString;
 public class TransactionExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger("execute");
-    private static final Logger stateLogger = LoggerFactory.getLogger("state");
 
     private Transaction tx;
     private Repository track;
     private byte[] coinbase;
 
-    private boolean readyToExecute = false;
-
     long basicTxAmount = 0;
     long basicTxFee = 0;
-
-    boolean localCall = false;
 
     //constructor
     public TransactionExecutor(Transaction tx, Repository track) {
@@ -40,32 +35,24 @@ public class TransactionExecutor {
         this.track= track;
     }
 
-    //setLocal
-    public TransactionExecutor setLocalCall(boolean localCall) {
-        this.localCall = localCall;
-	    return this;
-    }
-
     /**
-     * Do all the basic validation, if the executor
-     * will be ready to run the transaction at the end
-     * set readyToExecute = true
+     * Do all the basic validation
      */
     public boolean init() {
 
-        if (localCall) {
-            readyToExecute = true;
-            return true;
-        }
-
 		// Check In Transaction Amount
         basicTxAmount = toBI(tx.getAmount()).longValue();
+        if (basicTxAmount < 0 ) {
+            if (logger.isWarnEnabled())
+                logger.warn("Transaction amount [{}] is invalid!", basicTxAmount);
+            return false;
+        }
 
         // Check In Transaction Fee
         basicTxFee = toBI(tx.transactionCost()).longValue();
         if (basicTxFee < 0 ) {
             if (logger.isWarnEnabled())
-                logger.warn("Not enough fee for transaction execution: Require: {} Got: {}", basicTxFee);
+                logger.warn("Transaction fee [{}] is invalid!", basicTxFee);
             tx.TRANSACTION_STATUS = "Not enough fee for transaction";
             return false;
         }
@@ -80,7 +67,6 @@ public class TransactionExecutor {
             tx.TRANSACTION_STATUS = "No enough balance";
             return false;
         }
-        readyToExecute = true;
         return true;
     }
 
@@ -90,8 +76,6 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal() {
-        if (!readyToExecute) return;
-
 		// Sender subtract balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
         logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
