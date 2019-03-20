@@ -149,7 +149,7 @@ public interface Taucoin {
     /**
      * @return - pending state repository
      */
-    Repository getPendingState();
+    io.taucoin.core.PendingState getPendingState();
 
     public void init();
 

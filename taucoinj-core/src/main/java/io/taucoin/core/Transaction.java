@@ -31,7 +31,7 @@ import static io.taucoin.util.TimeUtils.timeNows;
  * There are two types of transactions: those which result in message calls
  * and those which result in the creation of new contracts.
  */
-public class Transaction implements Comparable<Transaction>{
+public class Transaction {
 
     private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
     public String TRANSACTION_STATUS = "" ;
@@ -68,7 +68,7 @@ public class Transaction implements Comparable<Transaction>{
     
     private byte[] hash;
 
-    public static final int TTIME = 43200;
+    public static final int TTIME = 144;
     public static final int HASH_LENGTH = 32;
     public static final int ADDRESS_LENGTH = 20;
 
@@ -159,10 +159,10 @@ public class Transaction implements Comparable<Transaction>{
     }  
 
     //NowTime - TransactionTime < 1440s;
-    public synchronized boolean checkTime() {
+    public synchronized boolean checkTime(Block benchBlock) {
         //get current unix time
-        long diffTime = timeNows()- toBI(timeStamp).longValue();
-        if (diffTime > byteArrayToLong(expireTime)){
+        long benchTime = byteArrayToLong(benchBlock.getTimestamp());
+        if (benchTime > byteArrayToLong(this.timeStamp)){
             return false;
 		}
         return true;
@@ -174,11 +174,11 @@ public class Transaction implements Comparable<Transaction>{
         RLPList transaction = (RLPList) decodedTxList.get(0);
         logger.info("transaction item size is {}",transaction.size());
         this.version = transaction.get(0).getRLPData()==null? (byte)0: transaction.get(0).getRLPData()[0];
-        logger.info("item version is {}",(int)this.version);
+        //logger.info("item version is {}",(int)this.version);
         //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
         this.option = transaction.get(1).getRLPData()==null? (byte)0: transaction.get(1).getRLPData()[0];
         this.timeStamp = transaction.get(2).getRLPData();
-        logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
+        //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
         this.toAddress = transaction.get(3).getRLPData();
         this.amount = transaction.get(4).getRLPData();
         this.fee = transaction.get(5).getRLPData();
@@ -404,9 +404,7 @@ public class Transaction implements Comparable<Transaction>{
                 BigIntegers.asUnsignedByteArray(amount),
                 BigIntegers.asUnsignedByteArray(fee));
     }
-
-    @Override
-    public int compareTo(Transaction t){
-        return this.getBigIntegerFee().compareTo(t.getBigIntegerFee());
+    public byte[] getExpireTime() {
+        return expireTime;
     }
 }

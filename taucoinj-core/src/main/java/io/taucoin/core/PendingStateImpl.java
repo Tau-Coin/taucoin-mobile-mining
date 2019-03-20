@@ -1,6 +1,8 @@
 package io.taucoin.core;
 
+import io.taucoin.db.BlockStore;
 import io.taucoin.listener.TaucoinListener;
+import io.taucoin.manager.WorldManager;
 import io.taucoin.util.FastByteComparisons;
 import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
@@ -13,13 +15,7 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.math.BigInteger.ZERO;
 import org.apache.commons.collections4.map.LRUMap;
@@ -37,30 +33,18 @@ import io.taucoin.db.ByteArrayWrapper;
 @Singleton
 public class PendingStateImpl implements PendingState {
 
-    /*
-    public static class TransactionSortedSet extends TreeSet<Transaction> {
-
-        public TransactionSortedSet() {
-
-            super(public int compareFee(Transaction tx1, Transaction tx2){
-                      return FastByteComparisons.compareTo(tx1.getFee(), 0, 2, tx2.getFee(), 0, 2);
-	            }
-			);
-        }
-    }
-    */
     private static final Logger logger = LoggerFactory.getLogger("state");
 
     private TaucoinListener listener;
     private Repository repository;
+    private BlockStore blockStore;
     private Blockchain blockchain;
     private boolean isSyncdone = false;
     @Resource
-    private final List<Transaction> wireTransactions = new ArrayList<>();
-
+    private final PriorityQueue<MemoryPoolEntry> wireTransactions = new PriorityQueue<MemoryPoolEntry>(1,new MemoryPoolPolicy());
     // To filter out the transactions we have already processed
     // transactions could be sent by peers even if they were already included into blocks
-    private final Map<ByteArrayWrapper, Object> redceivedTxs = new LRUMap<>(500000);
+    private final Map<ByteArrayWrapper, Object> receivedTxs = new LRUMap<>(500000);
 
     private final Map<String, BigInteger> expendList = new HashMap<String, BigInteger>(500000);
 
@@ -75,9 +59,10 @@ public class PendingStateImpl implements PendingState {
     }
 
     @Inject
-    public PendingStateImpl(TaucoinListener listener, Repository repository) {
+    public PendingStateImpl(TaucoinListener listener, Repository repository,BlockStore blockStore) {
         this.listener = listener;
         this.repository = repository;
+        this.blockStore = blockStore;
     }
 
     @Override
@@ -92,9 +77,17 @@ public class PendingStateImpl implements PendingState {
         return pendingState;
     }
 
-    // Return Transaction Received From Network
+    /**
+     * Return Transactions in mempool
+     * these transactions are valid at best block chain
+     * @return
+     */
     public List<Transaction> getWireTransactions() {
-        return wireTransactions;
+        List<Transaction> list = new ArrayList<Transaction>();
+        for(MemoryPoolEntry entry : wireTransactions){
+            list.add(entry.tx);
+        }
+        return list;
     }
 
     public Block getBestBlock() {
@@ -127,7 +120,10 @@ public class PendingStateImpl implements PendingState {
         // tight synchronization here since a lot of duplicate transactions can arrive from many peers
         // and isValid(tx) call is very expensive
         synchronized (this) {
-            wireTransactions.addAll(newTxs);
+            for(Transaction tx : newTxs) {
+                MemoryPoolEntry entry = MemoryPoolEntry.with(tx);
+                wireTransactions.offer(entry);
+            }
         }
 
         /*
@@ -140,9 +136,9 @@ public class PendingStateImpl implements PendingState {
                 }
             });
         }
-*/
+       */
 
-        logger.info("Wire transaction list added: {} new, {} valid of received {}, #of known txs: {}", unknownTx, newTxs.size(), transactions.size(), redceivedTxs.size());
+        logger.info("Wire transaction list added: {} new, {} valid of received {}, #of known txs: {}", unknownTx, newTxs.size(), transactions.size(), receivedTxs.size());
         return newTxs;
     }
 
@@ -162,8 +158,22 @@ public class PendingStateImpl implements PendingState {
             tx.TRANSACTION_STATUS = "Invalid transaction in structure";
 			return false;
         }
+        long expireTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+        long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
+        Block benchBlock = null;
+        if(unlockTime >= 0) {
+            benchBlock = blockStore.getChainBlockByNumber(unlockTime);
+        }else{
+            /**
+             * this behavior is dangerous , whether node should prevent this into wire transaction pool.
+             */
+            logger.warn("dangerous behavior expire " +
+                            "time too long tx:{} expire time:{}",
+                    ByteUtil.toHexString(tx.getHash()),
+                    ByteUtil.byteArrayToLong(tx.getExpireTime()));
+        }
 
-        if(!tx.checkTime()) {
+        if(benchBlock != null && !tx.checkTime(benchBlock)) {
             if (logger.isWarnEnabled())
                 logger.warn("Invalid transaction in time");
             tx.TRANSACTION_STATUS = "Invalid transaction in time";
@@ -197,12 +207,12 @@ public class PendingStateImpl implements PendingState {
         }
 
         //update transaction memory pool
-        synchronized (redceivedTxs) {
-            if (!redceivedTxs.containsKey(hash)) {
-                redceivedTxs.put(hash, null);
+        synchronized (receivedTxs){
+            if (!receivedTxs.containsKey(hash)) {
+                receivedTxs.put(hash, null);
                 return true;
             } else {
-                tx.TRANSACTION_STATUS = "repeated transaction,can't be accepted";
+                tx.TRANSACTION_STATUS = "have processed transaction,can't be accepted";
                 return false;
             }
         }
@@ -214,7 +224,12 @@ public class PendingStateImpl implements PendingState {
             synchronized (this) {
                 pendingStateTransactions.add(tx);
             }
-            return isValid(tx);
+            boolean retval = isValid(tx);
+            if(retval){
+                wireTransactions.offer(new MemoryPoolEntry(tx));
+                pendingStateTransactions.remove(tx);
+            }
+            return retval;
         }
 
         return false;
@@ -244,25 +259,57 @@ public class PendingStateImpl implements PendingState {
 
         //clear wired transactions
         synchronized (wireTransactions) {
-            for (Transaction tx : wireTransactions)
-                if (!tx.checkTime()){
-                    removeExpendList(tx);
-                    outdated.add(tx);
-			    }
+            for (MemoryPoolEntry entry : wireTransactions) {
+                long expireTime = ByteUtil.byteArrayToLong(entry.tx.getExpireTime());
+                long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
+                Block benchBlock = null;
+                if(unlockTime >= 0) {
+                    benchBlock = blockStore.getChainBlockByNumber(unlockTime);
+                }else{
+                    /**
+                     * if user set a large expire time , this behavior may be harmful to net
+                     * in the future, more actions will be get to protect net from hack.
+                     */
+                    logger.warn("dangerous behavior expire " +
+                            "time too long tx:{} expire time:{}",
+                            ByteUtil.toHexString(entry.tx.getHash()),
+                            ByteUtil.byteArrayToLong(entry.tx.getExpireTime()));
+                }
+                if (benchBlock != null && !entry.tx.checkTime(benchBlock) ) {
+                    removeExpendList(entry.tx);
+                    outdated.add(entry.tx);
+                }
+            }
 
-		    if(!outdated.isEmpty())
-                wireTransactions.removeAll(outdated);
+		    if(!outdated.isEmpty()) {
+                for (Transaction tr:
+                     outdated) {
+                    MemoryPoolEntry entry = new MemoryPoolEntry(tr);
+                    wireTransactions.remove(entry);
+                }
+            }
         }
         outdated.clear();
 
         //clear pending transactions
         synchronized (pendingStateTransactions) {
-            for (Transaction tx : pendingStateTransactions)
-                if (!tx.checkTime()){
+            for (Transaction tx : pendingStateTransactions) {
+                long expireTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+                long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
+                Block benchBlock = null;
+                if(unlockTime >= 0) {
+                    benchBlock = blockStore.getChainBlockByNumber(unlockTime);
+                }else{
+                    logger.warn("dangerous behavior expire " +
+                                    "time too long tx:{} expire time:{}",
+                            ByteUtil.toHexString(tx.getHash()),
+                            ByteUtil.byteArrayToLong(tx.getExpireTime()));
+                }
+                if (benchBlock != null && !tx.checkTime(benchBlock)) {
                     removeExpendList(tx);
                     outdated.add(tx);
                 }
-
+            }
 		    if(!outdated.isEmpty())
                 pendingStateTransactions.removeAll(outdated);
         }
@@ -281,10 +328,25 @@ public class PendingStateImpl implements PendingState {
     }
 
     private void clearPendingState(List<Transaction> txs) {
-        synchronized (wireTransactions) {
+        synchronized (pendingStateTransactions) {
             for (Transaction tx : txs){
                 if (pendingStateTransactions.contains(tx)){
                     pendingStateTransactions.remove(tx);
+                }
+            }
+            /**
+             * because a new block has been insert into block chain
+             * a smart node should move some unsure transactions into
+             * wire transaction because it is valid time now.
+             */
+            synchronized (wireTransactions){
+                for(Transaction tr: pendingStateTransactions){
+                    if(isValid(tr)){
+                        MemoryPoolEntry entry = new MemoryPoolEntry(tr);
+                        wireTransactions.offer(entry);
+                        logger.info("transaction: {} change from invalid to valid",
+                                ByteUtil.toHexString(entry.tx.getHash()));
+                    }
                 }
             }
         }

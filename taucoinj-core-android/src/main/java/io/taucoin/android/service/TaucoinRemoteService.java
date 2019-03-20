@@ -361,7 +361,7 @@ public class TaucoinRemoteService extends TaucoinService {
         ChannelManager channelManager = component.channelManager();
         //channelManager.setTaucoin(taucoin);
         taucoin.getBlockForger().addListener(new TaucoinForgerListener());
-
+        taucoin.getPendingState().setBlockchain(taucoin.getBlockchain());
         // You can also add some other initialization logic.
     }
 

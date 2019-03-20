@@ -48,6 +48,8 @@ public interface PendingState extends io.taucoin.facade.PendingState{
 	//PendingState Contains Tx
     boolean pendingStateContains(Transaction tx);
 
+    void setBlockchain(Blockchain blockchain);
+
     /**
      * Fires inner logic related to main sync done event
      */

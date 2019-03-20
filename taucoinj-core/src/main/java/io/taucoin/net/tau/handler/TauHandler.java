@@ -271,6 +271,7 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
         for (Transaction tx : txList) {
             txSet.add(tx);
         }
+        //if this transaction comes from net and can not be judged whether valid, drop it !
         List<Transaction> txListBroadcasted = pendingState.addWireTransactions(txSet);
 
         // broadcast transactions only after tx is verified.

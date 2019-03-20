@@ -258,8 +258,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    PendingState providePendingState(TaucoinListener listener, Repository repository) {
-        return new PendingStateImpl(listener, repository);
+    PendingState providePendingState(TaucoinListener listener, Repository repository,BlockStore blockStore) {
+        return new PendingStateImpl(listener, repository,blockStore);
     }
 
     @Provides
