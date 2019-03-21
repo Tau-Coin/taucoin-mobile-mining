@@ -318,8 +318,9 @@ public class PendingStateImpl implements PendingState {
     private void clearWire(List<Transaction> txs) {
         synchronized (wireTransactions) {
             for (Transaction tx : txs) {
-                if (wireTransactions.contains(tx)){
-                    wireTransactions.remove(tx);
+                MemoryPoolEntry entry = new MemoryPoolEntry(tx);
+                if (wireTransactions.contains(entry)){
+                    wireTransactions.remove(entry);
                 }
 
                 removeExpendList(tx);

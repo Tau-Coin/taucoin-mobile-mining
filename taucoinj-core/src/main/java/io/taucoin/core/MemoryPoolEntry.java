@@ -14,7 +14,7 @@ public class MemoryPoolEntry {
     public long buildTime;
     public long fee;
 
-    protected MemoryPoolEntry(Transaction tx) {
+    public MemoryPoolEntry(Transaction tx) {
         this.tx = tx;
         this.buildTime = ByteUtil.byteArrayToLong(tx.getTime());
         this.fee = ByteUtil.byteArrayToLong(tx.getFee());
@@ -22,5 +22,11 @@ public class MemoryPoolEntry {
 
     public static MemoryPoolEntry with(Transaction tx) {
         return new MemoryPoolEntry(tx);
+    }
+    @Override
+    public boolean equals(Object entry){
+        if(entry.hashCode() == entry.hashCode())
+            return true;
+        return false;
     }
 }
