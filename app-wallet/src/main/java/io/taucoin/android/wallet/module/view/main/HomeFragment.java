@@ -96,6 +96,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        UserUtil.setNickName(tvNick);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UserUtil.setNickName(tvNick);

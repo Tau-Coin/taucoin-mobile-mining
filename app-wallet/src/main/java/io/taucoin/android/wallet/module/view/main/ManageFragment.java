@@ -105,6 +105,7 @@ public class ManageFragment extends BaseFragment implements IManageView {
         if(!hidden){
             showUpgradeView();
         }
+        UserUtil.setNickName(tvNick);
     }
 
     private void showUpgradeView() {
