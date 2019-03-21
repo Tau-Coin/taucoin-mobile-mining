@@ -24,6 +24,7 @@ import io.taucoin.android.wallet.module.view.manage.HelpActivity;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.manage.KeysActivity;
 import io.taucoin.android.wallet.module.view.manage.ProfileActivity;
+import io.taucoin.android.wallet.module.view.manage.SettingActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
@@ -57,7 +58,7 @@ public class ManageFragment extends BaseFragment implements IManageView {
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
     }
 
-    @OnClick({R.id.tv_nick, R.id.item_keys, R.id.item_address_note, R.id.item_help, R.id.tv_version})
+    @OnClick({R.id.tv_nick, R.id.item_keys, R.id.item_address_note, R.id.item_help, R.id.tv_version, R.id.item_setting})
     public void onClick(View view) {
        switch (view.getId()){
            case R.id.tv_nick:
@@ -85,6 +86,13 @@ public class ManageFragment extends BaseFragment implements IManageView {
                Intent intent = new Intent();
                intent.putExtra(TransmitKey.ISSHOWTIP, true);
                UpgradeService.startUpdateService(intent);
+               break;
+           case R.id.item_setting:
+               if(UserUtil.isImportKey()){
+                   ActivityUtil.startActivity(getActivity(), SettingActivity.class);
+               }else{
+                   ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+               }
                break;
            default:
                break;

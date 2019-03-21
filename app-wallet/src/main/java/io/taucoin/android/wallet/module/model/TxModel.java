@@ -47,6 +47,7 @@ import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
@@ -117,7 +118,7 @@ public class TxModel implements ITxModel {
                     Object isFinish = null;
                     if(history != null){
                         if(rawTx == null){
-                            boolean isFinishState = MiningUtil.isFinishState((int) history.getBlockNum());
+                            boolean isFinishState = MiningUtil.isFinishState(history);
                             if(isFinishState){
                                 isFinish = false;
                                 history.setNotRolled(-1);
@@ -126,7 +127,7 @@ public class TxModel implements ITxModel {
                             }
                         }else{
                             isFinish = true;
-                            int state = MiningUtil.parseTxState(rawTx.getNotRolled(), rawTx.getBlockNum());
+                            int state = MiningUtil.parseTxState(rawTx.getNotRolled(), history);
                             history.setNotRolled(state);
                             history.setBlockNum(rawTx.getBlockNum());
                             history.setBlockHash(rawTx.getBlockHash());
@@ -168,9 +169,11 @@ public class TxModel implements ITxModel {
             }else{
                 toAddress = Utils.parseAsHexOrBase58(txToAddress);
             }
-
+            long expiryTime = UserUtil.getTransExpiryTime();
+            long expiryBlock = UserUtil.getTransExpiryBlock();
+            byte[] expireTimeByte = ByteUtil.longToBytes(expiryBlock);
             io.taucoin.core.Transaction transaction = new io.taucoin.core.Transaction(TransactionVersion.V01.getCode(),
-                    TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee);
+                    TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee, expireTimeByte);
             transaction.sign(privateKey);
 
             int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
@@ -182,6 +185,7 @@ public class TxModel implements ITxModel {
             txHistory.setCreateTime(DateUtil.getCurrentTime());
             txHistory.setNotRolled(1);
             txHistory.setBlockNum(blockHeight);
+            txHistory.setExpireTime(expiryTime);
 
             insertTransactionHistory(txHistory);
             emitter.onNext(transaction);
@@ -317,7 +321,7 @@ public class TxModel implements ITxModel {
                         tx.setBlockNum(bean.getBlockNum());
                         tx.setBlockHash(bean.getBlockHash());
                         tx.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                        tx.setNotRolled(MiningUtil.parseTxState(bean.getNotRolled(), bean.getBlockNum()));
+                        tx.setNotRolled(MiningUtil.parseTxState(bean.getNotRolled(), tx));
                         TransactionHistoryDaoUtils.getInstance().insertOrReplace(tx);
                     }
                 }

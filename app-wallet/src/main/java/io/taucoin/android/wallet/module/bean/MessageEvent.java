@@ -18,7 +18,8 @@ public class MessageEvent{
         CONSOLE_LOG,
         CLEAR_SEND,
         FORGED_TIME,
-        NOTIFY_MINING
+        NOTIFY_MINING,
+        MINING_INIT_PROGRESS
     }
     private Object data;
 

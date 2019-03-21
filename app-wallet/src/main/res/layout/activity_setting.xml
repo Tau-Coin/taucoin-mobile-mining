@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_white"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_back_back"
+        app:titleBackground="@color/color_tool_bar_child"
+        app:titleText="@string/setting_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@color/color_main_line"
+        android:layout_height="wrap_content">
+
+        <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_trans_expiry"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
+            app:itemRightImage="@mipmap/icon_arrow"
+            app:itemRightTextColor="@color/color_grey_dark"
+            app:itemLeftText="@string/setting_transaction_expiry" />
+
+        <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_mutable_range"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="1dp"
+            app:itemRightImage="@mipmap/icon_arrow"
+            app:itemRightTextColor="@color/color_grey_dark"
+            app:itemLeftText="@string/setting_mutable_range" />
+
+    </LinearLayout>
+</LinearLayout>

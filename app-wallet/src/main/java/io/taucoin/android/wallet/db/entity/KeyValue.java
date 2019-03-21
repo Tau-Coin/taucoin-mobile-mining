@@ -22,9 +22,12 @@ public class KeyValue {
     private long power;
     private String nickName;
     private String miningState;
-    @Generated(hash = 925195785)
+    private long transExpiry;
+    private long mutableRange;
+    @Generated(hash = 2070790838)
     public KeyValue(Long id, String pubkey, String privkey, String address,
-            long balance, long power, String nickName, String miningState) {
+            long balance, long power, String nickName, String miningState,
+            long transExpiry, long mutableRange) {
         this.id = id;
         this.pubkey = pubkey;
         this.privkey = privkey;
@@ -33,6 +36,8 @@ public class KeyValue {
         this.power = power;
         this.nickName = nickName;
         this.miningState = miningState;
+        this.transExpiry = transExpiry;
+        this.mutableRange = mutableRange;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
@@ -85,4 +90,17 @@ public class KeyValue {
     public void setMiningState(String miningState) {
         this.miningState = miningState;
     }
+    public long getTransExpiry() {
+        return this.transExpiry;
+    }
+    public void setTransExpiry(long transExpiry) {
+        this.transExpiry = transExpiry;
+    }
+    public long getMutableRange() {
+        return this.mutableRange;
+    }
+    public void setMutableRange(long mutableRange) {
+        this.mutableRange = mutableRange;
+    }
+
 }

@@ -82,6 +82,12 @@ public class DateUtil {
         time = time / 1000;
         return String.valueOf(time);
     }
+    public static long getTime() {
+        Date date = new Date();
+        Long time = date.getTime();
+        time = time / 1000;
+        return time;
+    }
 
     public static String formatTime(String time, String pattern) {
         try {

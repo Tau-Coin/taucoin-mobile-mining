@@ -130,6 +130,9 @@
         <activity android:name="io.taucoin.android.wallet.module.view.mining.BlockTxListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
+        <activity android:name="io.taucoin.android.wallet.module.view.manage.SettingActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
     </application>
 
 </manifest>

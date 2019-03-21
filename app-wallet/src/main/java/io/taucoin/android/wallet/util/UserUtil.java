@@ -130,4 +130,20 @@ public class UserUtil {
         int visibility = StringUtil.isEmpty(newAddress) ? View.GONE : View.VISIBLE;
         tvAddress.setVisibility(visibility);
     }
+
+    public static long getTransExpiryTime() {
+        long minTime = 5;
+        long maxTime = 720;
+        long expiryTime = maxTime;
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue != null && keyValue.getTransExpiry() >= minTime
+                && keyValue.getTransExpiry() <= maxTime){
+            expiryTime = keyValue.getTransExpiry();
+        }
+        return expiryTime;
+    }
+
+    public static long getTransExpiryBlock() {
+        return getTransExpiryTime() / 5;
+    }
 }

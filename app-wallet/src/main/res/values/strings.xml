@@ -45,6 +45,7 @@
     <string name="manager_version">version %s</string>
     <string name="manager_keys">Keys</string>
     <string name="manager_address_note">Address Note</string>
+    <string name="manager_setting">Settings</string>
     <string name="manager_help">Help</string>
 
     <string name="send_receiver_address">Receiver\'s Address</string>
@@ -160,5 +161,12 @@
     <string name="mining_new_block">You have mined a new block. Income: %sTAU</string>
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
+    <string name="mining_init_progress_tip">Please stay while TAU initialize the system,\nit will take 5 minutes and will not consume data.</string>
+
+    <string name="setting_title">Settings</string>
+    <string name="setting_transaction_expiry">Transaction Expiry in blocks</string>
+    <string name="setting_mutable_range">Mutable range in blocks</string>
+    <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
+    <string name="setting_mutable_range_tip">Please enter the mutable range</string>
 
 </resources>

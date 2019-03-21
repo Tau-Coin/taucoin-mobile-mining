@@ -89,4 +89,30 @@ public class UserModel implements IUserModel{
                 .subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
+
+    @Override
+    public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> observer) {
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            String publicKey = MyApplication.getKeyValue().getPubkey();
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
+            keyValue.setTransExpiry(transExpiry);
+            KeyValueDaoUtils.getInstance().update(keyValue);
+            emitter.onNext(keyValue);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(observer);
+    }
+
+    @Override
+    public void saveMutableRange(long mutableRange, LogicObserver<KeyValue> observer) {
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            String publicKey = MyApplication.getKeyValue().getPubkey();
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
+            keyValue.setMutableRange(mutableRange);
+            KeyValueDaoUtils.getInstance().update(keyValue);
+            emitter.onNext(keyValue);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(observer);
+    }
 }

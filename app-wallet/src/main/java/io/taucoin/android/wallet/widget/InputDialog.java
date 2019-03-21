@@ -52,6 +52,8 @@ public class InputDialog extends Dialog {
         private boolean isEnabledPositive = true;
         private boolean isEnabledNegative = true;
         private int btnWidth;
+        private int inputType = -1;
+        private int inputHint = -1;
         private OnClickListener positiveButtonClickListener;
         private OnClickListener negativeButtonClickListener;
         private InputDialogListener negativeListener;
@@ -131,6 +133,16 @@ public class InputDialog extends Dialog {
             return this;
         }
 
+        public Builder setInputType(int inputType) {
+            this.inputType = inputType;
+            return this;
+        }
+
+        public Builder setInputHint(int inputHint) {
+            this.inputHint = inputHint;
+            return this;
+        }
+
         public InputDialog create() {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final InputDialog dialog = new InputDialog(context, R.style.CommonDialog);
@@ -147,6 +159,14 @@ public class InputDialog extends Dialog {
             }
             viewHolder.positiveButton.setEnabled(isEnabledPositive);
             viewHolder.negativeButton.setEnabled(isEnabledNegative);
+
+            if(inputType != -1){
+                viewHolder.etInput.setInputType(inputType);
+            }
+
+            if(inputHint != -1){
+                viewHolder.etInput.setHint(inputHint);
+            }
 
             if(!isEnabledPositive){
                 viewHolder.positiveButton.setBackgroundResource(R.drawable.grey_rect_round_bg);

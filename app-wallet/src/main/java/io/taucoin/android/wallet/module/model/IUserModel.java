@@ -28,4 +28,10 @@ public interface IUserModel {
 
     /** Get user key and address */
     void getKeyAndAddress(String publicKey, LogicObserver<KeyValue> observer);
+
+    /** Save Transaction Expiry in blocks */
+    void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> observer);
+
+    /** Save Mutable range in blocks */
+    void saveMutableRange(long mutableRange, LogicObserver<KeyValue> observer);
 }

@@ -107,6 +107,7 @@ public class UserPresenter {
         mIImportKeyView.gotoKeysActivity();
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION_IMPORT);
         EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
+        EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
     }
 
     private void getAddOuts() {
@@ -178,5 +179,13 @@ public class UserPresenter {
                 }
             });
         }
+    }
+
+    public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> logicObserver) {
+        mUserModel.saveTransExpiry(transExpiry, logicObserver);
+    }
+
+    public void saveMutableRange(long mutableRange, LogicObserver<KeyValue> logicObserver) {
+        mUserModel.saveMutableRange(mutableRange, logicObserver);
     }
 }
