@@ -339,12 +339,14 @@ public class PendingStateImpl implements PendingState {
              * because a new block has been insert into block chain
              * a smart node should move some unsure transactions into
              * wire transaction because it is valid time now.
+             * state changes from pending to wire
              */
             synchronized (wireTransactions){
-                for(Transaction tr: pendingStateTransactions){
-                    if(isValid(tr)){
-                        MemoryPoolEntry entry = new MemoryPoolEntry(tr);
+                for(Transaction tx: pendingStateTransactions){
+                    if(isValid(tx)){
+                        MemoryPoolEntry entry = new MemoryPoolEntry(tx);
                         wireTransactions.offer(entry);
+                        pendingStateTransactions.remove(tx);
                         logger.info("transaction: {} change from invalid to valid",
                                 ByteUtil.toHexString(entry.tx.getHash()));
                     }
