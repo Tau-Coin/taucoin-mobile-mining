@@ -46,11 +46,6 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    private void updateView(KeyValue keyValue) {
-        MyApplication.setKeyValue(keyValue);
-        loadView();
-    }
-
     @OnClick({R.id.tv_trans_expiry, R.id.tv_mutable_range})
     void onClick(View view) {
         switch (view.getId()) {
@@ -72,13 +67,12 @@ public class SettingActivity extends BaseActivity {
             .setInputHint(inputHint)
             .setNegativeButton(R.string.common_cancel, (InputDialog.InputDialogListener) (dialog, text) -> dialog.cancel())
             .setPositiveButton(R.string.common_done, (InputDialog.InputDialogListener) (dialog, text) -> {
-                loadView();
                 try {
                     long input = new BigInteger(text).longValue();
                     if(type == 0){
-                        saveTransExpiry(input);
+                        mPresenter.saveTransExpiry(input, logicObserver);
                     }else {
-                        saveMutableRange(input);
+                        mPresenter.saveMutableRange(input, logicObserver);
                     }
                 }catch (Exception e){
                     Logger.e("new BigInteger is error", e);
@@ -87,23 +81,11 @@ public class SettingActivity extends BaseActivity {
             }).create().show();
     }
 
-    private void saveTransExpiry(long transExpiry) {
-        mPresenter.saveTransExpiry(transExpiry, new LogicObserver<KeyValue>(){
-
-            @Override
-            public void handleData(KeyValue keyValue) {
-                updateView(keyValue);
-            }
-        });
-    }
-
-    private void saveMutableRange(long mutableRange) {
-        mPresenter.saveMutableRange(mutableRange, new LogicObserver<KeyValue>(){
-
-            @Override
-            public void handleData(KeyValue keyValue) {
-                updateView(keyValue);
-            }
-        });
-    }
+    private LogicObserver<KeyValue> logicObserver = new LogicObserver<KeyValue>() {
+        @Override
+        public void handleData(KeyValue keyValue) {
+            MyApplication.setKeyValue(keyValue);
+            loadView();
+        }
+    };
 }

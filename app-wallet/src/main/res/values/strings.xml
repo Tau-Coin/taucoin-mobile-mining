@@ -51,6 +51,7 @@
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
     <string name="send_memo">Memo</string>
+    <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction Expiry in blocks <font color="#0E88EF">%s</font> (≈%s min)]]> </Data></string>
     <string name="send_priority">priority</string>
     <string name="send_normal">normal</string>
     <string name="send_customize">customize</string>

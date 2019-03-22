@@ -208,18 +208,21 @@ public class TxService extends Service {
 
     private void getBlockHeight(boolean isDelayRefresh){
         mIsGetBlockHeight = true;
-        mTxModel.getBlockHeight(new TAUObserver<DataResult<Integer>>(){
+        mTxModel.getBlockHeight(new TAUObserver<DataResult<String>>(){
 
             @Override
-            public void handleData(DataResult<Integer> result) {
-                if(result != null && result.getData() > 0){
+            public void handleData(DataResult<String> result) {
+                if(result != null){
                     Logger.d("getBlockHeight =" + result.getData());
-                    mTxModel.updateBlockHeight(result.getData(), new LogicObserver<Boolean>() {
-                        @Override
-                        public void handleData(Boolean keyValue) {
-                            EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
-                        }
-                    });
+                    int blockHeight = StringUtil.getIntString(result.getData());
+                    if(blockHeight > 0){
+                        mTxModel.updateBlockHeight(blockHeight, new LogicObserver<Boolean>() {
+                            @Override
+                            public void handleData(Boolean keyValue) {
+                                EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+                            }
+                        });
+                    }
                 }
                 if(isDelayRefresh){
                     getBlockHeightDelay();
@@ -233,7 +236,7 @@ public class TxService extends Service {
     }
 
     private void getBlockHeightDelay() {
-        Observable.timer(5, TimeUnit.MINUTES)
+        Observable.timer(1, TimeUnit.MINUTES)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override

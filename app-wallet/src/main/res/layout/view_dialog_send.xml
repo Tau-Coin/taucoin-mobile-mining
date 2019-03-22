@@ -3,8 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="20dp"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="1dp"
     android:orientation="vertical"
     android:background="@color/color_white"
     android:visibility="visible">
@@ -67,5 +68,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_trans_expiry"
+        style="@style/style_middle_grey"
+        android:layout_width="match_parent"
+        android:paddingBottom="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

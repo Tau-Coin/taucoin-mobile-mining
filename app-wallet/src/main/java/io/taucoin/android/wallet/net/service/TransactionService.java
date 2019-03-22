@@ -43,5 +43,5 @@ public interface TransactionService {
     Observable<DataResult<RawTxList>> getTxRecords(@Body Map<String,String> address);
 
     @POST("getTauHeight/")
-    Observable<DataResult<Integer>> getBlockHeight();
+    Observable<DataResult<String>> getBlockHeight();
 }

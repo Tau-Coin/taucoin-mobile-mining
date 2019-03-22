@@ -43,7 +43,6 @@ import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
-import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -176,15 +175,13 @@ public class TxModel implements ITxModel {
                     TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee, expireTimeByte);
             transaction.sign(privateKey);
 
-            int blockHeight = BlockInfoDaoUtils.getInstance().getBlockHeight();
             Logger.i("Create tx success");
             Logger.i(transaction.toString());
             txHistory.setTxId(Hex.toHexString(transaction.getHash()));
             txHistory.setResult(TransmitKey.TxResult.CONFIRMING);
             txHistory.setFromAddress(keyValue.getAddress());
-            txHistory.setCreateTime(DateUtil.getCurrentTime());
+            txHistory.setCreateTime(String.valueOf(timeStamp));
             txHistory.setNotRolled(1);
-            txHistory.setBlockNum(blockHeight);
             txHistory.setExpireTime(expiryTime);
 
             insertTransactionHistory(txHistory);
@@ -333,7 +330,7 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getBlockHeight(TAUObserver<DataResult<Integer>> observer) {
+    public void getBlockHeight(TAUObserver<DataResult<String>> observer) {
         NetWorkManager.createApiService(TransactionService.class)
                 .getBlockHeight()
                 .subscribeOn(Schedulers.io())

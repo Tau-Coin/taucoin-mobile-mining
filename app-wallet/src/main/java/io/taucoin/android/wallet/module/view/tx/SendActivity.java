@@ -1,6 +1,8 @@
 package io.taucoin.android.wallet.module.view.tx;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.view.View;
@@ -32,11 +34,13 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
+import io.taucoin.android.wallet.module.view.manage.SettingActivity;
 import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
@@ -60,6 +64,7 @@ public class SendActivity extends BaseActivity implements ISendView {
     Button btnSend;
 
     private TxPresenter mTxPresenter;
+    private ViewHolder mViewHolder ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,19 +155,33 @@ public class SendActivity extends BaseActivity implements ISendView {
     private void showSureDialog(TransactionHistory tx) {
         String amount = etAmount.getText().toString().trim();
         View view = LinearLayout.inflate(this, R.layout.view_dialog_send, null);
-        ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.tvToAddress.setText(tx.getToAddress());
-        viewHolder.tvToAmount.setText(amount);
-        viewHolder.tvToMemo.setText(tx.getMemo());
+        mViewHolder = new ViewHolder(view);
+        mViewHolder.tvToAddress.setText(tx.getToAddress());
+        mViewHolder.tvToAmount.setText(amount);
+        mViewHolder.tvToMemo.setText(tx.getMemo());
+        loadTransExpiryView();
         new CommonDialog.Builder(this)
                 .setContentView(view)
-                .setNegativeButton(R.string.send_dialog_no, (dialog, which) -> dialog.cancel())
+                .setNegativeButton(R.string.send_dialog_no, (dialog, which) -> {
+                    dialog.cancel();
+                    mViewHolder = null;
+                })
                 .setPositiveButton(R.string.send_dialog_yes, (dialog, which) -> {
                     dialog.cancel();
+                    mViewHolder = null;
                     handleSendTransaction(tx);
                 })
                 .create().show();
 
+    }
+
+    private void loadTransExpiryView() {
+        if(mViewHolder == null || mViewHolder.tvTransExpiry == null){
+            return;
+        }
+        String transExpiry = getText(R.string.send_transaction_expiry).toString();
+        transExpiry = String.format(transExpiry, UserUtil.getTransExpiryBlock(), UserUtil.getTransExpiryTime());
+        mViewHolder.tvTransExpiry.setText(Html.fromHtml(transExpiry));
     }
 
     private LogicObserver<Boolean> sendLogicObserver = new LogicObserver<Boolean>() {
@@ -229,9 +248,23 @@ public class SendActivity extends BaseActivity implements ISendView {
         TextView tvToAmount;
         @BindView(R.id.tv_to_Memo)
         TextView tvToMemo;
+        @BindView(R.id.tv_trans_expiry)
+        TextView tvTransExpiry;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
+
+        @OnClick(R.id.tv_trans_expiry)
+        void onClick(){
+            Intent intent = new Intent(SendActivity.this, SettingActivity.class);
+            startActivityForResult(intent, 100);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        loadTransExpiryView();
     }
 }
