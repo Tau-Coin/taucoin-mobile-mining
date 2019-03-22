@@ -574,18 +574,23 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         long txTime = ByteUtil.byteArrayToLong(tx.getTime());
 
+        long lockTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+
         if (txTime - Constants.MAX_TIMEDRIFT > blockTime) {
             logger.error("Tx time {} exceeds block time {} by {} seconds", txTime, blockTime, Constants.MAX_TIMEDRIFT);
             return false;
         }
-
-        long referenceTime;
-        if (bestBlock.getNumber() < Constants.TX_EXPIRATIONHEIGHT) {
+        long referenceTime = 0;
+        long referenceHeight = bestBlock.getNumber() - lockTime;
+        // this is dangerous behavior,a smart node will not accept it because this may be memory overflow hack.
+        if (referenceHeight < 0){
+            return true;
+        }
+        if (referenceHeight <= bestBlock.getNumber()) {
             referenceTime = ByteUtil.byteArrayToLong(blockStore.
-                    getChainBlockByNumber(0).getTimestamp());
+                    getChainBlockByNumber(referenceHeight).getTimestamp());
         } else {
-            referenceTime = ByteUtil.byteArrayToLong(blockStore.
-                    getChainBlockByNumber(bestBlock.getNumber() - Constants.TX_EXPIRATIONHEIGHT).getTimestamp());
+            return false;
         }
 
         if (txTime < referenceTime) {
