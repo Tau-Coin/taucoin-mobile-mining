@@ -684,6 +684,11 @@ public class SystemProperties {
     }
 
     @ValidateMe
+    public int getImmutableRange() {
+        return config.getInt("immutable.range");
+    }
+
+    @ValidateMe
     public boolean forgerStart() {
         return config.getBoolean("forge.start");
     }
