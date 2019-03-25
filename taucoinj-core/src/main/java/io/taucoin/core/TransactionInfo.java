@@ -12,31 +12,32 @@ import java.math.BigInteger;
 import static io.taucoin.crypto.HashUtil.*;
 
 public class TransactionInfo implements Serializable {
-   
-    private int trHashcode;
+
+    private byte[] trHash;
     private long trTime;
     private byte[] rlpEncoded;
     private boolean parsed;
         
-    public TransactionInfo(int trHashcode,long trTime) {
-         this.trHashcode = trHashcode; 
+    public TransactionInfo(long trTime,byte[] trHash) {
+         this.trHash = trHash;
          this.trTime = trTime;
          parsed = true;
     }
     public TransactionInfo(byte[] rlpEncodedData) {
-         rlpParse();
+        this.rlpEncoded = rlpEncodedData;
+        parsed = false;
     }
 
-    public int gettrHashcode() {
-         return trHashcode;
+    public byte[] gettrHashcode() {
+        return trHash;
     }
          
     public long gettrTime() {
          return trTime;
     }
          
-    public void settrHashcode(int trHashcode){
-         this.trHashcode = trHashcode;
+    public void settrHashcode(byte[] trHashcode){
+        this.trHash = trHashcode;
     }
 
     public void settrTime(long trTime){
@@ -48,7 +49,7 @@ public class TransactionInfo implements Serializable {
 
          byte[] trHashcode = transaction.get(0).getRLPData();
          byte[] trTime = transaction.get(1).getRLPData();
-         this.trHashcode = ByteUtil.byteArrayToInt(trHashcode);
+         this.trHash = trHashcode;
          this.trTime = ByteUtil.byteArrayToLong(trTime);
          this.parsed = true;
      }
@@ -57,7 +58,7 @@ public class TransactionInfo implements Serializable {
          if (!parsed) rlpParse();
          if (rlpEncoded != null) return rlpEncoded;
 
-         byte[] trHashcode = RLP.encodeInt(this.trHashcode);
+         byte[] trHashcode = RLP.encodeElement(this.trHash);
          byte[] trTime = RLP.encodeBigInteger(BigInteger.valueOf(this.trTime));
  
          this.rlpEncoded = RLP.encodeList(trHashcode, trTime);

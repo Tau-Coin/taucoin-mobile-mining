@@ -206,7 +206,12 @@ public class PendingStateImpl implements PendingState {
             }
         }
 
-        //update transaction memory pool
+        /**
+         *update precessed transaction memory pool
+         *if transactions survived in this container that means
+         *it has been added into memory pool (wire or pending )
+         *node needn't to add it again.
+         */
         synchronized (receivedTxs){
             if (!receivedTxs.containsKey(hash)) {
                 receivedTxs.put(hash, null);

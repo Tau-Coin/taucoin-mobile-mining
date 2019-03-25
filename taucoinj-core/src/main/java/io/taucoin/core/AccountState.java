@@ -19,11 +19,12 @@ public class AccountState implements Serializable {
     private static final Logger log = LoggerFactory.getLogger("accountState");
     private byte[] rlpEncoded;
 
-    /* A list size equal to the number of transactions sent since 24 h before.
+    /**
+     *  A list size equal to the number of transactions sent since 12 h before.
      */
-    private HashMap<Integer,Long> tranHistory = new HashMap<Integer,Long>();
+    private TreeMap<Long,byte[]> tranHistory = new TreeMap<Long,byte[]>();
 
-    /*
+    /**
     * power owned by this account to new block.
     */
     private BigInteger forgePower;
@@ -65,7 +66,7 @@ public class AccountState implements Serializable {
             for (int i = 0; i < trHis.size(); ++i) {
                 RLPElement transactionHis = trHis.get(i);
                 TransactionInfo trinfo = new TransactionInfo(transactionHis.getRLPData());
-                this.tranHistory.put(trinfo.gettrHashcode(), trinfo.gettrTime());
+                this.tranHistory.put(trinfo.gettrTime(),trinfo.gettrHashcode());
             }
         }
     }
@@ -118,10 +119,10 @@ public class AccountState implements Serializable {
             trHisEncoded[0] = forgePower;
             trHisEncoded[1] = balance;
             int i = 2;
-            for (int hashCode : tranHistory.keySet()) {
-              TransactionInfo txf = new TransactionInfo(hashCode,tranHistory.get(hashCode));
-              trHisEncoded[i] = txf.getEncoded();
-              ++i;
+            for (long txTime : tranHistory.keySet()) {
+                TransactionInfo txf = new TransactionInfo(txTime,tranHistory.get(txTime));
+                trHisEncoded[i] = txf.getEncoded();
+                ++i;
             }
             this.rlpEncoded = RLP.encodeList(trHisEncoded);
          }
@@ -158,7 +159,7 @@ public class AccountState implements Serializable {
                 "  Balance: " + getBalance() + "\n";
         return ret;
     }
-    public HashMap<Integer,Long> getTranHistory(){
+    public TreeMap<Long,byte[]> getTranHistory(){
         return tranHistory;
     }
 }
