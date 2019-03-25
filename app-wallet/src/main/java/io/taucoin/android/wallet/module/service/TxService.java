@@ -170,12 +170,7 @@ public class TxService extends Service {
         mTxModel.getBalance(new TAUObserver<DataResult<BalanceBean>>() {
             @Override
             public void handleError(String msg, int msgCode) {
-                if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
-                        StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
-                    getBalance(TransmitKey.ServiceType.GET_BALANCE);
-                }else{
-                    EventBusUtil.post(MessageEvent.EventCode.BALANCE);
-                }
+                handleBalanceDisplay(serviceType, false);
             }
 
             @Override
@@ -188,19 +183,32 @@ public class TxService extends Service {
                         @Override
                         public void handleData(KeyValue entry) {
                             MyApplication.setKeyValue(entry);
-                            if(entry != null){
-                                if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
-                                        StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
-                                    EventBusUtil.post(MessageEvent.EventCode.ALL);
-                                }else{
-                                    EventBusUtil.post(MessageEvent.EventCode.BALANCE);
-                                }
-                            }
+                            handleBalanceDisplay(serviceType, true);
+                        }
+
+                        @Override
+                        public void handleError(int code, String msg) {
+                            handleBalanceDisplay(serviceType, false);
                         }
                     });
+                }else{
+                    handleBalanceDisplay(serviceType, false);
                 }
             }
         });
+    }
+
+    private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
+        if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
+                StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
+            if(isSuccess){
+                EventBusUtil.post(MessageEvent.EventCode.ALL);
+            }else{
+                getBalance(TransmitKey.ServiceType.GET_BALANCE);
+            }
+        }else{
+            EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+        }
     }
 
     private void getBlockHeight(boolean isDelayRefresh){
@@ -212,14 +220,12 @@ public class TxService extends Service {
                 if(result != null){
                     Logger.d("getBlockHeight =" + result.getData());
                     int blockHeight = StringUtil.getIntString(result.getData());
-                    if(blockHeight > 0){
-                        mTxModel.updateBlockHeight(blockHeight, new LogicObserver<Boolean>() {
-                            @Override
-                            public void handleData(Boolean keyValue) {
-                                EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
-                            }
-                        });
-                    }
+                    mTxModel.updateBlockHeight(blockHeight, new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean keyValue) {
+                            EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
+                        }
+                    });
                 }
                 if(isDelayRefresh){
                     getBlockHeightDelay();

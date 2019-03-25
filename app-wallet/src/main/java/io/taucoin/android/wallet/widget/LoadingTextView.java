@@ -21,6 +21,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
 import io.taucoin.android.wallet.base.BaseHandler;
+import io.taucoin.foundation.util.ThreadPool;
 
 public class LoadingTextView extends AppCompatTextView implements BaseHandler.HandleCallBack{
     private BufferType mBufferType = BufferType.NORMAL;
@@ -29,7 +30,6 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     private boolean isTime = false;
     private String text = "";
     private BaseHandler mHandler;
-    private Thread mThread;
 
     public LoadingTextView(Context context) {
         this(context, null);
@@ -118,7 +118,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     }
 
     private synchronized void startLoadingDelay() {
-        mThread = new Thread(() -> {
+        ThreadPool.getThreadPool().execute(() -> {
             if(isLoading){
                 try {
                     int delayTime = isTime ? 1000 : 380;
@@ -134,7 +134,6 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
                 }
             }
         });
-        mThread.start();
     }
 
     public void setNormalText(String text) {

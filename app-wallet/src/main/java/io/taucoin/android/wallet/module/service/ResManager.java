@@ -24,11 +24,14 @@ import android.os.IInterface;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
+import com.github.naturs.logger.Logger;
+
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseHandler;
 import io.taucoin.android.wallet.util.SysUtil;
+import io.taucoin.foundation.util.ThreadPool;
 
- class ResManager implements BaseHandler.HandleCallBack{
+class ResManager implements BaseHandler.HandleCallBack{
 
      private boolean isRunning = true;
      private IBinder mBinder = null;
@@ -36,6 +39,7 @@ import io.taucoin.android.wallet.util.SysUtil;
 
      private BaseHandler mHandler;
      private ResCallBack mResCallBack;
+     private SysUtil mSysUtil;
 
      ResManager(){
          mHandler = new BaseHandler(this);
@@ -75,32 +79,32 @@ import io.taucoin.android.wallet.util.SysUtil;
          }
      }
 
+     private synchronized void startResThreadDelay() {
+         ThreadPool.getThreadPool().execute(() -> {
+             try {
+                 if(isRunning){
+                     Context context = MyApplication.getInstance();
+                     mSysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
+
+                     SysUtil.MemoryInfo info =  mSysUtil.loadAppProcess();
+                     Bundle bundle = new Bundle();
+                     bundle.putParcelable("data", info);
+                     Message message = mHandler.obtainMessage(2);
+                     message.setData(bundle);
+                     mHandler.sendMessage(message);
+                     Thread.sleep(1000);
+                     startResThreadDelay();
+                 }
+             } catch (InterruptedException e) {
+                 Logger.e("startResThreadDelay is error", e);
+             }
+         });
+     }
+
     void startResThread(ResCallBack resCallBack) {
         mResCallBack = resCallBack;
-        SysUtil sysUtil = new SysUtil();
-        Thread mThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if(isRunning){
-                        Context context = MyApplication.getInstance();
-                        sysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
-
-                        SysUtil.MemoryInfo info =  sysUtil.loadAppProcess();
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("data", info);
-                        Message message = mHandler.obtainMessage(2);
-                        message.setData(bundle);
-                        mHandler.sendMessage(message);
-                        Thread.sleep(1000);
-                        this.run();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        mThread.start();
+        mSysUtil = new SysUtil();
+        startResThreadDelay();
     }
 
      private IPackageStatsObserver.Stub packageStatsObserver = new IPackageStatsObserver.Stub() {
