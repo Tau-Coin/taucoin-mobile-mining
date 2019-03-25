@@ -131,9 +131,9 @@ public class SysUtil {
 
     public MemoryInfo loadAppProcess() {
         Context context = MyApplication.getInstance();
-        List<AndroidAppProcess> processes = AndroidProcesses.getRunningAppProcesses();
         MemoryInfo memoryInfo = new MemoryInfo();
         try {
+            List<AndroidAppProcess> processes = AndroidProcesses.getRunningAppProcesses();
             for (AndroidAppProcess process : processes) {
                 // Get some information about the process
                 String processName = process.name;
