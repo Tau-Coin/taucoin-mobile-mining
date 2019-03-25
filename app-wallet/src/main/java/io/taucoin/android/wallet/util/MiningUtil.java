@@ -101,7 +101,6 @@ public class MiningUtil {
         transactionHistory.setTxId(txId);
         transactionHistory.setResult(TransmitKey.TxResult.FAILED);
         transactionHistory.setMessage(result);
-        transactionHistory.setNotRolled(-1);
         new TxModel().updateTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean aBoolean) {

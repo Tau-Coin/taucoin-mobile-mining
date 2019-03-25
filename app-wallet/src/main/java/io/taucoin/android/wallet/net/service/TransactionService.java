@@ -20,8 +20,8 @@ import java.util.Map;
 import io.reactivex.Observable;
 
 import io.taucoin.android.wallet.module.bean.BalanceBean;
-import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.foundation.net.callback.DataResult;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -34,7 +34,7 @@ public interface TransactionService {
     Observable<DataResult<BalanceBean>> getBalance(@Body Map<String,String> email);
 
     @POST("getTauTransaction/")
-    Observable<DataResult<RawTxBean>> getRawTransaction(@Body Map<String,String> txId);
+    Observable<DataResult<TxDataBean>> getRawTransaction(@Body Map<String,String> txId);
 
     @POST("sendTauTransation/")
     Observable<DataResult<String>> sendRawTransaction(@Body Map<String,String> tx_hex);

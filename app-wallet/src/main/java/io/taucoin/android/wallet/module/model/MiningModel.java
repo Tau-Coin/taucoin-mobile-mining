@@ -1,3 +1,18 @@
+/**
+ * Copyright 2018 Taucoin Core Developers.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.taucoin.android.wallet.module.model;
 
 import com.mofei.tau.R;
@@ -144,7 +159,7 @@ public class MiningModel implements IMiningModel{
         }
     }
 
-    private boolean handleSynchronizedTransaction(Block block, boolean isConnect) {
+    private boolean handleSynchronizedTransaction(Block block) {
         List<Transaction> txList = block.getTransactionsList();
         String blockHash = Hex.toHexString(block.getHash());
         long blockNumber = block.getNumber() + 1;
@@ -153,9 +168,8 @@ public class MiningModel implements IMiningModel{
                 String txId = Hex.toHexString(transaction.getHash());
                 long blockTime = new BigInteger(transaction.getTime()).longValue();
                 TransactionHistory txHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
-                if(txHistory != null){
+                if(txHistory != null && StringUtil.isNotSame(txHistory.getResult(), TransmitKey.TxResult.SUCCESSFUL)){
                     txHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                    txHistory.setNotRolled(isConnect ? 1 : 0);
                     txHistory.setBlockTime(blockTime);
                     txHistory.setBlockNum(blockNumber);
                     txHistory.setBlockHash(blockHash);
@@ -177,10 +191,10 @@ public class MiningModel implements IMiningModel{
                     updateSynchronizedBlockNum((int) blockNumber + 1);
                     saveMiningInfo(block, isConnect, true);
 
-                    boolean isUpdate = handleSynchronizedTransaction(block, isConnect);
-                    if(isUpdate){
-                        eventCode = MessageEvent.EventCode.ALL;
-                    }
+//                    boolean isUpdate = handleSynchronizedTransaction(block, isConnect);
+//                    if(isUpdate){
+//                        eventCode = MessageEvent.EventCode.ALL;
+//                    }
                 }
             }
             emitter.onNext(eventCode);

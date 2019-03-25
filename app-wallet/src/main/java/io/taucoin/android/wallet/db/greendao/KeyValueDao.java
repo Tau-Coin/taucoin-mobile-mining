@@ -33,7 +33,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property NickName = new Property(6, String.class, "nickName", false, "NICK_NAME");
         public final static Property MiningState = new Property(7, String.class, "miningState", false, "MINING_STATE");
         public final static Property TransExpiry = new Property(8, long.class, "transExpiry", false, "TRANS_EXPIRY");
-        public final static Property MutableRange = new Property(9, long.class, "mutableRange", false, "MUTABLE_RANGE");
+        public final static Property MutableRange = new Property(9, String.class, "mutableRange", false, "MUTABLE_RANGE");
     }
 
 
@@ -58,7 +58,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"NICK_NAME\" TEXT," + // 6: nickName
                 "\"MINING_STATE\" TEXT," + // 7: miningState
                 "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 8: transExpiry
-                "\"MUTABLE_RANGE\" INTEGER NOT NULL );"); // 9: mutableRange
+                "\"MUTABLE_RANGE\" TEXT);"); // 9: mutableRange
     }
 
     /** Drops the underlying database table. */
@@ -103,7 +103,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(8, miningState);
         }
         stmt.bindLong(9, entity.getTransExpiry());
-        stmt.bindLong(10, entity.getMutableRange());
+ 
+        String mutableRange = entity.getMutableRange();
+        if (mutableRange != null) {
+            stmt.bindString(10, mutableRange);
+        }
     }
 
     @Override
@@ -142,7 +146,11 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(8, miningState);
         }
         stmt.bindLong(9, entity.getTransExpiry());
-        stmt.bindLong(10, entity.getMutableRange());
+ 
+        String mutableRange = entity.getMutableRange();
+        if (mutableRange != null) {
+            stmt.bindString(10, mutableRange);
+        }
     }
 
     @Override
@@ -162,7 +170,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // nickName
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // miningState
             cursor.getLong(offset + 8), // transExpiry
-            cursor.getLong(offset + 9) // mutableRange
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // mutableRange
         );
         return entity;
     }
@@ -178,7 +186,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setNickName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setMiningState(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setTransExpiry(cursor.getLong(offset + 8));
-        entity.setMutableRange(cursor.getLong(offset + 9));
+        entity.setMutableRange(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     @Override

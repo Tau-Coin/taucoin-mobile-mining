@@ -108,7 +108,7 @@ public class UserModel implements IUserModel{
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             String publicKey = MyApplication.getKeyValue().getPubkey();
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
-            keyValue.setMutableRange(mutableRange);
+            keyValue.setMutableRange(String.valueOf(mutableRange));
             KeyValueDaoUtils.getInstance().update(keyValue);
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())

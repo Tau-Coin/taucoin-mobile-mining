@@ -41,7 +41,6 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.NotifyManager;
-import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.net.p2p.HelloMessage;
@@ -179,7 +178,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_BLOCK_CONNECT:
                         blockEventData = data.getParcelable("data");
                         handleSynchronizedBlock(blockEventData, true);
-                        logMessage = "Disconnect block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
+                        logMessage = "Connect block with " + /*blockEventData.receipts.size() +*/ " transaction receipts.";
                         time = blockEventData.registeredTime;
                         addLogEntry(time, logMessage);
                         break;
@@ -246,9 +245,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     }
 
     private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {
-        if(isConnect){
-            TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
-        }
         if(block != null){
             getMiningModel().handleSynchronizedBlock(block, isConnect, new LogicObserver<MessageEvent.EventCode>() {
                 @Override

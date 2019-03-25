@@ -17,7 +17,6 @@ package io.taucoin.android.wallet.module.model;
 
 import java.util.List;
 
-import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.BalanceBean;
@@ -32,7 +31,7 @@ public interface ITxModel {
     void getBalance(TAUObserver<DataResult<BalanceBean>> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
-    void checkRawTransaction(String txId, LogicObserver<Boolean> observer);
+    void checkRawTransaction(TransactionHistory transaction, LogicObserver<Boolean> observer);
 
     /** Get the list of transactions to be Pending */
     void getTxPendingList(LogicObserver<List<TransactionHistory>> observer);
@@ -41,7 +40,7 @@ public interface ITxModel {
     void createTransaction(TransactionHistory txHistory, LogicObserver<Transaction> observer);
 
     /** Send transaction to the server */
-    void sendRawTransaction(String txHex, String txId, LogicObserver<Boolean> observer);
+    void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer);
 
     /** Update local transaction history */
     void updateTransactionHistory(TransactionHistory txHistory, LogicObserver<Boolean> observer);
@@ -67,5 +66,4 @@ public interface ITxModel {
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
 
-    void getBlockInfo(LogicObserver<BlockInfo> observer);
 }

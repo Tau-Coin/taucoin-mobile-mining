@@ -29,7 +29,7 @@ import java.util.List;
  * Created by ly on 18-10-31
  * @version 2.0
  * Edited by yang
- * @description: TransactionHistory
+ * TransactionHistory
  */
 public class TransactionHistoryDaoUtils {
 
@@ -54,18 +54,13 @@ public class TransactionHistoryDaoUtils {
     public List<TransactionHistory> getTxPendingList(String formAddress) {
         QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
         return qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
-                qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING),
-                        qb.and(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL),
-                                TransactionHistoryDao.Properties.NotRolled.eq(1))))
+                qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
+                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)))
         .list();
     }
 
     public List<TransactionHistory> getPendingAmountList(String formAddress) {
-        return getTransactionHistoryDao().queryBuilder()
-                .where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
-                        TransactionHistoryDao.Properties.NotRolled.notEq(0),
-                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING))
-                .list();
+        return getTxPendingList(formAddress);
     }
 
     public TransactionHistory queryTransactionById(String txId) {
@@ -85,8 +80,8 @@ public class TransactionHistoryDaoUtils {
 
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-         db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
-                 TransactionHistoryDao.Properties.NotRolled.notEq(0),
+         db.where(TransactionHistoryDao.Properties.BlockTime.lt(time),
+                 TransactionHistoryDao.Properties.TimeBasis.eq(1),
                 db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                     TransactionHistoryDao.Properties.ToAddress.eq(address))
                 ).orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
@@ -98,7 +93,7 @@ public class TransactionHistoryDaoUtils {
     public String getNewestTxTime(String address) {
         long time = 0L;
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-        db.where(TransactionHistoryDao.Properties.CreateTime.eq(TransactionHistoryDao.Properties.BlockTime),
+        db.where(TransactionHistoryDao.Properties.TimeBasis.eq(1),
             db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                 TransactionHistoryDao.Properties.ToAddress.eq(address))
         )

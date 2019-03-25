@@ -34,7 +34,7 @@ public class PropertyUtils {
     }
 
     /**
-     * 获取api请求的BaseUrl
+     * Getting BaseUrl for the API request
      *
      * @return
      */
@@ -48,22 +48,7 @@ public class PropertyUtils {
     }
 
     /**
-     * 获取写一写BaseUrl
-     *
-     * @return
-     */
-    public static String getWritingBaseUrl() {
-        if (mProps == null) {
-            throw new IllegalArgumentException("must call #init(context) in application");
-        } else {
-            String configUrl = mProps.getProperty("api.base.url", "");
-            configUrl = configUrl.substring(0, configUrl.indexOf(".com") + 4);
-            return configUrl;
-        }
-    }
-
-    /**
-     * 获取H5的BaseUrl
+     * Get BaseUrl for H5
      *
      * @return
      */
@@ -77,7 +62,7 @@ public class PropertyUtils {
     }
 
     /**
-     * 是否是线上版本
+     * Is it an online version?
      *
      * @return
      */
@@ -90,7 +75,7 @@ public class PropertyUtils {
     }
 
     /**
-     * 是否开启debug
+     * Whether to open debug
      *
      * @return
      */

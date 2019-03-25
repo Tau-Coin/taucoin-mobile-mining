@@ -23,11 +23,11 @@ public class KeyValue {
     private String nickName;
     private String miningState;
     private long transExpiry;
-    private long mutableRange;
-    @Generated(hash = 2070790838)
+    private String mutableRange;
+    @Generated(hash = 713651028)
     public KeyValue(Long id, String pubkey, String privkey, String address,
             long balance, long power, String nickName, String miningState,
-            long transExpiry, long mutableRange) {
+            long transExpiry, String mutableRange) {
         this.id = id;
         this.pubkey = pubkey;
         this.privkey = privkey;
@@ -96,11 +96,10 @@ public class KeyValue {
     public void setTransExpiry(long transExpiry) {
         this.transExpiry = transExpiry;
     }
-    public long getMutableRange() {
+    public String getMutableRange() {
         return this.mutableRange;
     }
-    public void setMutableRange(long mutableRange) {
+    public void setMutableRange(String mutableRange) {
         this.mutableRange = mutableRange;
     }
-
 }

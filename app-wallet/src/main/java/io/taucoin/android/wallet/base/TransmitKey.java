@@ -37,11 +37,15 @@ public class TransmitKey {
     public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";
 
     public static final int PAGE_SIZE = 20;
+    public static final long MIN_TRANS_EXPIRY = 5;
+    public static final long MAX_TRANS_EXPIRY = 720;
+    public static final String DEFAULT_MUTABLE_RANGE = "288";
 
     public static class TxResult {
         public static final String FAILED = "Failed";
         public static final String SUCCESSFUL = "Successful";
         public static final String CONFIRMING = "Confirming";
+        public static final String BROADCASTING = "Broadcasting";
     }
 
     public static class MiningState {

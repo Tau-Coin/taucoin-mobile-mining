@@ -116,18 +116,7 @@ public class TxPresenter {
             MyApplication.getRemoteConnector().isInit()){
             MyApplication.getRemoteConnector().submitTransaction(transaction);
         }else{
-            String txHash = Hex.toHexString(transaction.getEncoded());
-            String txId = Hex.toHexString(transaction.getHash());
-            String hex_after_base64 = null;
-            try {
-                BASE64Encoder base64en = new BASE64Encoder();
-                hex_after_base64 = base64en.encode(txHash.getBytes("utf-8"));
-            } catch (UnsupportedEncodingException ignore) {
-            }
-            if(StringUtil.isNotEmpty(hex_after_base64)){
-                mTxModel.sendRawTransaction(hex_after_base64, txId, observer);
-            }
-            Logger.i("Transactions encrypted by BASE64: " + hex_after_base64);
+            mTxModel.sendRawTransaction(transaction, observer);
         }
     }
 }

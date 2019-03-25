@@ -37,8 +37,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         public final static Property BlockNum = new Property(10, long.class, "blockNum", false, "BLOCK_NUM");
         public final static Property BlockHash = new Property(11, String.class, "blockHash", false, "BLOCK_HASH");
         public final static Property BlockTime = new Property(12, long.class, "blockTime", false, "BLOCK_TIME");
-        public final static Property NotRolled = new Property(13, int.class, "notRolled", false, "NOT_ROLLED");
-        public final static Property ExpireTime = new Property(14, long.class, "expireTime", false, "EXPIRE_TIME");
+        public final static Property ExpireTime = new Property(13, long.class, "expireTime", false, "EXPIRE_TIME");
+        public final static Property TimeBasis = new Property(14, int.class, "timeBasis", false, "TIME_BASIS");
     }
 
 
@@ -67,8 +67,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
                 "\"BLOCK_NUM\" INTEGER NOT NULL ," + // 10: blockNum
                 "\"BLOCK_HASH\" TEXT," + // 11: blockHash
                 "\"BLOCK_TIME\" INTEGER NOT NULL ," + // 12: blockTime
-                "\"NOT_ROLLED\" INTEGER NOT NULL ," + // 13: notRolled
-                "\"EXPIRE_TIME\" INTEGER NOT NULL );"); // 14: expireTime
+                "\"EXPIRE_TIME\" INTEGER NOT NULL ," + // 13: expireTime
+                "\"TIME_BASIS\" INTEGER NOT NULL );"); // 14: timeBasis
     }
 
     /** Drops the underlying database table. */
@@ -137,8 +137,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(12, blockHash);
         }
         stmt.bindLong(13, entity.getBlockTime());
-        stmt.bindLong(14, entity.getNotRolled());
-        stmt.bindLong(15, entity.getExpireTime());
+        stmt.bindLong(14, entity.getExpireTime());
+        stmt.bindLong(15, entity.getTimeBasis());
     }
 
     @Override
@@ -201,8 +201,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             stmt.bindString(12, blockHash);
         }
         stmt.bindLong(13, entity.getBlockTime());
-        stmt.bindLong(14, entity.getNotRolled());
-        stmt.bindLong(15, entity.getExpireTime());
+        stmt.bindLong(14, entity.getExpireTime());
+        stmt.bindLong(15, entity.getTimeBasis());
     }
 
     @Override
@@ -226,8 +226,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             cursor.getLong(offset + 10), // blockNum
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // blockHash
             cursor.getLong(offset + 12), // blockTime
-            cursor.getInt(offset + 13), // notRolled
-            cursor.getLong(offset + 14) // expireTime
+            cursor.getLong(offset + 13), // expireTime
+            cursor.getInt(offset + 14) // timeBasis
         );
         return entity;
     }
@@ -247,8 +247,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         entity.setBlockNum(cursor.getLong(offset + 10));
         entity.setBlockHash(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
         entity.setBlockTime(cursor.getLong(offset + 12));
-        entity.setNotRolled(cursor.getInt(offset + 13));
-        entity.setExpireTime(cursor.getLong(offset + 14));
+        entity.setExpireTime(cursor.getLong(offset + 13));
+        entity.setTimeBasis(cursor.getInt(offset + 14));
      }
     
     @Override

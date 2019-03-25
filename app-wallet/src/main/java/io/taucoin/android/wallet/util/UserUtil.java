@@ -27,6 +27,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
@@ -132,8 +133,8 @@ public class UserUtil {
     }
 
     public static long getTransExpiryTime() {
-        long minTime = 5;
-        long maxTime = 720;
+        long minTime = TransmitKey.MIN_TRANS_EXPIRY;
+        long maxTime = TransmitKey.MAX_TRANS_EXPIRY;
         long expiryTime = maxTime;
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null && keyValue.getTransExpiry() >= minTime
@@ -145,5 +146,14 @@ public class UserUtil {
 
     public static long getTransExpiryBlock() {
         return getTransExpiryTime() / 5;
+    }
+
+    public static String getMutableRange() {
+        String mutableRange = TransmitKey.DEFAULT_MUTABLE_RANGE;
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue != null && StringUtil.isNotEmpty(keyValue.getMutableRange())){
+            mutableRange = keyValue.getMutableRange();
+        }
+        return mutableRange;
     }
 }

@@ -142,14 +142,11 @@ public class TxService extends Service {
                         try {
                             String txId = txHistories.get(i).getTxId();
                             Logger.d("checkRawTransaction TxId=" + txId);
-                            mTxModel.checkRawTransaction(txId, new LogicObserver<Boolean>(){
+                            mTxModel.checkRawTransaction(txHistories.get(i), new LogicObserver<Boolean>(){
 
                                 @Override
-                                public void handleData(Boolean isOnBlockChain) {
-                                    if(isOnBlockChain){
-                                        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
-                                        getBalance(TransmitKey.ServiceType.GET_BALANCE);
-                                    }else{
+                                public void handleData(Boolean isRefresh) {
+                                    if(isRefresh){
                                         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
                                         getBalance(TransmitKey.ServiceType.GET_BALANCE);
                                     }

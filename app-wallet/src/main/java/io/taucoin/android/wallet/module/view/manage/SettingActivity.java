@@ -14,8 +14,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.InputDialog;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -41,8 +44,8 @@ public class SettingActivity extends BaseActivity {
     private void loadView() {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
-            tvTransExpiry.setRightText(keyValue.getTransExpiry() + "min");
-            tvMutableRange.setRightText(keyValue.getMutableRange());
+            tvTransExpiry.setRightText(UserUtil.getTransExpiryTime() + "min");
+            tvMutableRange.setRightText(UserUtil.getMutableRange());
         }
     }
 
@@ -70,6 +73,10 @@ public class SettingActivity extends BaseActivity {
                 try {
                     long input = new BigInteger(text).longValue();
                     if(type == 0){
+                        if(input > TransmitKey.MAX_TRANS_EXPIRY || input < TransmitKey.MIN_TRANS_EXPIRY){
+                            ToastUtils.showShortToast(R.string.setting_transaction_expiry_limit);
+                            return;
+                        }
                         mPresenter.saveTransExpiry(input, logicObserver);
                     }else {
                         mPresenter.saveMutableRange(input, logicObserver);

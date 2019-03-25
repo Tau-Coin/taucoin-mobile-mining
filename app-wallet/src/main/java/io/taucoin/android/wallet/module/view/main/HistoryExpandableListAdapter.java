@@ -107,14 +107,16 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         }
         groupViewHolder.tvTime.setText(time);
         // The user is the sender
-        boolean isSuccess = StringUtil.isSame(TransmitKey.TxResult.SUCCESSFUL, tx.getResult());
-        boolean isConfirming = StringUtil.isSame(TransmitKey.TxResult.CONFIRMING, tx.getResult());
         int color = R.color.color_red;
-        if(tx.getNotRolled() != 0){
-            if (isConfirming) {
-                color = R.color.color_blue;
-            } else if (isSuccess) {
-                color = R.color.color_black;
+        if(StringUtil.isNotEmpty(tx.getResult())){
+            switch (tx.getResult()){
+                case TransmitKey.TxResult.BROADCASTING:
+                case TransmitKey.TxResult.CONFIRMING:
+                    color = R.color.color_blue;
+                    break;
+                case TransmitKey.TxResult.SUCCESSFUL:
+                    color = R.color.color_black;
+                    break;
             }
         }
         int textColor = ContextCompat.getColor(parent.getContext(), color);

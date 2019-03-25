@@ -44,15 +44,15 @@ public class TransactionHistory {
     private String blockHash;
 
     private long blockTime;
-    // -1 finishState
-    private int notRolled;
-    // tx expiration date
+    // tx expiration date(expire block num)
     private long expireTime;
-    @Generated(hash = 42648251)
+    // Time basis for acquiring transaction records
+    private int timeBasis;
+    @Generated(hash = 1757760342)
     public TransactionHistory(Long id, String txId, String fromAddress,
             String toAddress, String createTime, String amount, String memo,
             String fee, String result, String message, long blockNum,
-            String blockHash, long blockTime, int notRolled, long expireTime) {
+            String blockHash, long blockTime, long expireTime, int timeBasis) {
         this.id = id;
         this.txId = txId;
         this.fromAddress = fromAddress;
@@ -66,8 +66,8 @@ public class TransactionHistory {
         this.blockNum = blockNum;
         this.blockHash = blockHash;
         this.blockTime = blockTime;
-        this.notRolled = notRolled;
         this.expireTime = expireTime;
+        this.timeBasis = timeBasis;
     }
     @Generated(hash = 63079048)
     public TransactionHistory() {
@@ -150,17 +150,16 @@ public class TransactionHistory {
     public void setBlockTime(long blockTime) {
         this.blockTime = blockTime;
     }
-    public int getNotRolled() {
-        return this.notRolled;
-    }
-    public void setNotRolled(int notRolled) {
-        this.notRolled = notRolled;
-    }
     public long getExpireTime() {
         return this.expireTime;
     }
     public void setExpireTime(long expireTime) {
         this.expireTime = expireTime;
     }
-
+    public int getTimeBasis() {
+        return this.timeBasis;
+    }
+    public void setTimeBasis(int timeBasis) {
+        this.timeBasis = timeBasis;
+    }
 }

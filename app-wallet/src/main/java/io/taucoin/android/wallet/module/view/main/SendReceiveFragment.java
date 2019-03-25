@@ -101,7 +101,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             ProgressManager.showProgressDialog(getActivity());
         }
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.BALANCE));
-        onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.TRANSACTION));
+        onRefresh(null);
     }
 
     @Override
@@ -200,9 +200,6 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                 UserUtil.setBalance(balanceText);
                 break;
             case TRANSACTION:
-                onRefresh(null);
-                break;
-            case TRANSACTION_IMPORT:
                 startRefresh();
                 break;
             default:
@@ -216,7 +213,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         mTxPresenter.queryTransactionHistory(mPageNo, mTime);
     }
 
-    public void startRefresh() {
+    private synchronized void startRefresh() {
         mPageNo = 1;
         mTime = DateUtil.getCurrentTime();
         if(mTxPresenter != null){
