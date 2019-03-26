@@ -227,6 +227,18 @@ public class InMemoryBlockStore implements BlockStore{
         s.close();
     }
 
+    public void delNonChainBlock(byte[] hash) {
+
+    }
+
+    public void delNonChainBlocksEndWith(byte[] hash) {
+
+    }
+
+    public void delNonChainBlocksByNumber(long number) {
+
+    }
+
     public void load(){
 
         logger.info("loading db");
@@ -269,15 +281,15 @@ public class InMemoryBlockStore implements BlockStore{
     }
 
     @Override
-    public void getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
-
+    public boolean getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
+        return true;
     }
 
-	@Override
+    @Override
     public void reBranchBlocks(List<Block> undoBlocks, List<Block> newBlocks) {
 
     }
-    
+
     @Override
     public BigInteger getTotalDifficultyForHash(byte[] hash) {
         return null;

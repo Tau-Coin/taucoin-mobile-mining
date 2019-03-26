@@ -199,12 +199,23 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     public synchronized ImportResult tryConnectAndFork(final Block block) {
         if (isMoreThan(block.getCumulativeDifficulty(), this.totalDifficulty)) {
             //cumulative difficulty is more than current chain
-            track = repository.startTracking();
+
             //try to roll back and reconnect
             List<Block> undoBlocks = new ArrayList<>();
             List<Block> newBlocks = new ArrayList<>();
-            blockStore.getForkBlocksInfo(block, undoBlocks, newBlocks);
+            if (!blockStore.getForkBlocksInfo(block, undoBlocks, newBlocks)) {
+                logger.error("Can not find continuous branch!");
+                blockStore.delNonChainBlock(block.getPreviousHeaderHash());
+                return DISCONTINUOUS_BRANCH;
+            }
             newBlocks.add(0, block);
+
+            if (undoBlocks.size() > config.getMutableRange()) {
+                logger.info("Blocks to be rolled back are out of mutable range !");
+                return IMMUTABLE_BRANCH;
+            }
+
+            track = repository.startTracking();
 
             for (Block undoBlock : undoBlocks) {
                 logger.info("Try to disconnect block, block number: {}, hash: {}",
@@ -356,6 +367,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     @Override
                     public void run() {
                         pendingState.processBest(block);
+                        blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
                     }
                 });
                 return IMPORTED_BEST;
@@ -378,6 +390,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                         @Override
                         public void run() {
                             pendingState.processBest(block);
+                            blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
                         }
                     });
                 }

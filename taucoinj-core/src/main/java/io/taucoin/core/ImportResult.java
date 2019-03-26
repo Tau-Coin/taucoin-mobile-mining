@@ -6,7 +6,9 @@ public enum ImportResult {
     EXIST,
     NO_PARENT,
     INVALID_BLOCK,
-    CONSENSUS_BREAK;
+    CONSENSUS_BREAK,
+    DISCONTINUOUS_BRANCH,
+    IMMUTABLE_BRANCH;
 
     public boolean isSuccessful() {
         return equals(IMPORTED_BEST) || equals(IMPORTED_NOT_BEST);

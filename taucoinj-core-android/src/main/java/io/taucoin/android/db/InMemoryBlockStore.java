@@ -224,8 +224,23 @@ public class InMemoryBlockStore implements BlockStore {
     }
 
     @Override
-    public void getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
+    public void delNonChainBlock(byte[] hash) {
 
+    }
+
+    @Override
+    public void delNonChainBlocksEndWith(byte[] hash) {
+
+    }
+
+    @Override
+    public void delNonChainBlocksByNumber(long number) {
+
+    }
+
+    @Override
+    public boolean getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
+        return true;
     }
 
     @Override

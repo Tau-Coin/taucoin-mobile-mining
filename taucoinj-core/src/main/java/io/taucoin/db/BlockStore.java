@@ -30,6 +30,12 @@ public interface BlockStore {
 
     void saveBlock(Block block, BigInteger cummDifficulty, boolean mainChain);
 
+    public void delNonChainBlock(byte[] hash);
+
+    public void delNonChainBlocksEndWith(byte[] hash);
+
+    public void delNonChainBlocksByNumber(long number);
+
     BigInteger getTotalDifficultyForHash(byte[] hash);
 
     BigInteger getTotalDifficulty();
@@ -40,7 +46,7 @@ public interface BlockStore {
 
     void flush();
 
-    void getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks);
+    boolean getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks);
 
     void reBranchBlocks(List<Block> undoBlocks, List<Block> newBlocks);
 
