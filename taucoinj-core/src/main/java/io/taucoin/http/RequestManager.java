@@ -32,15 +32,17 @@ public class RequestManager {
     protected Blockchain blockchain;
     protected TaucoinListener listener;
     protected ChainInfoManager chainInfoManager;
+    protected RequestQueue requestQueue;
 
     private Object stateLock = new Object();
     private SyncStateEnum syncState = SyncStateEnum.IDLE;
 
     @Inject
     public RequestManager(Blockchain blockchain, TaucoinListener listener,
-            ChainInfoManager chainInfoManager) {
+            RequestQueue requestQueue, ChainInfoManager chainInfoManager) {
         this.blockchain = blockchain;
         this.listener = listener;
+        this.requestQueue = requestQueue;
         this.chainInfoManager = chainInfoManager;
     }
 
