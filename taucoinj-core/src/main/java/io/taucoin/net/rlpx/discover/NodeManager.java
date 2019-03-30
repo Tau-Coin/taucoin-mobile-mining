@@ -3,6 +3,7 @@ package io.taucoin.net.rlpx.discover;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.datasource.mapdb.MapDBFactory;
+import io.taucoin.http.RequestManager;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.rlpx.*;
@@ -379,6 +380,14 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
                 return true;
             }
         }, BEST_DIFFICULTY_COMPARATOR, limit);
+    }
+
+    public List<NodeHandler> getBestEthNodes(
+            final List<RequestManager> usedIds,
+            final BigInteger lowerDifficulty,
+            int limit
+    ){
+       return null;
     }
 
     /**
