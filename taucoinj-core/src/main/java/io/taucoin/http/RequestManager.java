@@ -78,6 +78,9 @@ public class RequestManager {
         //todo
         return false;
     }
+    public boolean isChainInfoRetrievingDone(){
+        return false;
+    }
     public void ban(RequestManager requestManager){
 
     }

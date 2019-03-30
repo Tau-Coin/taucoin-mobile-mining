@@ -103,13 +103,22 @@ public class SyncManager {
         this.requestManager = requestManager;
 
         syncStates.put(SyncStateEnum.IDLE, new IdleState());
+        syncStates.put(CHAININFO_RETRIEVING,new ChainInfoRetrievingState());
         syncStates.put(SyncStateEnum.HASH_RETRIEVING, new HashRetrievingState());
         syncStates.put(SyncStateEnum.BLOCK_RETRIEVING, new BlockRetrievingState());
-
+        /**
+         * preparation 4 state and set state transfer manager.
+         * to operate this node smoothly.
+         */
         for (SyncState state : syncStates.values()) {
             ((AbstractSyncState)state).setSyncManager(this);
         }
     }
+
+    /**
+     * in p2p net work,all channels can help node to complete tasks
+     * in different state situation.
+     */
 
     public void setChannelManager(ChannelManager channelManager) {
         this.channelManager = channelManager;
@@ -124,7 +133,8 @@ public class SyncManager {
 
                 // sync queue
                 queue.init();
-                // peers pool
+                // request manager to complete corresponding work at
+                // different state that was set by sync manager.
                 requestManager.init();
 
                 if (!config.isSyncEnabled()) {
@@ -134,11 +144,13 @@ public class SyncManager {
 
                 logger.info("Sync Manager: ON");
 
-                // set IDLE state at the beginning
+                //set IDLE state at the beginning
                 state = syncStates.get(IDLE);
 
+                //this set current net version that nodes can communicate with each other.
                 masterVersion = initialMasterVersion();
 
+                //set current local chain difficulty.
                 updateDifficulties();
 
                 changeState(initialState());
@@ -329,13 +341,41 @@ public class SyncManager {
 
     }
 
+    /**
+     * 2 possible state will be returned.
+     * if Block queue is empty hash retrieving
+     * if Block queue is not empty imply that request manager
+     * is getting block from remote peer and block retrieving
+     * is returned.
+     */
     private SyncStateEnum initialState() {
-        if (queue.hasSolidBlocks()) {
-            logger.info("It seems that BLOCK_RETRIEVING was interrupted, starting from this state now");
-            return BLOCK_RETRIEVING;
-        } else {
+        if (queue.isBlocksEmpty() && isIdleTimeout() && state.is(IDLE)){
+            return CHAININFO_RETRIEVING;
+        }
+        if (requestManager.isChainInfoRetrievingDone() &&
+                blockchain.getTotalDifficulty().compareTo(requestManager.getTotalDifficulty()) >= 0
+        && state.is(CHAININFO_RETRIEVING)){
+            return IDLE;
+        }
+        if (requestManager.isChainInfoRetrievingDone() &&
+                blockchain.getTotalDifficulty().compareTo(requestManager.getTotalDifficulty()) < 0
+        && state.is(CHAININFO_RETRIEVING)){
             return HASH_RETRIEVING;
         }
+        if (!queue.isMoreBlocksNeeded() && state.is(HASH_RETRIEVING)){
+            return IDLE;
+        }
+        if (requestManager.isHashRetrievingDone() && state.is(HASH_RETRIEVING)) {
+            logger.info("It seems that BLOCK_RETRIEVING was interrupted, starting from this state now");
+            return BLOCK_RETRIEVING;
+        }
+        if (!queue.isMoreBlocksNeeded() || queue.isHashesEmpty() && state.is(BLOCK_RETRIEVING)){
+            return IDLE;
+        }
+        if (!queue.isHashesEmpty() && state.is(IDLE)){
+            return BLOCK_RETRIEVING;
+        }
+        return IDLE;
     }
 
     private int gapSize(BlockWrapper block) {
@@ -588,5 +628,10 @@ public class SyncManager {
         synchronized (stateMutex) {
             state.doMaintain();
         }
+    }
+
+    private boolean isIdleTimeout(){
+        //todo
+        return true;
     }
 }
