@@ -4,10 +4,13 @@ import io.taucoin.http.message.Message;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -76,12 +79,19 @@ public class ChainInfoMessage extends Message {
 
     @Override
     public String toJsonString() {
-        return null;
+        return MessageFactory.createJsonString(this);
     }
 
     @Override
     public String toString() {
-        return "GetChainInfoMessage()";
+        StringBuilder payload = new StringBuilder();
+        payload.append("\nChainInfoMessage[\n");
+        payload.append("\tgenesisHash:" + Hex.toHexString(genesisHash) + ",\n");
+        payload.append("\theight:" + height + ",\n");
+        payload.append("\tcurrentBlockHash:" + Hex.toHexString(currentBlockHash) + ",\n");
+        payload.append("\ttotalDiff:" + totalDiff.toString(16) + "\n");
+        payload.append("]\n");
+        return payload.toString();
     }
 
     public static class Serializer extends StdSerializer<ChainInfoMessage> {
@@ -99,9 +109,17 @@ public class ChainInfoMessage extends Message {
                 ChainInfoMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
+                jsonGenerator.writeStringField("genesishash",
+                        Hex.toHexString(message.getGenesisHash()));
+                jsonGenerator.writeNumberField("height", message.getHeight());
+                jsonGenerator.writeStringField("currentblockhash",
+                        Hex.toHexString(message.getCurrentBlockHash()));
+                jsonGenerator.writeStringField("totaldiff",
+                        message.getTotalDiff().toString(16));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
+                logger.error("taumessage serialize fatal error {}", e);
                 throw new RuntimeException("Tau serializing message exception");
             }
         }
@@ -119,7 +137,28 @@ public class ChainInfoMessage extends Message {
 
         @Override
         public ChainInfoMessage deserialize(JsonParser parser, DeserializationContext deserializer) {
-            return new ChainInfoMessage();
+            ChainInfoMessage message = new ChainInfoMessage();
+
+            ObjectCodec codec = parser.getCodec();
+            JsonNode node = null;
+            try {
+                node = codec.readTree(parser);
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("deserialize message erorr {}", e);
+                return null;
+            }
+
+            JsonNode genesisHashNode = node.get("genesishash");
+            message.setGenesisHash(Hex.decode(genesisHashNode.asText()));
+            JsonNode heightNode = node.get("height");
+            message.setHeight(heightNode.asLong());
+            JsonNode blockHashNode = node.get("currentblockhash");
+            message.setCurrentBlockHash(Hex.decode(blockHashNode.asText()));
+            JsonNode totalDiffNode = node.get("totaldiff");
+            message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
+
+            return message;
         }
     }
 }

@@ -1,19 +1,76 @@
 package io.taucoin.http.tau.message;
 
+import io.taucoin.core.Block;
 import io.taucoin.http.message.Message;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.spongycastle.util.encoders.Base64;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
 
 public class NewBlockMessage extends Message {
 
+    // The number of the new block.
+    private long number;
+
+    // Previous block hash.
+    private byte[] previousBlockHash;
+
+    // Total difficulity of the new block.
+    private BigInteger totalDiff;
+
+    private Block newBlock;
+
     public NewBlockMessage() {
+    }
+
+    public NewBlockMessage(long number, BigInteger totalDiff, Block newBlock) {
+        this.number = number;
+        this.previousBlockHash = newBlock.getPreviousHeaderHash();
+        this.totalDiff = totalDiff;
+        this.newBlock = newBlock;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    public void setNumber(long number) {
+        this.number = number;
+    }
+
+    public byte[] getPreviousBlockHash() {
+        return previousBlockHash;
+    }
+
+    public void setPreviousBlockHash(byte[] previousBlockHash) {
+        this.previousBlockHash = previousBlockHash;
+    }
+
+    public BigInteger getTotalDiff() {
+        return totalDiff;
+    }
+
+    public void setTotalDiff(BigInteger totalDiff) {
+        this.totalDiff = totalDiff;
+    }
+
+    public Block getNewBlock() {
+        return newBlock;
+    }
+
+    public void setNewBlock(Block newBlock) {
+        this.newBlock = newBlock;
     }
 
     @Override
@@ -23,12 +80,19 @@ public class NewBlockMessage extends Message {
 
     @Override
     public String toJsonString() {
-        return null;
+        return MessageFactory.createJsonString(this);
     }
 
     @Override
     public String toString() {
-        return "GetChainInfoMessage()";
+        StringBuilder payload = new StringBuilder();
+        payload.append("\nNewBlockMessage[\n");
+        payload.append("\tnumber:" + number + ",\n");
+        payload.append("\tpreviousBlockHash:" + Hex.toHexString(previousBlockHash) + ",\n");
+        payload.append("\ttotalDiff:" + totalDiff.toString(16) + ",\n");
+        payload.append("\tnewBlock:" + Hex.toHexString(newBlock.getHash()) + "\n");
+        payload.append("]\n");
+        return payload.toString();
     }
 
     public static class Serializer extends StdSerializer<NewBlockMessage> {
@@ -46,6 +110,14 @@ public class NewBlockMessage extends Message {
                 NewBlockMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
+                jsonGenerator.writeNumberField("number", message.getNumber());
+                jsonGenerator.writeStringField("previoushash",
+                        Hex.toHexString(message.getPreviousBlockHash()));
+                jsonGenerator.writeStringField("totaldiff",
+                        message.getTotalDiff().toString(16));
+                jsonGenerator.writeStringField("block",
+                        new String(Base64.encode(message.getNewBlock().getEncodedMsg()),
+                                    Charset.forName("UTF-8")));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,7 +138,29 @@ public class NewBlockMessage extends Message {
 
         @Override
         public NewBlockMessage deserialize(JsonParser parser, DeserializationContext deserializer) {
-            return new NewBlockMessage();
+            NewBlockMessage message = new NewBlockMessage();
+
+            ObjectCodec codec = parser.getCodec();
+            JsonNode node = null;
+            try {
+                node = codec.readTree(parser);
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("deserialize message erorr {}", e);
+                return null;
+            }
+
+            JsonNode numberNode = node.get("number");
+            message.setNumber(numberNode.asLong());
+            JsonNode prevHashNode = node.get("previoushash");
+            message.setPreviousBlockHash(Hex.decode(prevHashNode.asText()));
+            JsonNode totalDiffNode = node.get("totaldiff");
+            message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
+            JsonNode blockNode = node.get("block");
+            message.setNewBlock(
+                    new Block(Base64.decode(blockNode.asText()), true));
+
+            return message;
         }
     }
 }

@@ -28,7 +28,7 @@ public class GetChainInfoMessage extends Message {
 
     @Override
     public String toString() {
-        return "GetChainInfoMessage()";
+        return "GetChainInfoMessage[]";
     }
 
     public static class Serializer extends StdSerializer<GetChainInfoMessage> {
