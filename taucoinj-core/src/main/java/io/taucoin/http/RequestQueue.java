@@ -1,5 +1,6 @@
 package io.taucoin.http;
 
+import io.taucoin.http.client.ClientsPool;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.http.message.Message;
 
@@ -42,10 +43,12 @@ public class RequestQueue {
 
     TaucoinListener ethereumListener;
     private ScheduledFuture<?> timerTask;
+    private ClientsPool clientsPool;
 
     @Inject
-    public RequestQueue(TaucoinListener listener) {
+    public RequestQueue(TaucoinListener listener, ClientsPool clientsPool) {
         this.ethereumListener = listener;
+        this.clientsPool = clientsPool;
     }
 
     public void activate() {
@@ -57,7 +60,7 @@ public class RequestQueue {
                     logger.error("Unhandled exception", t);
                 }
             }
-        }, 10, 10, TimeUnit.MILLISECONDS);
+        }, 250, 250, TimeUnit.MILLISECONDS);
     }
 
     public void sendMessage(Message msg) {
@@ -109,7 +112,12 @@ public class RequestQueue {
 
             //ethereumListener.onSendMessage(channel, msg);
 
-            // TODO: send this request
+            // send this request
+            boolean result = clientsPool.next().sendRequest(requestRoundtrip.getMsg());
+            if (!result) {
+                logger.error("send to wire failed");
+                return;
+            }
 
             if (msg.getAnswerMessage() == null)
                 requestQueue.remove();

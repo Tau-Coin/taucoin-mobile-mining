@@ -754,6 +754,21 @@ public class SystemProperties {
         return genesis;
     }
 
+    @ValidateMe
+    public List<String> httpDiscoveryActivePeers() {
+        return config.getStringList("http.active.peers");
+    }
+
+    @ValidateMe
+    public int httpClientPoolSize() {
+        return config.getInt("http.client.pool.size");
+    }
+
+    @ValidateMe
+    public int httpConnectionTimeout() {
+        return config.getInt("http.client.connection.timeout") * 1000;
+    }
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }
