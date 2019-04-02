@@ -2,21 +2,27 @@ package io.taucoin.android.wallet.module.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
 import com.mofei.tau.R;
 
-import io.taucoin.android.wallet.base.BaseActivity;
-import io.taucoin.android.wallet.module.view.main.MainActivity;
-
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.module.view.main.MainActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
+import io.taucoin.foundation.util.AppUtil;
 
 public class SplashActivity extends BaseActivity {
+
+    @BindView(R.id.app_title)
+    TextView appTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,8 @@ public class SplashActivity extends BaseActivity {
             Logger.d("SplashActivity show");
             // Open for the first time
             setContentView(R.layout.activity_splash);
+            ButterKnife.bind(this);
+            initView();
 
             Logger.i("SplashActivity onCreate");
 
@@ -45,6 +53,12 @@ public class SplashActivity extends BaseActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mDisposableObserver);
         }
+    }
+
+    private void initView() {
+        String title = getText(R.string.splash_title).toString();
+        title = String.format(title, AppUtil.getVersionName(this));
+        appTitle.setText(title);
     }
 
     private CommonObserver<Long> mDisposableObserver = new CommonObserver<Long>() {

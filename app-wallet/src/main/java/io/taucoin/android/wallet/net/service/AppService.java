@@ -35,6 +35,6 @@ public interface AppService {
     @POST("getHelps/")
     Observable<DataResult<List<HelpBean>>> getHelpData();
 
-    @POST("getVersion/")
+    @POST("getTauVersion/")
     Observable<DataResult<VersionBean>> checkAppVersion(@Body Map<String, Object> map);
 }

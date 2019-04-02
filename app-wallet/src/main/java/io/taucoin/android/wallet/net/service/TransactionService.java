@@ -36,7 +36,7 @@ public interface TransactionService {
     @POST("getTauTransaction/")
     Observable<DataResult<TxDataBean>> getRawTransaction(@Body Map<String,String> txId);
 
-    @POST("sendTauTransation/")
+    @POST("sendTauTransaction/")
     Observable<DataResult<String>> sendRawTransaction(@Body Map<String,String> tx_hex);
 
     @POST("getTxRecords/")

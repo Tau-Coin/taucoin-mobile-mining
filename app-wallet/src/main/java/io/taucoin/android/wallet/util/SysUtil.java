@@ -155,14 +155,9 @@ public class SysUtil {
 
                 double cpu = sampleCPU(stat, processName.equals(context.getPackageName()));
                 memoryInfo.cpuUsageRate += cpu;
-                Logger.i( "loadAppProcess.processName=" + processName);
-                Logger.i("loadAppProcess.pid=" + pid);
-                Logger.i("loadAppProcess.residentSetSize=" + formatFileSize(residentSetSize));
-                Logger.i("loadAppProcess.cpuUsageRate=" + cpu);
             }
-            Logger.i("loadAppProcess.residentSetSize=" + formatFileSize(memoryInfo.totalMemory));
-            Logger.i("loadAppProcess.cpuUsageRate=" + memoryInfo.cpuUsageRate);
         } catch (Exception e) {
+            Logger.i("loadAppProcess.is error", e);
             e.printStackTrace();
         }
         return memoryInfo;
