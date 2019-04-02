@@ -66,6 +66,7 @@ public class MessageFactory {
         sModule.addSerializer(GetPoolTxsMessage.class, new GetPoolTxsMessage.Serializer());
         sModule.addSerializer(PoolTxsMessage.class, new PoolTxsMessage.Serializer());
         sModule.addSerializer(NewBlockMessage.class, new NewBlockMessage.Serializer());
+        sModule.addSerializer(NewTxMessage.class, new NewTxMessage.Serializer());
         sModule.addSerializer(MessageResponse.class, new MessageResponse.Serializer());
 
         // Add deserializers
@@ -78,6 +79,7 @@ public class MessageFactory {
         sModule.addDeserializer(GetPoolTxsMessage.class, new GetPoolTxsMessage.Deserializer());
         sModule.addDeserializer(PoolTxsMessage.class, new PoolTxsMessage.Deserializer());
         sModule.addDeserializer(NewBlockMessage.class, new NewBlockMessage.Deserializer());
+        sModule.addDeserializer(NewTxMessage.class, new NewTxMessage.Deserializer());
         sModule.addDeserializer(MessageResponse.class, new MessageResponse.Deserializer());
 
         sObjectMapper.registerModule(sModule);
