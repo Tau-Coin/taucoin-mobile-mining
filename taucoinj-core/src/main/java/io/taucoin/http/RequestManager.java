@@ -7,6 +7,7 @@ import io.taucoin.net.message.ReasonCode;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.sync2.ChainInfoManager;
+import io.taucoin.sync2.IdleState;
 import io.taucoin.sync2.SyncStateEnum;
 
 import org.slf4j.Logger;
@@ -110,7 +111,11 @@ public class RequestManager {
      * state change when at special condition.
      */
     public void changeStateForIdles(SyncStateEnum state){
-
+        synchronized(stateLock) {
+            if (this.syncState.equals(SyncStateEnum.IDLE)) {
+                syncState = state;
+            }
+        }
     }
     public void setLastHashToAsk(byte[] hash){
 
