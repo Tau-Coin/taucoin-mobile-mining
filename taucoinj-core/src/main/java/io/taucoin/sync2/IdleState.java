@@ -17,8 +17,6 @@ public class IdleState extends AbstractSyncState {
     public void doOnTransition() {
 
         super.doOnTransition();
-
-        syncManager.requestManager.changeSyncState(IDLE);
     }
 
     @Override
@@ -31,11 +29,10 @@ public class IdleState extends AbstractSyncState {
             return;
         }
 
-        if (syncManager.queue.isBlocksEmpty() && syncManager.queue.isHashesEmpty()) {
+        if (syncManager.queue.isBlocksEmpty() && syncManager.queue.isHashesEmpty()
+                && syncManager.hasToPullChainInfo()) {
             syncManager.changeState(CHAININFO_RETRIEVING);
             return;
         }
-        //a lucky peer!
-        syncManager.requestManager.changeStateForIdles(IDLE);
     }
 }

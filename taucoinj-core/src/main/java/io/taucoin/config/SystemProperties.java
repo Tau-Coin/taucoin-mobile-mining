@@ -769,6 +769,11 @@ public class SystemProperties {
         return config.getInt("http.client.connection.timeout") * 1000;
     }
 
+    @ValidateMe
+    public long pullChainInfoPeriod() {
+        return config.getInt("sync2.chaininfo.pull.period") * 1000;
+    }
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }

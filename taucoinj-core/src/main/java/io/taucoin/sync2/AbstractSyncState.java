@@ -1,5 +1,7 @@
 package io.taucoin.sync2;
 
+import io.taucoin.http.RequestManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,8 @@ public abstract class AbstractSyncState implements SyncState {
     private static final Logger logger = LoggerFactory.getLogger("sync");
 
     protected SyncManager syncManager;
+
+    protected RequestManager requestManager;
 
     protected SyncStateEnum name;
 
@@ -41,5 +45,9 @@ public abstract class AbstractSyncState implements SyncState {
 
     public void setSyncManager(SyncManager syncManager) {
         this.syncManager = syncManager;
+    }
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
 }

@@ -44,5 +44,6 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
         p.addLast(this.messageCodecProvider.get());
         p.addLast(this.handlerProvider.get());
+        p.addLast(this.requestManager);
     }
 }

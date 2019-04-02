@@ -18,15 +18,17 @@ import static io.taucoin.sync2.SyncStateEnum.IDLE;
  */
 public class HashRetrievingState extends AbstractSyncState {
 
-    private static final Logger logger = LoggerFactory.getLogger("sync");
+    private static final Logger logger = LoggerFactory.getLogger("sync2");
 
     public HashRetrievingState() {
         super(HASH_RETRIEVING);
     }
+
     @Override
-    public void doOnTransition(){
-        syncManager.requestManager.changeSyncState(HASH_RETRIEVING);
+    public void doOnTransition() {
+        super.doOnTransition();
     }
+
     @Override
     public void doMaintain() {
 
@@ -38,11 +40,9 @@ public class HashRetrievingState extends AbstractSyncState {
         }
 
         // if hash retrieving is done all we need to do is just change state and quit
-        if (syncManager.requestManager.isHashRetrievingDone()) {
+        if (requestManager.isHashRetrievingDone()) {
             syncManager.changeState(BLOCK_RETRIEVING);
             return;
         }
-
-        syncManager.requestManager.changeStateForIdles(HASH_RETRIEVING);
     }
 }

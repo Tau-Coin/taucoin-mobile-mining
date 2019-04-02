@@ -143,7 +143,7 @@ public class SyncQueue {
                 if (importResult == NO_PARENT) {
 //                    logger.info("No parent on the chain for block.number: {} block.hash: {}", wrapper.getNumber(), wrapper.getBlock().getShortHash());
                     wrapper.importFailed();
-                    syncManager.tryGapRecovery(wrapper);
+                    //syncManager.tryGapRecovery(wrapper);
                     // Here not add this block into block queue, because we don't
                     // know its block number. This node will request block headers
                     // and block bodies ASAP.

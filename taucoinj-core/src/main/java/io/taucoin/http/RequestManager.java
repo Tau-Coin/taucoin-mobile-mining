@@ -1,15 +1,21 @@
 package io.taucoin.http;
 
-import io.taucoin.core.Blockchain;
+import io.taucoin.core.*;
+import io.taucoin.db.BlockStore;
 import io.taucoin.http.message.Message;
+import io.taucoin.http.tau.message.*;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.message.ReasonCode;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.sync2.IdleState;
+import io.taucoin.sync2.SyncManager;
+import io.taucoin.sync2.SyncQueue;
 import io.taucoin.sync2.SyncStateEnum;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,23 +32,36 @@ import java.util.List;
  *     (2) Handle inbound messages, etc, ChainInfoMessage, HashesMessage and so on.
  */
 @Singleton
-public class RequestManager {
+public class RequestManager extends SimpleChannelInboundHandler<Message> {
 
     protected static final Logger logger = LoggerFactory.getLogger("http");
 
     protected Blockchain blockchain;
+
+    protected BlockStore blockstore;
+
     protected TaucoinListener listener;
-    protected ChainInfoManager chainInfoManager;
+
+    protected SyncManager syncManager;
+
+    protected SyncQueue queue;
+
     protected RequestQueue requestQueue;
+
+    protected ChainInfoManager chainInfoManager;
 
     private Object stateLock = new Object();
     private SyncStateEnum syncState = SyncStateEnum.IDLE;
 
     @Inject
-    public RequestManager(Blockchain blockchain, TaucoinListener listener,
-            RequestQueue requestQueue, ChainInfoManager chainInfoManager) {
+    public RequestManager(Blockchain blockchain, BlockStore blockstore, TaucoinListener listener,
+            SyncManager syncManager, SyncQueue queue, RequestQueue requestQueue,
+            ChainInfoManager chainInfoManager) {
         this.blockchain = blockchain;
+        this.blockstore = blockstore;
         this.listener = listener;
+        this.syncManager = syncManager;
+        this.queue = queue;
         this.requestQueue = requestQueue;
         this.chainInfoManager = chainInfoManager;
     }
@@ -58,96 +77,38 @@ public class RequestManager {
             return this.syncState;
         }
     }
-    public void handleMessage(Message message) {
-    }
 
-    /**
-     * follow method should to be impletation.
-     * all these are fit for main net.
-     */
-    public void init(){
-
-    }
-    public void stop(){
-
-    }
     public boolean isHashRetrievingDone(){
         //todo
         return false;
     }
+
     public boolean isHashRetrieving(){
         //todo
         return false;
     }
+
     public boolean isChainInfoRetrievingDone(){
         return false;
     }
-    public void ban(RequestManager requestManager){
 
-    }
-    public void disconnect(ReasonCode reasonCode){
+    @Override
+    public void channelRead0(final ChannelHandlerContext ctx, Message msg) throws InterruptedException {
 
-    }
+        listener.trace(String.format("RequestManager invoke: [%s]", msg.getClass()));
 
-    public byte[] getPeerIdShort(){
-        return null;
-    }
-
-    public RequestManager getByNodeId(byte[] nodeId){
-        return null;
-    }
-
-    public RequestManager getMaster(){
-        return null;
-    }
-    public TauVersion getTauVersion(){
-        return null;
-    }
-
-    public boolean hasCompatible(TauVersion version){
-        return false;
-    }
-    /**
-     * state change when at special condition.
-     */
-    public void changeStateForIdles(SyncStateEnum state){
-        synchronized(stateLock) {
-            if (this.syncState.equals(SyncStateEnum.IDLE)) {
-                syncState = state;
-            }
+        if (msg instanceof ChainInfoMessage) {
+            processChainInfoMessage((ChainInfoMessage)msg);
+        } else if (msg instanceof HashesMessage) {
+            processHashesMessage((HashesMessage)msg);
+        } else {
+            ctx.fireChannelRead(msg);
         }
     }
-    public void setLastHashToAsk(byte[] hash){
 
+    private void processChainInfoMessage(ChainInfoMessage msg) {
     }
-    public byte[] getBestKnownHash(){
-        return null;
-    }
-    public byte[] getLastHashToAsk(){
-        return null;
-    }
-    public byte[] getMaxHashesAsk(){
-        return null;
-    }
-    public List<RequestManager> nodesInUse(){
-        return null;
-    }
-    public void logActivePeers(){
 
-    }
-    public void logBannedPeers(){
-
-    }
-    public boolean hasBlocksLack(){
-        return false;
-    }
-    public BigInteger getTotalDifficulty(){
-        return null;
-    }
-    public int activeCount(){
-        return 0;
-    }
-    public void connect(Node node){
-
+    private void processHashesMessage(HashesMessage msg) {
     }
 }
