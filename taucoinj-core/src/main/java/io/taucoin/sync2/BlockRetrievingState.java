@@ -39,6 +39,6 @@ public class BlockRetrievingState extends AbstractSyncState {
             return;
         }
 
-        syncManager.requestManager.changeStateForIdles(BLOCK_RETRIEVING,V62);
+        syncManager.requestManager.changeStateForIdles(BLOCK_RETRIEVING);
     }
 }

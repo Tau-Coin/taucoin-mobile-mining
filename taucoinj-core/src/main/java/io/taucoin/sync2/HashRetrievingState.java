@@ -82,7 +82,7 @@ public class HashRetrievingState extends AbstractSyncState {
 
         // Since Eth V61 it makes sense to download blocks and hashes simultaneously
         if (peer.getTauVersion().getCode() > V60.getCode()) {
-            syncManager.requestManager.changeStateForIdles(BLOCK_RETRIEVING, syncManager.masterVersion);
+            syncManager.requestManager.changeStateForIdles(BLOCK_RETRIEVING);
         }
     }
 }

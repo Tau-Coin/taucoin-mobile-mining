@@ -109,7 +109,7 @@ public class RequestManager {
     /**
      * state change when at special condition.
      */
-    public void changeStateForIdles(SyncStateEnum state,TauVersion version){
+    public void changeStateForIdles(SyncStateEnum state){
 
     }
     public void setLastHashToAsk(byte[] hash){
