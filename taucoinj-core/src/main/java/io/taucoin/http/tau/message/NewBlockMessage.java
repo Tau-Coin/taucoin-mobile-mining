@@ -113,7 +113,7 @@ public class NewBlockMessage extends Message {
                 jsonGenerator.writeNumberField("number", message.getNumber());
                 jsonGenerator.writeStringField("previoushash",
                         Hex.toHexString(message.getPreviousBlockHash()));
-                jsonGenerator.writeStringField("totaldiff",
+                jsonGenerator.writeStringField("totaldiffculty",
                         message.getTotalDiff().toString(16));
                 jsonGenerator.writeStringField("block",
                         new String(Base64.encode(message.getNewBlock().getEncodedMsg()),
@@ -154,7 +154,7 @@ public class NewBlockMessage extends Message {
             message.setNumber(numberNode.asLong());
             JsonNode prevHashNode = node.get("previoushash");
             message.setPreviousBlockHash(Hex.decode(prevHashNode.asText()));
-            JsonNode totalDiffNode = node.get("totaldiff");
+            JsonNode totalDiffNode = node.get("totaldiffculty");
             message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
             JsonNode blockNode = node.get("block");
             message.setNewBlock(

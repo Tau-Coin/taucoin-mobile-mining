@@ -111,10 +111,10 @@ public class ChainInfoMessage extends Message {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("genesishash",
                         Hex.toHexString(message.getGenesisHash()));
-                jsonGenerator.writeNumberField("height", message.getHeight());
-                jsonGenerator.writeStringField("currentblockhash",
+                jsonGenerator.writeNumberField("totalheight", message.getHeight());
+                jsonGenerator.writeStringField("currenthash",
                         Hex.toHexString(message.getCurrentBlockHash()));
-                jsonGenerator.writeStringField("totaldiff",
+                jsonGenerator.writeStringField("totaldiffculty",
                         message.getTotalDiff().toString(16));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -151,11 +151,11 @@ public class ChainInfoMessage extends Message {
 
             JsonNode genesisHashNode = node.get("genesishash");
             message.setGenesisHash(Hex.decode(genesisHashNode.asText()));
-            JsonNode heightNode = node.get("height");
+            JsonNode heightNode = node.get("totalheight");
             message.setHeight(heightNode.asLong());
-            JsonNode blockHashNode = node.get("currentblockhash");
+            JsonNode blockHashNode = node.get("currenthash");
             message.setCurrentBlockHash(Hex.decode(blockHashNode.asText()));
-            JsonNode totalDiffNode = node.get("totaldiff");
+            JsonNode totalDiffNode = node.get("totaldiffculty");
             message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
 
             return message;

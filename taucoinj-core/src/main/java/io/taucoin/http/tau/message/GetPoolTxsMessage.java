@@ -80,7 +80,7 @@ public class GetPoolTxsMessage extends Message {
                 GetPoolTxsMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeNumberField("max", message.getMax());
+                jsonGenerator.writeNumberField("amount", message.getMax());
                 jsonGenerator.writeNumberField("minfee", message.getMinFee());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -114,7 +114,7 @@ public class GetPoolTxsMessage extends Message {
                 return null;
             }
 
-            JsonNode maxNode = node.get("max");
+            JsonNode maxNode = node.get("amount");
             message.setMax(maxNode.asLong());
             JsonNode minFeeNode = node.get("minfee");
             message.setMinFee(minFeeNode.asLong());

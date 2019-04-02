@@ -111,7 +111,7 @@ public class BlocksMessage extends Message {
                 BlocksMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeNumberField("start", message.getStartNumber());
+                jsonGenerator.writeNumberField("startno", message.getStartNumber());
                 jsonGenerator.writeBooleanField("reverse", message.getReverse());
 
                 jsonGenerator.writeArrayFieldStart("blocks");
@@ -154,7 +154,7 @@ public class BlocksMessage extends Message {
                 return null;
             }
 
-            JsonNode startNode = node.get("start");
+            JsonNode startNode = node.get("startno");
             message.setStartNumber(startNode.asLong());
             JsonNode reverseNode = node.get("reverse");
             message.setReverse(reverseNode.asBoolean());

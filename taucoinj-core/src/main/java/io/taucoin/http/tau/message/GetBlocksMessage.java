@@ -92,8 +92,8 @@ public class GetBlocksMessage extends Message {
                 GetBlocksMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeNumberField("start", message.getStartNumber());
-                jsonGenerator.writeNumberField("max", message.getMax());
+                jsonGenerator.writeNumberField("startno", message.getStartNumber());
+                jsonGenerator.writeNumberField("amount", message.getMax());
                 jsonGenerator.writeBooleanField("reverse", message.getReverse());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -127,9 +127,9 @@ public class GetBlocksMessage extends Message {
                 return null;
             }
 
-            JsonNode startNode = node.get("start");
+            JsonNode startNode = node.get("startno");
             message.setStartNumber(startNode.asLong());
-            JsonNode maxNode = node.get("max");
+            JsonNode maxNode = node.get("amount");
             message.setMax(maxNode.asLong());
             JsonNode reverseNode = node.get("reverse");
             message.setReverse(reverseNode.asBoolean());
