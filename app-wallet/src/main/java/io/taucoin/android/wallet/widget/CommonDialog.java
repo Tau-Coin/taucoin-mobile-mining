@@ -26,7 +26,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

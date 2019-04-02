@@ -16,7 +16,7 @@
 package io.taucoin.android.wallet.util;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

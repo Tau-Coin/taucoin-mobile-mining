@@ -25,7 +25,7 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;

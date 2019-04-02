@@ -34,7 +34,6 @@ import com.facebook.stetho.Stetho;
 import com.github.naturs.logger.Logger;
 import com.github.naturs.logger.android.adapter.AndroidLogAdapter;
 import com.github.naturs.logger.android.strategy.converter.AndroidLogConverter;
-import com.mofei.tau.BuildConfig;
 import com.squareup.leakcanary.LeakCanary;
 
 public class MyApplication extends MultiDexApplication {

@@ -27,7 +27,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

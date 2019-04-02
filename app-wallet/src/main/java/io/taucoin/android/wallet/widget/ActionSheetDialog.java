@@ -29,7 +29,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.ArrayList;
 import java.util.List;

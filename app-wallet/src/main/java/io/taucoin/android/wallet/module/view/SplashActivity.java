@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
 

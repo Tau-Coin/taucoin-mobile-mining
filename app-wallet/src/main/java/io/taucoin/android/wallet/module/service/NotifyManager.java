@@ -31,7 +31,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.Date;
 

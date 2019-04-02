@@ -19,7 +19,7 @@ import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.ArrayList;
 import java.util.List;

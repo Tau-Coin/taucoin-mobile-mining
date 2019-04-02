@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.mofei.tau.BuildConfig;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.BuildConfig;
+import io.taucoin.android.wallet.R;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 

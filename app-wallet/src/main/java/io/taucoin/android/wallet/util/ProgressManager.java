@@ -22,7 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Window;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.lang.ref.WeakReference;
 

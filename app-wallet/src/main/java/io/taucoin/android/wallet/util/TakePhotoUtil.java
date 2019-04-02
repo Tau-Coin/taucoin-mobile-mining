@@ -30,8 +30,8 @@
 //import android.support.v4.app.FragmentActivity;
 //
 //import com.github.naturs.logger.Logger;
-//import com.mofei.tau.BuildConfig;
-//import com.mofei.tau.R;
+//import io.taucoin.android.wallet.BuildConfig;
+//import io.taucoin.android.wallet.R;
 //
 //import java.io.File;
 //import java.io.FileOutputStream;

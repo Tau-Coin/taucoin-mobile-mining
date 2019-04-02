@@ -5,7 +5,7 @@ import android.text.InputType;
 import android.view.View;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.math.BigInteger;
 

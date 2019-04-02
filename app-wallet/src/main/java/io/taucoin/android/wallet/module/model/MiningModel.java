@@ -15,7 +15,7 @@
  */
 package io.taucoin.android.wallet.module.model;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import org.spongycastle.util.encoders.Hex;
 

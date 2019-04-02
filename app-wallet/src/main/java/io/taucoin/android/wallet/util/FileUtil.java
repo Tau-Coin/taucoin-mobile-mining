@@ -23,7 +23,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
-import com.mofei.tau.BuildConfig;
+import io.taucoin.android.wallet.BuildConfig;
 
 import java.io.File;
 import java.io.FileInputStream;

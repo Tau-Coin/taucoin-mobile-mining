@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.mofei.tau">
+    package="io.taucoin.android.wallet">
 
     <!--Allow programs to access network privileges and connect to the network-->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -61,7 +61,7 @@
         </activity>
 
         <provider
-            android:authorities="com.mofei.tau.fileprovider"
+            android:authorities="io.taucoin.android.wallet.fileprovider"
             android:name="android.support.v4.content.FileProvider"
             android:grantUriPermissions="true"
             android:exported="false">

@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
 

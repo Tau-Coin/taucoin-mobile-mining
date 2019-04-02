@@ -20,7 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;

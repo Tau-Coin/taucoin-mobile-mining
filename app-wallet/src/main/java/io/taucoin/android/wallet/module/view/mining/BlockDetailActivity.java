@@ -4,11 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import org.spongycastle.util.encoders.Hex;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import butterknife.BindView;

@@ -12,7 +12,7 @@
         <!-- path=""Represents the root directory, or you can specify a specific directory
             ，name="camera_picture" Is a virtual directory camera_picture -->
         <root-path name="root" path="" />
-        <files-path name="files" path="com.mofei.tau" />
+        <files-path name="files" path="io.taucoin.android.wallet" />
         <cache-path name="cache" path="" />
         <external-path name="external" path="" />
         <external-files-path name="external_files" path="" />

@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 
 import com.github.naturs.logger.Logger;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;

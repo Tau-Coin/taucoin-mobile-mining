@@ -15,7 +15,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

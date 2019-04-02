@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

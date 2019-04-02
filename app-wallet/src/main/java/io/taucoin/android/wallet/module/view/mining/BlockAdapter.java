@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.ArrayList;
 import java.util.List;

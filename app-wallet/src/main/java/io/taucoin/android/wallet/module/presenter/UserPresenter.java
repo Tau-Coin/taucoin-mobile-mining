@@ -19,7 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.util.Map;
 import java.util.Set;

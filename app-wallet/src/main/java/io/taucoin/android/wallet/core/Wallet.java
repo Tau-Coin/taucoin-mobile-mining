@@ -15,7 +15,7 @@
  */
 
 package io.taucoin.android.wallet.core;
-import com.mofei.tau.R;
+import io.taucoin.android.wallet.R;
 
 import java.math.BigInteger;
 
