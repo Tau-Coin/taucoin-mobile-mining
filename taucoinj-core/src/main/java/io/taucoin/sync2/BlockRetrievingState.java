@@ -30,9 +30,9 @@ public class BlockRetrievingState extends AbstractSyncState {
             return;
         }
 
-        // hash queue is empty.
-        // there are no blocks corresponding to hashes for retrieving.
-        if (syncManager.queue.isHashesEmpty()) {
+        // block number queue is empty.
+        // there are no blocks corresponding to numbers for retrieving.
+        if (syncManager.queue.isBlockNumbersEmpty()) {
 
             syncManager.changeState(IDLE);
             return;

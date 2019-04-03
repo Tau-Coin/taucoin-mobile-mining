@@ -22,14 +22,14 @@ public class IdleState extends AbstractSyncState {
     @Override
     public void doMaintain() {
         super.doMaintain();
-        if (!syncManager.queue.isHashesEmpty()) {
-            // there are new hashes in the store
+        if (!syncManager.queue.isBlockNumbersEmpty()) {
+            // there are new block numbers in the store
             // it's time to download blocks
             syncManager.changeState(BLOCK_RETRIEVING);
             return;
         }
 
-        if (syncManager.queue.isBlocksEmpty() && syncManager.queue.isHashesEmpty()
+        if (syncManager.queue.isBlocksEmpty() && syncManager.queue.isBlockNumbersEmpty()
                 && syncManager.hasToPullChainInfo()) {
             syncManager.changeState(CHAININFO_RETRIEVING);
             return;

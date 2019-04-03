@@ -484,6 +484,10 @@ public class SyncQueue {
         return headerStore.isEmpty();
     }
 
+    public boolean isBlockNumbersEmpty() {
+        return blockNumbersStore.isEmpty();
+    }
+
     public boolean isBlocksEmpty() {
         return blockQueue.isEmpty();
     }
