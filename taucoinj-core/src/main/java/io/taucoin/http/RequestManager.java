@@ -190,7 +190,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         long bestNumber = blockchain.getBestBlock().getNumber();
         byte[] bestHash = blockchain.getBestBlock().getHash();
 
-        logger.trace("Start looking for common ancestor, height {}, hash {}",
+        logger.debug("Start looking for common ancestor, height {}, hash {}",
                 bestNumber, Hex.toHexString(bestHash));
 
         if (chainInfoManager.getHeight() == bestNumber + 1
@@ -206,9 +206,9 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     private void maintainForkCoverage(List<byte[]> received, long startNumber,
             boolean reverse) {
         long ancestorNumber = startNumber;
-        if (reverse) {
+        if (!reverse) {
             Collections.reverse(received);
-            ancestorNumber = startNumber - received.size() + 1;
+            ancestorNumber = startNumber + received.size() - 1;
         }
 
         ListIterator<byte[]> it = received.listIterator();
@@ -223,7 +223,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
                         ancestorNumber, Hex.toHexString(hash));
                 break;
             }
-            ancestorNumber++;
+            ancestorNumber--;
         }
 
         if (commonAncestorFound) {
