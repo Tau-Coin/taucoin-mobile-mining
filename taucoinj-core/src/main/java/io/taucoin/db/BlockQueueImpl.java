@@ -292,6 +292,11 @@ public class BlockQueueImpl implements BlockQueue {
     }
 
     @Override
+    public List<Long> filterExistingNumbers(Collection<Long> numbers) {
+        return Collections.emptyList();
+    }
+
+    @Override
     public boolean isBlockExist(byte[] hash) {
         return hashes.contains(new ByteArrayWrapper(hash));
     }

@@ -37,6 +37,8 @@ public interface BlockQueue extends DiskStore {
 
     List<BlockHeader> filterExistingHeaders(Collection<BlockHeader> headers);
 
+    List<Long> filterExistingNumbers(Collection<Long> numbers);
+
     boolean isBlockExist(byte[] hash);
 
     void drop(byte[] nodeId, int scanLimit);

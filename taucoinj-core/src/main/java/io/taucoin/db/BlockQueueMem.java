@@ -289,6 +289,21 @@ public class BlockQueueMem implements BlockQueue {
     }
 
     @Override
+    public List<Long> filterExistingNumbers(Collection<Long> numbers) {
+        awaitInit();
+
+        List<Long> filtered = new ArrayList<>();
+        for (Long n : numbers) {
+            if (blocks.get(n) == null) {
+                filtered.add(n);
+            }
+        }
+
+        return filtered;
+    }
+
+
+    @Override
     public boolean isBlockExist(byte[] hash) {
         return hashes.contains(new ByteArrayWrapper(hash));
     }

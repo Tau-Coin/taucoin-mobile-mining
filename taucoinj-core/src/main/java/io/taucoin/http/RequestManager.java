@@ -246,9 +246,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     }
 
     private void pushBlockNumbers(long startNumber) {
-        while (startNumber <= chainInfoManager.getHeight()) {
-            // Push into SyncQueue block number queue
-        }
+        queue.addBlockNumbers(startNumber, chainInfoManager.getHeight());
     }
 
     protected void sendGetBlockHashes(long blockNumber, long maxBlocksAsk, boolean reverse) {

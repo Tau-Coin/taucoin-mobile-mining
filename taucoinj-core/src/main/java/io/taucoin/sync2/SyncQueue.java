@@ -49,6 +49,11 @@ public class SyncQueue {
     private HeaderStore headerStore;
 
     /**
+     * Store holding a list of block numbers of the blocks which need sync from peers.
+     */
+    private BlockNumberStore blockNumbersStore;
+
+    /**
      * Queue with blocks to be validated and added to the blockchain
      */
     private BlockQueue blockQueue;
@@ -88,6 +93,7 @@ public class SyncQueue {
 
         hashStore = new HashStoreMem();
         headerStore = new HeaderStoreMem();
+        blockNumbersStore = new BlockNumberStoreMem();
         blockQueue = new BlockQueueMem();
 
 //        hashStore = new HashStoreImpl();
@@ -100,6 +106,7 @@ public class SyncQueue {
 
         hashStore.open();
         headerStore.open();
+        blockNumbersStore.open();
         blockQueue.open();
 
         if (!config.isSyncEnabled()) {
@@ -346,6 +353,63 @@ public class SyncQueue {
      */
     public List<byte[]> pollHashes() {
         return hashStore.pollBatch(config.maxBlocksAsk());
+    }
+
+    /**
+     * Adds list of block numbers to the beginning of BlockNumberStore queue. <br>
+     * Sorts out those block numbers which blocks are already added to BlockQueue
+     *
+     * @param numbers numbers
+     */
+    public void addBlockNumbers(List<Long> numbers) {
+        List<Long> filtered = blockQueue.filterExistingNumbers(numbers);
+        blockNumbersStore.addBatch(filtered);
+
+        if (logger.isDebugEnabled())
+            logger.debug("{} numbers filtered out, {} added", numbers.size() - filtered.size(), filtered.size());
+    }
+
+    /**
+     * Adds list of block numbers to the beginning of BlockNumberStore queue. <br>
+     * Sorts out those numbers which blocks are already added to BlockQueue
+     *
+     * @param numbers numbers
+     */
+    public void addBlockNumbers(long startNumber, long endNumber) {
+        List<Long> numbers = new ArrayList<>();
+        while (startNumber <= endNumber) {
+            numbers.add(startNumber);
+            startNumber++;
+        }
+
+        List<Long> filtered = blockQueue.filterExistingNumbers(numbers);
+        blockNumbersStore.addBatch(filtered);
+
+        if (logger.isDebugEnabled())
+            logger.debug("{} numbers filtered out, {} added", numbers.size() - filtered.size(), filtered.size());
+    }
+
+    /**
+     * Puts back given block numbers. <br>
+     * Numbers are added to the beginning of queue
+     *
+     * @param numbers returning numbers
+     */
+    public void returnBlockNumbers(List<Long> numbers) {
+
+        if (numbers.isEmpty()) return;
+
+        List<Long> filtered = blockQueue.filterExistingNumbers(numbers);
+        blockNumbersStore.addBatch(filtered);
+    }
+
+    /**
+     * Return a list of block numbers from blocks that still need to be downloaded.
+     *
+     * @return A list of block numbers for which blocks need to be retrieved.
+     */
+    public List<Long> pollBlockNumbers() {
+        return blockNumbersStore.pollBatch(config.maxBlocksAsk());
     }
 
     /**
