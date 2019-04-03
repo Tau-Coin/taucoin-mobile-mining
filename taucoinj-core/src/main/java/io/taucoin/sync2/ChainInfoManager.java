@@ -44,7 +44,7 @@ public class ChainInfoManager {
     }
 
     public synchronized byte[] getPreviousBlockHash() {
-        return previousBlockHash;
+        return currentBlockHash;
     }
 
     public synchronized byte[] getCurrentBlockHash() {

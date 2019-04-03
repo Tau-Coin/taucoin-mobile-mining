@@ -7,6 +7,8 @@ import io.taucoin.http.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,10 +47,24 @@ public class RequestQueue {
     private ScheduledFuture<?> timerTask;
     private ClientsPool clientsPool;
 
+    private List<MessageListener> listeners = new ArrayList<>();
+
     @Inject
     public RequestQueue(TaucoinListener listener, ClientsPool clientsPool) {
         this.ethereumListener = listener;
         this.clientsPool = clientsPool;
+    }
+
+    public void registerListener(MessageListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    private void notifyListenersTimeout(Message message) {
+        for (MessageListener l : listeners) {
+            l.onMessageTimeout(message);
+        }
     }
 
     public void activate() {
@@ -85,8 +101,10 @@ public class RequestQueue {
     }
 
     private void removeTimeoutMessage(RequestRoundtrip requestRoundtrip) {
-        if (requestRoundtrip != null && requestRoundtrip.isTimeout())
+        if (requestRoundtrip != null && requestRoundtrip.isTimeout()) {
             requestQueue.remove();
+            notifyListenersTimeout(requestRoundtrip.getMsg());
+        }
     }
 
     private void removeAnsweredMessage(RequestRoundtrip requestRoundtrip) {
@@ -132,5 +150,9 @@ public class RequestQueue {
         if (timerTask != null) {
             timerTask.cancel(false);
         }
+    }
+
+    public interface MessageListener {
+        void onMessageTimeout(Message message);
     }
 }

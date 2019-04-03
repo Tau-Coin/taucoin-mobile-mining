@@ -210,4 +210,15 @@ public class Utils {
 
         return key.getPrivKey().toByteArray();
     }
+
+    public static boolean hashEquals(byte[] hash1, byte[] hash2) {
+        if (hash1 == null || hash1.length == 0 || hash2 == null || hash2.length == 0) {
+            return false;
+        }
+
+        String hashStr1 = Hex.toHexString(hash1);
+        String hashStr2 = Hex.toHexString(hash2);
+
+        return hashStr1.equals(hashStr2);
+    }
 }

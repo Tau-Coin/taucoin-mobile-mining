@@ -23,6 +23,9 @@ public class ChainInfoMessage extends Message {
     // Current block chain height
     private long height;
 
+    // Previous block hash
+    private byte[] previousBlockHash;
+
     // Current block hash
     private byte[] currentBlockHash;
 
@@ -33,11 +36,12 @@ public class ChainInfoMessage extends Message {
     }
 
     public ChainInfoMessage(byte[] genesisHash, long height, byte[] currentBlockHash,
-            BigInteger totalDiff) {
+            BigInteger totalDiff, byte[] previousBlockHash) {
         this.genesisHash = genesisHash;
         this.height = height;
         this.currentBlockHash = currentBlockHash;
         this.totalDiff = totalDiff;
+        this.previousBlockHash = previousBlockHash;
     }
 
     public byte[] getGenesisHash() {
@@ -54,6 +58,14 @@ public class ChainInfoMessage extends Message {
 
     public void setHeight(long height) {
         this.height = height;
+    }
+
+    public byte[] getPreviousBlockHash() {
+        return previousBlockHash;
+    }
+
+    public void setPreviousBlockHash(byte[] previousBlockHash) {
+        this.previousBlockHash = previousBlockHash;
     }
 
     public byte[] getCurrentBlockHash() {
@@ -88,6 +100,7 @@ public class ChainInfoMessage extends Message {
         payload.append("\nChainInfoMessage[\n");
         payload.append("\tgenesisHash:" + Hex.toHexString(genesisHash) + ",\n");
         payload.append("\theight:" + height + ",\n");
+        payload.append("\tpreviousBlockHash:" + Hex.toHexString(previousBlockHash) + ",\n");
         payload.append("\tcurrentBlockHash:" + Hex.toHexString(currentBlockHash) + ",\n");
         payload.append("\ttotalDiff:" + totalDiff.toString(16) + "\n");
         payload.append("]\n");
@@ -112,6 +125,8 @@ public class ChainInfoMessage extends Message {
                 jsonGenerator.writeStringField("genesishash",
                         Hex.toHexString(message.getGenesisHash()));
                 jsonGenerator.writeNumberField("totalheight", message.getHeight());
+                jsonGenerator.writeStringField("previoushash",
+                        Hex.toHexString(message.getPreviousBlockHash()));
                 jsonGenerator.writeStringField("currenthash",
                         Hex.toHexString(message.getCurrentBlockHash()));
                 jsonGenerator.writeStringField("totaldiffculty",
@@ -153,6 +168,8 @@ public class ChainInfoMessage extends Message {
             message.setGenesisHash(Hex.decode(genesisHashNode.asText()));
             JsonNode heightNode = node.get("totalheight");
             message.setHeight(heightNode.asLong());
+            JsonNode previousHashNode = node.get("previoushash");
+            message.setPreviousBlockHash(Hex.decode(previousHashNode.asText()));
             JsonNode blockHashNode = node.get("currenthash");
             message.setCurrentBlockHash(Hex.decode(blockHashNode.asText()));
             JsonNode totalDiffNode = node.get("totaldiffculty");

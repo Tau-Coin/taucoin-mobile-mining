@@ -172,11 +172,11 @@ public class SyncManager {
         synchronized (stateMutex) {
             newState.doOnTransition();
             state = newState;
-            requestManager.changeSyncState(newStateName);
+        }
 
-            if (newStateName == CHAININFO_RETRIEVING) {
+        requestManager.changeSyncState(newStateName);
+        if (newStateName == CHAININFO_RETRIEVING) {
                 savePullChainInfoTime();
-            }
         }
     }
 
