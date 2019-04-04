@@ -115,7 +115,10 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
     }
 
     private Message createMessage(ByteArrayOutputStream contentsStream) {
-        String jsonString = new String(contentsStream.toByteArray());
+        String jsonString = null;
+        if (contentsStream.size() > 0) {
+            jsonString = new String(contentsStream.toByteArray());
+        }
         Message message = MessageFactory.create(jsonString);
         if (message == null) {
             throw new IllegalArgumentException("No such message: " + jsonString);

@@ -38,8 +38,8 @@ public class NewTxMessage extends Message {
     }
 
     @Override
-    public Class<?> getAnswerMessage() {
-        return null;
+    public Class<DummyMessage> getAnswerMessage() {
+        return DummyMessage.class;
     }
 
     @Override

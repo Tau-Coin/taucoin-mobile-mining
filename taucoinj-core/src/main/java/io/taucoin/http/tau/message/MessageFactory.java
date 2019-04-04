@@ -86,6 +86,10 @@ public class MessageFactory {
     }
 
     public static Message create(String response) {
+        if (response == null || response.isEmpty()) {
+            return new DummyMessage();
+        }
+
         MessageResponse messageResp = null;
         try {
             messageResp = sObjectMapper.readValue(response, MessageResponse.class);
