@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -75,9 +76,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
 
         requestQueue.receivedMessage(msg);
 
-        if (msg instanceof BlocksMessage) {
-            processBlocksMessage((BlocksMessage)msg);
-        } else if (msg instanceof PoolTxsMessage) {
+        if (msg instanceof PoolTxsMessage) {
             processPoolTxsMessage((PoolTxsMessage)msg);
         } else {
             ctx.fireChannelRead(msg);
@@ -90,9 +89,21 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
         ctx.close();
     }
 
-    private void processBlocksMessage(BlocksMessage msg) {
-    }
-
     private void processPoolTxsMessage(PoolTxsMessage msg) {
+        List<Transaction> txList = msg.getTransactions();
+        Set<Transaction>  txSet = new HashSet<Transaction>();
+        for (Transaction tx : txList) {
+            txSet.add(tx);
+        }
+        if (txSet.size() == 0) {
+            return;
+        }
+        for (Transaction tx : txSet) {
+            logger.debug("Get pool tx {}", Hex.toHexString(tx.getHash()));
+        }
+
+        List<Transaction> txListAdded = pendingState.addWireTransactions(txSet);
+        logger.debug("Recv txs [{}], added [{}], dropped [{}]", txSet.size(),
+                txListAdded.size(), txSet.size() - txListAdded.size());
     }
 }
