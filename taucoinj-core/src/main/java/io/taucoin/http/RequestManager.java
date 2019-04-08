@@ -483,4 +483,9 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         NewTxMessage message = new NewTxMessage(tx);
         requestQueue.sendMessage(message);
     }
+
+    public void startPullPoolTxs(long max, long minFee) {
+        GetPoolTxsMessage message = new GetPoolTxsMessage(max, minFee);
+        requestQueue.sendMessage(message);
+    }
 }

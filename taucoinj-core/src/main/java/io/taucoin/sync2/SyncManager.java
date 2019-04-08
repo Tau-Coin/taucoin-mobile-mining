@@ -53,6 +53,8 @@ public class SyncManager {
 
     ChainInfoManager chainInfoManager;
 
+    PoolSynchronizer poolSynchronizer;
+
     Thread workerThread = null;
 
     private long getChainInfoTimestamp = 0;
@@ -61,13 +63,14 @@ public class SyncManager {
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue,
             TaucoinListener taucoinListener, RequestManager requestManager,
-            ChainInfoManager chainInfoManager) {
+            ChainInfoManager chainInfoManager, PoolSynchronizer poolSynchronizer) {
         this.blockchain = blockchain;
         this.queue = queue;
         this.queue.setSyncManager(this);
         this.taucoinListener = taucoinListener;
         this.requestManager = requestManager;
         this.chainInfoManager = chainInfoManager;
+        this.poolSynchronizer = poolSynchronizer;
 
         syncStates.put(IDLE, new IdleState());
         syncStates.put(CHAININFO_RETRIEVING, new ChainInfoRetrievingState());

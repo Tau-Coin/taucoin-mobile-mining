@@ -774,6 +774,21 @@ public class SystemProperties {
         return config.getInt("sync2.chaininfo.pull.period") * 1000;
     }
 
+    @ValidateMe
+    public long pullPoolTxsTime() {
+        return config.getInt("sync2.pooltxs.pull.seconds");
+    }
+
+    @ValidateMe
+    public long pullPoolTxsAmount() {
+        return config.getInt("sync2.pooltxs.amount");
+    }
+
+    @ValidateMe
+    public long pullPoolTxsMinFee() {
+        return config.getInt("sync2.pooltxs.minfee");
+    }
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }
