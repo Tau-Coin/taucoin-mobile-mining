@@ -4,6 +4,7 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Block;
 import io.taucoin.core.BlockWrapper;
 import io.taucoin.core.Blockchain;
+import io.taucoin.http.ConnectionManager;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.TaucoinListener;
 import org.slf4j.Logger;
@@ -55,6 +56,8 @@ public class SyncManager {
 
     PoolSynchronizer poolSynchronizer;
 
+    ConnectionManager connectionManager;
+
     Thread workerThread = null;
 
     private long getChainInfoTimestamp = 0;
@@ -63,7 +66,8 @@ public class SyncManager {
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue,
             TaucoinListener taucoinListener, RequestManager requestManager,
-            ChainInfoManager chainInfoManager, PoolSynchronizer poolSynchronizer) {
+            ChainInfoManager chainInfoManager, PoolSynchronizer poolSynchronizer,
+            ConnectionManager connectionManager) {
         this.blockchain = blockchain;
         this.queue = queue;
         this.queue.setSyncManager(this);
@@ -71,6 +75,7 @@ public class SyncManager {
         this.requestManager = requestManager;
         this.chainInfoManager = chainInfoManager;
         this.poolSynchronizer = poolSynchronizer;
+        this.connectionManager = connectionManager;
 
         syncStates.put(IDLE, new IdleState());
         syncStates.put(CHAININFO_RETRIEVING, new ChainInfoRetrievingState());

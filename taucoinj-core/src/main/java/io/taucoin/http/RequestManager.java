@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static io.taucoin.http.ConnectionState.*;
 import static io.taucoin.sync2.SyncStateEnum.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -64,6 +65,8 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     protected ChainInfoManager chainInfoManager;
 
     protected PeersManager peersManager;
+
+    protected ConnectionManager connectionManager;
 
     private Object stateLock = new Object();
     private SyncStateEnum syncState = IDLE;
@@ -100,7 +103,8 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     @Inject
     public RequestManager(Blockchain blockchain, BlockStore blockstore, TaucoinListener listener,
             SyncManager syncManager, SyncQueue queue, RequestQueue requestQueue,
-            ChainInfoManager chainInfoManager, PeersManager peersManager) {
+            ChainInfoManager chainInfoManager, PeersManager peersManager,
+            ConnectionManager connectionManager) {
         this.blockchain = blockchain;
         this.blockstore = blockstore;
         this.listener = listener;
@@ -109,6 +113,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         this.requestQueue = requestQueue;
         this.chainInfoManager = chainInfoManager;
         this.peersManager = peersManager;
+        this.connectionManager = connectionManager;
 
         this.requestQueue.registerListener(this);
     }
@@ -223,8 +228,13 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     }
 
     private void startPullChainInfo() {
-        GetChainInfoMessage message = new GetChainInfoMessage();
-        requestQueue.sendMessage(message);
+        if (connectionManager.isNetworkConnected()) {
+            GetChainInfoMessage message = new GetChainInfoMessage();
+            requestQueue.sendMessage(message);
+        } else {
+            logger.warn("network disconnected, change chaininfo retriving done");
+            changeSyncState(DONE_CHAININFO_RETRIEVING);
+        }
     }
 
     private void processHashesMessage(HashesMessage msg) {
@@ -253,6 +263,12 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
      *************************/
 
     private void startForkCoverage() {
+
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, change hash retriving done");
+            changeSyncState(DONE_HASH_RETRIEVING);
+            return;
+        }
 
         commonAncestorFound = false;
         hashesAmountArrayIndex = 0;
@@ -326,6 +342,11 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
                     blockNumber, maxBlocksAsk, reverse);
         }
 
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, discard getting block hash");
+            return;
+        }
+
         GetHashesMessage msg = new GetHashesMessage(blockNumber, maxBlocksAsk, reverse);
         requestQueue.sendMessage(msg);
     }
@@ -353,6 +374,11 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     }
 
     private void startBlockRetrieving() {
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, discard getting block");
+            return;
+        }
+
         sendGetBlocks();
     }
 
@@ -423,12 +449,24 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         }
     }
 
-    public void submitNewBlock(Block block) {
+    public boolean submitNewBlock(Block block) {
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, discard block {}", block);
+            return false;
+        }
+
         this.newBlocks.add(block);
+        return true;
     }
 
-    public void submitNewTransaction(Transaction tx) {
+    public boolean submitNewTransaction(Transaction tx) {
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, discard tx {}", tx);
+            return false;
+        }
+
         this.newTransactions.add(tx);
+        return true;
     }
 
     /**
@@ -485,7 +523,12 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     }
 
     public void startPullPoolTxs(long max, long minFee) {
-        GetPoolTxsMessage message = new GetPoolTxsMessage(max, minFee);
-        requestQueue.sendMessage(message);
+        if (connectionManager.isNetworkConnected()) {
+            GetPoolTxsMessage message = new GetPoolTxsMessage(max, minFee);
+            requestQueue.sendMessage(message);
+        } else {
+            logger.warn("network disconnected, discard pool tx sync");
+            return;
+        }
     }
 }

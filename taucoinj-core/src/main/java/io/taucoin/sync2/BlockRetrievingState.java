@@ -1,5 +1,7 @@
 package io.taucoin.sync2;
 
+import io.taucoin.http.ConnectionManager;
+
 import static io.taucoin.sync2.SyncStateEnum.*;
 
 /**
@@ -26,6 +28,12 @@ public class BlockRetrievingState extends AbstractSyncState {
         // block queue is full or exceed maximum.
         // if retrieving block further will lead to memory disaster.
         if (!syncManager.queue.isMoreBlocksNeeded()) {
+            syncManager.changeState(IDLE);
+            return;
+        }
+
+        // If network is disconnected, don't download blocks until network recovery.
+        if (!syncManager.connectionManager.isNetworkConnected()) {
             syncManager.changeState(IDLE);
             return;
         }
