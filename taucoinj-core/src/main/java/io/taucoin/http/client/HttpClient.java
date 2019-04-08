@@ -39,16 +39,16 @@ public class HttpClient {
 
     PeersManager peersManager;
 
-    TaucoinListener ethereumListener;
+    TaucoinListener listener;
 
     Provider<HttpClientInitializer> provider;
 
     private AtomicBoolean isIdle = new AtomicBoolean(true);
 
     @Inject
-    public HttpClient(TaucoinListener ethereumListener, Provider<HttpClientInitializer> provider,
+    public HttpClient(TaucoinListener listener, Provider<HttpClientInitializer> provider,
             PeersManager peersManager) {
-        this.ethereumListener = ethereumListener;
+        this.listener = listener;
         this.provider = provider;
         this.peersManager = peersManager;
     }
@@ -74,8 +74,8 @@ public class HttpClient {
             logger.error("Not idle http client");
             return false;
         }
-        ethereumListener.trace("Send request: " + message.toString());
-        logger.trace("Send request {}", message);
+        listener.trace("Send request: " + message.toString());
+        logger.debug("Send request {}", message);
 
         HttpClientInitializer httpInitializer = provider.get();
         Node peer = peersManager.getRandomPeer();

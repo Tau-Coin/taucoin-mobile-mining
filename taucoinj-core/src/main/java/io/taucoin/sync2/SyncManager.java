@@ -7,6 +7,7 @@ import io.taucoin.core.Blockchain;
 import io.taucoin.http.ConnectionManager;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.TaucoinListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -14,13 +15,13 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.sync2.SyncStateEnum.*;
-import static io.taucoin.util.BIUtil.isIn20PercentRange;
 import static io.taucoin.util.TimeUtils.secondsToMillis;
 
 /**
@@ -63,6 +64,8 @@ public class SyncManager {
     private long getChainInfoTimestamp = 0;
     private long pullChainInfoPeriod = config.pullChainInfoPeriod();
 
+    private AtomicBoolean started = new AtomicBoolean(false);
+
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue,
             TaucoinListener taucoinListener, RequestManager requestManager,
@@ -92,7 +95,11 @@ public class SyncManager {
         }
     }
 
-    public void init() {
+    public void start() {
+        if (started.get()) {
+            return;
+        }
+        started.set(true);
 
         // make it asynchronously
         this.workerThread = new Thread(new Runnable() {
@@ -131,6 +138,7 @@ public class SyncManager {
     }
 
     public void stop() {
+        started.set(false);
         if (worker != null) {
             worker.shutdownNow();
             worker = null;
@@ -184,7 +192,7 @@ public class SyncManager {
 
         requestManager.changeSyncState(newStateName);
         if (newStateName == CHAININFO_RETRIEVING) {
-                savePullChainInfoTime();
+            savePullChainInfoTime();
         }
     }
 

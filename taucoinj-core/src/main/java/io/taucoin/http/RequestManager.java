@@ -8,9 +8,7 @@ import io.taucoin.http.discovery.PeersManager;
 import io.taucoin.http.message.Message;
 import io.taucoin.http.tau.message.*;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.net.message.ReasonCode;
 import io.taucoin.net.rlpx.Node;
-import io.taucoin.net.tau.TauVersion;
 import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.sync2.IdleState;
 import io.taucoin.sync2.SyncManager;
@@ -98,7 +96,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     private Thread blockDistributeThread;
     private Thread txDistributeThread;
 
-    private AtomicBoolean started;
+    private AtomicBoolean started = new AtomicBoolean(false);
 
     @Inject
     public RequestManager(Blockchain blockchain, BlockStore blockstore, TaucoinListener listener,
@@ -124,26 +122,27 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         }
         started.set(true);
 
-        // Resending new blocks to network in loop
+        // sending new blocks to network in loop
         this.blockDistributeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 newBlocksDistributeLoop();
             }
-        }, "NewSyncThreadBlocks");
+        }, "NewBlocksDistributeThread");
         this.blockDistributeThread.start();
 
-        // Resending pending txs to newly connected peers
+        // sending pending txs to remote peers
         this.txDistributeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 newTxDistributeLoop();
             }
-        }, "NewSyncThreadTx");
+        }, "NewTxDistributeThread");
         this.txDistributeThread.start();
     }
 
     public void stop() {
+        started.set(false);
         if (blockDistributeThread != null) {
             blockDistributeThread.interrupt();
             blockDistributeThread = null;
@@ -155,6 +154,8 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     }
 
     public void changeSyncState(SyncStateEnum state) {
+        logger.info("sync state changed from {} to {}", getSyncState(), state);
+
         synchronized(stateLock) {
             if (this.syncState == state) {
                 return;

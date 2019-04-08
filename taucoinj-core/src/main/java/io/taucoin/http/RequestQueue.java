@@ -24,7 +24,7 @@ import javax.inject.Singleton;
  *      GetBlocksMessage by BlocksMessage
  *      GetPoolTxsMessage by PoolTxsMessage
  *
- * The following messages will not be answered:
+ * The following messages will not be answered, but DummyMessage will be received.
  *      NewBlockMessage, NewTxMessage
  *
  * @author Taucoin Core Developers
@@ -76,7 +76,7 @@ public class RequestQueue {
                     logger.error("Unhandled exception", t);
                 }
             }
-        }, 250, 250, TimeUnit.MILLISECONDS);
+        }, 100, 100, TimeUnit.MILLISECONDS);
     }
 
     public void sendMessage(Message msg) {
@@ -86,6 +86,7 @@ public class RequestQueue {
     public void receivedMessage(Message msg) throws InterruptedException {
 
         ethereumListener.trace("[Recv: " + msg + "]");
+        logger.info("Recv message {}", msg);
 
         if (requestQueue.peek() != null) {
             RequestRoundtrip requestRoundtrip = requestQueue.peek();

@@ -41,19 +41,19 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    private TaucoinListener ethereumListener;
+    private TaucoinListener tauListener;
 
     private ByteArrayOutputStream contentsStream = new ByteArrayOutputStream();
 
     @Inject
     public TauMessageCodec(TaucoinListener listener) {
-        this.ethereumListener = listener;
+        this.tauListener = listener;
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, HttpObject msg, List<Object> out) throws Exception {
         String output = String.format("From: \t%s \tRecv: \t%s", ctx.channel().remoteAddress(), msg);
-        ethereumListener.trace(output);
+        tauListener.trace(output);
         logger.debug("Receive http response {}", msg);
 
         if (msg instanceof HttpResponse) {
@@ -86,7 +86,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
         String output = String.format("To: \t%s \tSend: \t%s", ctx.channel().remoteAddress(), msg);
-        ethereumListener.trace(output);
+        tauListener.trace(output);
 
         HttpMethod method = MessageEncodeResolver.resolveHttpMethod(msg.getClass());
         String path = MessageEncodeResolver.resolveHttpPath(msg.getClass());
