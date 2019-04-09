@@ -3,7 +3,7 @@ package io.taucoin.http;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
 import io.taucoin.db.BlockStore;
-import io.taucoin.facade.Blockchain;
+import io.taucoin.core.Blockchain;
 import io.taucoin.http.discovery.PeersManager;
 import io.taucoin.http.message.Message;
 import io.taucoin.http.tau.message.*;

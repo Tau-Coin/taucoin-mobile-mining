@@ -7,6 +7,7 @@ import io.taucoin.core.*;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.forge.BlockForger;
+import io.taucoin.http.RequestManager;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.client.PeerClient;
@@ -31,12 +32,11 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
     private static final Logger log = LoggerFactory.getLogger("tauAndroid");
     @Inject
     public Taucoin(WorldManager worldManager, AdminInfo adminInfo,
-                    ChannelManager channelManager, io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
-                    Provider<PeerClient> peerClientProvider, UDPListener discoveryServer,
-                    PeerServer peerServer, BlockForger blockForger) {
+                    io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
+                    BlockForger blockForger, RequestManager requestManager) {
 
-        super(worldManager, adminInfo, channelManager, blockLoader, pendingState, peerClientProvider,
-                discoveryServer, peerServer, blockForger);
+        super(worldManager, adminInfo, blockLoader, pendingState, blockForger,
+                requestManager);
     }
 
     public void init(List<String> privateKeys) {

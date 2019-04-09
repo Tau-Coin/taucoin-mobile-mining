@@ -5,14 +5,11 @@ import io.taucoin.core.*;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.PeerClient;
-import io.taucoin.net.rlpx.discover.UDPListener;
-import io.taucoin.sync.SyncManager;
-import io.taucoin.net.peerdiscovery.PeerDiscovery;
-import io.taucoin.net.rlpx.discover.NodeManager;
-import io.taucoin.net.server.ChannelManager;
+import io.taucoin.sync2.SyncManager;
 import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,43 +46,35 @@ public class WorldManager {
 
     private PeerClient activePeer;
 
-    private PeerDiscovery peerDiscovery;
-
     private BlockStore blockStore;
 
-    private ChannelManager channelManager;
-
     private AdminInfo adminInfo;
-
-    private NodeManager nodeManager;
 
     private SyncManager syncManager;
 
     private PendingState pendingState;
 
-    private UDPListener discoveryServer;
+    private RequestManager requestManager;
 
     private volatile boolean isDiscoveryRunning = false;
 
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
-    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet, PeerDiscovery peerDiscovery
-                        , BlockStore blockStore, ChannelManager channelManager, AdminInfo adminInfo, NodeManager nodeManager, SyncManager syncManager
-                        , PendingState pendingState) {
+    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
+                        , BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager
+                        , PendingState pendingState, RequestManager requestManager) {
         logger.info("World manager instantiated");
         this.listener = listener;
         this.blockchain = blockchain;
         this.repository = repository;
         this.wallet = wallet;
-        this.peerDiscovery = peerDiscovery;
         this.blockStore = blockStore;
-        this.channelManager = channelManager;
         this.adminInfo = adminInfo;
-        this.nodeManager = nodeManager;
         this.syncManager = syncManager;
         this.pendingState = pendingState;
-        this.nodeManager.setWorldManager(this);
+        this.requestManager = requestManager;
+        this.syncManager.setRequestManager(requestManager);
     }
 
     public void init() {
@@ -104,43 +93,17 @@ public class WorldManager {
         ((CompositeTaucoinListener) this.listener).addListener(listener);
     }
 
-    public void setDiscoveryServer(UDPListener discoveryServer) {
-        this.discoveryServer = discoveryServer;
-    }
-
     public void startPeerDiscovery() {
-        /*
-        if (!peerDiscovery.isStarted())
-            peerDiscovery.start();
-         */
         if (isDiscoveryRunning) return;
 
-        syncManager.init();
-        channelManager.init();
-        discoveryServer.init();
+        syncManager.start();
         isDiscoveryRunning = true;
     }
 
     public void stopPeerDiscovery() {
-        /*
-        if (peerDiscovery.isStarted())
-            peerDiscovery.stop();
-         */
         if (!isDiscoveryRunning) return;
 
-        if (discoveryServer.isStarted()) {
-            discoveryServer.shutdown();
-        }
-        nodeManager.shutdown();
         isDiscoveryRunning = false;
-    }
-
-    public ChannelManager getChannelManager() {
-        return channelManager;
-    }
-
-    public PeerDiscovery getPeerDiscovery() {
-        return peerDiscovery;
     }
 
     public TaucoinListener getListener() {
@@ -238,10 +201,8 @@ public class WorldManager {
 
     public void close() {
         stopPeerDiscovery();
-        channelManager.shutdown();
         syncManager.stop();
         repository.close();
         blockchain.close();
     }
-
 }

@@ -356,10 +356,6 @@ public class TaucoinRemoteService extends TaucoinService {
 
         taucoin = component.taucoin();
         taucoin.addListener(new TaucoinListener());
-        PeersPool peersPool = component.peersPool();
-        peersPool.setTaucoin(taucoin);
-        ChannelManager channelManager = component.channelManager();
-        //channelManager.setTaucoin(taucoin);
         taucoin.getBlockForger().addListener(new TaucoinForgerListener());
         taucoin.getPendingState().setBlockchain(taucoin.getBlockchain());
         // You can also add some other initialization logic.
@@ -982,7 +978,7 @@ public class TaucoinRemoteService extends TaucoinService {
         Bundle replyData = new Bundle();
 
         if (taucoin != null) {
-            if (taucoin.getWorldManager().getSyncManager().isSyncDone()) {
+            if (false/*taucoin.getWorldManager().getSyncManager().isSyncDone()*/) {
                 replyData.putSerializable("event", EventFlag.EVENT_HAS_SYNC_DONE);
             } else {
                 replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);

@@ -466,7 +466,8 @@ public class NodeManager implements Functional.Consumer<DiscoveryEvent>{
     }
 
     public boolean isNeedMoreSyncPeers() {
-        return this.worldManager.getSyncManager().isNeedMorePeers();
+        //return this.worldManager.getSyncManager().isNeedMorePeers();
+        return false;
     }
 
     private class ListenerHandler {

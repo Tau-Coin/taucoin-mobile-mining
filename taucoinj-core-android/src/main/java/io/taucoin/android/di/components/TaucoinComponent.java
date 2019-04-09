@@ -19,8 +19,8 @@ public interface TaucoinComponent {
 
     Context context();
     Taucoin taucoin();
-    ChannelManager channelManager();
+    //ChannelManager channelManager();
     WorldManager worldManager();
     ParentBlockHeaderValidator parentBlockHeaderValidator();
-    PeersPool peersPool();
+    //PeersPool peersPool();
 }

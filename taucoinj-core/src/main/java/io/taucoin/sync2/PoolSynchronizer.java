@@ -49,10 +49,13 @@ public class PoolSynchronizer implements ForgerListener {
     };
 
     @Inject
-    public PoolSynchronizer(BlockForger blockForger, RequestManager requestManager) {
+    public PoolSynchronizer(BlockForger blockForger) {
         this.blockForger = blockForger;
-        this.requestManager = requestManager;
         this.blockForger.addListener(this);
+    }
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
 
     public void close() {

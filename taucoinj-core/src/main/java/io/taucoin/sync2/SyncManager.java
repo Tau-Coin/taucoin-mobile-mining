@@ -68,9 +68,8 @@ public class SyncManager {
 
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue,
-            TaucoinListener taucoinListener, RequestManager requestManager,
-            ChainInfoManager chainInfoManager, PoolSynchronizer poolSynchronizer,
-            ConnectionManager connectionManager) {
+            TaucoinListener taucoinListener, ChainInfoManager chainInfoManager,
+            PoolSynchronizer poolSynchronizer, ConnectionManager connectionManager) {
         this.blockchain = blockchain;
         this.queue = queue;
         this.queue.setSyncManager(this);
@@ -93,6 +92,11 @@ public class SyncManager {
             ((AbstractSyncState)state).setSyncManager(this);
             ((AbstractSyncState)state).setRequestManager(requestManager);
         }
+    }
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+        this.poolSynchronizer.setRequestManager(requestManager);
     }
 
     public void start() {

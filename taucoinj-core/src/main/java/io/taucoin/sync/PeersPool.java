@@ -202,7 +202,7 @@ public class PeersPool implements Iterable<Channel> {
     }
 
     public void connect(Node node) {
-        if (this.taucoin.getChannelManager().isPeerExist(node.getId())) {
+        if (/*this.taucoin.getChannelManager().isPeerExist(node.getId())*/true) {
             logger.info("Peer {} connection exists, ignore", node.getHexIdShort());
             return;
         }

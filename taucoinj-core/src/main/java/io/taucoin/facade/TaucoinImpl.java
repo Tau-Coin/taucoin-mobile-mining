@@ -9,13 +9,12 @@ import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.forge.BlockForger;
+import io.taucoin.http.RequestManager;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.rlpx.NodeType;
-import io.taucoin.net.rlpx.discover.UDPListener;
 import io.taucoin.net.server.ChannelManager;
-import io.taucoin.net.server.PeerServer;
 import io.taucoin.net.submit.NewBlockHeaderBroadcaster;
 import io.taucoin.net.submit.NewBlockHeaderTask;
 import io.taucoin.net.submit.TransactionExecutor;
@@ -56,34 +55,24 @@ public class TaucoinImpl implements Taucoin {
 
     protected AdminInfo adminInfo;
 
-    protected ChannelManager channelManager;
-
-    protected PeerServer peerServer;
-
-    protected Provider<PeerClient> providerPeer;
-
-    protected UDPListener discoveryServer;
-
     protected BlockLoader blockLoader;
 
     protected PendingState pendingState;
 
     protected BlockForger blockForger;
 
+    protected RequestManager requestManager;
+
     @Inject
-    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo, ChannelManager channelManager,
-            BlockLoader blockLoader, PendingState pendingState, Provider<PeerClient> providerPeer,
-            UDPListener discoveryServer, PeerServer peerServer, BlockForger blockForger) {
+    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo,
+            BlockLoader blockLoader, PendingState pendingState, BlockForger blockForger,
+            RequestManager requestManager) {
         this.worldManager = worldManager;
         this.adminInfo = adminInfo;
-        this.channelManager = channelManager;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
-        this.providerPeer = providerPeer;
-        this.discoveryServer = discoveryServer;
-        this.worldManager.setDiscoveryServer(discoveryServer);
-        this.peerServer = peerServer;
         this.blockForger = blockForger;
+        this.requestManager = requestManager;
         this.blockForger.setTaucoin(this);
         this.blockForger.init();
     }
@@ -93,17 +82,6 @@ public class TaucoinImpl implements Taucoin {
     }
 
     public void init() {
-        if (CONFIG.listenPort() > 0
-                && CONFIG.getHomeNodeType() == NodeType.SUPER) {
-            Executors.newSingleThreadExecutor().submit(
-                    new Runnable() {
-                        public void run() {
-                            peerServer.start(CONFIG.listenPort());
-                        }
-                    }
-            );
-        }
-
         gLogger.info("EthereumJ node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
     }
 
@@ -129,20 +107,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public PeerInfo findOnlinePeer(Set<PeerInfo> excludePeers) {
         logger.info("Looking for online peers...");
-
-        final TaucoinListener listener = worldManager.getListener();
-        listener.trace("Looking for online peer");
-
-        worldManager.startPeerDiscovery();
-
-        final Set<PeerInfo> peers = worldManager.getPeerDiscovery().getPeers();
-        for (PeerInfo peer : peers) { // it blocks until a peer is available.
-            if (peer.isOnline() && !excludePeers.contains(peer)) {
-                logger.info("Found peer: {}", peer.toString());
-                listener.trace(String.format("Found online peer: [ %s ]", peer.toString()));
-                return peer;
-            }
-        }
         return null;
     }
 
@@ -162,7 +126,7 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public Set<PeerInfo> getPeers() {
-        return worldManager.getPeerDiscovery().getPeers();
+        return null;
     }
 
     @Override
@@ -183,8 +147,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public void connect(final String ip, final int port, final String remoteId) {
         logger.info("Connecting to: {}:{}", ip, port);
-        final PeerClient peerClient = providerPeer.get();
-        peerClient.connectAsync(ip, port, remoteId, false);
     }
 
     @Override
@@ -211,20 +173,7 @@ public class TaucoinImpl implements Taucoin {
     public ImportResult addNewMinedBlock(Block block) {
         ImportResult importResult = worldManager.getBlockchain().tryToConnect(block);
         if (importResult == ImportResult.IMPORTED_BEST) {
-            channelManager.sendNewBlock(block, null);
         }
-        return importResult;
-    }
-
-    @Override
-    public boolean addNewForgedBlockHeader(BlockHeader header) {
-        // TODO: import this block header into blockchain.
-        boolean importResult = false;
-        if (importResult) {
-            NewBlockHeaderTask task = new NewBlockHeaderTask(header, channelManager);
-            NewBlockHeaderBroadcaster.instance.submitNewBlockHeader(task);
-        }
-
         return importResult;
     }
 
@@ -249,14 +198,7 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public PeerClient getDefaultPeer() {
-
-        PeerClient peer = worldManager.getActivePeer();
-        if (peer == null) {
-
-            peer = providerPeer.get();
-            worldManager.setActivePeer(peer);
-        }
-        return peer;
+        return null;
     }
 
     @Override
@@ -279,39 +221,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public Transaction submitTransaction(Transaction transaction) {
         Transaction retval = null;
-        SyncManager syncManager = worldManager.getSyncManager();
-        if (syncManager.isSyncDone()) {
-            boolean submitResult = pendingState.addPendingTransaction(transaction);
-            if (submitResult) {
-                TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
-
-                Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
-
-                try {
-                    retval = listFuture.get().get(0);
-                    retval.TRANSACTION_STATUS = TRANSACTION_SUBMITSUCCESS;
-                } catch (Exception e) {
-
-                }
-                return retval;
-            }
-        } else {
-            if (channelManager.getAllPeersCount() > 0) {
-                TransactionTask transactionTask = new TransactionTask(transaction, channelManager);
-
-                Future<List<Transaction>> listFuture = TransactionExecutor.instance.submitTransaction(transactionTask);
-
-                try {
-                    retval = listFuture.get().get(0);
-                    retval.TRANSACTION_STATUS = TRANSACTION_RELAYTOREMOTE;
-                } catch (Exception e) {
-
-                }
-                return retval;
-            } else {
-                transaction.TRANSACTION_STATUS = TRANSACTION_SUBMITFAIL;
-            }
-        }
         retval = transaction;
         return retval;
     }
@@ -335,11 +244,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public AdminInfo getAdminInfo() {
         return adminInfo;
-    }
-
-    @Override
-    public ChannelManager getChannelManager() {
-        return channelManager;
     }
 
     @Override

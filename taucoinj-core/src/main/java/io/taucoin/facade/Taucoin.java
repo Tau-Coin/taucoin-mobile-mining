@@ -100,11 +100,6 @@ public interface Taucoin {
     ImportResult addNewMinedBlock(Block block);
 
     /**
-     * Submit new forged block header into wire network.
-     */
-    boolean addNewForgedBlockHeader(BlockHeader header);
-
-    /**
      * Factory for general transaction
      *
      *
@@ -154,8 +149,6 @@ public interface Taucoin {
     public void init();
 
     AdminInfo getAdminInfo();
-
-    ChannelManager getChannelManager();
 
     /**
      * @return - currently pending transactions received from the net
