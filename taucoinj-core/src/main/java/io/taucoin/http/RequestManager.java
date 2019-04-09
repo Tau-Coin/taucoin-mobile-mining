@@ -139,6 +139,8 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             }
         }, "NewTxDistributeThread");
         this.txDistributeThread.start();
+
+        requestQueue.activate();
     }
 
     public void stop() {
@@ -151,6 +153,8 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             txDistributeThread.interrupt();
             txDistributeThread = null;
         }
+
+        requestQueue.close();
     }
 
     public void changeSyncState(SyncStateEnum state) {
@@ -467,6 +471,18 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         }
 
         this.newTransactions.add(tx);
+        return true;
+    }
+
+    public boolean submitNewTransaction(List<Transaction> txs) {
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, discard tx {}", txs);
+            return false;
+        }
+
+        for (Transaction tx : txs) {
+            this.newTransactions.add(tx);
+        }
         return true;
     }
 

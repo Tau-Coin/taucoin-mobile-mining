@@ -74,6 +74,10 @@ public interface Taucoin {
 
     void stopPeerDiscovery();
 
+    void startSync();
+
+    void stopSync();
+
     void connect(InetAddress addr, int port, String remoteId);
 
     void connect(String ip, int port, String remoteId);

@@ -56,7 +56,7 @@ public class WorldManager {
 
     private RequestManager requestManager;
 
-    private volatile boolean isDiscoveryRunning = false;
+    private volatile boolean isSyncRunning = false;
 
     SystemProperties config = SystemProperties.CONFIG;
 
@@ -94,16 +94,33 @@ public class WorldManager {
     }
 
     public void startPeerDiscovery() {
-        if (isDiscoveryRunning) return;
-
-        syncManager.start();
-        isDiscoveryRunning = true;
+        // TODO: start peer discovery
     }
 
     public void stopPeerDiscovery() {
-        if (!isDiscoveryRunning) return;
+        // TODO: stop peer discovery
+    }
 
-        isDiscoveryRunning = false;
+    public void startSync() {
+        if (isSyncRunning) {
+            return;
+        }
+        isSyncRunning = true;
+
+        // First of all, start net components
+        requestManager.start();
+        // Then start sync module
+        syncManager.start();
+    }
+
+    public void stopSync() {
+        if (!isSyncRunning) {
+            return;
+        }
+        isSyncRunning = false;
+
+        syncManager.stop();
+        requestManager.stop();
     }
 
     public TaucoinListener getListener() {
@@ -144,6 +161,10 @@ public class WorldManager {
 
     public SyncManager getSyncManager() {
         return syncManager;
+    }
+
+    public RequestManager getRequestManager() {
+        return requestManager;
     }
 
     public void loadBlockchain() {
@@ -201,7 +222,7 @@ public class WorldManager {
 
     public void close() {
         stopPeerDiscovery();
-        syncManager.stop();
+        stopSync();
         repository.close();
         blockchain.close();
     }

@@ -10,16 +10,12 @@ import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.http.RequestManager;
+import io.taucoin.http.submit.TransactionExecutor;
+import io.taucoin.http.submit.TransactionTask;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.rlpx.NodeType;
-import io.taucoin.net.server.ChannelManager;
-import io.taucoin.net.submit.NewBlockHeaderBroadcaster;
-import io.taucoin.net.submit.NewBlockHeaderTask;
-import io.taucoin.net.submit.TransactionExecutor;
-import io.taucoin.net.submit.TransactionTask;
-import io.taucoin.sync.SyncManager;
 import io.taucoin.util.ByteUtil;
 import org.apache.commons.collections4.list.TransformedList;
 import org.slf4j.Logger;
@@ -82,7 +78,7 @@ public class TaucoinImpl implements Taucoin {
     }
 
     public void init() {
-        gLogger.info("EthereumJ node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
+        gLogger.info("Tau-mobile node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
     }
 
     /**
@@ -140,6 +136,16 @@ public class TaucoinImpl implements Taucoin {
     }
 
     @Override
+    public void startSync() {
+        worldManager.startSync();
+    }
+
+    @Override
+    public void stopSync() {
+        worldManager.stopSync();
+    }
+
+    @Override
     public void connect(InetAddress addr, int port, String remoteId) {
         connect(addr.getHostName(), port, remoteId);
     }
@@ -173,6 +179,7 @@ public class TaucoinImpl implements Taucoin {
     public ImportResult addNewMinedBlock(Block block) {
         ImportResult importResult = worldManager.getBlockchain().tryToConnect(block);
         if (importResult == ImportResult.IMPORTED_BEST) {
+            requestManager.submitNewBlock(block);
         }
         return importResult;
     }
@@ -220,9 +227,23 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public Transaction submitTransaction(Transaction transaction) {
-        Transaction retval = null;
-        retval = transaction;
-        return retval;
+         boolean submitResult = pendingState.addPendingTransaction(transaction);
+         if (submitResult) {
+             TransactionTask transactionTask = new TransactionTask(transaction, requestManager);
+             final Future<List<Transaction>> listFuture =
+                     TransactionExecutor.instance.submitTransaction(transactionTask);
+             List<Transaction> txList;
+             try {
+                 txList = listFuture.get();
+             } catch (Exception e) {
+                 e.printStackTrace();
+                 logger.error("send tx exception {}", e);
+                 return null;
+             }
+             return txList.get(0);
+         }
+
+         return null;
     }
 
     @Override
