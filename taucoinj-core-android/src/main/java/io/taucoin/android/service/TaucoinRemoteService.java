@@ -1,6 +1,11 @@
 package io.taucoin.android.service;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +27,7 @@ import io.taucoin.core.Transaction;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
+import io.taucoin.http.ConnectionManager;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.server.ChannelManager;
@@ -45,6 +51,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
+import static io.taucoin.http.ConnectionState.*;
 
 public class TaucoinRemoteService extends TaucoinService {
 
@@ -60,10 +67,11 @@ public class TaucoinRemoteService extends TaucoinService {
     protected int portBootstrap = 30606;
     protected String remoteIdBootstrap = null;
 
+    private ConnectionManager connectionManager = null;
+
     public TaucoinRemoteService() {
 
         super();
-
     }
 
     /** Handles incoming messages from clients. */
@@ -309,8 +317,6 @@ public class TaucoinRemoteService extends TaucoinService {
             logger.info("Loading genesis cost {} ms", (endTime1 - startTime1)/1000000);
             logger.info("Genesis loaded");
 
-            taucoin.getDefaultPeer();
-
             taucoin.initSync();
             isTaucoinStarted = true;
             isInitialized = true;
@@ -320,6 +326,9 @@ public class TaucoinRemoteService extends TaucoinService {
                 logger.info("Starting json rpc...");
                 startJsonRpc(null);
             }
+
+            // Init network status and register listener.
+            initNetwork();
 
             // Send reply
             if (replyTo != null && reply != null) {
@@ -355,6 +364,7 @@ public class TaucoinRemoteService extends TaucoinService {
                 .build();
 
         taucoin = component.taucoin();
+        connectionManager = component.connectionManager();
         taucoin.addListener(new TaucoinListener());
         taucoin.getBlockForger().addListener(new TaucoinForgerListener());
         taucoin.getPendingState().setBlockchain(taucoin.getBlockchain());
@@ -382,6 +392,52 @@ public class TaucoinRemoteService extends TaucoinService {
         new InitializeTask(privateKeys, message.replyTo, message.obj).execute();
     }
 
+    private void initNetwork() {
+        initNetworkStatus();
+        registerNetworkStateListener();
+    }
+
+    private void initNetworkStatus() {
+        ConnectivityManager manager
+                = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            connectionManager.setConnectionState(CONNECTED);
+        } else {
+            connectionManager.setConnectionState(DISCONNECTED);
+        }
+    }
+
+    private void registerNetworkStateListener() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(new NetworkStateListener(connectionManager), filter);
+    }
+
+    private static class NetworkStateListener extends BroadcastReceiver {
+
+        private ConnectionManager connectionManager;
+
+        public NetworkStateListener(ConnectionManager connectionManager) {
+            this.connectionManager = connectionManager;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                NetworkInfo info
+                        = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if (info != null) {
+                    if (NetworkInfo.State.CONNECTED == info.getState()
+                            && info.isAvailable()) {
+                        connectionManager.setConnectionState(CONNECTED);
+                    } else {
+                        connectionManager.setConnectionState(DISCONNECTED);
+                    }
+                }
+            }
+        }
+    }
 
     /*
     protected void init(Message message) {
@@ -978,12 +1034,8 @@ public class TaucoinRemoteService extends TaucoinService {
         Bundle replyData = new Bundle();
 
         if (taucoin != null) {
-            if (false/*taucoin.getWorldManager().getSyncManager().isSyncDone()*/) {
-                replyData.putSerializable("event", EventFlag.EVENT_HAS_SYNC_DONE);
-            } else {
-                replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);
-            }
-            taucoin.startPeerDiscovery();
+            replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);
+            taucoin.startSync();
         }
 
         replyMessage.setData(replyData);

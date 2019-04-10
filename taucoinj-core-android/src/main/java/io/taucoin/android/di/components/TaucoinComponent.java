@@ -4,6 +4,7 @@ import android.content.Context;
 
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.Taucoin;
+import io.taucoin.http.ConnectionManager;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.PeersPool;
@@ -23,4 +24,5 @@ public interface TaucoinComponent {
     WorldManager worldManager();
     ParentBlockHeaderValidator parentBlockHeaderValidator();
     //PeersPool peersPool();
+    ConnectionManager connectionManager();
 }
