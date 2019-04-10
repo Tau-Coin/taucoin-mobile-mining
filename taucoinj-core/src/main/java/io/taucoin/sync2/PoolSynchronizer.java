@@ -43,7 +43,7 @@ public class PoolSynchronizer implements ForgerListener {
             try {
                 requestManager.startPullPoolTxs(PullPoolTxsAmount, PullPoolTxsMinFee);
             } catch (Throwable t) {
-                logger.error("Unhandled exception", t);
+                logger.error("Unhandled exception ", t);
             }
         }
     };

@@ -90,13 +90,16 @@ public class SyncManager {
          */
         for (SyncState state : syncStates.values()) {
             ((AbstractSyncState)state).setSyncManager(this);
-            ((AbstractSyncState)state).setRequestManager(requestManager);
         }
     }
 
     public void setRequestManager(RequestManager requestManager) {
         this.requestManager = requestManager;
         this.poolSynchronizer.setRequestManager(requestManager);
+
+        for (SyncState state : syncStates.values()) {
+            ((AbstractSyncState)state).setRequestManager(requestManager);
+        }
     }
 
     public void start() {

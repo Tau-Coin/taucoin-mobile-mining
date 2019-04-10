@@ -78,7 +78,7 @@ public class TaucoinImpl implements Taucoin {
     }
 
     public void init() {
-        gLogger.info("Tau-mobile node started: enode://" + Hex.toHexString(CONFIG.nodeId()) + "@" + CONFIG.externalIp() + ":" + CONFIG.listenPort());
+        // TODO: initialization logic
     }
 
     /**

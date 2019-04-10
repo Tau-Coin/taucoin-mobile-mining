@@ -70,15 +70,12 @@ public class HttpClient {
     }
 
     public boolean sendRequest(Message message) {
-        if (!isIdle()) {
-            logger.error("Not idle http client");
-            return false;
-        }
         listener.trace("Send request: " + message.toString());
-        logger.debug("Send request {}", message);
 
         HttpClientInitializer httpInitializer = provider.get();
         Node peer = peersManager.getRandomPeer();
+
+        logger.debug("Send request {} to {}:{}", message, peer.getHost(), peer.getPort());
 
         Bootstrap b = new Bootstrap();
         b.group(workerGroup)
@@ -94,6 +91,10 @@ public class HttpClient {
             // Wait for the server to close the connection.
             ch.closeFuture().sync();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+            logger.error("Sending message exception {}", e);
+            return false;
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error("Sending message exception {}", e);
             return false;

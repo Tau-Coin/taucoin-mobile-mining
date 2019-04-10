@@ -15,6 +15,7 @@ public class RequestRoundtrip {
     private final Message msg;
     long lastTimestamp = 0;
     long retryTimes = 0;
+    long failTimes = 0;
     boolean answered = false;
 
     public RequestRoundtrip(Message msg) {
@@ -38,6 +39,10 @@ public class RequestRoundtrip {
         ++retryTimes;
     }
 
+    public void incFailTimes() {
+        ++failTimes;
+    }
+
     public void saveTime() {
         lastTimestamp = System.currentTimeMillis();
     }
@@ -51,6 +56,6 @@ public class RequestRoundtrip {
     }
 
     public boolean isTimeout() {
-        return retryTimes >= 2;
+        return retryTimes >= 2 || failTimes >= 3;
     }
 }

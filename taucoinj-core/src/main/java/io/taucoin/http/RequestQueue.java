@@ -73,7 +73,7 @@ public class RequestQueue {
                 try {
                     nudgeQueue();
                 } catch (Throwable t) {
-                    logger.error("Unhandled exception", t);
+                    logger.error("Unhandled exception ", t);
                 }
             }
         }, 100, 100, TimeUnit.MILLISECONDS);
@@ -135,6 +135,7 @@ public class RequestQueue {
             boolean result = clientsPool.next().sendRequest(requestRoundtrip.getMsg());
             if (!result) {
                 logger.error("send to wire failed");
+                requestRoundtrip.incFailTimes();
                 return;
             }
 
