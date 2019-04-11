@@ -229,18 +229,10 @@ public class TaucoinImpl implements Taucoin {
     public Transaction submitTransaction(Transaction transaction) {
          boolean submitResult = pendingState.addPendingTransaction(transaction);
          if (submitResult) {
-             TransactionTask transactionTask = new TransactionTask(transaction, requestManager);
-             final Future<List<Transaction>> listFuture =
-                     TransactionExecutor.instance.submitTransaction(transactionTask);
-             List<Transaction> txList;
-             try {
-                 txList = listFuture.get();
-             } catch (Exception e) {
-                 e.printStackTrace();
-                 logger.error("send tx exception {}", e);
-                 return null;
+             boolean sendResult = requestManager.submitNewTransaction(transaction);
+             if (sendResult) {
+                 return transaction;
              }
-             return txList.get(0);
          }
 
          return null;

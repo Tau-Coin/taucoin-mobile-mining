@@ -85,7 +85,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("Tau handling failed", cause);
+        logger.error("Tau handling failed ", cause);
         ctx.close();
     }
 

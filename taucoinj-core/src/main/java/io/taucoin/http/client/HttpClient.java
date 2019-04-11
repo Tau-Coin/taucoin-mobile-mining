@@ -53,7 +53,7 @@ public class HttpClient {
         this.peersManager = peersManager;
     }
 
-    private static EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
+    private EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
         AtomicInteger cnt = new AtomicInteger(0);
         @Override
         public Thread newThread(Runnable r) {
@@ -75,11 +75,12 @@ public class HttpClient {
         HttpClientInitializer httpInitializer = provider.get();
         Node peer = peersManager.getRandomPeer();
 
-        logger.debug("Send request {} to {}:{}", message, peer.getHost(), peer.getPort());
+        logger.info("Send request {} to {}:{}", message, peer.getHost(), peer.getPort());
 
         Bootstrap b = new Bootstrap();
         b.group(workerGroup)
          .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.httpConnectionTimeout())
+         .option(ChannelOption.SO_KEEPALIVE, true)
          .channel(NioSocketChannel.class)
          .handler(httpInitializer);
 
@@ -87,9 +88,11 @@ public class HttpClient {
         try {
             Channel ch = b.connect(peer.getHost(), peer.getPort()).sync().channel();
             // Send the message.
+            //Thread.sleep(2000);
             ch.writeAndFlush(message);
             // Wait for the server to close the connection.
             ch.closeFuture().sync();
+            logger.info("{}:{} disconnected", peer.getHost(), peer.getPort());
         } catch (InterruptedException e) {
             e.printStackTrace();
             logger.error("Sending message exception {}", e);

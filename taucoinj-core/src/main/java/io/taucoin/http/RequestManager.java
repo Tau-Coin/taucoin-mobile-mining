@@ -121,6 +121,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             return;
         }
         started.set(true);
+        logger.info("RequestManager is starting...");
 
         // sending new blocks to network in loop
         this.blockDistributeThread = new Thread(new Runnable() {
