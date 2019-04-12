@@ -4,6 +4,8 @@ import io.taucoin.http.client.ClientsPool;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.http.message.Message;
 
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +47,14 @@ public class RequestQueue {
 
     TaucoinListener ethereumListener;
     private ScheduledFuture<?> timerTask;
-    private ClientsPool clientsPool;
 
     private List<MessageListener> listeners = new ArrayList<>();
 
+    private ChannelHandlerContext ctx = null;
+
     @Inject
-    public RequestQueue(TaucoinListener listener, ClientsPool clientsPool) {
+    public RequestQueue(TaucoinListener listener) {
         this.ethereumListener = listener;
-        this.clientsPool = clientsPool;
     }
 
     public void registerListener(MessageListener listener) {
@@ -67,7 +69,8 @@ public class RequestQueue {
         }
     }
 
-    public void activate() {
+    public void activate(ChannelHandlerContext ctx) {
+        this.ctx = ctx;
         timerTask = timer.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 try {
@@ -81,6 +84,10 @@ public class RequestQueue {
 
     public void sendMessage(Message msg) {
         requestQueue.add(new RequestRoundtrip(msg));
+    }
+
+    public int size() {
+        return requestQueue.size();
     }
 
     public void receivedMessage(Message msg) throws InterruptedException {
@@ -132,12 +139,7 @@ public class RequestQueue {
             //ethereumListener.onSendMessage(channel, msg);
 
             // send this request
-            boolean result = clientsPool.next().sendRequest(requestRoundtrip.getMsg());
-            if (!result) {
-                logger.error("send to wire failed");
-                requestRoundtrip.incFailTimes();
-                return;
-            }
+            ctx.writeAndFlush(msg).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 
             if (msg.getAnswerMessage() == null)
                 requestQueue.remove();

@@ -6,6 +6,7 @@ import io.taucoin.db.BlockStore;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.listener.TaucoinListenerAdapter;
+import io.taucoin.http.client.HttpClient;
 import io.taucoin.http.message.Message;
 import io.taucoin.http.RequestQueue;
 import io.taucoin.http.RequestManager;
@@ -51,23 +52,45 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
 
     protected PendingState pendingState;
 
-    protected RequestQueue requestQueue;
-
     protected RequestManager requestManager;
+
+    protected HttpClient httpClient;
+
+    private RequestQueue requestQueue;
 
     @Inject
     public TauHandler(Blockchain blockchain, BlockStore blockstore, SyncManager syncManager,
             SyncQueue queue, PendingState pendingState, TaucoinListener tauListener,
-            RequestQueue requestQueue, RequestManager requestManager) {
+            RequestManager requestManager) {
         this.blockchain = blockchain;
         this.blockstore = blockstore;
         this.syncManager = syncManager;
         this.queue = queue;
         this.pendingState = pendingState;
         this.tauListener = (CompositeTaucoinListener)tauListener;
-        this.requestQueue = requestQueue;
         this.requestManager = requestManager;
     }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+    
+    public void setRequestQueue(RequestQueue requestQueue) {
+        this.requestQueue = requestQueue;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        httpClient.activate(ctx);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        httpClient.deactivate(ctx);
+    }
+
 
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, Message msg) throws InterruptedException {
@@ -87,6 +110,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("Tau handling failed ", cause);
         ctx.close();
+        httpClient.deactivate(ctx);
     }
 
     private void processPoolTxsMessage(PoolTxsMessage msg) {

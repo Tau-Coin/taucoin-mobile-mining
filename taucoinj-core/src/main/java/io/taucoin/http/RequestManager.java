@@ -4,6 +4,7 @@ import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
 import io.taucoin.db.BlockStore;
 import io.taucoin.core.Blockchain;
+import io.taucoin.http.client.ClientsPool;
 import io.taucoin.http.discovery.PeersManager;
 import io.taucoin.http.message.Message;
 import io.taucoin.http.tau.message.*;
@@ -58,7 +59,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
 
     protected SyncQueue queue;
 
-    protected RequestQueue requestQueue;
+    protected ClientsPool clientsPool;
 
     protected ChainInfoManager chainInfoManager;
 
@@ -100,7 +101,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
 
     @Inject
     public RequestManager(Blockchain blockchain, BlockStore blockstore, TaucoinListener listener,
-            SyncManager syncManager, SyncQueue queue, RequestQueue requestQueue,
+            SyncManager syncManager, SyncQueue queue, ClientsPool clientsPool,
             ChainInfoManager chainInfoManager, PeersManager peersManager,
             ConnectionManager connectionManager) {
         this.blockchain = blockchain;
@@ -108,12 +109,12 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         this.listener = listener;
         this.syncManager = syncManager;
         this.queue = queue;
-        this.requestQueue = requestQueue;
+        this.clientsPool = clientsPool;
         this.chainInfoManager = chainInfoManager;
         this.peersManager = peersManager;
         this.connectionManager = connectionManager;
 
-        this.requestQueue.registerListener(this);
+        this.clientsPool.setRequestManager(this);
     }
 
     public void start() {
@@ -140,8 +141,6 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             }
         }, "NewTxDistributeThread");
         this.txDistributeThread.start();
-
-        requestQueue.activate();
     }
 
     public void stop() {
@@ -154,8 +153,6 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             txDistributeThread.interrupt();
             txDistributeThread = null;
         }
-
-        requestQueue.close();
     }
 
     public void changeSyncState(SyncStateEnum state) {
@@ -236,7 +233,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     private void startPullChainInfo() {
         if (connectionManager.isNetworkConnected()) {
             GetChainInfoMessage message = new GetChainInfoMessage();
-            requestQueue.sendMessage(message);
+            clientsPool.sendMessage(message);
         } else {
             logger.warn("network disconnected, change chaininfo retriving done");
             changeSyncState(DONE_CHAININFO_RETRIEVING);
@@ -354,7 +351,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         }
 
         GetHashesMessage msg = new GetHashesMessage(blockNumber, maxBlocksAsk, reverse);
-        requestQueue.sendMessage(msg);
+        clientsPool.sendMessage(msg);
     }
 
     private void processBlocksMessage(BlocksMessage msg) {
@@ -410,7 +407,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
 
         GetBlocksMessage msg = new GetBlocksMessage(start, sentNumbers.size(), false);
 
-        requestQueue.sendMessage(msg);
+        clientsPool.sendMessage(msg);
     }
 
     private List<Long> preprocessBlocksMessage(BlocksMessage msg) {
@@ -532,18 +529,18 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
     private void sendNewBlock(Block block) {
         NewBlockMessage message = new NewBlockMessage(block.getNumber(),
                 block.getCumulativeDifficulty(), block);
-        requestQueue.sendMessage(message);
+        clientsPool.sendMessage(message);
     }
 
     private void sendNewTransaction(Transaction tx) {
         NewTxMessage message = new NewTxMessage(tx);
-        requestQueue.sendMessage(message);
+        clientsPool.sendMessage(message);
     }
 
     public void startPullPoolTxs(long max, long minFee) {
         if (connectionManager.isNetworkConnected()) {
             GetPoolTxsMessage message = new GetPoolTxsMessage(max, minFee);
-            requestQueue.sendMessage(message);
+            clientsPool.sendMessage(message);
         } else {
             logger.warn("network disconnected, discard pool tx sync");
             return;

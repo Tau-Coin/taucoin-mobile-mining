@@ -1,6 +1,7 @@
 package io.taucoin.http.client;
 
 import io.taucoin.http.RequestManager;
+import io.taucoin.http.RequestQueue;
 import io.taucoin.http.tau.codec.TauMessageCodec;
 import io.taucoin.http.tau.handler.TauHandler;
 
@@ -22,6 +23,8 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
     private RequestManager requestManager;
     private Provider<TauMessageCodec> messageCodecProvider;
     private Provider<TauHandler> handlerProvider;
+    private HttpClient httpClient;
+    private RequestQueue requestQueue;
 
     @Inject
     public HttpClientInitializer(RequestManager requestManager,
@@ -30,6 +33,14 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         this.requestManager = requestManager;
         this.messageCodecProvider = messageCodecProvider;
         this.handlerProvider = handlerProvider;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public void setRequestQueue(RequestQueue requestQueue) {
+        this.requestQueue = requestQueue;
     }
 
     @Override
@@ -43,7 +54,10 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         //p.addLast(new HttpContentDecompressor());
 
         p.addLast(this.messageCodecProvider.get());
-        p.addLast(this.handlerProvider.get());
+        TauHandler handler = handlerProvider.get();
+        handler.setHttpClient(httpClient);
+        handler.setRequestQueue(requestQueue);
+        p.addLast(handler);
         p.addLast(this.requestManager);
     }
 }

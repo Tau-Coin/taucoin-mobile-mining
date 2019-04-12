@@ -1,5 +1,9 @@
 package io.taucoin.http.client;
 
+import io.taucoin.http.message.Message;
+import io.taucoin.http.RequestManager;
+import io.taucoin.http.RequestQueue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,33 +21,41 @@ public class ClientsPool {
 
     private final static Logger logger = LoggerFactory.getLogger("http");
 
-    private Provider<HttpClient> provider;
+    private Provider<HttpClient> clientProvider;
+    private Provider<RequestQueue> queueProvider;
+    private RequestManager requestManager;
 
     private List<HttpClient> pool = Collections.synchronizedList(new ArrayList<HttpClient>());
     private AtomicInteger index = new AtomicInteger(0);
 
+    private HttpClient mainHttpClient;
+
     @Inject
-    public ClientsPool(Provider<HttpClient> provider) {
-        this.provider = provider;
+    public ClientsPool(Provider<HttpClient> clientProvider,
+            Provider<RequestQueue> queueProvider) {
+        this.clientProvider = clientProvider;
+        this.queueProvider = queueProvider;
+    }
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
         init();
     }
 
     private void init() {
         int n = CONFIG.httpClientPoolSize();
         for (int i = 0; i < n; i++) {
-            pool.add(this.provider.get());
+            RequestQueue queue = queueProvider.get();
+            queue.registerListener(requestManager);
+            HttpClient client = clientProvider.get();
+            client.setRequestQueue(queue);
+            pool.add(client);
         }
+
+        mainHttpClient = pool.get(0);
     }
 
-    // Retrive next idle client
-    public synchronized HttpClient next() {
-        while (true) {
-            if (pool.get(index.get()).compareAndSetIdle(true, false)) {
-                logger.debug("{}th client hit", index.get());
-                return pool.get(index.get());
-            } else {
-                index.set(index.addAndGet(1) % pool.size());
-            }
-        }
+    public synchronized void sendMessage(Message message) {
+        mainHttpClient.sendRequest(message);
     }
 }

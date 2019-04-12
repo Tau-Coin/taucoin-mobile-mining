@@ -4,11 +4,14 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.http.discovery.PeersManager;
 import io.taucoin.http.message.Message;
+import io.taucoin.http.RequestQueue;
 import io.taucoin.net.rlpx.Node;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.DefaultMessageSizeEstimator;
 import io.netty.channel.EventLoopGroup;
@@ -20,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
@@ -37,21 +40,22 @@ public class HttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    PeersManager peersManager;
+    private boolean inited = false;
 
-    TaucoinListener listener;
+    private PeersManager peersManager;
 
-    Provider<HttpClientInitializer> provider;
+    private TaucoinListener listener;
 
-    private AtomicBoolean isIdle = new AtomicBoolean(true);
+    private Provider<HttpClientInitializer> provider;
 
-    @Inject
-    public HttpClient(TaucoinListener listener, Provider<HttpClientInitializer> provider,
-            PeersManager peersManager) {
-        this.listener = listener;
-        this.provider = provider;
-        this.peersManager = peersManager;
-    }
+    private RequestQueue requestQueue;
+
+    private Node peer = null;
+    private Bootstrap bootstrap = null;
+    private HttpClientInitializer httpInitializer = null;
+    private Channel channel = null;
+    private AtomicBoolean isConnected = new AtomicBoolean(false);
+    private AtomicBoolean isConnecting = new AtomicBoolean(false);
 
     private static EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
         AtomicInteger cnt = new AtomicInteger(0);
@@ -61,62 +65,144 @@ public class HttpClient {
         }
     });
 
-    public boolean isIdle() {
-        return this.isIdle.get();
+    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+        private AtomicInteger cnt = new AtomicInteger(0);
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "ConnectTimer-" + cnt.getAndIncrement());
+        }
+    });
+    private ScheduledFuture<?> timerTask;
+
+    @Inject
+    public HttpClient(TaucoinListener listener, Provider<HttpClientInitializer> provider,
+            PeersManager peersManager) {
+        this.listener = listener;
+        this.provider = provider;
+        this.peersManager = peersManager;
     }
 
-    public boolean compareAndSetIdle(boolean expect, boolean update) {
-        return this.isIdle.compareAndSet(expect, update);
+    private void init() {
+        peer = peersManager.getRandomPeer();
+        httpInitializer = provider.get();
+        httpInitializer.setHttpClient(this);
+        httpInitializer.setRequestQueue(requestQueue);
+        bootstrap = new Bootstrap();
+        bootstrap.group(workerGroup);
+        bootstrap.channel(NioSocketChannel.class);
+
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+        bootstrap.option(ChannelOption.SO_REUSEADDR, true);
+        bootstrap.option(ChannelOption.TCP_NODELAY, true);
+        bootstrap.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
+        bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
+        bootstrap.remoteAddress(peer.getHost(), peer.getPort());
+        bootstrap.handler(httpInitializer);
     }
 
-    public boolean sendRequest(Message message) {
-        listener.trace("Send request: " + message.toString());
+    public void setRequestQueue(RequestQueue requestQueue) {
+        this.requestQueue = requestQueue;
+    }
 
-        HttpClientInitializer httpInitializer = provider.get();
-        Node peer = peersManager.getRandomPeer();
-
-        logger.info("Send request {} to {}:{}", message, peer.getHost(), peer.getPort());
-
-        // Make the connection attempt.
-        try {
-            ChannelFuture f = connectAsync(httpInitializer, peer);
-            f.sync();
-            // Send the message.
-            f.channel().writeAndFlush(message);
-            // Wait for the server to close the connection.
-            f.channel().closeFuture().sync();
-            f.channel().close();
-            f.channel().deregister();
-            logger.info("{}:{} disconnected", peer.getHost(), peer.getPort());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            logger.error("Sending message exception {}", e);
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Sending message exception {}", e);
-            return false;
-        } finally {
-            this.isIdle.set(true);
+    public void sendRequest(Message message) {
+        if (!inited) {
+            inited = true;
+            init();
         }
 
-        return true;
+        requestQueue.sendMessage(message);
+        tryConnect();
     }
 
-    public ChannelFuture connectAsync(HttpClientInitializer httpInitializer, Node peer) {
+    public void tryConnect() {
+        if (isConnected.get() || isConnecting.get()) {
+            logger.info("Peer {} is still alive", channel);
+            return;
+        }
 
-        Bootstrap b = new Bootstrap();
-        b.group(workerGroup);
-        b.channel(NioSocketChannel.class);
-
-        b.option(ChannelOption.SO_KEEPALIVE, true);
-        b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
-        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
-        b.remoteAddress(peer.getHost(), peer.getPort());
-
-        b.handler(httpInitializer);
-
-        // Start the client.
-        return b.connect();
+        isConnecting.set(true);
+        // schedule connect task
+        scheduleConnect(100);
     }
+
+    public void activate(ChannelHandlerContext ctx) {
+        isConnected.set(true);
+        isConnecting.set(false);
+        requestQueue.activate(ctx);
+        channel = ctx.channel();
+        logger.info("Peer {} connected", channel);
+    }
+
+    public void deactivate(ChannelHandlerContext ctx) {
+        isConnected.set(false);
+        isConnecting.set(false);
+        requestQueue.close();
+        logger.info("Peer {} disconnected", ctx.channel());
+        channel = null;
+
+        // schedule reconnect task
+        if (requestQueue.size() > 0) {
+            scheduleConnect(100);
+        }
+    }
+
+    private void doConnect() {
+        try {
+            ChannelFuture f = bootstrap.connect();
+            f.sync();
+
+            // Wait until the connection is closed.
+            f.channel().closeFuture().sync();
+
+            logger.debug("Connection is closed");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Connect exception {} ", e);
+        }
+    }
+
+    private void scheduleConnect(long millis) {
+        timerTask = timer.schedule(new Runnable() {
+            public void run() {
+                try {
+                    doConnect();
+                } catch (Throwable t) {
+                    logger.error("Unhandled exception", t);
+                }
+            }
+        }, millis, TimeUnit.MILLISECONDS);
+    }
+
+    /*
+    public static class ConnectChannelFutureListener implements ChannelFutureListener {
+        HttpClient client;
+        private Message message;
+        private int reconnectTimes = 0;
+
+        public ConnectChannelFutureListener(HttpClient client, Message message) {
+            this.client = client;
+            this.message = message;
+        }
+
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+            Channel channel = future.channel();
+            if (future.isSuccess()) {
+                logger.info("Connect sucess {}", channel);
+                channel.writeAndFlush(message);
+                client.compareAndSetIdle(false, true);
+            } else {
+                channel.close();
+                if (reconnectTimes <= 3) {
+                    logger.info("Connect fail, try again");
+                    reconnectTimes++;
+                    client.doConnect().addListener(this);
+                } else {
+                    logger.info("No need to reconnect");
+                    client.compareAndSetIdle(false, true);
+                }
+            }
+        }
+    }
+    */
 }

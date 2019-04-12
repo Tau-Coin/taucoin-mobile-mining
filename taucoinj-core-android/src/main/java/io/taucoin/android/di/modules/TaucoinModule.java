@@ -260,24 +260,23 @@ public class TaucoinModule {
     @Singleton
     RequestManager provideRequestManager(Blockchain blockchain,
             BlockStore blockstore, TaucoinListener listener,
-            SyncManager syncManager, SyncQueue queue, RequestQueue requestQueue,
+            SyncManager syncManager, SyncQueue queue, ClientsPool clientsPool,
             ChainInfoManager chainInfoManager, PeersManager peersManager,
             ConnectionManager connectionManager) {
         return new RequestManager(blockchain, blockstore, listener, syncManager,
-                queue, requestQueue, chainInfoManager, peersManager, connectionManager);
+                queue, clientsPool, chainInfoManager, peersManager, connectionManager);
+    }
+
+    @Provides
+    RequestQueue provideRequestQueue(TaucoinListener listener) {
+        return new RequestQueue(listener);
     }
 
     @Provides
     @Singleton
-    RequestQueue provideRequestQueue(TaucoinListener listener,
-            ClientsPool clientsPool) {
-        return new RequestQueue(listener, clientsPool);
-    }
-
-    @Provides
-    @Singleton
-    ClientsPool provideClientsPool(Provider<HttpClient> provider) {
-        return new ClientsPool(provider);
+    ClientsPool provideClientsPool(Provider<HttpClient> clientProvider,
+            Provider<RequestQueue> queueProvider) {
+        return new ClientsPool(clientProvider, queueProvider);
     }
 
     @Provides
@@ -303,10 +302,9 @@ public class TaucoinModule {
     @Provides
     TauHandler provideTauHandler(Blockchain blockchain, BlockStore blockstore,
             SyncManager syncManager, SyncQueue queue, PendingState pendingState,
-            TaucoinListener tauListener, RequestQueue requestQueue,
-            RequestManager requestManager) {
+            TaucoinListener tauListener, RequestManager requestManager) {
         return new TauHandler(blockchain, blockstore, syncManager, queue, pendingState,
-                tauListener, requestQueue, requestManager);
+                tauListener, requestManager);
     }
 
     @Provides
