@@ -111,7 +111,7 @@ dependencies {
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile "io.netty:netty-all:4.0.30.Final"
+    compile "io.netty:netty-all:4.1.34.Final"
     compile "com.madgag.spongycastle:core:${scastleVersion}" // for SHA3 and SECP256K1
     compile "com.madgag.spongycastle:prov:${scastleVersion}" // for SHA3 and SECP256K1
 

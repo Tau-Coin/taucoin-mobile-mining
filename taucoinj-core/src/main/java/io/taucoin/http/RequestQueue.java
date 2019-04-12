@@ -76,7 +76,7 @@ public class RequestQueue {
                     logger.error("Unhandled exception ", t);
                 }
             }
-        }, 100, 100, TimeUnit.MILLISECONDS);
+        }, 250, 250, TimeUnit.MILLISECONDS);
     }
 
     public void sendMessage(Message msg) {

@@ -53,7 +53,7 @@ public class HttpClient {
         this.peersManager = peersManager;
     }
 
-    private EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
+    private static EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
         AtomicInteger cnt = new AtomicInteger(0);
         @Override
         public Thread newThread(Runnable r) {
@@ -77,21 +77,16 @@ public class HttpClient {
 
         logger.info("Send request {} to {}:{}", message, peer.getHost(), peer.getPort());
 
-        Bootstrap b = new Bootstrap();
-        b.group(workerGroup)
-         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.httpConnectionTimeout())
-         .option(ChannelOption.SO_KEEPALIVE, true)
-         .channel(NioSocketChannel.class)
-         .handler(httpInitializer);
-
         // Make the connection attempt.
         try {
-            Channel ch = b.connect(peer.getHost(), peer.getPort()).sync().channel();
+            ChannelFuture f = connectAsync(httpInitializer, peer);
+            f.sync();
             // Send the message.
-            //Thread.sleep(2000);
-            ch.writeAndFlush(message);
+            f.channel().writeAndFlush(message);
             // Wait for the server to close the connection.
-            ch.closeFuture().sync();
+            f.channel().closeFuture().sync();
+            f.channel().close();
+            f.channel().deregister();
             logger.info("{}:{} disconnected", peer.getHost(), peer.getPort());
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -106,5 +101,22 @@ public class HttpClient {
         }
 
         return true;
+    }
+
+    public ChannelFuture connectAsync(HttpClientInitializer httpInitializer, Node peer) {
+
+        Bootstrap b = new Bootstrap();
+        b.group(workerGroup);
+        b.channel(NioSocketChannel.class);
+
+        b.option(ChannelOption.SO_KEEPALIVE, true);
+        b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
+        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
+        b.remoteAddress(peer.getHost(), peer.getPort());
+
+        b.handler(httpInitializer);
+
+        // Start the client.
+        return b.connect();
     }
 }
