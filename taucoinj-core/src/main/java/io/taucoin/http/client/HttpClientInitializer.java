@@ -20,17 +20,14 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    private RequestManager requestManager;
     private Provider<TauMessageCodec> messageCodecProvider;
     private Provider<TauHandler> handlerProvider;
     private HttpClient httpClient;
     private RequestQueue requestQueue;
 
     @Inject
-    public HttpClientInitializer(RequestManager requestManager,
-            Provider<TauMessageCodec> messageCodecProvider,
+    public HttpClientInitializer(Provider<TauMessageCodec> messageCodecProvider,
             Provider<TauHandler> handlerProvider) {
-        this.requestManager = requestManager;
         this.messageCodecProvider = messageCodecProvider;
         this.handlerProvider = handlerProvider;
     }
@@ -58,6 +55,5 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         handler.setHttpClient(httpClient);
         handler.setRequestQueue(requestQueue);
         p.addLast(handler);
-        p.addLast(this.requestManager);
     }
 }

@@ -44,8 +44,7 @@ import static java.lang.Math.min;
  *         GetBlocksMessage and so on.
  */
 @Singleton
-public class RequestManager extends SimpleChannelInboundHandler<Message>
-        implements RequestQueue.MessageListener {
+public class RequestManager implements RequestQueue.MessageListener {
 
     protected static final Logger logger = LoggerFactory.getLogger("http");
 
@@ -208,8 +207,7 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
         }
     }
 
-    @Override
-    public void channelRead0(final ChannelHandlerContext ctx, Message msg) throws InterruptedException {
+    public synchronized void processMessage(Message msg) {
 
         listener.trace(String.format("RequestManager invoke: [%s]", msg.getClass()));
 
@@ -219,8 +217,6 @@ public class RequestManager extends SimpleChannelInboundHandler<Message>
             processHashesMessage((HashesMessage)msg);
         } else if (msg instanceof BlocksMessage) {
             processBlocksMessage((BlocksMessage)msg);
-        } else {
-            ctx.fireChannelRead(msg);
         }
     }
 

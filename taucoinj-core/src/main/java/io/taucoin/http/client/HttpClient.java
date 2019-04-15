@@ -40,6 +40,8 @@ public class HttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
+    public static final int RECONNECT_DELAY = 5;
+
     private boolean inited = false;
 
     private PeersManager peersManager;
@@ -51,7 +53,6 @@ public class HttpClient {
     private RequestQueue requestQueue;
 
     private Node peer = null;
-    private Bootstrap bootstrap = null;
     private HttpClientInitializer httpInitializer = null;
     private Channel channel = null;
     private AtomicBoolean isConnected = new AtomicBoolean(false);
@@ -81,24 +82,6 @@ public class HttpClient {
         this.peersManager = peersManager;
     }
 
-    private void init() {
-        peer = peersManager.getRandomPeer();
-        httpInitializer = provider.get();
-        httpInitializer.setHttpClient(this);
-        httpInitializer.setRequestQueue(requestQueue);
-        bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup);
-        bootstrap.channel(NioSocketChannel.class);
-
-        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-        bootstrap.option(ChannelOption.SO_REUSEADDR, true);
-        bootstrap.option(ChannelOption.TCP_NODELAY, true);
-        bootstrap.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
-        bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
-        bootstrap.remoteAddress(peer.getHost(), peer.getPort());
-        bootstrap.handler(httpInitializer);
-    }
-
     public void setRequestQueue(RequestQueue requestQueue) {
         this.requestQueue = requestQueue;
     }
@@ -106,11 +89,15 @@ public class HttpClient {
     public void sendRequest(Message message) {
         if (!inited) {
             inited = true;
-            init();
+            //init();
         }
 
         requestQueue.sendMessage(message);
         tryConnect();
+    }
+
+    public void setIsConnecting(boolean IsConnecting) {
+        isConnecting.set(IsConnecting);
     }
 
     public void tryConnect() {
@@ -121,7 +108,7 @@ public class HttpClient {
 
         isConnecting.set(true);
         // schedule connect task
-        scheduleConnect(100);
+        scheduleConnect(RECONNECT_DELAY * 1000);
     }
 
     public void activate(ChannelHandlerContext ctx) {
@@ -135,26 +122,18 @@ public class HttpClient {
     public void deactivate(ChannelHandlerContext ctx) {
         isConnected.set(false);
         isConnecting.set(false);
-        requestQueue.close();
+        requestQueue.deactivate();
         logger.info("Peer {} disconnected", ctx.channel());
         channel = null;
 
-        // schedule reconnect task
         if (requestQueue.size() > 0) {
-            scheduleConnect(100);
+            tryConnect();
         }
     }
 
     private void doConnect() {
         try {
-            ChannelFuture f = bootstrap.connect();
-            f.sync();
-
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
-
-            logger.debug("Connection is closed");
-
+            connect(configureBootstrap(new Bootstrap()));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Connect exception {} ", e);
@@ -173,36 +152,37 @@ public class HttpClient {
         }, millis, TimeUnit.MILLISECONDS);
     }
 
-    /*
-    public static class ConnectChannelFutureListener implements ChannelFutureListener {
-        HttpClient client;
-        private Message message;
-        private int reconnectTimes = 0;
+    private Bootstrap configureBootstrap(Bootstrap b) {
+        return configureBootstrap(b, workerGroup);
+    }
 
-        public ConnectChannelFutureListener(HttpClient client, Message message) {
-            this.client = client;
-            this.message = message;
-        }
+    public Bootstrap configureBootstrap(Bootstrap b, EventLoopGroup g) {
+        b.group(g);
+        b.channel(NioSocketChannel.class);
 
-        @Override
-        public void operationComplete(ChannelFuture future) throws Exception {
-            Channel channel = future.channel();
-            if (future.isSuccess()) {
-                logger.info("Connect sucess {}", channel);
-                channel.writeAndFlush(message);
-                client.compareAndSetIdle(false, true);
-            } else {
-                channel.close();
-                if (reconnectTimes <= 3) {
-                    logger.info("Connect fail, try again");
-                    reconnectTimes++;
-                    client.doConnect().addListener(this);
-                } else {
-                    logger.info("No need to reconnect");
-                    client.compareAndSetIdle(false, true);
+        b.option(ChannelOption.SO_KEEPALIVE, true);
+        b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT);
+        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONFIG.peerConnectionTimeout());
+        peer = peersManager.getRandomPeer();
+        httpInitializer = provider.get();
+        httpInitializer.setHttpClient(this);
+        httpInitializer.setRequestQueue(requestQueue);
+        logger.info("Config remote peer {}:{}", peer.getHost(), peer.getPort());
+        b.remoteAddress(peer.getHost(), peer.getPort());
+        b.handler(httpInitializer);
+
+        return b;
+    }
+
+    public void connect(Bootstrap b) {
+        b.connect().addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (future.cause() != null) {
+                    logger.error("Failed to connect: " + future.cause());
+                    future.cause().printStackTrace();
                 }
             }
-        }
+        });
     }
-    */
 }

@@ -4,6 +4,7 @@ import io.taucoin.http.client.ClientsPool;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.http.message.Message;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -121,6 +122,11 @@ public class RequestQueue {
     }
 
     private void nudgeQueue() {
+        if (this.ctx == null) {
+            logger.warn("channel deactived");
+            return;
+        }
+
         // remove timeout message
         removeTimeoutMessage(requestQueue.peek());
         // remove last answered message on the queue
@@ -150,9 +156,10 @@ public class RequestQueue {
         }
     }
 
-    public void close() {
+    public void deactivate() {
+        this.ctx = null;
         if (timerTask != null) {
-            timerTask.cancel(false);
+            timerTask.cancel(true);
         }
     }
 

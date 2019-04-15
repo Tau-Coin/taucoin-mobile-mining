@@ -287,10 +287,9 @@ public class TaucoinModule {
 
     @Provides
     HttpClientInitializer provideHttpClientInitializer(
-            RequestManager requestManager,
             Provider<TauMessageCodec> messageCodecProvider,
             Provider<TauHandler> handlerProvider) {
-        return new HttpClientInitializer(requestManager, messageCodecProvider,
+        return new HttpClientInitializer(messageCodecProvider,
                 handlerProvider);
     }
 

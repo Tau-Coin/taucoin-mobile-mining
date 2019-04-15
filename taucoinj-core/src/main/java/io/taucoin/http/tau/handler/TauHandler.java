@@ -17,7 +17,9 @@ import io.taucoin.sync2.SyncQueue;
 import io.taucoin.util.BIUtil;
 import io.taucoin.util.ByteUtil;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.sync2.SyncStateEnum.*;
@@ -74,7 +77,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
     public void setHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
-    
+
     public void setRequestQueue(RequestQueue requestQueue) {
         this.requestQueue = requestQueue;
     }
@@ -91,7 +94,6 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
         httpClient.deactivate(ctx);
     }
 
-
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, Message msg) throws InterruptedException {
 
@@ -102,7 +104,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
         if (msg instanceof PoolTxsMessage) {
             processPoolTxsMessage((PoolTxsMessage)msg);
         } else {
-            ctx.fireChannelRead(msg);
+            requestManager.processMessage(msg);
         }
     }
 
@@ -110,7 +112,6 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("Tau handling failed ", cause);
         ctx.close();
-        httpClient.deactivate(ctx);
     }
 
     private void processPoolTxsMessage(PoolTxsMessage msg) {

@@ -56,6 +56,6 @@ public class RequestRoundtrip {
     }
 
     public boolean isTimeout() {
-        return retryTimes >= 2 || failTimes >= 3;
+        return retryTimes >= 3 || failTimes >= 3;
     }
 }
