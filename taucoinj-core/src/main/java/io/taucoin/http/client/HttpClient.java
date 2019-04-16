@@ -42,8 +42,6 @@ public class HttpClient {
 
     public static final int RECONNECT_DELAY = 5;
 
-    private boolean inited = false;
-
     private PeersManager peersManager;
 
     private TaucoinListener listener;
@@ -87,11 +85,6 @@ public class HttpClient {
     }
 
     public void sendRequest(Message message) {
-        if (!inited) {
-            inited = true;
-            //init();
-        }
-
         requestQueue.sendMessage(message);
         tryConnect();
     }
