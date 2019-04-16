@@ -167,6 +167,7 @@ public class HttpClient {
         httpInitializer = provider.get();
         httpInitializer.setHttpClient(this);
         httpInitializer.setRequestQueue(requestQueue);
+        httpInitializer.setHost(peer.getHost());
         logger.info("Config remote peer {}:{}", peer.getHost(), peer.getPort());
         b.remoteAddress(peer.getHost(), peer.getPort());
         b.handler(httpInitializer);
@@ -181,6 +182,9 @@ public class HttpClient {
                 if (future.cause() != null) {
                     logger.error("Failed to connect: " + future.cause());
                     future.cause().printStackTrace();
+
+                    setIsConnecting(false);
+                    tryConnect();
                 }
             }
         });

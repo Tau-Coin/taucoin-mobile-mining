@@ -45,9 +45,15 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
 
     private ByteArrayOutputStream contentsStream = new ByteArrayOutputStream();
 
+    private String host;
+
     @Inject
     public TauMessageCodec(TaucoinListener listener) {
         this.tauListener = listener;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
     @Override
@@ -107,6 +113,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
                     HttpVersion.HTTP_1_1, method, path);
         }
 
+        request.headers().set(HttpHeaders.Names.HOST, host);
         request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, "UTF-8");
         request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");

@@ -101,6 +101,7 @@ public class MessageFactory {
 
         String message = messageResp.getMessage();
         String payload = messageResp.getPayload();
+        logger.debug("deserialize message {} payload {}", message, payload);
         if (message == null || message.isEmpty() || payload == null
                 || payload.isEmpty() || Name2ClassMap.get(message) == null) {
             return null;
@@ -218,7 +219,7 @@ public class MessageFactory {
                 JsonNode messageNode = node.get("message");
                 String message = messageNode.asText();
                 JsonNode payloadNode = node.get("payload");
-                String payload = payloadNode.asText();
+                String payload = payloadNode.toString();
                 response.setMessage(message);
                 response.setPayload(payload);
 

@@ -24,6 +24,7 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
     private Provider<TauHandler> handlerProvider;
     private HttpClient httpClient;
     private RequestQueue requestQueue;
+    private String host;
 
     @Inject
     public HttpClientInitializer(Provider<TauMessageCodec> messageCodecProvider,
@@ -40,6 +41,10 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         this.requestQueue = requestQueue;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     @Override
     public void initChannel(SocketChannel ch) {
 
@@ -50,7 +55,9 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         // Remove the following line if you don't want automatic content decompression.
         //p.addLast(new HttpContentDecompressor());
 
-        p.addLast(this.messageCodecProvider.get());
+        TauMessageCodec codec = this.messageCodecProvider.get();
+        codec.setHost(host);
+        p.addLast(codec);
         TauHandler handler = handlerProvider.get();
         handler.setHttpClient(httpClient);
         handler.setRequestQueue(requestQueue);
