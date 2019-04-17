@@ -16,7 +16,7 @@ public class MessageEncodeResolver {
     private static Map<Class<?>, HttpMethod> Message2Method
             = new HashMap<Class<?>, HttpMethod>();
     static {
-        Message2Method.put(GetChainInfoMessage.class, HttpMethod.GET);
+        Message2Method.put(GetChainInfoMessage.class, HttpMethod.POST);
         Message2Method.put(GetHashesMessage.class, HttpMethod.POST);
         Message2Method.put(GetBlocksMessage.class, HttpMethod.POST);
         Message2Method.put(GetPoolTxsMessage.class, HttpMethod.POST);
