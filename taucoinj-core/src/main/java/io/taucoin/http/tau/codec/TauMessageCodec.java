@@ -72,7 +72,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         } else if (msg instanceof HttpContent) {
             HttpContent content = (HttpContent) msg;
 
-            logger.info("http content {}", content.content().toString(CharsetUtil.UTF_8));
+            logger.debug("http content part {}", content.content().toString(CharsetUtil.UTF_8));
 
             ByteBuf contents = content.content();
             contents.getBytes(0, contentsStream, contents.readableBytes());
@@ -80,9 +80,12 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
             if (content instanceof LastHttpContent) {
                 Message message;
                 try {
+                    logger.info("http response payload {}", contentsStream);
                     message = createMessage(contentsStream);
                 } catch (Exception e) {
                     throw new DecoderException("decode exception", e);
+                } finally {
+                    contentsStream.reset();
                 }
                 out.add(message);
             }
