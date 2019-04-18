@@ -367,7 +367,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     @Override
                     public void run() {
                         pendingState.processBest(block);
-                        blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                        if (block.getNumber() > config.getMutableRange()) {
+                            blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                        }
                     }
                 });
                 return IMPORTED_BEST;
@@ -390,7 +392,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                         @Override
                         public void run() {
                             pendingState.processBest(block);
-                            blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                            if (block.getNumber() > config.getMutableRange()) {
+                                blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                            }
                         }
                     });
                 }
