@@ -103,6 +103,7 @@ public class RequestQueue {
             if (waitingMessage.getAnswerMessage() != null
                     && msg.getClass() == waitingMessage.getAnswerMessage()) {
                 requestRoundtrip.answer();
+                requestQueue.remove();
                 logger.trace("Message round trip covered: [{}] ",
                         requestRoundtrip.getMsg().getClass());
             }

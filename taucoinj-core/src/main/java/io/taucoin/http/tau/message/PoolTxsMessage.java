@@ -103,8 +103,7 @@ public class PoolTxsMessage extends Message {
                 jsonGenerator.writeArrayFieldStart("txs");
                 for (Transaction tx : message.getTransactions()) {
                     jsonGenerator.writeString(
-                            new String(Base64.encode(tx.getEncoded()),
-                                    Charset.forName("UTF-8")));
+                            new String(Hex.toHexString(tx.getEncoded())));
                 }
                 jsonGenerator.writeEndArray();
 
@@ -150,7 +149,7 @@ public class PoolTxsMessage extends Message {
                 Iterator<JsonNode> it = txsNode.iterator();
                 while (it.hasNext()) {
                     txsList.add(new Transaction(
-                            Base64.decode(it.next().asText())));
+                            Hex.decode(it.next().asText())));
                 }
             } else {
                 logger.error("deserialize message erorr: not array json");

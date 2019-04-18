@@ -113,11 +113,10 @@ public class NewBlockMessage extends Message {
                 jsonGenerator.writeNumberField("number", message.getNumber());
                 jsonGenerator.writeStringField("previoushash",
                         Hex.toHexString(message.getPreviousBlockHash()));
-                jsonGenerator.writeStringField("totaldiffculty",
+                jsonGenerator.writeStringField("totaldifficulty",
                         message.getTotalDiff().toString(16));
                 jsonGenerator.writeStringField("block",
-                        new String(Base64.encode(message.getNewBlock().getEncodedMsg()),
-                                    Charset.forName("UTF-8")));
+                        new String(Hex.toHexString(message.getNewBlock().getEncodedMsg())));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -154,11 +153,11 @@ public class NewBlockMessage extends Message {
             message.setNumber(numberNode.asLong());
             JsonNode prevHashNode = node.get("previoushash");
             message.setPreviousBlockHash(Hex.decode(prevHashNode.asText()));
-            JsonNode totalDiffNode = node.get("totaldiffculty");
+            JsonNode totalDiffNode = node.get("totaldifficulty");
             message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
             JsonNode blockNode = node.get("block");
             message.setNewBlock(
-                    new Block(Base64.decode(blockNode.asText()), true));
+                    new Block(Hex.decode(blockNode.asText()), true));
 
             return message;
         }

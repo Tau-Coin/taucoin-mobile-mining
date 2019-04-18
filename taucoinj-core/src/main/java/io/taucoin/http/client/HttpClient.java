@@ -40,7 +40,7 @@ public class HttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    public static final int RECONNECT_DELAY = 5;
+    public static final int RECONNECT_DELAY = 2;
 
     private PeersManager peersManager;
 

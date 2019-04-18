@@ -115,7 +115,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         }
 
         request.headers().set(HttpHeaders.Names.HOST, host);
-        request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+        request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, "UTF-8");
         request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         //request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");

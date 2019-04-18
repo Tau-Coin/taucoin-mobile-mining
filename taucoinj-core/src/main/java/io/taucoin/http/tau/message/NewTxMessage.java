@@ -72,8 +72,7 @@ public class NewTxMessage extends Message {
             try {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("transaction",
-                        new String(Base64.encode(message.getNewTransaction().getEncoded()),
-                                    Charset.forName("UTF-8")));
+                        new String(Hex.toHexString(message.getNewTransaction().getEncoded())));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -107,7 +106,7 @@ public class NewTxMessage extends Message {
             }
 
             JsonNode txNode = node.get("transaction");
-            message.setNewTransaction(new Transaction(Base64.decode(txNode.asText())));
+            message.setNewTransaction(new Transaction(Hex.decode(txNode.asText())));
 
             return message;
         }

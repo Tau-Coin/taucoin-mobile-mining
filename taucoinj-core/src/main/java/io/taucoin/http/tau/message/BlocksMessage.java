@@ -117,8 +117,7 @@ public class BlocksMessage extends Message {
                 jsonGenerator.writeArrayFieldStart("blocks");
                 for (Block block : message.getBlocks()) {
                     jsonGenerator.writeString(
-                            new String(Base64.encode(block.getEncodedMsg()),
-                                    Charset.forName("UTF-8")));
+                            new String(Hex.toHexString(block.getEncodedMsg())));
                 }
                 jsonGenerator.writeEndArray();
 
@@ -165,7 +164,7 @@ public class BlocksMessage extends Message {
                 Iterator<JsonNode> it = blocksNode.iterator();
                 while (it.hasNext()) {
                     blocksList.add(new Block(
-                            Base64.decode(it.next().asText()), true));
+                            Hex.decode(it.next().asText()), true));
                 }
             } else {
                 logger.error("deserialize message erorr: not array json");

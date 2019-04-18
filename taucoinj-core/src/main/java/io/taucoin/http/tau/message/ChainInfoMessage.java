@@ -100,7 +100,8 @@ public class ChainInfoMessage extends Message {
         payload.append("\nChainInfoMessage[\n");
         payload.append("\tgenesisHash:" + Hex.toHexString(genesisHash) + ",\n");
         payload.append("\theight:" + height + ",\n");
-        payload.append("\tpreviousBlockHash:" + Hex.toHexString(previousBlockHash) + ",\n");
+        payload.append("\tpreviousBlockHash:" +
+                (previousBlockHash == null ? "null" : Hex.toHexString(previousBlockHash)) + ",\n");
         payload.append("\tcurrentBlockHash:" + Hex.toHexString(currentBlockHash) + ",\n");
         payload.append("\ttotalDiff:" + totalDiff.toString(16) + "\n");
         payload.append("]\n");
@@ -129,7 +130,7 @@ public class ChainInfoMessage extends Message {
                         Hex.toHexString(message.getPreviousBlockHash()));
                 jsonGenerator.writeStringField("currenthash",
                         Hex.toHexString(message.getCurrentBlockHash()));
-                jsonGenerator.writeStringField("totaldiffculty",
+                jsonGenerator.writeStringField("totaldifficulty",
                         message.getTotalDiff().toString(16));
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -169,11 +170,24 @@ public class ChainInfoMessage extends Message {
             JsonNode heightNode = node.get("totalheight");
             message.setHeight(heightNode.asLong());
             JsonNode previousHashNode = node.get("previoushash");
-            message.setPreviousBlockHash(Hex.decode(previousHashNode.asText()));
+            String previousHash = null;
+            if (previousHashNode != null) {
+                previousHash = previousHashNode.asText();
+            }
+            if (previousHash == null || previousHash.isEmpty()) {
+                message.setPreviousBlockHash(null);
+            } else {
+                message.setPreviousBlockHash(Hex.decode(previousHash));
+            }
             JsonNode blockHashNode = node.get("currenthash");
             message.setCurrentBlockHash(Hex.decode(blockHashNode.asText()));
-            JsonNode totalDiffNode = node.get("totaldiffculty");
-            message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
+            JsonNode totalDiffNode = node.get("totaldifficulty");
+            String totalDiff = totalDiffNode.asText();
+            if ("0".equals(totalDiff)) {
+                message.setTotalDiff(BigInteger.ZERO);
+            } else {
+                message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiff)));
+            }
 
             return message;
         }
