@@ -72,7 +72,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         } else if (msg instanceof HttpContent) {
             HttpContent content = (HttpContent) msg;
 
-            logger.debug("http content {}", content.content().toString(CharsetUtil.UTF_8));
+            logger.info("http content {}", content.content().toString(CharsetUtil.UTF_8));
 
             ByteBuf contents = content.content();
             contents.getBytes(0, contentsStream, contents.readableBytes());
@@ -101,6 +101,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         }
 
         String jsonPayload = msg.toJsonString();
+        logger.info("Send request {}", jsonPayload);
         HttpRequest request;
         if (jsonPayload != null) {
             byte[] bytes = jsonPayload.getBytes();
@@ -117,6 +118,10 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, "UTF-8");
         request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
+        //request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
+        if (jsonPayload != null) {
+            request.headers().set(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(jsonPayload.length()));
+        }
 
         out.add(request);
     }

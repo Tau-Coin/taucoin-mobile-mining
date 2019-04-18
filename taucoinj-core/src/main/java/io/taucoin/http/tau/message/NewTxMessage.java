@@ -50,7 +50,7 @@ public class NewTxMessage extends Message {
     @Override
     public String toString() {
         StringBuilder payload = new StringBuilder();
-        payload.append("\nPoolTxsMessage[\n");
+        payload.append("\nNewTxMessage[\n");
         payload.append("\tnewTx:" + Hex.toHexString(newTx.getHash()) + "\n");
         payload.append("]\n");
         return payload.toString();
