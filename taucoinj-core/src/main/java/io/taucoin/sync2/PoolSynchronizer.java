@@ -1,6 +1,7 @@
 package io.taucoin.sync2;
 
 import io.taucoin.core.Block;
+import io.taucoin.core.PendingState;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.forge.ForgerListener;
@@ -25,7 +26,7 @@ public class PoolSynchronizer implements ForgerListener {
     private static final long PullPoolTxsAmount = CONFIG.pullPoolTxsAmount();
     private static final long PullPoolTxsMinFee = CONFIG.pullPoolTxsMinFee();
 
-    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(4, new ThreadFactory() {
         private AtomicInteger cnt = new AtomicInteger(0);
         public Thread newThread(Runnable r) {
             return new Thread(r, "PoolSyncTimer-" + cnt.getAndIncrement());
@@ -34,14 +35,20 @@ public class PoolSynchronizer implements ForgerListener {
 
     BlockForger blockForger;
 
+    PendingState pendingState;
+
     RequestManager requestManager;
 
     private ScheduledFuture<?> timerTask = null;
 
     private Runnable task = new Runnable() {
         public void run() {
+            long requestAmount = PullPoolTxsAmount - (long)pendingState.size();
+            if (requestAmount <= 0) {
+                return;
+            }
             try {
-                requestManager.startPullPoolTxs(PullPoolTxsAmount, PullPoolTxsMinFee);
+                requestManager.startPullPoolTxs(requestAmount, PullPoolTxsMinFee);
             } catch (Throwable t) {
                 logger.error("Unhandled exception ", t);
             }
@@ -49,9 +56,10 @@ public class PoolSynchronizer implements ForgerListener {
     };
 
     @Inject
-    public PoolSynchronizer(BlockForger blockForger) {
+    public PoolSynchronizer(BlockForger blockForger, PendingState pendingState) {
         this.blockForger = blockForger;
         this.blockForger.addListener(this);
+        this.pendingState = pendingState;
     }
 
     public void setRequestManager(RequestManager requestManager) {

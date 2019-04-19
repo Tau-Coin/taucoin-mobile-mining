@@ -398,4 +398,8 @@ public class PendingStateImpl implements PendingState {
         isSyncdone = true;
     }
 
+    @Override
+    public int size() {
+        return wireTransactions.size() + pendingStateTransactions.size();
+    }
 }

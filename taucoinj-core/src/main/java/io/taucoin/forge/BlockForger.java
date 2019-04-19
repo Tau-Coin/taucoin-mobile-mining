@@ -224,6 +224,9 @@ public class BlockForger {
                     return false;
                 }
             }
+        } else {
+            logger.info("Forged time has lapsed");
+            fireNextBlockForgedInternal(0);
         }
 
         if (stopForge) {

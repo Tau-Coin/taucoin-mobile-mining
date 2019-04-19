@@ -278,7 +278,7 @@ public class RequestManager implements RequestQueue.MessageListener {
         logger.debug("Start looking for common ancestor, height {}, hash {}",
                 bestNumber, Hex.toHexString(bestHash));
 
-        if (chainInfoManager.getHeight() == bestNumber + 1
+        if (chainInfoManager.getHeight() == bestNumber
                 && Utils.hashEquals(chainInfoManager.getPreviousBlockHash(), bestHash)) {
             commonAncestorFound = true;
             pushBlockNumbers(bestNumber + 1);

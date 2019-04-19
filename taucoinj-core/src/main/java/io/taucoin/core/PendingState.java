@@ -54,4 +54,9 @@ public interface PendingState extends io.taucoin.facade.PendingState{
      * Fires inner logic related to main sync done event
      */
     void onSyncDone();
+
+    /**
+     * Return pending state transactions amount.
+     */
+    int size();
 }
