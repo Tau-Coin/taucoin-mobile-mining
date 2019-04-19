@@ -6,6 +6,9 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.forge.ForgerListener;
 import io.taucoin.http.RequestManager;
+import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.listener.TaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,19 @@ public class PoolSynchronizer implements ForgerListener {
 
     RequestManager requestManager;
 
+    TaucoinListener tauListener;
+
+    private Block bestBlock;
+    private long averageFee = PullPoolTxsMinFee;
+    private TaucoinListener newBlockListener = new TaucoinListenerAdapter() {
+        @Override
+        public void onBlockConnected(Block block) {
+            bestBlock = block;
+            averageFee =
+                   bestBlock.getCumulativeFee().longValue() / (bestBlock.getNumber() + 1);
+        }
+    };
+
     private ScheduledFuture<?> timerTask = null;
 
     private Runnable task = new Runnable() {
@@ -48,7 +64,7 @@ public class PoolSynchronizer implements ForgerListener {
                 return;
             }
             try {
-                requestManager.startPullPoolTxs(requestAmount, PullPoolTxsMinFee);
+                requestManager.startPullPoolTxs(requestAmount, averageFee);
             } catch (Throwable t) {
                 logger.error("Unhandled exception ", t);
             }
@@ -56,7 +72,10 @@ public class PoolSynchronizer implements ForgerListener {
     };
 
     @Inject
-    public PoolSynchronizer(BlockForger blockForger, PendingState pendingState) {
+    public PoolSynchronizer(TaucoinListener listener,
+            BlockForger blockForger, PendingState pendingState) {
+        this.tauListener = listener;
+        ((CompositeTaucoinListener)this.tauListener).addListener(newBlockListener);
         this.blockForger = blockForger;
         this.blockForger.addListener(this);
         this.pendingState = pendingState;

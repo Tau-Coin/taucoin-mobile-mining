@@ -327,8 +327,9 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    PoolSynchronizer providePoolSynchronizer(BlockForger blockForger, PendingState pendingState) {
-        return new PoolSynchronizer(blockForger, pendingState);
+    PoolSynchronizer providePoolSynchronizer(TaucoinListener listener,
+            BlockForger blockForger, PendingState pendingState) {
+        return new PoolSynchronizer(listener, blockForger, pendingState);
     }
 
     public static void close() {
