@@ -183,11 +183,7 @@ public class ChainInfoMessage extends Message {
             message.setCurrentBlockHash(Hex.decode(blockHashNode.asText()));
             JsonNode totalDiffNode = node.get("totaldifficulty");
             String totalDiff = totalDiffNode.asText();
-            if ("0".equals(totalDiff)) {
-                message.setTotalDiff(BigInteger.ZERO);
-            } else {
-                message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiff)));
-            }
+            message.setTotalDiff(new BigInteger(totalDiff, 16).abs());
 
             return message;
         }

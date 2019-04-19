@@ -97,10 +97,10 @@ public class TaucoinModule {
     @Singleton
     WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet,
             BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager, PendingState pendingState,
-            RequestManager requestManager) {
+            RequestManager requestManager, PoolSynchronizer poolSynchronizer) {
 
         return new WorldManager(listener, blockchain, repository, wallet, blockStore, adminInfo, syncManager,
-                pendingState, requestManager);
+                pendingState, requestManager, poolSynchronizer);
     }
 
     @Provides

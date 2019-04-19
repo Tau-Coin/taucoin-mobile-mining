@@ -10,6 +10,7 @@ import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.sync2.SyncManager;
+import io.taucoin.sync2.PoolSynchronizer;
 import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,8 @@ public class WorldManager {
 
     private RequestManager requestManager;
 
+    private PoolSynchronizer poolSynchronizer;
+
     private volatile boolean isSyncRunning = false;
 
     SystemProperties config = SystemProperties.CONFIG;
@@ -63,7 +66,7 @@ public class WorldManager {
     @Inject
     public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
                         , BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager
-                        , PendingState pendingState, RequestManager requestManager) {
+                        , PendingState pendingState, RequestManager requestManager, PoolSynchronizer poolSynchronizer) {
         logger.info("World manager instantiated");
         this.listener = listener;
         this.blockchain = blockchain;
@@ -74,7 +77,9 @@ public class WorldManager {
         this.syncManager = syncManager;
         this.pendingState = pendingState;
         this.requestManager = requestManager;
+        this.poolSynchronizer = poolSynchronizer;
         this.syncManager.setRequestManager(requestManager);
+        this.poolSynchronizer.setRequestManager(requestManager);
     }
 
     public void init() {
@@ -121,6 +126,7 @@ public class WorldManager {
 
         syncManager.stop();
         requestManager.stop();
+        poolSynchronizer.close();
     }
 
     public TaucoinListener getListener() {

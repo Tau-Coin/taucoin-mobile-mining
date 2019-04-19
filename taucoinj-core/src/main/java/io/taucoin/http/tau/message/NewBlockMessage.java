@@ -154,7 +154,7 @@ public class NewBlockMessage extends Message {
             JsonNode prevHashNode = node.get("previoushash");
             message.setPreviousBlockHash(Hex.decode(prevHashNode.asText()));
             JsonNode totalDiffNode = node.get("totaldifficulty");
-            message.setTotalDiff(new BigInteger(1, Hex.decode(totalDiffNode.asText())));
+            message.setTotalDiff(new BigInteger(totalDiffNode.asText()).abs());
             JsonNode blockNode = node.get("block");
             message.setNewBlock(
                     new Block(Hex.decode(blockNode.asText()), true));
