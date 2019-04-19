@@ -366,7 +366,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        pendingState.processBest(block);
+                        //pendingState.processBest(block);
                         if (block.getNumber() > config.getMutableRange()) {
                             blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
                         }
@@ -391,7 +391,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     EventDispatchThread.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            pendingState.processBest(block);
+                            //pendingState.processBest(block);
                             if (block.getNumber() > config.getMutableRange()) {
                                 blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
                             }

@@ -1,7 +1,9 @@
 package io.taucoin.core;
 
 import io.taucoin.db.BlockStore;
+import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.util.FastByteComparisons;
 import io.taucoin.util.ByteUtil;
@@ -55,12 +57,25 @@ public class PendingStateImpl implements PendingState {
 
     private Block best = null;
 
+    private TaucoinListener ProcessBlockListener = new TaucoinListenerAdapter() {
+        @Override
+        public void onBlockConnected(final Block block) {
+            EventDispatchThread.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    processBest(block);
+                }
+            });
+        }
+    };
+
     public PendingStateImpl() {
     }
 
     @Inject
     public PendingStateImpl(TaucoinListener listener, Repository repository,BlockStore blockStore) {
         this.listener = listener;
+        ((CompositeTaucoinListener)this.listener).addListener(ProcessBlockListener);
         this.repository = repository;
         this.blockStore = blockStore;
     }
