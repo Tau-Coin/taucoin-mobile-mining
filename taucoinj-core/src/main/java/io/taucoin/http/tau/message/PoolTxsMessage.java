@@ -22,9 +22,6 @@ import java.util.Iterator;
 
 public class PoolTxsMessage extends Message {
 
-    // Min tx fee.
-    private long minFee;
-
     // List of Pool txs.
     private List<Transaction> listTxs = new ArrayList<Transaction>();
 
@@ -32,16 +29,7 @@ public class PoolTxsMessage extends Message {
     }
 
     public PoolTxsMessage(long minFee, List<Transaction> listTxs) {
-        this.minFee = minFee;
         this.listTxs.addAll(listTxs);
-    }
-
-    public long getMinFee() {
-        return minFee;
-    }
-
-    public void setMinFee(long minFee) {
-        this.minFee = minFee;
     }
 
     public List<Transaction> getTransactions() {
@@ -69,7 +57,6 @@ public class PoolTxsMessage extends Message {
     public String toString() {
         StringBuilder payload = new StringBuilder();
         payload.append("\nPoolTxsMessage[\n");
-        payload.append("\tminFee:" + minFee + ",\n");
 
         StringBuilder txsHashes = new StringBuilder();
         txsHashes.append("[");
@@ -98,7 +85,6 @@ public class PoolTxsMessage extends Message {
                 PoolTxsMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeNumberField("minfee", message.getMinFee());
 
                 jsonGenerator.writeArrayFieldStart("txs");
                 for (Transaction tx : message.getTransactions()) {
@@ -139,9 +125,6 @@ public class PoolTxsMessage extends Message {
                 logger.error("deserialize message erorr {}", e);
                 return null;
             }
-
-            JsonNode minfeeNode = node.get("minfee");
-            message.setMinFee(minfeeNode.asLong());
 
             JsonNode txsNode = node.get("txs");
             List<Transaction> txsList = new ArrayList<Transaction>();
