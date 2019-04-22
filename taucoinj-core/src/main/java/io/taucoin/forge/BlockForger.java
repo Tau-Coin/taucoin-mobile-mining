@@ -36,6 +36,8 @@ import static io.taucoin.config.SystemProperties.CONFIG;
 public class BlockForger {
     private static final Logger logger = LoggerFactory.getLogger("forge");
 
+    private static final long PULL_TX_POOL_TIMEOUT = 10000;
+
     private static ExecutorService executor = null;//Executors.newSingleThreadExecutor();
 
     private Repository repository;
@@ -74,6 +76,11 @@ public class BlockForger {
     private static final int TNO = 50;
 
     private long nextBlockForgedTimePoint = 0;
+
+    private Object pullTxPoolLock = new Object();
+
+    // Indicate whether pulling pool tx is successful or not.
+    private boolean txsGot = false;
 
     public void init() {
         listener.addListener(new TaucoinListenerAdapter() {
@@ -234,6 +241,18 @@ public class BlockForger {
             return false;
         }
 
+        try {
+            waitForPullTxPool();
+        } catch (InterruptedException e) {
+            logger.warn("Forging task is interrupted");
+            return false;
+        }
+
+        if (!txsGot) {
+            logger.warn("Pull pool tx timeout, retry again.");
+            return true;
+        }
+
         cumulativeDifficulty = ProofOfTransaction.
                 calculateCumulativeDifficulty(bestBlock.getCumulativeDifficulty(), baseTarget);
 
@@ -318,6 +337,20 @@ public class BlockForger {
     protected void fireNextBlockForgedInternal(long internal) {
         for (ForgerListener l : listeners) {
             l.nextBlockForgedInternal(internal);
+        }
+    }
+
+    private void waitForPullTxPool() throws InterruptedException{
+        synchronized(pullTxPoolLock) {
+            txsGot = false;
+            pullTxPoolLock.wait(PULL_TX_POOL_TIMEOUT);
+        }
+    }
+
+    public void notifyPullTxPoolFinished() {
+        synchronized(pullTxPoolLock) {
+            txsGot = true;
+            pullTxPoolLock.notify();
         }
     }
 

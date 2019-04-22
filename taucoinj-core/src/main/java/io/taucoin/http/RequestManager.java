@@ -533,9 +533,9 @@ public class RequestManager implements RequestQueue.MessageListener {
         clientsPool.sendMessage(message);
     }
 
-    public void startPullPoolTxs(long max, long minFee) {
+    public void startPullPoolTxs(long max) {
         if (connectionManager.isNetworkConnected()) {
-            GetPoolTxsMessage message = new GetPoolTxsMessage(max, minFee);
+            GetPoolTxsMessage message = new GetPoolTxsMessage(max);
             clientsPool.sendMessage(message);
         } else {
             logger.warn("network disconnected, discard pool tx sync");

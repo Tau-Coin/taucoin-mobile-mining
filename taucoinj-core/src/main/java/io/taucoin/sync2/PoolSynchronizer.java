@@ -1,6 +1,7 @@
 package io.taucoin.sync2;
 
 import io.taucoin.core.Block;
+import io.taucoin.core.Transaction;
 import io.taucoin.core.PendingState;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.forge.BlockForger;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -44,14 +46,11 @@ public class PoolSynchronizer implements ForgerListener {
 
     TaucoinListener tauListener;
 
-    private Block bestBlock;
-    private long averageFee = PullPoolTxsMinFee;
-    private TaucoinListener newBlockListener = new TaucoinListenerAdapter() {
+    private TaucoinListener txReceivedListener = new TaucoinListenerAdapter() {
         @Override
-        public void onBlockConnected(Block block) {
-            bestBlock = block;
-            averageFee =
-                   bestBlock.getCumulativeFee().longValue() / (bestBlock.getNumber() + 1);
+        public void onPendingTransactionsReceived(List<Transaction> transactions) {
+            logger.info("txs received");
+            blockForger.notifyPullTxPoolFinished();
         }
     };
 
@@ -64,7 +63,7 @@ public class PoolSynchronizer implements ForgerListener {
                 return;
             }
             try {
-                requestManager.startPullPoolTxs(requestAmount, averageFee);
+                requestManager.startPullPoolTxs(requestAmount);
             } catch (Throwable t) {
                 logger.error("Unhandled exception ", t);
             }
@@ -75,7 +74,7 @@ public class PoolSynchronizer implements ForgerListener {
     public PoolSynchronizer(TaucoinListener listener,
             BlockForger blockForger, PendingState pendingState) {
         this.tauListener = listener;
-        ((CompositeTaucoinListener)this.tauListener).addListener(newBlockListener);
+        ((CompositeTaucoinListener)this.tauListener).addListener(txReceivedListener);
         this.blockForger = blockForger;
         this.blockForger.addListener(this);
         this.pendingState = pendingState;
@@ -120,7 +119,7 @@ public class PoolSynchronizer implements ForgerListener {
             startTimerTask(10);
         } else {
             // Start a timer to pull pool txs
-            startTimerTask((internal - PullPoolTxsTime) * 1000);
+            startTimerTask(internal * 1000 - 500);
         }
     }
 

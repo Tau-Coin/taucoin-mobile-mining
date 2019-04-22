@@ -18,15 +18,11 @@ public class GetPoolTxsMessage extends Message {
     // Max amount of txs.
     private long max;
 
-    // Min tx fee.
-    private long minFee;
-
     public GetPoolTxsMessage() {
     }
 
-    public GetPoolTxsMessage(long max, long minFee) {
+    public GetPoolTxsMessage(long max) {
         this.max = max;
-        this.minFee = minFee;
     }
 
     public long getMax() {
@@ -35,14 +31,6 @@ public class GetPoolTxsMessage extends Message {
 
     public void setMax(long max) {
         this.max = max;
-    }
-
-    public long getMinFee() {
-        return minFee;
-    }
-
-    public void setMinFee(long minFee) {
-        this.minFee = minFee;
     }
 
     @Override
@@ -59,8 +47,7 @@ public class GetPoolTxsMessage extends Message {
     public String toString() {
         StringBuilder payload = new StringBuilder();
         payload.append("\nGetPoolTxsMessage[\n");
-        payload.append("\tmax:" + max + ",\n");
-        payload.append("\tminfee:" + minFee + "\n");
+        payload.append("\tmax:" + max + "\n");
         payload.append("]\n");
         return payload.toString();
     }
@@ -81,7 +68,6 @@ public class GetPoolTxsMessage extends Message {
             try {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeNumberField("amount", message.getMax());
-                jsonGenerator.writeNumberField("minfee", message.getMinFee());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -116,8 +102,6 @@ public class GetPoolTxsMessage extends Message {
 
             JsonNode maxNode = node.get("amount");
             message.setMax(maxNode.asLong());
-            JsonNode minFeeNode = node.get("minfee");
-            message.setMinFee(minFeeNode.asLong());
 
             return message;
         }

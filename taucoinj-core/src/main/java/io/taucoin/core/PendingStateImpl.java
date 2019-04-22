@@ -141,7 +141,6 @@ public class PendingStateImpl implements PendingState {
             }
         }
 
-        /*
         if (!newTxs.isEmpty()) {
             EventDispatchThread.invokeLater(new Runnable() {
                 @Override
@@ -151,7 +150,6 @@ public class PendingStateImpl implements PendingState {
                 }
             });
         }
-       */
 
         logger.info("Wire transaction list added: {} new, {} valid of received {}, #of known txs: {}", unknownTx, newTxs.size(), transactions.size(), receivedTxs.size());
         return newTxs;
