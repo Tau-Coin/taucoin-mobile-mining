@@ -32,9 +32,9 @@ public interface AppService {
     @POST("getInfo/")
     Observable<Object> getInfo(@Body Map<String, String> email);
 
-    @POST("getHelps/")
+    @POST("tau/helps/")
     Observable<DataResult<List<HelpBean>>> getHelpData();
 
-    @POST("getTauVersion/")
+    @POST("tau/versions/")
     Observable<DataResult<VersionBean>> checkAppVersion(@Body Map<String, Object> map);
 }

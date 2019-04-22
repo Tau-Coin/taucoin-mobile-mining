@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2018 Taucoin Core Developers.
  * <p>

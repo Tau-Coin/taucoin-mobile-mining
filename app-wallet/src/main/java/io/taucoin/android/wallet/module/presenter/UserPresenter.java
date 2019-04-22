@@ -21,9 +21,6 @@ import android.widget.LinearLayout;
 
 import io.taucoin.android.wallet.R;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
@@ -37,9 +34,6 @@ import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.StringUtil;
-import io.taucoin.platform.adress.Key;
-import io.taucoin.platform.adress.KeyManager;
 
 public class UserPresenter {
 
@@ -130,55 +124,14 @@ public class UserPresenter {
     }
 
     public void initLocalData() {
-        Map<String, ?> mapValue = SharedPreferencesHelper.getInstance().getSP().getAll();
-        Set<String> keys = mapValue.keySet();
-        String privateKey = null;
-        String publicKey = null;
-        String address = null;
-        for (String key : keys) {
-            if(StringUtil.isNotEmpty(key)){
-                Object object = mapValue.get(key);
-                String value  = object == null ? null : object.toString();
-                if(key.endsWith(TransmitKey.PRIVATE_KEY)){
-                    privateKey = value;
-                }else if(key.endsWith(TransmitKey.PUBLIC_KEY)){
-                    publicKey = value;
-                }else if(key.endsWith(TransmitKey.ADDRESS)){
-                    address = value;
-                }
-            }
-        }
-        // handle old version2.0 data
-        if(StringUtil.isNotEmpty(privateKey) && StringUtil.isNotEmpty(publicKey)
-                && StringUtil.isNotEmpty(address)){
-            KeyValue kayValue = new KeyValue();
-            kayValue.setPrivkey(privateKey);
-            kayValue.setPubkey(publicKey);
-            kayValue.setAddress(address);
-            Key key = KeyManager.validateKey(privateKey);
-            if(key != null){
-                kayValue.setPubkey(key.getPubkey());
-                kayValue.setAddress(key.getAddress());
-            }
 
-            mUserModel.saveKeyAndAddress(kayValue, new LogicObserver<KeyValue>() {
-                @Override
-                public void handleData(KeyValue keyValue) {
-                    MyApplication.setKeyValue(keyValue);
-                    SharedPreferencesHelper.getInstance().clear();
-                    SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubkey());
-                    SharedPreferencesHelper.getInstance().putString(TransmitKey.ADDRESS, keyValue.getAddress());
-                }
-            });
-        }else{
-            publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-            mUserModel.getKeyAndAddress(publicKey, new LogicObserver<KeyValue>() {
-                @Override
-                public void handleData(KeyValue keyValue) {
-                    MyApplication.setKeyValue(keyValue);
-                }
-            });
-        }
+        String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        mUserModel.getKeyAndAddress(publicKey, new LogicObserver<KeyValue>() {
+            @Override
+            public void handleData(KeyValue keyValue) {
+                MyApplication.setKeyValue(keyValue);
+            }
+        });
     }
 
     public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> logicObserver) {
