@@ -88,7 +88,9 @@ public class RequestQueue {
     }
 
     public int size() {
-        return requestQueue.size();
+        int size = requestQueue.size();
+        logger.info("Request queue size {}", size);
+        return size;
     }
 
     public void receivedMessage(Message msg) throws InterruptedException {
@@ -131,7 +133,7 @@ public class RequestQueue {
         // remove timeout message
         removeTimeoutMessage(requestQueue.peek());
         // remove last answered message on the queue
-        removeAnsweredMessage(requestQueue.peek());
+        //removeAnsweredMessage(requestQueue.peek());
         // Now send the next message
         sendToWire(requestQueue.peek());
     }
