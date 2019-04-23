@@ -44,9 +44,9 @@ public class Genesis extends Block {
 //        this(version,timeStamp,previousHeaderHash,pubkey,r,s,option,TR);
 //    }
 
-    public Genesis(byte version, byte[] timeStamp, byte[] previousHeaderHash, byte[] pubkey,
-                   byte[] r, byte[]s,byte option, List<Transaction> TR){
-        super(version,timeStamp,previousHeaderHash,pubkey,r,s,option,TR);
+    public Genesis(byte version, byte[] timeStamp, byte[] previousHeaderHash,byte v,
+                   byte[] r, byte[]s,byte option, List<Transaction> tx){
+        super(version,timeStamp,previousHeaderHash,v,r,s,option,tx);
     }
     public static Block getInstance() {
         return SystemProperties.CONFIG.getGenesis();

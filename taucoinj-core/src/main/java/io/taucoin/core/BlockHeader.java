@@ -21,6 +21,7 @@ import static io.taucoin.util.ByteUtil.toHexString;
  * Block header is a value object containing
  * the basic information of a block
  */
+@Deprecated
 public class BlockHeader {
 
     /* ripemd160 result length, with 20 bytes */

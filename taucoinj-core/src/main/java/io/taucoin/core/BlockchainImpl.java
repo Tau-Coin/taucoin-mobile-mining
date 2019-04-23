@@ -419,7 +419,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         Block block = new Block(version,
                 timeStamp,
                 parent.getHash(),
-                config.getForgerPubkey(),
                 option,
                 txs);
 
@@ -685,9 +684,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        if (!isValid(block.getHeader())) {
-            return false;
-        }
+//        if (!isValid(block.getHeader())) {
+//            return false;
+//        }
 
         List<Transaction> txs = block.getTransactionsList();
         if (txs.size() > Constants.MAX_BLOCKTXSIZE) {
