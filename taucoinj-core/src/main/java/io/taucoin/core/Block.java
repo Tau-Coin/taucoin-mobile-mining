@@ -166,7 +166,7 @@ public class Block {
 
             if(block.size() > 10) {
                 // Parse Transactions
-                RLPList txTransactions = (RLPList) block.get(8);
+                RLPList txTransactions = (RLPList) block.get(10);
                 // here may need original trie
                 this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
             }
@@ -190,7 +190,7 @@ public class Block {
             this.option = block.get(4).getRLPData()[0];
             // Parse Transactions
             if(block.size() > 5){
-                RLPList txTransactions = (RLPList) block.get(3);
+                RLPList txTransactions = (RLPList) block.get(5);
                 this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
             }
         }
