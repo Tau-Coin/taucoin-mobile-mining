@@ -17,9 +17,13 @@ package io.taucoin.android.wallet.module.model;
 
 import io.taucoin.android.wallet.R;
 
+import io.taucoin.core.Utils;
+import io.taucoin.crypto.ECKey;
+import io.taucoin.util.ByteUtil;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.security.SignatureException;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -128,7 +132,13 @@ public class MiningModel implements IMiningModel{
         String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
         String number = String.valueOf(block.getNumber());
         String hash = Hex.toHexString(block.getHash());
-        String generatorPublicKey = Hex.toHexString(block.getGeneratorPublicKey());
+        ECKey key = null;
+        try {
+            key = ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
+        }catch(SignatureException e){
+
+        }
+        String generatorPublicKey = Hex.toHexString(key == null ? ByteUtil.intToBytes(0):key.getPubKey());
         MiningInfo entry = MiningInfoDaoUtils.getInstance().queryByBlockHash(hash);
         boolean isMine = StringUtil.isSame(pubicKey.toLowerCase(), generatorPublicKey);
         if(entry == null){

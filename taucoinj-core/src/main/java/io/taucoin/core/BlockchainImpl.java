@@ -221,7 +221,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             for (Block undoBlock : undoBlocks) {
                 logger.info("Try to disconnect block, block number: {}, hash: {}",
                         undoBlock.getNumber(), Hex.toHexString(undoBlock.getHash()));
-                ECKey key = ECKey.fromPublicOnly(undoBlock.getGeneratorPublicKey());
+                ECKey key;
+                try {
+                    key = ECKey.signatureToKey(undoBlock.getRawHash(), undoBlock.getblockSignature().toBase64());
+                }catch (SignatureException e){
+                    return DISCONNECTED_FAILED;
+                }
+
                 for (Transaction tx : undoBlock.getTransactionsList()){
                     //roll back
                     TransactionExecutor executor = new TransactionExecutor(tx, track);
@@ -319,8 +325,15 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             BigInteger baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(preBlock, blockStore);
             block.setBaseTarget(baseTarget);
 
+            ECKey key;
+            try {
+                key = ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
+            }catch (SignatureException e){
+                return INVALID_BLOCK;
+            }
+
             byte[] generationSignature = ProofOfTransaction.
-                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature(), block.getGeneratorPublicKey());
+                    calculateNextBlockGenerationSignature(preBlock.getGenerationSignature(), key.getPubKey());
             block.setGenerationSignature(generationSignature);
 
             BigInteger lastCumulativeDifficulty = preBlock.getCumulativeDifficulty();
