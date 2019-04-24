@@ -1255,6 +1255,74 @@ public class TaucoinRemoteService extends TaucoinService {
         }
     }
 
+    protected void getAccountState(Message message) {
+
+        logger.info("get account state from taucoin service");
+        if (taucoin != null) {
+            new GetAccountStateTask(message).execute(taucoin);
+        } else {
+            logger.warn("Taucoin not connected.");
+        }
+    }
+
+    private static class AccountStateWraper {
+        BigInteger balance;
+        BigInteger power;
+
+        public AccountStateWraper(BigInteger balance, BigInteger power) {
+            this.balance = balance;
+            this.power   = power;
+        }
+    }
+
+    protected class GetAccountStateTask extends AsyncTask<Taucoin, Void, AccountStateWraper> {
+
+        Messenger messenger;
+        Object obj;
+        String address;
+
+        public GetAccountStateTask(Message message) {
+
+            this.messenger = message.replyTo;
+            this.obj = message.obj;
+
+            Bundle data = message.getData();
+            if (data.containsKey("address")) {
+                this.address = data.getString("address");
+            }
+        }
+
+        protected AccountStateWraper doInBackground(Taucoin... args) {
+
+            BigInteger balance = BigInteger.ZERO;
+            BigInteger power   = BigInteger.ZERO;
+            if (taucoin != null && address != null) {
+                balance = taucoin.getRepository().getBalance(address.getBytes());
+                power = taucoin.getRepository().getforgePower(address.getBytes());
+            }
+
+            return new AccountStateWraper(balance, power);
+        }
+
+        protected void onPostExecute(AccountStateWraper state) {
+
+            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_ACCOUNT_STATE, 0, 0, obj);
+            Bundle replyData = new Bundle();
+
+            replyData.putString("address", address);
+            replyData.putString("balance", state.balance.toString(10));
+            replyData.putString("power", state.power.toString(10));
+            replyMessage.setData(replyData);
+
+            try {
+                messenger.send(replyMessage);
+                logger.info("Send account state to app");
+            } catch (RemoteException e) {
+                logger.error("Exception sending account state to client: " + e.getMessage());
+            }
+        }
+    }
+
     protected void getChainHeight(Message message) {
          Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CHAIN_HEIGHT, 0, 0, message.obj);
          Bundle replyData = new Bundle();

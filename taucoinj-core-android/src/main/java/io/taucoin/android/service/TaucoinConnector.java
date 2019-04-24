@@ -758,6 +758,37 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    /**
+     * Get account state address.
+     * @param identifier String Caller identifier used to return the response
+     * @param address String requested address
+     *
+     * For response, please handle TaucoinClientMessage.MSG_ACCOUNT_STATE:
+     *                {
+     *                    "address": <requested account's taucoin address>,
+     *                    "balance": <account balance with string type>,
+     *                    "power": <account forging power with string type>
+     *                }
+     */
+    public void getAccountState(String identifier, String address) {
+
+        if (!isBound || identifier == null || address == null || address.isEmpty())
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_ACCOUNT_STATE, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putString("address", address);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getAccountState) to service: " + e.getMessage());
+        }
+    }
+
     public void sendMiningNotify(String object) {
         if (!isBound)
             return;

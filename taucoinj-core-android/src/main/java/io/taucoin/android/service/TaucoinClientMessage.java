@@ -86,4 +86,9 @@ public class TaucoinClientMessage {
      * Send taucoin close done event to client
      */
     public static final int MSG_CLOSE_DONE = 17;
+
+    /**
+     * Send account state event to client
+     */
+    public static final int MSG_ACCOUNT_STATE = 18;
 }

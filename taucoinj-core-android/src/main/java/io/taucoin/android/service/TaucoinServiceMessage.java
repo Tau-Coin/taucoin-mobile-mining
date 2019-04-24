@@ -154,4 +154,9 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_CLOSE_MINING_PROGRESS = 30;
 
+    /**
+     * Command to the service to get account state
+     */
+    public static final int MSG_GET_ACCOUNT_STATE = 31;
+
 }
