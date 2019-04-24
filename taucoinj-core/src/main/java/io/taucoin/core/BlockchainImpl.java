@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.SignatureException;
 import java.util.*;
 
 import static java.lang.Math.max;
@@ -421,7 +422,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 parent.getHash(),
                 option,
                 txs);
-
         BigInteger curTotalfee = parent.getCumulativeFee();
         for(Transaction tr: txs){
             curTotalfee = curTotalfee.add(new BigInteger(tr.getFee()));
@@ -433,7 +433,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         block.setCumulativeDifficulty(cumulativeDifficulty);
         block.setCumulativeFee(curTotalfee);
         block.sign(config.getForgerPrikey());
-
         return block;
     }
 
@@ -633,7 +632,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             }
         }
 
-        ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
+        ECKey key = ECKey.fromPrivate(config.getForgerPrikey());
         byte[] address = key.getAddress();
         BigInteger forgingPower = repo.getforgePower(address);
         logger.info("Address: {}, forge power: {}", Hex.toHexString(address), forgingPower);
@@ -748,12 +747,19 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         Repository cacheTrack;
         boolean isValid = true;
+        ECKey key = null;
+        try {
+             key = ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
+        }catch (SignatureException e){
+            return false;
+        }
         for (Transaction tx : block.getTransactionsList()) {
             stateLogger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack);
-            ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
+
+            //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
             if (!executor.init()) {
                 isValid = false;
                 cacheTrack.rollback();

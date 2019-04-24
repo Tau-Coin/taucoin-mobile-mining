@@ -457,14 +457,12 @@ public class Block {
         if (rlpRaw == null) {
             byte[] version = RLP.encodeByte(this.version);
             byte[] timestamp = RLP.encodeElement(this.timeStamp);
-            byte[] signature = getSignatureEncoded();
             byte[] previousHeaderHash = RLP.encodeElement(this.previousHeaderHash);
 
             List<byte[]> block = getBodyElementsWithoutBlockSignature();
             block.add(0, version);
             block.add(1,timestamp);
-            block.add(2,signature);
-            block.add(3,previousHeaderHash);
+            block.add(2,previousHeaderHash);
             byte[][] elements = block.toArray(new byte[block.size()][]);
 
             this.rlpRaw = RLP.encodeList(elements);
