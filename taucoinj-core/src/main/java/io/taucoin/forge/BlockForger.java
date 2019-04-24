@@ -248,6 +248,8 @@ public class BlockForger {
             return false;
         }
 
+        logger.info("Forging thread wakeup...");
+
         if (!txsGot) {
             logger.warn("Pull pool tx timeout, retry again.");
             return true;
@@ -340,7 +342,8 @@ public class BlockForger {
         }
     }
 
-    private void waitForPullTxPool() throws InterruptedException{
+    private void waitForPullTxPool() throws InterruptedException {
+        logger.info("Wait for pulling pool txs");
         synchronized(pullTxPoolLock) {
             txsGot = false;
             pullTxPoolLock.wait(PULL_TX_POOL_TIMEOUT);
@@ -348,6 +351,7 @@ public class BlockForger {
     }
 
     public void notifyPullTxPoolFinished() {
+        logger.info("Pulling pool txs finished");
         synchronized(pullTxPoolLock) {
             txsGot = true;
             pullTxPoolLock.notify();

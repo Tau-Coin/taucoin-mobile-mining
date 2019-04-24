@@ -119,7 +119,7 @@ public class PoolSynchronizer implements ForgerListener {
             startTimerTask(10);
         } else {
             // Start a timer to pull pool txs
-            startTimerTask(internal * 1000 - 500);
+            startTimerTask(internal * 1000);
         }
     }
 

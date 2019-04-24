@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class PendingTransactionsEventData extends EventData {
 
-    public Set<Transaction> transactions;
+    public Set<Transaction> transactions = new HashSet<Transaction>();
 
     public PendingTransactionsEventData(List<Transaction> transactionsList) {
 
