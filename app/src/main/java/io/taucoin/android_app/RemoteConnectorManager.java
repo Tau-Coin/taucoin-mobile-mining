@@ -62,6 +62,7 @@ public class RemoteConnectorManager implements ConnectorHandler {
     static final String ACTION_BLOCK_SYNC = "intent.action.block.sync";
     static final String ACTION_BLOCK_HASH = "intent.action.block.hash";
     static final String ACTION_POOL_TXS = "intent.action.pool.txs";
+    static final String ACTION_ACCOUNT_STATE = "intent.action.account.state";
 
     public void createRemoteConnector(){
         if (mTaucoinConnector == null) {
@@ -224,6 +225,11 @@ public class RemoteConnectorManager implements ConnectorHandler {
                 intent.putExtras(message.getData());
                 broadcastAction(intent, ACTION_POOL_TXS);
                 break;
+            case TaucoinClientMessage.MSG_ACCOUNT_STATE:
+                intent = new Intent();
+                intent.putExtras(message.getData());
+                broadcastAction(intent, ACTION_ACCOUNT_STATE);
+                break;
             default:
                 isClaimed = false;
         }
@@ -304,5 +310,10 @@ public class RemoteConnectorManager implements ConnectorHandler {
     public void getPendingTxs(){
         Toast.makeText(TaucoinApplication.getInstance(), "getPendingTxs", Toast.LENGTH_SHORT).show();
         mTaucoinConnector.getPendingTxs();
+    }
+
+    public void getAccountState(String address){
+        Toast.makeText(TaucoinApplication.getInstance(), "getAccountState", Toast.LENGTH_SHORT).show();
+        mTaucoinConnector.getAccountState(mHandlerIdentifier, address);
     }
 }

@@ -24,6 +24,7 @@ import io.taucoin.core.Block;
 import io.taucoin.core.DumpedPrivateKey;
 import io.taucoin.core.Genesis;
 import io.taucoin.core.Transaction;
+import io.taucoin.core.VersionedChecksummedBytes;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
@@ -284,6 +285,10 @@ public class TaucoinRemoteService extends TaucoinService {
 
             case TaucoinServiceMessage.MSG_GET_CHAIN_HEIGHT:
                 getChainHeight(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_GET_ACCOUNT_STATE:
+                getAccountState(message);
                 break;
 
             default:
@@ -1296,9 +1301,14 @@ public class TaucoinRemoteService extends TaucoinService {
 
             BigInteger balance = BigInteger.ZERO;
             BigInteger power   = BigInteger.ZERO;
-            if (taucoin != null && address != null) {
-                balance = taucoin.getRepository().getBalance(address.getBytes());
-                power = taucoin.getRepository().getforgePower(address.getBytes());
+            byte[] addressBytes = null;
+
+            VersionedChecksummedBytes toEncoedAddress= new VersionedChecksummedBytes(address);
+            addressBytes = toEncoedAddress.getBytes();
+
+            if (taucoin != null && address != null && addressBytes != null) {
+                balance = taucoin.getRepository().getBalance(addressBytes);
+                power = taucoin.getRepository().getforgePower(addressBytes);
             }
 
             return new AccountStateWraper(balance, power);

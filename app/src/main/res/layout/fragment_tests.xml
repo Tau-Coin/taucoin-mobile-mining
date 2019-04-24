@@ -89,4 +89,34 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:weightSum="2"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="getAccountState"
+            android:layout_weight="1"
+            android:id="@+id/accountButton"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="hidden"
+            android:layout_weight="1"
+            android:id="@+id/hidden"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 </LinearLayout>

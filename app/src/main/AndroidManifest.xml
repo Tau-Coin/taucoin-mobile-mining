@@ -35,6 +35,7 @@
         <activity android:name=".MiningActivity"/>
         <activity android:name=".BlockHashActivity"/>
         <activity android:name=".PoolTxsActivity"/>
+　　　　　　　　<activity android:name=".AccountStateActivity"/>
     </application>
 
 </manifest>
