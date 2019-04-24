@@ -121,16 +121,6 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
             txSet.add(tx);
         }
 
-        EventDispatchThread.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tauListener.onPendingTransactionsReceived(txList);
-            }
-        });
-
-        if (txSet.size() == 0) {
-            return;
-        }
         for (Transaction tx : txSet) {
             logger.debug("Get pool tx {}", Hex.toHexString(tx.getHash()));
         }
@@ -138,5 +128,12 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
         List<Transaction> txListAdded = pendingState.addWireTransactions(txSet);
         logger.debug("Recv txs [{}], added [{}], dropped [{}]", txSet.size(),
                 txListAdded.size(), txSet.size() - txListAdded.size());
+
+        EventDispatchThread.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tauListener.onPendingTransactionsReceived(txList);
+            }
+        });
     }
 }
