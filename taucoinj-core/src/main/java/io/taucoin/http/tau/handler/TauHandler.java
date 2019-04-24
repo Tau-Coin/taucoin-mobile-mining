@@ -115,11 +115,19 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
     }
 
     private void processPoolTxsMessage(PoolTxsMessage msg) {
-        List<Transaction> txList = msg.getTransactions();
+        final List<Transaction> txList = msg.getTransactions();
         Set<Transaction>  txSet = new HashSet<Transaction>();
         for (Transaction tx : txList) {
             txSet.add(tx);
         }
+
+        EventDispatchThread.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tauListener.onPendingTransactionsReceived(txList);
+            }
+        });
+
         if (txSet.size() == 0) {
             return;
         }
