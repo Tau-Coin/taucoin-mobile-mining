@@ -205,7 +205,7 @@ public class Block {
             try{
                 key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
                 if(key != null){
-                    forgerPubkey = key.getPubKey();
+                    forgerPubkey = key.getCompressedPubKey();
                 }
             }catch (SignatureException e){
                 forgerPubkey = ByteUtil.intToBytes(0);
@@ -437,7 +437,7 @@ public class Block {
             try{
                 key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
                 if(key != null){
-                    forgerPubkey = key.getPubKey();
+                    forgerPubkey = key.getCompressedPubKey();
                 }
             }catch (SignatureException e){
                 forgerPubkey = ByteUtil.intToBytes(0);
