@@ -54,6 +54,7 @@ public class Block {
     private byte[] generationSignature;
     private BigInteger cumulativeDifficulty = BigInteger.ZERO; //this is total chain difficulty
     private BigInteger cumulativeFee = BigInteger.ZERO;
+    private byte[] forgerPubkey;
 
 
     protected byte[] rlpEncoded;
@@ -161,14 +162,15 @@ public class Block {
             this.cumulativeFee = culFee == null ? BigInteger.ZERO
                     : new BigInteger(1,culFee);
 
-            // Parse option
-            this.option = block.get(9).getRLPData()[0];
+            this.forgerPubkey = block.get(9).getRLPData();
 
-            if(block.size() > 10) {
+            // Parse option
+            this.option = block.get(10).getRLPData()[0];
+
+            if(block.size() > 11) {
                 // Parse Transactions
-                RLPList txTransactions = (RLPList) block.get(10);
-                // here may need original trie
-                this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
+                RLPList txTransactions = (RLPList) block.get(11);
+                this.parseTxs(txTransactions);
             }
         } else {
             RLPList params = RLP.decode2(rlpEncodedMsg);
@@ -191,7 +193,7 @@ public class Block {
             // Parse Transactions
             if(block.size() > 5){
                 RLPList txTransactions = (RLPList) block.get(5);
-                this.parseTxs(/*this.header.getTxTrieRoot()*/ txTransactions);
+                this.parseTxs(txTransactions);
             }
         }
 
@@ -233,10 +235,10 @@ public class Block {
         return this.timeStamp;
     }
 
-    @Deprecated
-    private byte[] getGeneratorPublicKey() {
+
+    public byte[] getGeneratorPublicKey() {
         if (!parsed) parseRLP();
-        return null;
+        return forgerPubkey;
     }
 
     public byte getVersion() {
@@ -418,6 +420,15 @@ public class Block {
             byte[] signature = getSignatureEncoded();
             byte[] previousHeaderHash = RLP.encodeElement(this.previousHeaderHash);
 
+            ECKey key;
+            try{
+                key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
+                if(key != null){
+                    forgerPubkey = key.getPubKey();
+                }
+            }catch (SignatureException e){
+                forgerPubkey = ByteUtil.intToBytes(0);
+            }
             List<byte[]> block = getFullBodyElements();
             logger.info("size of encode element is {}",block.size());
             block.add(0, version);
@@ -510,6 +521,7 @@ public class Block {
         byte[] generationSignature = RLP.encodeElement(this.generationSignature);
         byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty == null ? BigInteger.valueOf(0xffffff):this.cumulativeDifficulty);
         byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);
+        byte[] forgerpubkey = RLP.encodeElement(this.forgerPubkey);
         byte[] option = getOptionEncoded();
         byte[] transactions = getTransactionsEncoded();
 
@@ -519,6 +531,7 @@ public class Block {
         body.add(generationSignature);
         body.add(cumulativeDifficulty);
         body.add(cumulativeFee);
+        body.add(forgerpubkey);
         body.add(option);
         body.add(transactions);
 
