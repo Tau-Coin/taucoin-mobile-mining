@@ -6,6 +6,7 @@ import android.view.View;
 
 import io.taucoin.android.wallet.R;
 
+import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.util.ByteUtil;
 import org.spongycastle.util.encoders.Hex;
@@ -56,20 +57,21 @@ public class BlockDetailActivity extends BaseActivity {
         blockEvent = getIntent().getParcelableExtra(TransmitKey.BEAN);
         if(blockEvent != null && blockEvent.block != null){
             Block blockBean = blockEvent.block;
-            ECKey key = null;
+            byte[] bytesKey = ByteUtil.intToBytes(0);
             try {
-                key = ECKey.signatureToKey(blockBean.getRawHash(), blockBean.getblockSignature().toBase64());
-            }catch(SignatureException e){
+                ECKey key = ECKey.signatureToKey(blockBean.getRawHash(), blockBean.getblockSignature().toBase64());
+                bytesKey = key.getPubKey();
+            }catch(SignatureException ignore){ }
+            publicKey = Hex.toHexString(bytesKey);
 
-            }
-            publicKey = Hex.toHexString(key == null ? ByteUtil.intToBytes(0):key.getPubKey());
             tvMiner.setRightText(publicKey);
             List<Transaction> txList = blockBean.getTransactionsList();
             if(txList != null){
                 tvTotalTransaction.setRightText(txList.size());
                 String totalFee = MiningUtil.parseBlockReward(txList);
                 String income = FmtMicrometer.fmtFormat(totalFee);
-                tvMiningIncome.setRightText(income + "TAU");
+                income += ResourcesUtil.getText(R.string.common_balance_unit);
+                tvMiningIncome.setRightText(income);
             }
             String title = getText(R.string.block_no).toString();
             title = String.format(title, blockBean.getNumber());
