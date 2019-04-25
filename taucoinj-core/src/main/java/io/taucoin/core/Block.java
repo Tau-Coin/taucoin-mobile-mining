@@ -521,6 +521,7 @@ public class Block {
         byte[] generationSignature = RLP.encodeElement(this.generationSignature);
         byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty == null ? BigInteger.valueOf(0xffffff):this.cumulativeDifficulty);
         byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);
+        byte[] forgerpubkey = RLP.encodeElement(this.forgerPubkey);
         byte[] option = getOptionEncoded();
         byte[] transactions = getTransactionsEncoded();
 
@@ -530,7 +531,7 @@ public class Block {
         body.add(generationSignature);
         body.add(cumulativeDifficulty);
         body.add(cumulativeFee);
-        body.add(this.forgerPubkey);
+        body.add(forgerpubkey);
         body.add(option);
         body.add(transactions);
 
