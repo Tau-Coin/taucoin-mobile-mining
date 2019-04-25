@@ -130,6 +130,8 @@ public class UserPresenter {
             @Override
             public void handleData(KeyValue keyValue) {
                 MyApplication.setKeyValue(keyValue);
+                SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubKey());
+                SharedPreferencesHelper.getInstance().putString(TransmitKey.ADDRESS, keyValue.getAddress());
             }
         });
     }

@@ -74,7 +74,7 @@ public class UserModel implements IUserModel{
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
 
-            if(StringUtil.isNotEmpty(keyValue.getPriKey())){
+            if(keyValue != null && StringUtil.isNotEmpty(keyValue.getPriKey())){
                 Key key = KeyManager.validateKey(keyValue.getPriKey());
                 if(key != null){
                     keyValue.setPubKey(key.getPubkey());
@@ -84,6 +84,7 @@ public class UserModel implements IUserModel{
                 emitter.onNext(keyValue);
             }else{
                 SharedPreferencesHelper.getInstance().clear();
+                saveKeyAndAddress(null, observer);
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

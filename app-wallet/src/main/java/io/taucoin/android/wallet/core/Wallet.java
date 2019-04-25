@@ -60,16 +60,16 @@ public class Wallet {
             logicObserver.onNext(false);
             return;
         }
-        BigInteger minAmount = Constants.MIN_CHANGE;
-        BigInteger maxAmount = Constants.MAX_MONEY;
+        BigInteger minAmount = Constants.MIN_AMOUNT;
+        BigInteger maxAmount = Constants.MAX_AMOUNT;
         String amountStr = FmtMicrometer.fmtTxValue(tx.getAmount());
         BigInteger amount = new BigInteger(amountStr, 10);
         if (amount.compareTo(minAmount) < 0) {
-            ToastUtils.showShortToast(TransactionFailReason.AMOUNT_TO_SMALL.getMsg());
+            ToastUtils.showShortToast(R.string.send_amount_too_low);
             logicObserver.onNext(false);
             return;
         } else if (amount.compareTo(maxAmount) >= 0) {
-            ToastUtils.showShortToast(TransactionFailReason.AMOUNT_TO_LARGE.getMsg());
+            ToastUtils.showShortToast(R.string.send_amount_too_high);
             logicObserver.onNext(false);
             return;
         }
@@ -81,16 +81,16 @@ public class Wallet {
         }
         tx.setAmount(amountStr);
 
-        BigInteger minFee = Constants.DEFAULT_TX_FEE_MIN;
-        BigInteger maxFee = Constants.DEFAULT_TX_FEE_MAX;
+        BigInteger minFee = Constants.MIN_FEE;
+        BigInteger maxFee = Constants.MAX_FEE;
         String feeStr = FmtMicrometer.fmtTxValue(tx.getFee());
         BigInteger fee = new BigInteger(feeStr, 10);
         if (fee.compareTo(minFee) < 0) {
-            ToastUtils.showShortToast(TransactionFailReason.TX_FEE_TOO_SMALL.getMsg());
+            ToastUtils.showShortToast(R.string.send_fee_too_low);
             logicObserver.onNext(false);
             return;
         } else if (fee.compareTo(maxFee) > 0) {
-            ToastUtils.showShortToast(TransactionFailReason.TX_FEE_TOO_LARGE.getMsg());
+            ToastUtils.showShortToast(R.string.send_fee_too_high);
             logicObserver.onNext(false);
             return;
         }
@@ -109,7 +109,7 @@ public class Wallet {
                 public void handleData(Long balance) {
                     BigInteger balanceBig = new BigInteger(balance.toString(), 10);
                     if (balanceBig.compareTo(amount.add(fee)) < 0) {
-                        ToastUtils.showShortToast(TransactionFailReason.NO_ENOUGH_COINS.getMsg());
+                        ToastUtils.showShortToast(R.string.send_no_enough_coins);
                         logicObserver.onNext(false);
                     }else{
                         logicObserver.onNext(true);
