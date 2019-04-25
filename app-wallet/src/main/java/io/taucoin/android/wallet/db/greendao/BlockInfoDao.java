@@ -24,9 +24,9 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Id = new Property(0, long.class, "id", true, "_id");
         public final static Property BlockHeight = new Property(1, int.class, "blockHeight", false, "BLOCK_HEIGHT");
-        public final static Property BlockSynchronized = new Property(2, int.class, "blockSynchronized", false, "BLOCK_SYNCHRONIZED");
+        public final static Property BlockSync = new Property(2, int.class, "blockSync", false, "BLOCK_SYNC");
     }
 
 
@@ -42,9 +42,9 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"BLOCK_INFO\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
                 "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 1: blockHeight
-                "\"BLOCK_SYNCHRONIZED\" INTEGER NOT NULL );"); // 2: blockSynchronized
+                "\"BLOCK_SYNC\" INTEGER NOT NULL );"); // 2: blockSync
     }
 
     /** Drops the underlying database table. */
@@ -56,47 +56,39 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, BlockInfo entity) {
         stmt.clearBindings();
- 
-        Long id = entity.getId();
-        if (id != null) {
-            stmt.bindLong(1, id);
-        }
+        stmt.bindLong(1, entity.getId());
         stmt.bindLong(2, entity.getBlockHeight());
-        stmt.bindLong(3, entity.getBlockSynchronized());
+        stmt.bindLong(3, entity.getBlockSync());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, BlockInfo entity) {
         stmt.clearBindings();
- 
-        Long id = entity.getId();
-        if (id != null) {
-            stmt.bindLong(1, id);
-        }
+        stmt.bindLong(1, entity.getId());
         stmt.bindLong(2, entity.getBlockHeight());
-        stmt.bindLong(3, entity.getBlockSynchronized());
+        stmt.bindLong(3, entity.getBlockSync());
     }
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        return cursor.getLong(offset + 0);
     }    
 
     @Override
     public BlockInfo readEntity(Cursor cursor, int offset) {
         BlockInfo entity = new BlockInfo( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // blockHeight
-            cursor.getInt(offset + 2) // blockSynchronized
+            cursor.getInt(offset + 2) // blockSync
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, BlockInfo entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setId(cursor.getLong(offset + 0));
         entity.setBlockHeight(cursor.getInt(offset + 1));
-        entity.setBlockSynchronized(cursor.getInt(offset + 2));
+        entity.setBlockSync(cursor.getInt(offset + 2));
      }
     
     @Override
@@ -116,7 +108,7 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
 
     @Override
     public boolean hasKey(BlockInfo entity) {
-        return entity.getId() != null;
+        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
     }
 
     @Override

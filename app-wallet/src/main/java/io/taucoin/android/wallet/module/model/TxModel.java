@@ -107,7 +107,7 @@ public class TxModel implements ITxModel {
 
     @Override
     public void checkRawTransaction(TransactionHistory transaction, LogicObserver<Boolean> observer) {
-        String expireTime = String.valueOf(transaction.getExpireTime());
+        String expireTime = String.valueOf(transaction.getTransExpiry());
         String txId = transaction.getTxId();
         Map<String,String> map = new HashMap<>();
         map.put("txid", transaction.getTxId());
@@ -173,7 +173,7 @@ public class TxModel implements ITxModel {
     public void createTransaction(TransactionHistory txHistory, LogicObserver<io.taucoin.core.Transaction> observer) {
         Observable.create((ObservableOnSubscribe<io.taucoin.core.Transaction>) emitter -> {
             KeyValue keyValue = MyApplication.getKeyValue();
-            if(keyValue == null || StringUtil.isEmpty(keyValue.getPrivkey())){
+            if(keyValue == null || StringUtil.isEmpty(keyValue.getPriKey())){
                 emitter.onError(CodeException.getError());
                 return;
             }
@@ -181,7 +181,7 @@ public class TxModel implements ITxModel {
             byte[] amount = (new BigInteger(txHistory.getAmount())).toByteArray();
             byte[] fee = (new BigInteger(txHistory.getFee())).toByteArray();
 
-            byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(keyValue.getPrivkey());
+            byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(keyValue.getPriKey());
             byte[] toAddress;
             String txToAddress = txHistory.getToAddress();
             if(txToAddress.startsWith("T")) {
@@ -201,7 +201,7 @@ public class TxModel implements ITxModel {
             txHistory.setResult(TransmitKey.TxResult.BROADCASTING);
             txHistory.setFromAddress(keyValue.getAddress());
             txHistory.setCreateTime(String.valueOf(timeStamp));
-            txHistory.setExpireTime(expiryBlock);
+            txHistory.setTransExpiry(expiryBlock);
 
             insertTransactionHistory(txHistory);
             emitter.onNext(transaction);

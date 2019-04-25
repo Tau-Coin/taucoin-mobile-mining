@@ -24,16 +24,15 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Pubkey = new Property(1, String.class, "pubkey", false, "PUBKEY");
-        public final static Property Privkey = new Property(2, String.class, "privkey", false, "PRIVKEY");
+        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property PubKey = new Property(1, String.class, "pubKey", false, "PUB_KEY");
+        public final static Property PriKey = new Property(2, String.class, "priKey", false, "PRI_KEY");
         public final static Property Address = new Property(3, String.class, "address", false, "ADDRESS");
         public final static Property Balance = new Property(4, long.class, "balance", false, "BALANCE");
         public final static Property Power = new Property(5, long.class, "power", false, "POWER");
         public final static Property NickName = new Property(6, String.class, "nickName", false, "NICK_NAME");
         public final static Property MiningState = new Property(7, String.class, "miningState", false, "MINING_STATE");
         public final static Property TransExpiry = new Property(8, long.class, "transExpiry", false, "TRANS_EXPIRY");
-        public final static Property MutableRange = new Property(9, String.class, "mutableRange", false, "MUTABLE_RANGE");
     }
 
 
@@ -49,16 +48,15 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"KEY_VALUE\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"PUBKEY\" TEXT," + // 1: pubkey
-                "\"PRIVKEY\" TEXT," + // 2: privkey
+                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"PUB_KEY\" TEXT," + // 1: pubKey
+                "\"PRI_KEY\" TEXT," + // 2: priKey
                 "\"ADDRESS\" TEXT," + // 3: address
                 "\"BALANCE\" INTEGER NOT NULL ," + // 4: balance
                 "\"POWER\" INTEGER NOT NULL ," + // 5: power
                 "\"NICK_NAME\" TEXT," + // 6: nickName
                 "\"MINING_STATE\" TEXT," + // 7: miningState
-                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 8: transExpiry
-                "\"MUTABLE_RANGE\" TEXT);"); // 9: mutableRange
+                "\"TRANS_EXPIRY\" INTEGER NOT NULL );"); // 8: transExpiry
     }
 
     /** Drops the underlying database table. */
@@ -70,20 +68,16 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, KeyValue entity) {
         stmt.clearBindings();
+        stmt.bindLong(1, entity.getId());
  
-        Long id = entity.getId();
-        if (id != null) {
-            stmt.bindLong(1, id);
+        String pubKey = entity.getPubKey();
+        if (pubKey != null) {
+            stmt.bindString(2, pubKey);
         }
  
-        String pubkey = entity.getPubkey();
-        if (pubkey != null) {
-            stmt.bindString(2, pubkey);
-        }
- 
-        String privkey = entity.getPrivkey();
-        if (privkey != null) {
-            stmt.bindString(3, privkey);
+        String priKey = entity.getPriKey();
+        if (priKey != null) {
+            stmt.bindString(3, priKey);
         }
  
         String address = entity.getAddress();
@@ -103,30 +97,21 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(8, miningState);
         }
         stmt.bindLong(9, entity.getTransExpiry());
- 
-        String mutableRange = entity.getMutableRange();
-        if (mutableRange != null) {
-            stmt.bindString(10, mutableRange);
-        }
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, KeyValue entity) {
         stmt.clearBindings();
+        stmt.bindLong(1, entity.getId());
  
-        Long id = entity.getId();
-        if (id != null) {
-            stmt.bindLong(1, id);
+        String pubKey = entity.getPubKey();
+        if (pubKey != null) {
+            stmt.bindString(2, pubKey);
         }
  
-        String pubkey = entity.getPubkey();
-        if (pubkey != null) {
-            stmt.bindString(2, pubkey);
-        }
- 
-        String privkey = entity.getPrivkey();
-        if (privkey != null) {
-            stmt.bindString(3, privkey);
+        String priKey = entity.getPriKey();
+        if (priKey != null) {
+            stmt.bindString(3, priKey);
         }
  
         String address = entity.getAddress();
@@ -146,47 +131,40 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(8, miningState);
         }
         stmt.bindLong(9, entity.getTransExpiry());
- 
-        String mutableRange = entity.getMutableRange();
-        if (mutableRange != null) {
-            stmt.bindString(10, mutableRange);
-        }
     }
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        return cursor.getLong(offset + 0);
     }    
 
     @Override
     public KeyValue readEntity(Cursor cursor, int offset) {
         KeyValue entity = new KeyValue( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubkey
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // privkey
+            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubKey
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // priKey
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // address
             cursor.getLong(offset + 4), // balance
             cursor.getLong(offset + 5), // power
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // nickName
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // miningState
-            cursor.getLong(offset + 8), // transExpiry
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // mutableRange
+            cursor.getLong(offset + 8) // transExpiry
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, KeyValue entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setPubkey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPrivkey(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setId(cursor.getLong(offset + 0));
+        entity.setPubKey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setPriKey(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setBalance(cursor.getLong(offset + 4));
         entity.setPower(cursor.getLong(offset + 5));
         entity.setNickName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setMiningState(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setTransExpiry(cursor.getLong(offset + 8));
-        entity.setMutableRange(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     @Override
@@ -206,7 +184,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
 
     @Override
     public boolean hasKey(KeyValue entity) {
-        return entity.getId() != null;
+        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
     }
 
     @Override

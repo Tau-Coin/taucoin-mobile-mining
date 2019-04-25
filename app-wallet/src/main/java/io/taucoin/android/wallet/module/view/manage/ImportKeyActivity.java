@@ -57,8 +57,8 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
             ToastUtils.showShortToast(R.string.keys_private_invalid);
         }else{
             KeyValue keyValue = new KeyValue();
-            keyValue.setPrivkey(privateKey);
-            keyValue.setPubkey(key.getPubkey());
+            keyValue.setPriKey(privateKey);
+            keyValue.setPubKey(key.getPubkey());
             keyValue.setAddress(key.getAddress());
             mUserPresenter.showSureDialog(this, keyValue);
         }

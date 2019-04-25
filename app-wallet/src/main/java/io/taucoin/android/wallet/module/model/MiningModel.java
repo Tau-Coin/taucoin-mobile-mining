@@ -17,7 +17,6 @@ package io.taucoin.android.wallet.module.model;
 
 import io.taucoin.android.wallet.R;
 
-import io.taucoin.core.Utils;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.util.ByteUtil;
 import org.spongycastle.util.encoders.Hex;
@@ -64,7 +63,7 @@ public class MiningModel implements IMiningModel{
             }
             // set mining info
             List<MiningInfo> list = MiningInfoDaoUtils.getInstance().queryByPubicKey(pubicKey);
-            blockInfo.setMiningInfos(list);
+            blockInfo.setMiningInfo(list);
 
             emitter.onNext(blockInfo);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -102,12 +101,12 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private void updateSynchronizedBlockNum(int blockSynchronized){
+    private void updateSynchronizedBlockNum(int blockSync){
         BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
         if(entry == null){
             entry = new BlockInfo();
         }
-        entry.setBlockSynchronized(blockSynchronized);
+        entry.setBlockSync(blockSync);
         BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
     }
 
@@ -145,7 +144,7 @@ public class MiningModel implements IMiningModel{
             if(isMine && isConnect){
                 entry = new MiningInfo();
                 entry.setBlockNo(number);
-                entry.setPublicKey(pubicKey);
+                entry.setPubKey(pubicKey);
                 entry.setBlockHash(hash);
                 entry.setValid(1);
 

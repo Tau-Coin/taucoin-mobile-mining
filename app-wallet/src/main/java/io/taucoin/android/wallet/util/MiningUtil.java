@@ -44,7 +44,7 @@ public class MiningUtil {
 
     public static int parseMinedBlocks(BlockInfo blockInfo) {
         if(blockInfo != null){
-            List<MiningInfo> list= blockInfo.getMiningInfos();
+            List<MiningInfo> list= blockInfo.getMiningInfo();
             if(list != null){
                 return list.size();
             }
@@ -55,7 +55,7 @@ public class MiningUtil {
     public static String parseMiningIncome(BlockInfo blockInfo) {
         BigDecimal number = new BigDecimal("0");
         if(blockInfo != null){
-            List<MiningInfo> list= blockInfo.getMiningInfos();
+            List<MiningInfo> list= blockInfo.getMiningInfo();
             if(list != null && list.size() > 0){
                 for (MiningInfo bean : list) {
                     try {
@@ -123,7 +123,7 @@ public class MiningUtil {
     public static boolean isFinishState(TransactionHistory history) {
         long txTime = history.getBlockTime();
         long currentTime = DateUtil.getTime();
-        long expireTime = history.getExpireTime();
+        long expireTime = history.getTransExpiry();
         if(txTime <= 0){
             try {
                 txTime = new BigInteger(history.getCreateTime()).longValue();

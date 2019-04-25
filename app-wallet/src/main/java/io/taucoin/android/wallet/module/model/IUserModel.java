@@ -31,7 +31,4 @@ public interface IUserModel {
 
     /** Save Transaction Expiry in blocks */
     void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> observer);
-
-    /** Save Mutable range in blocks */
-    void saveMutableRange(long mutableRange, LogicObserver<KeyValue> observer);
 }

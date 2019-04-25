@@ -6,26 +6,25 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
 
 /**
- * Created by yang on 18-11-21
- *
  * @version 1.0
- * @description: mining information
+ * mining information
  */
 @Entity
 public class MiningInfo {
+
     @Id
-    private Long mid;
-    private String publicKey;
+    private long id;
+    private String pubKey;
     private String blockNo;
     private String blockHash;
     private String reward;
     private int valid;
     private int total;
-    @Generated(hash = 776442791)
-    public MiningInfo(Long mid, String publicKey, String blockNo, String blockHash,
+    @Generated(hash = 896663996)
+    public MiningInfo(long id, String pubKey, String blockNo, String blockHash,
             String reward, int valid, int total) {
-        this.mid = mid;
-        this.publicKey = publicKey;
+        this.id = id;
+        this.pubKey = pubKey;
         this.blockNo = blockNo;
         this.blockHash = blockHash;
         this.reward = reward;
@@ -35,17 +34,17 @@ public class MiningInfo {
     @Generated(hash = 636345119)
     public MiningInfo() {
     }
-    public Long getMid() {
-        return this.mid;
+    public long getId() {
+        return this.id;
     }
-    public void setMid(Long mid) {
-        this.mid = mid;
+    public void setId(long id) {
+        this.id = id;
     }
-    public String getPublicKey() {
-        return this.publicKey;
+    public String getPubKey() {
+        return this.pubKey;
     }
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
     }
     public String getBlockNo() {
         return this.blockNo;

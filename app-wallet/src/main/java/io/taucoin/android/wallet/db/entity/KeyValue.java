@@ -6,59 +6,56 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * Created by ly on 18-11-21
- *
  * @version 1.0
- * @description:
+ * Key Value
  */
 @Entity
 public class KeyValue {
+
     @Id
-    private Long id;
-    private String pubkey;
-    private String privkey;
+    private long id;
+    private String pubKey;
+    private String priKey;
     private String address;
     private long balance;
     private long power;
     private String nickName;
     private String miningState;
     private long transExpiry;
-    private String mutableRange;
-    @Generated(hash = 713651028)
-    public KeyValue(Long id, String pubkey, String privkey, String address,
+    @Generated(hash = 816305586)
+    public KeyValue(long id, String pubKey, String priKey, String address,
             long balance, long power, String nickName, String miningState,
-            long transExpiry, String mutableRange) {
+            long transExpiry) {
         this.id = id;
-        this.pubkey = pubkey;
-        this.privkey = privkey;
+        this.pubKey = pubKey;
+        this.priKey = priKey;
         this.address = address;
         this.balance = balance;
         this.power = power;
         this.nickName = nickName;
         this.miningState = miningState;
         this.transExpiry = transExpiry;
-        this.mutableRange = mutableRange;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
     }
-    public Long getId() {
+    public long getId() {
         return this.id;
     }
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
-    public String getPubkey() {
-        return this.pubkey;
+    public String getPubKey() {
+        return this.pubKey;
     }
-    public void setPubkey(String pubkey) {
-        this.pubkey = pubkey;
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
     }
-    public String getPrivkey() {
-        return this.privkey;
+    public String getPriKey() {
+        return this.priKey;
     }
-    public void setPrivkey(String privkey) {
-        this.privkey = privkey;
+    public void setPriKey(String priKey) {
+        this.priKey = priKey;
     }
     public String getAddress() {
         return this.address;
@@ -95,11 +92,5 @@ public class KeyValue {
     }
     public void setTransExpiry(long transExpiry) {
         this.transExpiry = transExpiry;
-    }
-    public String getMutableRange() {
-        return this.mutableRange;
-    }
-    public void setMutableRange(String mutableRange) {
-        this.mutableRange = mutableRange;
     }
 }

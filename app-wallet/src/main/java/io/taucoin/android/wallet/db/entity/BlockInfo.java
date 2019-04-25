@@ -8,54 +8,60 @@ import org.greenrobot.greendao.annotation.Transient;
 import java.util.List;
 
 /**
- * Created by yang on 18-11-21
- *
  * @version 1.0
- * @description: mining information
+ * mining information
  */
 @Entity
 public class BlockInfo {
     @Id
-    private Long id;
+    private long id;
     private int blockHeight;
-    private int blockSynchronized;
+    private int blockSync;
 
     @Transient
-    private List<MiningInfo> miningInfos;
+    private List<MiningInfo> miningInfo;
 
-    public List<MiningInfo> getMiningInfos() {
-        return miningInfos;
-    }
-
-    public void setMiningInfos(List<MiningInfo> miningInfos) {
-        this.miningInfos = miningInfos;
-    }
-
-    @Generated(hash = 1508347332)
-    public BlockInfo(Long id, int blockHeight, int blockSynchronized) {
+    @Generated(hash = 220266045)
+    public BlockInfo(long id, int blockHeight, int blockSync) {
         this.id = id;
         this.blockHeight = blockHeight;
-        this.blockSynchronized = blockSynchronized;
+        this.blockSync = blockSync;
     }
+
     @Generated(hash = 1647740766)
     public BlockInfo() {
     }
-    public Long getId() {
+
+    public List<MiningInfo> getMiningInfo() {
+        return miningInfo;
+    }
+
+    public void setMiningInfo(List<MiningInfo> miningInfo) {
+        this.miningInfo = miningInfo;
+    }
+
+    public long getId() {
         return this.id;
     }
-    public void setId(Long id) {
+
+    public void setId(long id) {
         this.id = id;
     }
+
     public int getBlockHeight() {
         return this.blockHeight;
     }
+
     public void setBlockHeight(int blockHeight) {
         this.blockHeight = blockHeight;
     }
-    public int getBlockSynchronized() {
-        return this.blockSynchronized;
+
+    public int getBlockSync() {
+        return this.blockSync;
     }
-    public void setBlockSynchronized(int blockSynchronized) {
-        this.blockSynchronized = blockSynchronized;
+
+    public void setBlockSync(int blockSync) {
+        this.blockSync = blockSync;
     }
+
 }

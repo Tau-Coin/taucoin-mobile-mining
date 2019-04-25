@@ -323,7 +323,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     public void init(){
         Logger.d("init");
         if(UserUtil.isImportKey()){
-            String privateKey = MyApplication.getKeyValue().getPrivkey();
+            String privateKey = MyApplication.getKeyValue().getPriKey();
             // import privateKey and init
             if(isTaucoinConnected){
                 if(isInit){

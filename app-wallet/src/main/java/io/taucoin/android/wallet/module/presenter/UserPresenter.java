@@ -77,7 +77,7 @@ public class UserPresenter {
             @Override
             public void handleData(KeyValue keyValue) {
                 MyApplication.setKeyValue(keyValue);
-                SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubkey());
+                SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubKey());
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.ADDRESS, keyValue.getAddress());
                 TxService.startTxService(TransmitKey.ServiceType.GET_IMPORT_DATA);
                 TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
@@ -136,9 +136,5 @@ public class UserPresenter {
 
     public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> logicObserver) {
         mUserModel.saveTransExpiry(transExpiry, logicObserver);
-    }
-
-    public void saveMutableRange(long mutableRange, LogicObserver<KeyValue> logicObserver) {
-        mUserModel.saveMutableRange(mutableRange, logicObserver);
     }
 }

@@ -90,12 +90,12 @@ public class BlockListActivity extends BaseActivity {
     private void updateListView() {
         if(mBlockInfo != null){
             if(mPageNo == 0){
-                mDataSize = mBlockInfo.getBlockSynchronized();
+                mDataSize = mBlockInfo.getBlockSync();
 
-                if(mBlockInfo.getMiningInfos() != null){
-                    mAdapter.setListData(mBlockInfo.getMiningInfos());
+                if(mBlockInfo.getMiningInfo() != null){
+                    mAdapter.setListData(mBlockInfo.getMiningInfo());
                     if(mIsMe){
-                        mDataSize = mBlockInfo.getMiningInfos().size();
+                        mDataSize = mBlockInfo.getMiningInfo().size();
                     }
                 }
             }

@@ -28,8 +28,6 @@ public class SettingActivity extends BaseActivity {
 
     @BindView(R.id.tv_trans_expiry)
     ItemTextView tvTransExpiry;
-    @BindView(R.id.tv_mutable_range)
-    ItemTextView tvMutableRange;
     private UserPresenter mPresenter;
 
     @Override
@@ -45,26 +43,22 @@ public class SettingActivity extends BaseActivity {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
             tvTransExpiry.setRightText(UserUtil.getTransExpiryTime() + "min");
-            tvMutableRange.setRightText(UserUtil.getMutableRange());
         }
     }
 
-    @OnClick({R.id.tv_trans_expiry, R.id.tv_mutable_range})
+    @OnClick({R.id.tv_trans_expiry})
     void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_trans_expiry:
-                showInputDialog(0);
-                break;
-            case R.id.tv_mutable_range:
-                showInputDialog(1);
+                showInputDialog();
                 break;
             default:
                 break;
         }
     }
 
-    private void showInputDialog(int type){
-        int inputHint = type == 0 ? R.string.setting_transaction_expiry_tip : R.string.setting_mutable_range_tip;
+    private void showInputDialog(){
+        int inputHint = R.string.setting_transaction_expiry_tip;
         new InputDialog.Builder(this)
             .setInputType(InputType.TYPE_CLASS_NUMBER)
             .setInputHint(inputHint)
@@ -72,15 +66,11 @@ public class SettingActivity extends BaseActivity {
             .setPositiveButton(R.string.common_done, (InputDialog.InputDialogListener) (dialog, text) -> {
                 try {
                     long input = new BigInteger(text).longValue();
-                    if(type == 0){
-                        if(input > TransmitKey.MAX_TRANS_EXPIRY || input < TransmitKey.MIN_TRANS_EXPIRY){
-                            ToastUtils.showShortToast(R.string.setting_transaction_expiry_limit);
-                            return;
-                        }
-                        mPresenter.saveTransExpiry(input, logicObserver);
-                    }else {
-                        mPresenter.saveMutableRange(input, logicObserver);
+                    if(input > TransmitKey.MAX_TRANS_EXPIRY || input < TransmitKey.MIN_TRANS_EXPIRY){
+                        ToastUtils.showShortToast(R.string.setting_transaction_expiry_limit);
+                        return;
                     }
+                    mPresenter.saveTransExpiry(input, logicObserver);
                 }catch (Exception e){
                     Logger.e("new BigInteger is error", e);
                 }

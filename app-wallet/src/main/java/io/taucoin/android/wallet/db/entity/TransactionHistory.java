@@ -6,12 +6,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * Created by ly on 18-10-30
- *
  * @version 1.0
- * @description:
- *
- * @version 2.0
  * Edited by yang on 19-02-23
  */
 
@@ -19,7 +14,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class TransactionHistory {
 
     @Id
-    private Long id;
+    private long id;
 
     private String txId;
 
@@ -45,14 +40,14 @@ public class TransactionHistory {
 
     private long blockTime;
     // tx expiration date(expire block num)
-    private long expireTime;
+    private long transExpiry;
     // Time basis for acquiring transaction records
     private int timeBasis;
-    @Generated(hash = 1757760342)
-    public TransactionHistory(Long id, String txId, String fromAddress,
+    @Generated(hash = 1568833116)
+    public TransactionHistory(long id, String txId, String fromAddress,
             String toAddress, String createTime, String amount, String memo,
             String fee, String result, String message, long blockNum,
-            String blockHash, long blockTime, long expireTime, int timeBasis) {
+            String blockHash, long blockTime, long transExpiry, int timeBasis) {
         this.id = id;
         this.txId = txId;
         this.fromAddress = fromAddress;
@@ -66,16 +61,16 @@ public class TransactionHistory {
         this.blockNum = blockNum;
         this.blockHash = blockHash;
         this.blockTime = blockTime;
-        this.expireTime = expireTime;
+        this.transExpiry = transExpiry;
         this.timeBasis = timeBasis;
     }
     @Generated(hash = 63079048)
     public TransactionHistory() {
     }
-    public Long getId() {
+    public long getId() {
         return this.id;
     }
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
     public String getTxId() {
@@ -150,11 +145,11 @@ public class TransactionHistory {
     public void setBlockTime(long blockTime) {
         this.blockTime = blockTime;
     }
-    public long getExpireTime() {
-        return this.expireTime;
+    public long getTransExpiry() {
+        return this.transExpiry;
     }
-    public void setExpireTime(long expireTime) {
-        this.expireTime = expireTime;
+    public void setTransExpiry(long transExpiry) {
+        this.transExpiry = transExpiry;
     }
     public int getTimeBasis() {
         return this.timeBasis;

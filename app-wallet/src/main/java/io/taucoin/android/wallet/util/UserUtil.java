@@ -147,13 +147,4 @@ public class UserUtil {
     public static long getTransExpiryBlock() {
         return getTransExpiryTime() / 5;
     }
-
-    public static String getMutableRange() {
-        String mutableRange = TransmitKey.DEFAULT_MUTABLE_RANGE;
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue != null && StringUtil.isNotEmpty(keyValue.getMutableRange())){
-            mutableRange = keyValue.getMutableRange();
-        }
-        return mutableRange;
-    }
 }

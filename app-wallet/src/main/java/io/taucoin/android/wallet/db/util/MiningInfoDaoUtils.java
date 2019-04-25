@@ -49,9 +49,9 @@ public class MiningInfoDaoUtils {
 
     public List<MiningInfo> queryByPubicKey(String pubicKey) {
         return getMiningInfoDao().queryBuilder()
-                .where(MiningInfoDao.Properties.PublicKey.eq(pubicKey),
+                .where(MiningInfoDao.Properties.PubKey.eq(pubicKey),
                         MiningInfoDao.Properties.Valid.eq(1))
-                .orderDesc(MiningInfoDao.Properties.Mid)
+                .orderDesc(MiningInfoDao.Properties.Id)
                 .list();
     }
 
@@ -63,7 +63,7 @@ public class MiningInfoDaoUtils {
     public MiningInfo queryByBlockHash(String blockHash) {
         List<MiningInfo> list = getMiningInfoDao().queryBuilder()
                 .where(MiningInfoDao.Properties.BlockHash.eq(blockHash))
-                .orderDesc(MiningInfoDao.Properties.Mid)
+                .orderDesc(MiningInfoDao.Properties.Id)
                 .list();
         if(list != null && list.size() > 0){
             return list.get(0);

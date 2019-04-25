@@ -39,7 +39,6 @@ public class TransmitKey {
     public static final int PAGE_SIZE = 20;
     public static final long MIN_TRANS_EXPIRY = 5;
     public static final long MAX_TRANS_EXPIRY = 720;
-    public static final String DEFAULT_MUTABLE_RANGE = "288";
 
     public static class TxResult {
         public static final String FAILED = "Failed";

@@ -247,7 +247,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         llMining.setVisibility(isMiner ? View.VISIBLE : View.GONE);
 
                         tvBlockHeight.setRightText(blockInfo.getBlockHeight());
-                        tvBlockSynchronized.setRightText(blockInfo.getBlockSynchronized());
+                        tvBlockSynchronized.setRightText(blockInfo.getBlockSync());
 
                         tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(blockInfo));
                         tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(blockInfo));

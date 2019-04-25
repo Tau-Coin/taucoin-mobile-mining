@@ -23,10 +23,8 @@ import io.taucoin.android.wallet.db.greendao.KeyValueDao;
 
 /**
  * @version 1.0
- * Created by ly on 18-10-31
- * @version 2.0
- * Edited by yang
- * @description: KeyValue
+ * Created by yang
+ * KeyValue
  */
 public class KeyValueDaoUtils {
 
@@ -51,7 +49,7 @@ public class KeyValueDaoUtils {
 
     public KeyValue queryByPubicKey(String pubicKey) {
         List<KeyValue> list = getKeyValueDao().queryBuilder()
-                .where(KeyValueDao.Properties.Pubkey.eq(pubicKey))
+                .where(KeyValueDao.Properties.PubKey.eq(pubicKey))
                 .orderDesc(KeyValueDao.Properties.Id)
                 .list();
         if(list.size() > 0){
@@ -61,13 +59,13 @@ public class KeyValueDaoUtils {
     }
 
     public KeyValue insertOrReplace(KeyValue keyValue) {
-        KeyValue result = KeyValueDaoUtils.getInstance().queryByPubicKey(keyValue.getPubkey());
+        KeyValue result = KeyValueDaoUtils.getInstance().queryByPubicKey(keyValue.getPubKey());
         if(result == null){
             result = keyValue;
         }else{
             result.setAddress(keyValue.getAddress());
-            result.setPubkey(keyValue.getPubkey());
-            result.setPrivkey(keyValue.getPrivkey());
+            result.setPubKey(keyValue.getPubKey());
+            result.setPriKey(keyValue.getPriKey());
         }
         getKeyValueDao().insertOrReplace(result);
         return result;

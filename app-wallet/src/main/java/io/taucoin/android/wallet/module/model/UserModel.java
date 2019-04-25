@@ -39,8 +39,8 @@ public class UserModel implements IUserModel{
                 Key key = KeyManager.generatorKey();
                 if(key != null){
                     kv = new KeyValue();
-                    kv.setPrivkey(key.getPrivkey());
-                    kv.setPubkey(key.getPubkey());
+                    kv.setPriKey(key.getPrivkey());
+                    kv.setPubKey(key.getPubkey());
                     kv.setAddress(key.getAddress());
                 }else {
                     emitter.onError(CodeException.getError());
@@ -74,10 +74,10 @@ public class UserModel implements IUserModel{
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
 
-            if(StringUtil.isNotEmpty(keyValue.getPrivkey())){
-                Key key = KeyManager.validateKey(keyValue.getPrivkey());
+            if(StringUtil.isNotEmpty(keyValue.getPriKey())){
+                Key key = KeyManager.validateKey(keyValue.getPriKey());
                 if(key != null){
-                    keyValue.setPubkey(key.getPubkey());
+                    keyValue.setPubKey(key.getPubkey());
                     keyValue.setAddress(key.getAddress());
                     KeyValueDaoUtils.getInstance().update(keyValue);
                 }
@@ -93,22 +93,9 @@ public class UserModel implements IUserModel{
     @Override
     public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> observer) {
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
-            String publicKey = MyApplication.getKeyValue().getPubkey();
+            String publicKey = MyApplication.getKeyValue().getPubKey();
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
             keyValue.setTransExpiry(transExpiry);
-            KeyValueDaoUtils.getInstance().update(keyValue);
-            emitter.onNext(keyValue);
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(observer);
-    }
-
-    @Override
-    public void saveMutableRange(long mutableRange, LogicObserver<KeyValue> observer) {
-        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
-            String publicKey = MyApplication.getKeyValue().getPubkey();
-            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
-            keyValue.setMutableRange(String.valueOf(mutableRange));
             KeyValueDaoUtils.getInstance().update(keyValue);
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())

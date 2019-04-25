@@ -45,8 +45,8 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
             tvAddress.setText(keyValue.getAddress());
-            tvPublicKey.setText(keyValue.getPubkey());
-            tvPrivateKey.setText(keyValue.getPrivkey());
+            tvPublicKey.setText(keyValue.getPubKey());
+            tvPrivateKey.setText(keyValue.getPriKey());
         }
     }
 

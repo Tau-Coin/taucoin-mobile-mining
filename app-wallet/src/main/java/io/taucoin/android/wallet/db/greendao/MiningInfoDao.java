@@ -24,8 +24,8 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Mid = new Property(0, Long.class, "mid", true, "_id");
-        public final static Property PublicKey = new Property(1, String.class, "publicKey", false, "PUBLIC_KEY");
+        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property PubKey = new Property(1, String.class, "pubKey", false, "PUB_KEY");
         public final static Property BlockNo = new Property(2, String.class, "blockNo", false, "BLOCK_NO");
         public final static Property BlockHash = new Property(3, String.class, "blockHash", false, "BLOCK_HASH");
         public final static Property Reward = new Property(4, String.class, "reward", false, "REWARD");
@@ -46,8 +46,8 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MINING_INFO\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: mid
-                "\"PUBLIC_KEY\" TEXT," + // 1: publicKey
+                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"PUB_KEY\" TEXT," + // 1: pubKey
                 "\"BLOCK_NO\" TEXT," + // 2: blockNo
                 "\"BLOCK_HASH\" TEXT," + // 3: blockHash
                 "\"REWARD\" TEXT," + // 4: reward
@@ -64,15 +64,11 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, MiningInfo entity) {
         stmt.clearBindings();
+        stmt.bindLong(1, entity.getId());
  
-        Long mid = entity.getMid();
-        if (mid != null) {
-            stmt.bindLong(1, mid);
-        }
- 
-        String publicKey = entity.getPublicKey();
-        if (publicKey != null) {
-            stmt.bindString(2, publicKey);
+        String pubKey = entity.getPubKey();
+        if (pubKey != null) {
+            stmt.bindString(2, pubKey);
         }
  
         String blockNo = entity.getBlockNo();
@@ -96,15 +92,11 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, MiningInfo entity) {
         stmt.clearBindings();
+        stmt.bindLong(1, entity.getId());
  
-        Long mid = entity.getMid();
-        if (mid != null) {
-            stmt.bindLong(1, mid);
-        }
- 
-        String publicKey = entity.getPublicKey();
-        if (publicKey != null) {
-            stmt.bindString(2, publicKey);
+        String pubKey = entity.getPubKey();
+        if (pubKey != null) {
+            stmt.bindString(2, pubKey);
         }
  
         String blockNo = entity.getBlockNo();
@@ -127,14 +119,14 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        return cursor.getLong(offset + 0);
     }    
 
     @Override
     public MiningInfo readEntity(Cursor cursor, int offset) {
         MiningInfo entity = new MiningInfo( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // mid
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // publicKey
+            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubKey
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // blockNo
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // blockHash
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // reward
@@ -146,8 +138,8 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
      
     @Override
     public void readEntity(Cursor cursor, MiningInfo entity, int offset) {
-        entity.setMid(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setPublicKey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setId(cursor.getLong(offset + 0));
+        entity.setPubKey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setBlockNo(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setBlockHash(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setReward(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
@@ -157,14 +149,14 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     
     @Override
     protected final Long updateKeyAfterInsert(MiningInfo entity, long rowId) {
-        entity.setMid(rowId);
+        entity.setId(rowId);
         return rowId;
     }
     
     @Override
     public Long getKey(MiningInfo entity) {
         if(entity != null) {
-            return entity.getMid();
+            return entity.getId();
         } else {
             return null;
         }
@@ -172,7 +164,7 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
 
     @Override
     public boolean hasKey(MiningInfo entity) {
-        return entity.getMid() != null;
+        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
     }
 
     @Override
