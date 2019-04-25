@@ -672,7 +672,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         BigInteger targetValue = ProofOfTransaction.
                 calculateMinerTargetValue(block.getBaseTarget(), forgingPower, blockTime - preBlockTime);
 
-        logger.info("Generation Signature {}", block.getGenerationSignature());
+        logger.info("Generation Signature {}", Hex.toHexString(block.getGenerationSignature()));
         BigInteger hit = ProofOfTransaction.calculateRandomHit(block.getGenerationSignature());
         logger.info("verify block target value {}, hit {}", targetValue, hit);
 
