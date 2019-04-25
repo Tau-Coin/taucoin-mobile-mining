@@ -188,6 +188,7 @@ public class Block {
             this.blockSignature = ECDSASignature.fromComponents(r, s,v);
 
             this.previousHeaderHash = block.get(3).getRLPData();
+
             // Parse option
             this.option = block.get(4).getRLPData()[0];
             // Parse Transactions
@@ -195,9 +196,21 @@ public class Block {
                 RLPList txTransactions = (RLPList) block.get(5);
                 this.parseTxs(txTransactions);
             }
+
         }
 
         this.parsed = true;
+        if(isMsg){
+            ECKey key;
+            try{
+                key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
+                if(key != null){
+                    forgerPubkey = key.getPubKey();
+                }
+            }catch (SignatureException e){
+                forgerPubkey = ByteUtil.intToBytes(0);
+            }
+        }
     }
 
 
