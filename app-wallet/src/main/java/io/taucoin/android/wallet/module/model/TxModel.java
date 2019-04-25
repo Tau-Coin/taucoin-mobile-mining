@@ -241,7 +241,7 @@ public class TxModel implements ITxModel {
                 .subscribe(new TAUObserver<DataResult<String>>() {
                     @Override
                     public void handleError(String msg, int msgCode) {
-                        String result = "Error in network, send failed";
+                        String result = ResourcesUtil.getText(R.string.send_tx_network_error);
                         MiningUtil.saveTransactionFail(txId, result);
                         observer.onNext(false);
                         super.handleError(result, msgCode);

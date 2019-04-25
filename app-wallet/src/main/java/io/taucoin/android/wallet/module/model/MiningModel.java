@@ -21,7 +21,6 @@ import io.taucoin.crypto.ECKey;
 import io.taucoin.util.ByteUtil;
 import org.spongycastle.util.encoders.Hex;
 
-import java.math.BigInteger;
 import java.security.SignatureException;
 import java.util.List;
 
@@ -34,11 +33,9 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningInfo;
-import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningInfoDaoUtils;
-import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.service.NotifyManager;
@@ -129,23 +126,24 @@ public class MiningModel implements IMiningModel{
 
     private void saveMiningInfo(Block block, boolean isConnect, boolean isSendNotify) {
         String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-        String number = String.valueOf(block.getNumber());
-        String hash = Hex.toHexString(block.getHash());
-        ECKey key = null;
-        try {
-            key = ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
-        }catch(SignatureException e){
+        String blockNo = String.valueOf(block.getNumber());
+        String blockHash = Hex.toHexString(block.getHash());
 
-        }
-        String generatorPublicKey = Hex.toHexString(key == null ? ByteUtil.intToBytes(0):key.getPubKey());
-        MiningInfo entry = MiningInfoDaoUtils.getInstance().queryByBlockHash(hash);
-        boolean isMine = StringUtil.isSame(pubicKey.toLowerCase(), generatorPublicKey);
+        byte[] bytesKey = ByteUtil.intToBytes(0);
+        try {
+            ECKey key = ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
+            bytesKey = key.getPubKey();
+        }catch(SignatureException ignore){ }
+
+        String generatorPublicKey = Hex.toHexString(bytesKey);
+        MiningInfo entry = MiningInfoDaoUtils.getInstance().queryByBlockHash(blockHash);
+        boolean isMine = StringUtil.isSame(pubicKey.toLowerCase(), generatorPublicKey.toLowerCase());
         if(entry == null){
             if(isMine && isConnect){
                 entry = new MiningInfo();
-                entry.setBlockNo(number);
+                entry.setBlockNo(blockNo);
                 entry.setPubKey(pubicKey);
-                entry.setBlockHash(hash);
+                entry.setBlockHash(blockHash);
                 entry.setValid(1);
 
                 List<Transaction> txList = block.getTransactionsList();
@@ -168,27 +166,6 @@ public class MiningModel implements IMiningModel{
         }
     }
 
-    private boolean handleSynchronizedTransaction(Block block) {
-        List<Transaction> txList = block.getTransactionsList();
-        String blockHash = Hex.toHexString(block.getHash());
-        long blockNumber = block.getNumber() + 1;
-        if(txList != null && txList.size() > 0){
-            for (Transaction transaction : txList) {
-                String txId = Hex.toHexString(transaction.getHash());
-                long blockTime = new BigInteger(transaction.getTime()).longValue();
-                TransactionHistory txHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
-                if(txHistory != null && StringUtil.isNotSame(txHistory.getResult(), TransmitKey.TxResult.SUCCESSFUL)){
-                    txHistory.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                    txHistory.setBlockTime(blockTime);
-                    txHistory.setBlockNum(blockNumber);
-                    txHistory.setBlockHash(blockHash);
-                    TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     public void handleSynchronizedBlock(BlockEventData blockEvent, boolean isConnect, LogicObserver<MessageEvent.EventCode> logicObserver) {
         Observable.create((ObservableOnSubscribe<MessageEvent.EventCode>) emitter -> {
@@ -199,11 +176,6 @@ public class MiningModel implements IMiningModel{
                     long blockNumber = block.getNumber();
                     updateSynchronizedBlockNum((int) blockNumber + 1);
                     saveMiningInfo(block, isConnect, true);
-
-//                    boolean isUpdate = handleSynchronizedTransaction(block, isConnect);
-//                    if(isUpdate){
-//                        eventCode = MessageEvent.EventCode.ALL;
-//                    }
                 }
             }
             emitter.onNext(eventCode);
