@@ -1,10 +1,8 @@
 package io.taucoin.forge;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
+
 import io.taucoin.facade.TaucoinImpl;
 import io.taucoin.util.ByteUtil;
-import org.apache.commons.collections4.CollectionUtils;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
@@ -13,6 +11,12 @@ import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListenerAdapter;
+import io.taucoin.sync2.ChainInfoManager;
+import io.taucoin.util.Utils;
+
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.BigIntegers;
@@ -21,6 +25,7 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -52,18 +57,7 @@ public class BlockForger {
 
     protected PendingState pendingState;
 
-    @Inject
-    public BlockForger() {
-	}
-
-    public void setTaucoin(Taucoin taucoin) {
-        this.taucoin = taucoin;
-        this.repository = taucoin.getRepository();
-        this.blockchain = taucoin.getBlockchain();
-        this.blockStore = taucoin.getBlockStore();
-        this.pendingState = taucoin.getWorldManager().getPendingState();
-        this.listener = (CompositeTaucoinListener)taucoin.getWorldManager().getListener();
-    }
+    private ChainInfoManager chainInfoManager;
 
     private List<ForgerListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -82,12 +76,40 @@ public class BlockForger {
     // Indicate whether pulling pool tx is successful or not.
     private boolean txsGot = false;
 
+    // Sync with remote peer.
+    private final Object syncLock = new Object();
+
+    private AtomicBoolean isWaitingSyncDone = new AtomicBoolean(false);
+
+    private ChainInfoManager.ChainInfoListener chainInfoListener
+            = new ChainInfoManager.ChainInfoListener() {
+        @Override
+        public void onChainInfoChanged(long height, byte[] previousBlockHash,
+                byte[] currentBlockHash, BigInteger totalDiff) {
+            BlockForger.this.onChainInfoChanged(height, currentBlockHash);
+        }
+    };
+
+    @Inject
+    public BlockForger(ChainInfoManager chainInfoManager) {
+        this.chainInfoManager = chainInfoManager;
+	}
+
+    public void setTaucoin(Taucoin taucoin) {
+        this.taucoin = taucoin;
+        this.repository = taucoin.getRepository();
+        this.blockchain = taucoin.getBlockchain();
+        this.blockStore = taucoin.getBlockStore();
+        this.pendingState = taucoin.getWorldManager().getPendingState();
+        this.listener = (CompositeTaucoinListener)taucoin.getWorldManager().getListener();
+    }
+
     public void init() {
         listener.addListener(new TaucoinListenerAdapter() {
 
             @Override
-            public void onBlock(Block block) {
-                BlockForger.this.onNewBlock(block);
+            public void onBlockConnected(Block block) {
+                BlockForger.this.onBlockConnected(block);
             }
 
             @Override
@@ -103,6 +125,8 @@ public class BlockForger {
             logger.info("Start forging now...");
             startForging((long)CONFIG.getForgedAmount());
         }
+
+        chainInfoManager.addListener(chainInfoListener);
     }
 
     public void startForging() {
@@ -171,10 +195,30 @@ public class BlockForger {
         return txListTemp;
     }
 
-    private void onNewBlock(Block newBlock) {
-        logger.info("On new block {}", newBlock.getNumber());
+    private void onBlockConnected(Block newBlock) {
+        logger.info("On block {} {} connected, remote block {}",
+                newBlock.getNumber(), Hex.toHexString(newBlock.getHash()),
+                Hex.toHexString(chainInfoManager.getCurrentBlockHash()));
 
-        // TODO: wakeup forging sleep thread or interupt forging process.
+        // If forging is running and current block is sync done with remote peer,
+        // wakeup forging thread.
+        if (isForging() && isWaitingSyncDone.get()
+                && Utils.hashEquals(
+                        newBlock.getHash(), chainInfoManager.getCurrentBlockHash())) {
+            notifySyncDone();
+        }
+    }
+
+    private void onChainInfoChanged(long height, byte[] currentHash) {
+        logger.info("On chain info changed {} {}", height, Hex.toHexString(currentHash));
+
+        // If forging is running and current block is sync done with remote peer,
+        // wakeup forging thread.
+        if (isForging() && isWaitingSyncDone.get()
+                && Utils.hashEquals(
+                        currentHash, chainInfoManager.getCurrentBlockHash())) {
+            notifySyncDone();
+        }
     }
 
     public boolean restartForging(String outcome) {
@@ -185,6 +229,17 @@ public class BlockForger {
         BigInteger cumulativeDifficulty;
 
         bestBlock = blockchain.getBestBlock();
+        if (!Utils.hashEquals(bestBlock.getHash(), chainInfoManager.getCurrentBlockHash())) {
+            try {
+                waitForSyncDone();
+            } catch (InterruptedException e) {
+                logger.warn("Forging task is interrupted when waiting for sync done");
+                isWaitingSyncDone.set(false);
+                return false;
+            }
+            return true;
+        }
+
         baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
         BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
@@ -355,6 +410,22 @@ public class BlockForger {
         synchronized(pullTxPoolLock) {
             txsGot = true;
             pullTxPoolLock.notify();
+        }
+    }
+
+    private void waitForSyncDone() throws InterruptedException {
+        logger.info("Wait for sync done");
+        synchronized(syncLock) {
+            isWaitingSyncDone.set(true);
+            syncLock.wait();
+            isWaitingSyncDone.set(false);
+        }
+    }
+
+    private void notifySyncDone() {
+        logger.info("notify sync done");
+        synchronized(syncLock) {
+            syncLock.notify();
         }
     }
 
