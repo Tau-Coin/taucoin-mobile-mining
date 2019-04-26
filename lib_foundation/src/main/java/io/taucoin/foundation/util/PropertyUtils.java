@@ -36,35 +36,30 @@ public class PropertyUtils {
     /**
      * Getting BaseUrl for the API request
      *
-     * @return
      */
     public static String getApiBaseUrl() {
         if (mProps == null) {
             throw new IllegalArgumentException("must call #init(context) in application");
         } else {
-            String configUrl = mProps.getProperty("api.base.url", "");
-            return configUrl;
+            return mProps.getProperty("api.base.url", "");
         }
     }
 
     /**
      * Get BaseUrl for H5
      *
-     * @return
      */
-    public static String getH5ApiBaseUrl() {
+    public static String getMainApiUrl() {
         if (mProps == null) {
             throw new IllegalArgumentException("must call #init(context) in application");
         } else {
-            String configUrl = mProps.getProperty("api.h5.base.url", "");
-            return configUrl;
+            return mProps.getProperty("api.main.url", "");
         }
     }
 
     /**
      * Is it an online version?
      *
-     * @return
      */
     public static boolean isProduct() {
         if (mProps == null) {
@@ -77,7 +72,6 @@ public class PropertyUtils {
     /**
      * Whether to open debug
      *
-     * @return
      */
     public static boolean isDebugOpen() {
         if (mProps == null) {

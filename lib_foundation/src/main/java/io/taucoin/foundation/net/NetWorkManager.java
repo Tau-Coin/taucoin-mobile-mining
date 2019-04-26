@@ -32,6 +32,7 @@ public class NetWorkManager {
 
     private static NetWorkManager mInstance;
     private static Retrofit retrofit;
+    private static Retrofit retrofitMain;
     private static Context mContext;
 
 
@@ -87,10 +88,23 @@ public class NetWorkManager {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
+        // init Retrofit
+        retrofitMain = new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(PropertyUtils.getMainApiUrl())
+                .addConverterFactory(GsonConverterFactory.create())
+                // Configure callback libraries using RxJava
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
     }
 
     public static <T> T createApiService(Class<T> tClass) {
         return retrofit.create(tClass);
+    }
+
+    public static <T> T createMainApiService(Class<T> tClass) {
+        return retrofitMain.create(tClass);
     }
 
     public static Context getContent() {
