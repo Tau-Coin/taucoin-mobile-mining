@@ -341,6 +341,14 @@ public class ECKey implements Serializable {
     }
 
     /**
+     * Get the compressed pubkey.
+     * @return
+     */
+    public byte[] getCompressedPubKey(){
+         return pub.getEncoded(true);
+    }
+
+    /**
      * Gets the public key in the form of an elliptic curve point object from Bouncy Castle.
      *
      * @return  -
