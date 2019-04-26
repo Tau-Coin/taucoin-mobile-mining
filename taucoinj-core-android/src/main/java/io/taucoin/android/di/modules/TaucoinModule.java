@@ -252,8 +252,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    BlockForger provideBlockForger() {
-        return new BlockForger();
+    BlockForger provideBlockForger(ChainInfoManager chainInfoManager) {
+        return new BlockForger(chainInfoManager);
     }
 
     @Provides

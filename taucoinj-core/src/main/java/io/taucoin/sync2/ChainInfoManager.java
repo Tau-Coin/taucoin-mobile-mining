@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -23,6 +25,8 @@ public class ChainInfoManager {
     private byte[] currentBlockHash;
     private BigInteger totalDiff;
 
+    private List<ChainInfoListener> listeners = new CopyOnWriteArrayList<>();
+
     @Inject
     public ChainInfoManager() {
         this.height = 0;
@@ -37,6 +41,8 @@ public class ChainInfoManager {
         this.previousBlockHash = previousBlockHash;
         this.currentBlockHash = currentBlockHash;
         this.totalDiff = totalDiff;
+
+        fireChainInfoChanged();
     }
 
     public synchronized long getHeight() {
@@ -53,5 +59,24 @@ public class ChainInfoManager {
 
     public synchronized BigInteger getTotalDiff() {
         return totalDiff;
+    }
+
+    public interface ChainInfoListener {
+        void onChainInfoChanged(long height, byte[] previousBlockHash,
+                byte[] currentBlockHash, BigInteger totalDiff);
+    }
+
+    public void addListener(ChainInfoListener l) {
+        listeners.add(l);
+    }
+
+    public void removeListener(ChainInfoListener l) {
+        listeners.remove(l);
+    }
+
+    private void fireChainInfoChanged() {
+        for (ChainInfoListener l : listeners) {
+            l.onChainInfoChanged(height, previousBlockHash, currentBlockHash, totalDiff);
+        }
     }
 }
