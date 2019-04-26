@@ -29,11 +29,13 @@ public class TransactionInfo implements Serializable {
     }
 
     public byte[] gettrHashcode() {
+        if(!parsed) rlpParse();
         return trHash;
     }
          
     public long gettrTime() {
-         return trTime;
+        if(!parsed) rlpParse();
+        return trTime;
     }
          
     public void settrHashcode(byte[] trHashcode){
@@ -43,15 +45,19 @@ public class TransactionInfo implements Serializable {
     public void settrTime(long trTime){
          this.trTime = trTime;
     }
-     public void rlpParse() { 
-         RLPList decodedTxList = RLP.decode2(rlpEncoded);
-         RLPList transaction = (RLPList) decodedTxList.get(0);
 
-         byte[] trHashcode = transaction.get(0).getRLPData();
-         byte[] trTime = transaction.get(1).getRLPData();
-         this.trHash = trHashcode;
-         this.trTime = ByteUtil.byteArrayToLong(trTime);
-         this.parsed = true;
+    public void rlpParse() {
+        if(rlpEncoded != null) {
+            RLPList decodedTxList = RLP.decode2(rlpEncoded);
+            RLPList transaction = (RLPList) decodedTxList.get(0);
+
+            byte[] trHashcode = transaction.get(0).getRLPData();
+            byte[] trTime = transaction.get(1).getRLPData();
+            this.trHash = trHashcode;
+            this.trTime = ByteUtil.byteArrayToLong(trTime);
+            this.parsed = true;
+        }
+        rlpEncoded = null;
      }
 
     public byte[] getEncoded() {

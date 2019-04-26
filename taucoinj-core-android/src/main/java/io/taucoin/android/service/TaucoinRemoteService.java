@@ -15,6 +15,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import android.util.Pair;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.manager.BlockLoader;
@@ -33,6 +34,7 @@ import io.taucoin.manager.AdminInfo;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.PeersPool;
+import io.taucoin.util.ByteUtil;
 import io.taucoin.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +43,7 @@ import org.spongycastle.util.encoders.Hex;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
@@ -1273,10 +1268,11 @@ public class TaucoinRemoteService extends TaucoinService {
     private static class AccountStateWraper {
         BigInteger balance;
         BigInteger power;
-
-        public AccountStateWraper(BigInteger balance, BigInteger power) {
+        ArrayList<String> txHis;
+        public AccountStateWraper(BigInteger balance, BigInteger power,ArrayList<String> txHis) {
             this.balance = balance;
             this.power   = power;
+            this.txHis   = txHis;
         }
     }
 
@@ -1301,6 +1297,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
             BigInteger balance = BigInteger.ZERO;
             BigInteger power   = BigInteger.ZERO;
+            TreeMap<Long,byte[]> txHistory = null;
             byte[] addressBytes = null;
 
             VersionedChecksummedBytes toEncoedAddress= new VersionedChecksummedBytes(address);
@@ -1309,9 +1306,25 @@ public class TaucoinRemoteService extends TaucoinService {
             if (taucoin != null && address != null && addressBytes != null) {
                 balance = taucoin.getRepository().getBalance(addressBytes);
                 power = taucoin.getRepository().getforgePower(addressBytes);
+                txHistory = taucoin.getRepository().getAccountState(addressBytes).getTranHistory();
             }
 
-            return new AccountStateWraper(balance, power);
+            ArrayList<String> retHistory = new ArrayList<>();
+            if (txHistory != null && txHistory.size() > 10) {
+                for (Long index : txHistory.keySet()) {
+                    byte[] txid = txHistory.get(index);
+                    retHistory.add("time: " + index.toString() + " hash: " + Hex.toHexString(txid).substring(0, 5));
+                }
+            }
+
+            if(txHistory != null && txHistory.size() < 10){
+                for (Long index : txHistory.keySet()) {
+                    System.out.println("======> size is: "+txHistory.size());
+                    byte[] txid = txHistory.get(index);
+                    retHistory.add("time: " + index.toString() + " hash: " + Hex.toHexString(txid).substring(0, 5));
+                }
+            }
+            return new AccountStateWraper(balance, power,retHistory);
         }
 
         protected void onPostExecute(AccountStateWraper state) {
@@ -1322,6 +1335,7 @@ public class TaucoinRemoteService extends TaucoinService {
             replyData.putString("address", address);
             replyData.putString("balance", state.balance.toString(10));
             replyData.putString("power", state.power.toString(10));
+            replyData.putStringArrayList("txHistory",state.txHis);
             replyMessage.setData(replyData);
 
             try {

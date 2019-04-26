@@ -1,5 +1,6 @@
 package io.taucoin.core;
 
+import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -131,7 +133,9 @@ public class TransactionExecutor {
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
             accountState.getTranHistory().put(txTime,tx.getHash());
         }
-
+        HashMap<ByteArrayWrapper, AccountState> updateTemp = new HashMap<ByteArrayWrapper, AccountState>();
+        updateTemp.put(new ByteArrayWrapper(tx.getSender()),accountState);
+        track.updateBatch(updateTemp);
     }
 
     public void undoTransaction() {

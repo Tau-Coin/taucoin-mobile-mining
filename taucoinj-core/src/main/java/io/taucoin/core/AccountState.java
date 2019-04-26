@@ -62,10 +62,10 @@ public class AccountState implements Serializable {
                 : new BigInteger(1, items.get(1).getRLPData());
 
         if(items.size() > 2) {
-            RLPList trHis = (RLPList) items.get(2);
-            for (int i = 0; i < trHis.size(); ++i) {
-                RLPElement transactionHis = trHis.get(i);
-                TransactionInfo trinfo = new TransactionInfo(transactionHis.getRLPData());
+            //RLPList trHis = (RLPList) items.get(2);
+            for (int i = 2; i < items.size(); ++i) {
+                byte[] transactionHis = items.get(i).getRLPData();
+                TransactionInfo trinfo = new TransactionInfo(transactionHis);
                 this.tranHistory.put(trinfo.gettrTime(),trinfo.gettrHashcode());
             }
         }
