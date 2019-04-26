@@ -44,6 +44,7 @@ import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.android.wallet.module.bean.TxPoolBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
@@ -59,7 +60,7 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.util.ByteUtil;
-import sun.misc.BASE64Encoder;
+import retrofit2.Response;
 
 public class TxModel implements ITxModel {
 
@@ -214,47 +215,30 @@ public class TxModel implements ITxModel {
     public void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer) {
         String txHash = Hex.toHexString(transaction.getEncoded());
         String txId = transaction.getTxid();
-        String createTime = Hex.toHexString(transaction.getTime());
-        String expireTime = Hex.toHexString(transaction.getExpireTime());
-        String fromAddress = Hex.toHexString(transaction.getSender());
-        String hex_after_base64 = null;
-        try {
-            BASE64Encoder base64en = new BASE64Encoder();
-            hex_after_base64 = base64en.encode(txHash.getBytes("utf-8"));
-        } catch (Exception ignore) {
-        }
-        if(StringUtil.isEmpty(hex_after_base64)){
-            observer.onError(CodeException.getError());
-            return;
-        }
-        Logger.d("txId=" + txId  + "\ttx_hex=" + hex_after_base64);
+        Logger.d("txId=" + txId  + "\ttxHash=" + txHash);
         Map<String,String> map = new HashMap<>();
-        map.put("tx_hex", hex_after_base64);
-        map.put("txid", txId);
-        map.put("ctime", createTime);
-        map.put("vblock", expireTime);
-        map.put("addin", fromAddress);
-        NetWorkManager.createApiService(TransactionService.class)
-                .sendRawTransaction(map)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new TAUObserver<DataResult<String>>() {
-                    @Override
-                    public void handleError(String msg, int msgCode) {
-                        String result = ResourcesUtil.getText(R.string.send_tx_network_error);
-                        MiningUtil.saveTransactionFail(txId, result);
-                        observer.onNext(false);
-                        super.handleError(result, msgCode);
-                    }
+        map.put("transaction", txHash);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .sendRawTransaction(map)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new TxObserver<Response<Void>>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    String result = ResourcesUtil.getText(R.string.send_tx_network_error);
+                    MiningUtil.saveTransactionFail(txId, result);
+                    observer.onNext(false);
+                    super.handleError(result, msgCode);
+                }
 
-                    @Override
-                    public void handleData(DataResult<String> dataResult) {
-                        super.handleData(dataResult);
-                        Logger.d("get_tx_id_after_sendTX=" + dataResult.getData());
-                        MiningUtil.saveTransactionSuccess();
-                        observer.onNext(true);
-                    }
-                });
+                @Override
+                public void handleData(Response<Void> dataResult) {
+                    super.handleData(dataResult);
+                    Logger.d("sendRawTransaction.handleData=" +dataResult);
+                    MiningUtil.saveTransactionSuccess();
+                    observer.onNext(true);
+                }
+            });
     }
 
     @Override

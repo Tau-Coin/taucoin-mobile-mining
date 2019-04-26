@@ -13,15 +13,15 @@ import org.greenrobot.greendao.annotation.Property;
 public class MiningInfo {
 
     @Id
-    private long id;
+    private Long id;
     private String pubKey;
     private String blockNo;
     private String blockHash;
     private String reward;
     private int valid;
     private int total;
-    @Generated(hash = 896663996)
-    public MiningInfo(long id, String pubKey, String blockNo, String blockHash,
+    @Generated(hash = 1481233812)
+    public MiningInfo(Long id, String pubKey, String blockNo, String blockHash,
             String reward, int valid, int total) {
         this.id = id;
         this.pubKey = pubKey;
@@ -34,10 +34,10 @@ public class MiningInfo {
     @Generated(hash = 636345119)
     public MiningInfo() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getPubKey() {

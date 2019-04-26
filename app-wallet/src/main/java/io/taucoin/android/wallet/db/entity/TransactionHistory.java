@@ -14,7 +14,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class TransactionHistory {
 
     @Id
-    private long id;
+    private Long id;
 
     private String txId;
 
@@ -43,8 +43,8 @@ public class TransactionHistory {
     private long transExpiry;
     // Time basis for acquiring transaction records
     private int timeBasis;
-    @Generated(hash = 1568833116)
-    public TransactionHistory(long id, String txId, String fromAddress,
+    @Generated(hash = 1686830942)
+    public TransactionHistory(Long id, String txId, String fromAddress,
             String toAddress, String createTime, String amount, String memo,
             String fee, String result, String message, long blockNum,
             String blockHash, long blockTime, long transExpiry, int timeBasis) {
@@ -67,10 +67,10 @@ public class TransactionHistory {
     @Generated(hash = 63079048)
     public TransactionHistory() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getTxId() {

@@ -23,6 +23,7 @@ import io.taucoin.android.wallet.module.bean.BalanceBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.foundation.net.callback.DataResult;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 /**
@@ -36,8 +37,8 @@ public interface TransactionService {
     @POST("getTauTransaction/")
     Observable<DataResult<TxDataBean>> getRawTransaction(@Body Map<String,String> txId);
 
-    @POST("sendTauTransaction/")
-    Observable<DataResult<String>> sendRawTransaction(@Body Map<String,String> tx_hex);
+    @POST("newtransaction")
+    Observable<Response<Void>> sendRawTransaction(@Body Map<String,String> tx_hex);
 
     @POST("getTxRecords/")
     Observable<DataResult<RawTxList>> getTxRecords(@Body Map<String,String> address);

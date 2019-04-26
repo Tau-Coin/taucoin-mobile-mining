@@ -24,7 +24,7 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property PubKey = new Property(1, String.class, "pubKey", false, "PUB_KEY");
         public final static Property BlockNo = new Property(2, String.class, "blockNo", false, "BLOCK_NO");
         public final static Property BlockHash = new Property(3, String.class, "blockHash", false, "BLOCK_HASH");
@@ -46,7 +46,7 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MINING_INFO\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"PUB_KEY\" TEXT," + // 1: pubKey
                 "\"BLOCK_NO\" TEXT," + // 2: blockNo
                 "\"BLOCK_HASH\" TEXT," + // 3: blockHash
@@ -64,7 +64,11 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, MiningInfo entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String pubKey = entity.getPubKey();
         if (pubKey != null) {
@@ -92,7 +96,11 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, MiningInfo entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String pubKey = entity.getPubKey();
         if (pubKey != null) {
@@ -119,13 +127,13 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public MiningInfo readEntity(Cursor cursor, int offset) {
         MiningInfo entity = new MiningInfo( //
-            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubKey
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // blockNo
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // blockHash
@@ -138,7 +146,7 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
      
     @Override
     public void readEntity(Cursor cursor, MiningInfo entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setPubKey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setBlockNo(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setBlockHash(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -164,7 +172,7 @@ public class MiningInfoDao extends AbstractDao<MiningInfo, Long> {
 
     @Override
     public boolean hasKey(MiningInfo entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

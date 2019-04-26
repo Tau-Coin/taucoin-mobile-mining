@@ -80,11 +80,10 @@ public class TransactionHistoryDaoUtils {
 
     public List<TransactionHistory> queryData(int pageNo, String time, String address) {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
-         db.where(TransactionHistoryDao.Properties.BlockTime.lt(time),
-                 TransactionHistoryDao.Properties.TimeBasis.eq(1),
+         db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
                 db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                     TransactionHistoryDao.Properties.ToAddress.eq(address))
-                ).orderDesc(TransactionHistoryDao.Properties.CreateTime, TransactionHistoryDao.Properties.BlockTime)
+                ).orderDesc(TransactionHistoryDao.Properties.CreateTime)
                  .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
         return db.list();
     }

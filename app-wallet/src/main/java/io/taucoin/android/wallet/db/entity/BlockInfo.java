@@ -14,15 +14,15 @@ import java.util.List;
 @Entity
 public class BlockInfo {
     @Id
-    private long id;
+    private Long id;
     private int blockHeight;
     private int blockSync;
 
     @Transient
     private List<MiningInfo> miningInfo;
 
-    @Generated(hash = 220266045)
-    public BlockInfo(long id, int blockHeight, int blockSync) {
+    @Generated(hash = 1356593060)
+    public BlockInfo(Long id, int blockHeight, int blockSync) {
         this.id = id;
         this.blockHeight = blockHeight;
         this.blockSync = blockSync;
@@ -40,11 +40,11 @@ public class BlockInfo {
         this.miningInfo = miningInfo;
     }
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,5 +63,4 @@ public class BlockInfo {
     public void setBlockSync(int blockSync) {
         this.blockSync = blockSync;
     }
-
 }

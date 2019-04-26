@@ -13,7 +13,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class KeyValue {
 
     @Id
-    private long id;
+    private Long id;
     private String pubKey;
     private String priKey;
     private String address;
@@ -22,8 +22,8 @@ public class KeyValue {
     private String nickName;
     private String miningState;
     private long transExpiry;
-    @Generated(hash = 816305586)
-    public KeyValue(long id, String pubKey, String priKey, String address,
+    @Generated(hash = 2046565074)
+    public KeyValue(Long id, String pubKey, String priKey, String address,
             long balance, long power, String nickName, String miningState,
             long transExpiry) {
         this.id = id;
@@ -39,10 +39,10 @@ public class KeyValue {
     @Generated(hash = 92014137)
     public KeyValue() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getPubKey() {

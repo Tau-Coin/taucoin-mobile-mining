@@ -24,7 +24,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property TxId = new Property(1, String.class, "txId", false, "TX_ID");
         public final static Property FromAddress = new Property(2, String.class, "fromAddress", false, "FROM_ADDRESS");
         public final static Property ToAddress = new Property(3, String.class, "toAddress", false, "TO_ADDRESS");
@@ -54,7 +54,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"TRANSACTION_HISTORY\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TX_ID\" TEXT," + // 1: txId
                 "\"FROM_ADDRESS\" TEXT," + // 2: fromAddress
                 "\"TO_ADDRESS\" TEXT," + // 3: toAddress
@@ -80,7 +80,11 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
     @Override
     protected final void bindValues(DatabaseStatement stmt, TransactionHistory entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String txId = entity.getTxId();
         if (txId != null) {
@@ -140,7 +144,11 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
     @Override
     protected final void bindValues(SQLiteStatement stmt, TransactionHistory entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String txId = entity.getTxId();
         if (txId != null) {
@@ -199,13 +207,13 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public TransactionHistory readEntity(Cursor cursor, int offset) {
         TransactionHistory entity = new TransactionHistory( //
-            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // txId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // fromAddress
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // toAddress
@@ -226,7 +234,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
      
     @Override
     public void readEntity(Cursor cursor, TransactionHistory entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTxId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setFromAddress(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setToAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -260,7 +268,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
 
     @Override
     public boolean hasKey(TransactionHistory entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

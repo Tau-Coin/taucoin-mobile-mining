@@ -230,6 +230,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                     ProgressManager.closeProgressDialog();
                     startRefresh();
                 }
+
+                @Override
+                public void handleError(int code, String msg) {
+                    startRefresh();
+                }
             });
         }else {
             refreshLayout.finishRefresh(1000);

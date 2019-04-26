@@ -17,14 +17,8 @@ package io.taucoin.android.wallet.module.presenter;
 
 import com.github.naturs.logger.Logger;
 
-import org.spongycastle.util.encoders.Hex;
-
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import io.taucoin.android.wallet.MyApplication;
-import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.model.ITxModel;
@@ -34,9 +28,6 @@ import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.net.exception.CodeException;
-import io.taucoin.foundation.util.StringUtil;
-import sun.misc.BASE64Encoder;
 
 public class TxPresenter {
     private ISendReceiveView mSendReceiveView;
@@ -107,16 +98,6 @@ public class TxPresenter {
     }
 
     public void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer){
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue == null) {
-            observer.onError(CodeException.getError());
-            return;
-        }
-        if(StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start) &&
-            MyApplication.getRemoteConnector().isInit()){
-            MyApplication.getRemoteConnector().submitTransaction(transaction);
-        }else{
-            mTxModel.sendRawTransaction(transaction, observer);
-        }
+        mTxModel.sendRawTransaction(transaction, observer);
     }
 }

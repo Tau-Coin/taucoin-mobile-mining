@@ -79,8 +79,8 @@ public class SysUtil {
             long appCpuTimeDiff = appTime - lastAppCpuTime;
             long cpuTimeDiff = cpuTime - lastCpuTime;
             sampleValue = ((double) appCpuTimeDiff / (double) cpuTimeDiff) * 100D;
-            Logger.i("sampleCPU=isMain:" + isMain + "\tappCpuTimeDiff:" + appCpuTimeDiff +
-                    "\tcpuTimeDiff:" + cpuTimeDiff + "\tsampleValue:" + sampleValue);
+//            Logger.i("sampleCPU=isMain:" + isMain + "\tappCpuTimeDiff:" + appCpuTimeDiff +
+//                    "\tcpuTimeDiff:" + cpuTimeDiff + "\tsampleValue:" + sampleValue);
             if(isMain){
                 lastMainAppCpuTime = appTime;
                 lastMainCpuTime = cpuTime;
