@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccountStateActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,9 +32,12 @@ public class AccountStateActivity extends AppCompatActivity implements View.OnCl
                             String address = bundle.getString("address");
                             String balance = bundle.getString("balance");
                             String power   = bundle.getString("power");
+                            ArrayList<String> txhis = bundle.getStringArrayList("txHistory");
+
                             stringBuilder.append("Address:" + address + "\n\n");
                             stringBuilder.append("Balance:" + balance + "\n\n");
-                            stringBuilder.append("Power:" + power);
+                            stringBuilder.append("Power:" + power + "\n\n");
+                            stringBuilder.append("txhistory:" + "\n" + txhis);
 
                             stateTextView.setText(stringBuilder.toString());
                             addressET.getText().clear();

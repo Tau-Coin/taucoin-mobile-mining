@@ -45,6 +45,7 @@ public class MessageFactory {
         Name2ClassMap.put("pooltransactions", PoolTxsMessage.class);
         Name2ClassMap.put("newblock", NewBlockMessage.class);
         Name2ClassMap.put("newtransaction", NewTxMessage.class);
+        Name2ClassMap.put("newtransactionstatus", NewTxStatusMessage.class);
     }
 
     private static ObjectMapper sObjectMapper = new ObjectMapper();
@@ -67,6 +68,7 @@ public class MessageFactory {
         sModule.addSerializer(PoolTxsMessage.class, new PoolTxsMessage.Serializer());
         sModule.addSerializer(NewBlockMessage.class, new NewBlockMessage.Serializer());
         sModule.addSerializer(NewTxMessage.class, new NewTxMessage.Serializer());
+        sModule.addSerializer(NewTxStatusMessage.class, new NewTxStatusMessage.Serializer());
         sModule.addSerializer(MessageResponse.class, new MessageResponse.Serializer());
 
         // Add deserializers
@@ -80,6 +82,7 @@ public class MessageFactory {
         sModule.addDeserializer(PoolTxsMessage.class, new PoolTxsMessage.Deserializer());
         sModule.addDeserializer(NewBlockMessage.class, new NewBlockMessage.Deserializer());
         sModule.addDeserializer(NewTxMessage.class, new NewTxMessage.Deserializer());
+        sModule.addDeserializer(NewTxStatusMessage.class, new NewTxStatusMessage.Deserializer());
         sModule.addDeserializer(MessageResponse.class, new MessageResponse.Deserializer());
 
         sObjectMapper.registerModule(sModule);

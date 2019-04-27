@@ -17,29 +17,28 @@ import org.spongycastle.util.encoders.Hex;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class NewTxMessage extends Message {
+public class NewTxStatusMessage extends Message {
 
-    // New tx
-    private Transaction newTx;
+    private String result;
 
-    public NewTxMessage() {
+    public NewTxStatusMessage() {
     }
 
-    public NewTxMessage(Transaction newTx) {
-        this.newTx = newTx;
+    public NewTxStatusMessage(String result) {
+        this.result = result;
     }
 
-    public Transaction getNewTransaction() {
-        return newTx;
+    public String getResult() {
+        return result;
     }
 
-    public void setNewTransaction(Transaction newTx) {
-        this.newTx = newTx;
+    public void setResult(String result) {
+        this.result = result;
     }
 
     @Override
-    public Class<NewTxStatusMessage> getAnswerMessage() {
-        return NewTxStatusMessage.class;
+    public Class<?> getAnswerMessage() {
+        return null;
     }
 
     @Override
@@ -50,29 +49,28 @@ public class NewTxMessage extends Message {
     @Override
     public String toString() {
         StringBuilder payload = new StringBuilder();
-        payload.append("\nNewTxMessage[\n");
-        payload.append("\tnewTx:" + Hex.toHexString(newTx.getHash()) + "\n");
+        payload.append("\nNewTxStatusMessage[\n");
+        payload.append("\tresult:" + result + ",\n");
         payload.append("]\n");
         return payload.toString();
     }
 
-    public static class Serializer extends StdSerializer<NewTxMessage> {
+    public static class Serializer extends StdSerializer<NewTxStatusMessage> {
 
         public Serializer() {
             this(null);
         }
 
-        public Serializer(Class<NewTxMessage> c) {
+        public Serializer(Class<NewTxStatusMessage> c) {
             super(c);
         }
 
         @Override
         public void serialize(
-                NewTxMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
+                NewTxStatusMessage message, JsonGenerator jsonGenerator, SerializerProvider serializer) {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("transaction",
-                        new String(Hex.toHexString(message.getNewTransaction().getEncoded())));
+                jsonGenerator.writeStringField("result", message.getResult());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -81,7 +79,7 @@ public class NewTxMessage extends Message {
         }
     }
 
-    public static class Deserializer extends StdDeserializer<NewTxMessage> {
+    public static class Deserializer extends StdDeserializer<NewTxStatusMessage> {
 
         public Deserializer() {
             this(null);
@@ -92,8 +90,8 @@ public class NewTxMessage extends Message {
         }
 
         @Override
-        public NewTxMessage deserialize(JsonParser parser, DeserializationContext deserializer) {
-            NewTxMessage message = new NewTxMessage();
+        public NewTxStatusMessage deserialize(JsonParser parser, DeserializationContext deserializer) {
+            NewTxStatusMessage message = new NewTxStatusMessage();
 
             ObjectCodec codec = parser.getCodec();
             JsonNode node = null;
@@ -105,8 +103,8 @@ public class NewTxMessage extends Message {
                 return null;
             }
 
-            JsonNode txNode = node.get("transaction");
-            message.setNewTransaction(new Transaction(Hex.decode(txNode.asText())));
+            JsonNode resultNode = node.get("result");
+            message.setResult(resultNode.asText());
 
             return message;
         }
