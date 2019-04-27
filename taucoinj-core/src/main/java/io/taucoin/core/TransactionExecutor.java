@@ -124,6 +124,7 @@ public class TransactionExecutor {
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
         AccountState accountState = track.getAccountState(tx.getSender());
+        //System.out.println("======> before size is: "+ accountState.getTranHistory().size());
         if(accountState.getTranHistory().size() > MaxHistoryCount){
             long txTime = Collections.min(accountState.getTranHistory().keySet());
             accountState.getTranHistory().remove(txTime);
@@ -133,9 +134,10 @@ public class TransactionExecutor {
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
             accountState.getTranHistory().put(txTime,tx.getHash());
         }
-        HashMap<ByteArrayWrapper, AccountState> updateTemp = new HashMap<ByteArrayWrapper, AccountState>();
-        updateTemp.put(new ByteArrayWrapper(tx.getSender()),accountState);
-        track.updateBatch(updateTemp);
+        //System.out.println("======> after size is: "+ accountState.getTranHistory().size());
+//        HashMap<ByteArrayWrapper, AccountState> updateTemp = new HashMap<ByteArrayWrapper, AccountState>();
+//        updateTemp.put(new ByteArrayWrapper(tx.getSender()),accountState);
+//        track.updateBatch(updateTemp);
     }
 
     public void undoTransaction() {
