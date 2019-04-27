@@ -227,12 +227,21 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 }catch (SignatureException e){
                     return DISCONNECTED_FAILED;
                 }
+                if(Hex.toHexString(key.getAddress()).equals("847ca210e2b61e9722d1584fcc0daea4c3639b09")){
+                    logger.warn("before undo special address forge power {} balance {}",
+                            track.getforgePower(key.getAddress()),track.getBalance(key.getAddress()));
+                }
 
                 for (Transaction tx : undoBlock.getTransactionsList()){
                     //roll back
                     TransactionExecutor executor = new TransactionExecutor(tx, track);
                     executor.setCoinbase(key.getAddress());
                     executor.undoTransaction();
+                }
+
+                if(Hex.toHexString(key.getAddress()).equals("847ca210e2b61e9722d1584fcc0daea4c3639b09")){
+                    logger.warn("after undo special address forge power {} balance {}",
+                            track.getforgePower(key.getAddress()),track.getBalance(key.getAddress()));
                 }
             }
 
