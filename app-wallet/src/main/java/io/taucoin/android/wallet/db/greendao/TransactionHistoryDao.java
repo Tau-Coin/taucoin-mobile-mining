@@ -34,11 +34,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         public final static Property Fee = new Property(7, String.class, "fee", false, "FEE");
         public final static Property Result = new Property(8, String.class, "result", false, "RESULT");
         public final static Property Message = new Property(9, String.class, "message", false, "MESSAGE");
-        public final static Property BlockNum = new Property(10, long.class, "blockNum", false, "BLOCK_NUM");
-        public final static Property BlockHash = new Property(11, String.class, "blockHash", false, "BLOCK_HASH");
-        public final static Property BlockTime = new Property(12, long.class, "blockTime", false, "BLOCK_TIME");
-        public final static Property TransExpiry = new Property(13, long.class, "transExpiry", false, "TRANS_EXPIRY");
-        public final static Property TimeBasis = new Property(14, int.class, "timeBasis", false, "TIME_BASIS");
+        public final static Property BlockHeight = new Property(10, long.class, "blockHeight", false, "BLOCK_HEIGHT");
+        public final static Property TransExpiry = new Property(11, long.class, "transExpiry", false, "TRANS_EXPIRY");
+        public final static Property TimeBasis = new Property(12, int.class, "timeBasis", false, "TIME_BASIS");
     }
 
 
@@ -64,11 +62,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
                 "\"FEE\" TEXT," + // 7: fee
                 "\"RESULT\" TEXT," + // 8: result
                 "\"MESSAGE\" TEXT," + // 9: message
-                "\"BLOCK_NUM\" INTEGER NOT NULL ," + // 10: blockNum
-                "\"BLOCK_HASH\" TEXT," + // 11: blockHash
-                "\"BLOCK_TIME\" INTEGER NOT NULL ," + // 12: blockTime
-                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 13: transExpiry
-                "\"TIME_BASIS\" INTEGER NOT NULL );"); // 14: timeBasis
+                "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 10: blockHeight
+                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 11: transExpiry
+                "\"TIME_BASIS\" INTEGER NOT NULL );"); // 12: timeBasis
     }
 
     /** Drops the underlying database table. */
@@ -130,15 +126,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         if (message != null) {
             stmt.bindString(10, message);
         }
-        stmt.bindLong(11, entity.getBlockNum());
- 
-        String blockHash = entity.getBlockHash();
-        if (blockHash != null) {
-            stmt.bindString(12, blockHash);
-        }
-        stmt.bindLong(13, entity.getBlockTime());
-        stmt.bindLong(14, entity.getTransExpiry());
-        stmt.bindLong(15, entity.getTimeBasis());
+        stmt.bindLong(11, entity.getBlockHeight());
+        stmt.bindLong(12, entity.getTransExpiry());
+        stmt.bindLong(13, entity.getTimeBasis());
     }
 
     @Override
@@ -194,15 +184,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         if (message != null) {
             stmt.bindString(10, message);
         }
-        stmt.bindLong(11, entity.getBlockNum());
- 
-        String blockHash = entity.getBlockHash();
-        if (blockHash != null) {
-            stmt.bindString(12, blockHash);
-        }
-        stmt.bindLong(13, entity.getBlockTime());
-        stmt.bindLong(14, entity.getTransExpiry());
-        stmt.bindLong(15, entity.getTimeBasis());
+        stmt.bindLong(11, entity.getBlockHeight());
+        stmt.bindLong(12, entity.getTransExpiry());
+        stmt.bindLong(13, entity.getTimeBasis());
     }
 
     @Override
@@ -223,11 +207,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // fee
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // result
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // message
-            cursor.getLong(offset + 10), // blockNum
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // blockHash
-            cursor.getLong(offset + 12), // blockTime
-            cursor.getLong(offset + 13), // transExpiry
-            cursor.getInt(offset + 14) // timeBasis
+            cursor.getLong(offset + 10), // blockHeight
+            cursor.getLong(offset + 11), // transExpiry
+            cursor.getInt(offset + 12) // timeBasis
         );
         return entity;
     }
@@ -244,11 +226,9 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         entity.setFee(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setResult(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setMessage(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setBlockNum(cursor.getLong(offset + 10));
-        entity.setBlockHash(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setBlockTime(cursor.getLong(offset + 12));
-        entity.setTransExpiry(cursor.getLong(offset + 13));
-        entity.setTimeBasis(cursor.getInt(offset + 14));
+        entity.setBlockHeight(cursor.getLong(offset + 10));
+        entity.setTransExpiry(cursor.getLong(offset + 11));
+        entity.setTimeBasis(cursor.getInt(offset + 12));
      }
     
     @Override

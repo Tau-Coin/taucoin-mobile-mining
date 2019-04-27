@@ -1,58 +1,50 @@
 package io.taucoin.android.wallet.module.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 public class RawTxBean {
 
-    /**
-     * txid : 0xe8dd583ebb7049641cc707b39a10b8ef079e37588726ff7db5f096b16044aaf5
-     * addin : TJdpA3upc9MYQdvGDAET786ehGscK8Vqen
-     * addout : TLQr4jCQXzopTVfzgpGPP4h9wihshMkz2b
-     * vout : 2000000000000000
-     * fee : 10
-     * blockNum : 0
-     * blockHash : 0x0e19e167b7160f7ce173dbe8dbf50d2266365907
-     * blockTime : 1548147259
-     */
-
-    private String txid;
-    private String addin;
-    private String addout;
-    private String vout;
+    @SerializedName(value = "txid")
+    private String txId;
+    private String sender;
+    private String receiver;
+    private String amount;
     private String fee;
-    private int blockNum;
-    private String blockHash;
-    private long blockTime;
-    private int notRolled;
+    @SerializedName(value = "blockheight")
+    private int blockHeight;
+    @SerializedName(value = "txtime")
+    private String txTime;
 
-    public String getTxid() {
-        return txid;
+    public String getTxId() {
+        return txId;
     }
 
-    public void setTxid(String txid) {
-        this.txid = txid;
+    public void setTxId(String txId) {
+        this.txId = txId;
     }
 
-    public String getAddin() {
-        return addin;
+    public String getSender() {
+        return sender;
     }
 
-    public void setAddin(String addin) {
-        this.addin = addin;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
-    public String getAddout() {
-        return addout;
+    public String getReceiver() {
+        return receiver;
     }
 
-    public void setAddout(String addout) {
-        this.addout = addout;
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
-    public String getVout() {
-        return vout;
+    public String getAmount() {
+        return amount;
     }
 
-    public void setVout(String vout) {
-        this.vout = vout;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 
     public String getFee() {
@@ -63,35 +55,19 @@ public class RawTxBean {
         this.fee = fee;
     }
 
-    public int getBlockNum() {
-        return blockNum;
+    public int getBlockHeight() {
+        return blockHeight;
     }
 
-    public void setBlockNum(int blockNum) {
-        this.blockNum = blockNum;
+    public void setBlockHeight(int blockHeight) {
+        this.blockHeight = blockHeight;
     }
 
-    public String getBlockHash() {
-        return blockHash;
+    public String getTxTime() {
+        return txTime;
     }
 
-    public void setBlockHash(String blockHash) {
-        this.blockHash = blockHash;
-    }
-
-    public long getBlockTime() {
-        return blockTime;
-    }
-
-    public void setBlockTime(long blockTime) {
-        this.blockTime = blockTime;
-    }
-
-    public int getNotRolled() {
-        return notRolled;
-    }
-
-    public void setNotRolled(int notRolled) {
-        this.notRolled = notRolled;
+    public void setTxTime(String txTime) {
+        this.txTime = txTime;
     }
 }

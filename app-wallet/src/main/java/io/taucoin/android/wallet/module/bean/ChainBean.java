@@ -1,20 +1,13 @@
 package io.taucoin.android.wallet.module.bean;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
-public class RawTxList {
+public class ChainBean {
 
     private int status;
     private String message;
-    private List<RawTxBean> records;
-
-    public List<RawTxBean> getRecords() {
-        return records;
-    }
-
-    public void setRecords(List<RawTxBean> records) {
-        this.records = records;
-    }
+    @SerializedName(value = "payload")
+    private ChainDetail payLoad;
 
     public int getStatus() {
         return status;
@@ -30,5 +23,13 @@ public class RawTxList {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public ChainDetail getPayLoad() {
+        return payLoad;
+    }
+
+    public void setPayLoad(ChainDetail payLoad) {
+        this.payLoad = payLoad;
     }
 }

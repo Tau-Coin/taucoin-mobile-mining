@@ -17,19 +17,21 @@ public class KeyValue {
     private String pubKey;
     private String priKey;
     private String address;
+    private String rawAddress;
     private long balance;
     private long power;
     private String nickName;
     private String miningState;
     private long transExpiry;
-    @Generated(hash = 2046565074)
+    @Generated(hash = 726499634)
     public KeyValue(Long id, String pubKey, String priKey, String address,
-            long balance, long power, String nickName, String miningState,
-            long transExpiry) {
+            String rawAddress, long balance, long power, String nickName,
+            String miningState, long transExpiry) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
         this.address = address;
+        this.rawAddress = rawAddress;
         this.balance = balance;
         this.power = power;
         this.nickName = nickName;
@@ -62,6 +64,12 @@ public class KeyValue {
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getRawAddress() {
+        return this.rawAddress;
+    }
+    public void setRawAddress(String rawAddress) {
+        this.rawAddress = rawAddress;
     }
     public long getBalance() {
         return this.balance;

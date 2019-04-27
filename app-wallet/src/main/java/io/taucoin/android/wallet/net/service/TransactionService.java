@@ -15,34 +15,36 @@
  */
 package io.taucoin.android.wallet.net.service;
 
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
 
-import io.taucoin.android.wallet.module.bean.BalanceBean;
+import io.taucoin.android.wallet.module.bean.AccountBean;
+import io.taucoin.android.wallet.module.bean.ChainBean;
+import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
-import io.taucoin.foundation.net.callback.DataResult;
-import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 /**
  * Application Transaction-related Background Services
  * */
 public interface TransactionService {
 
-    @POST("getAccountDetail/")
-    Observable<DataResult<BalanceBean>> getBalance(@Body Map<String,String> email);
+    @POST("getaccountinfo")
+    Observable<AccountBean> getBalance(@Body Map<String,String> address);
 
-    @POST("getTauTransaction/")
-    Observable<DataResult<TxDataBean>> getRawTransaction(@Body Map<String,String> txId);
+    @POST("gettxsstatus")
+    Observable<TxDataBean> getRawTransaction(@Body Map<String, List<String>> txIds);
 
     @POST("newtransaction")
-    Observable<Response<Void>> sendRawTransaction(@Body Map<String,String> tx_hex);
+    Observable<NewTxBean> sendRawTransaction(@Body Map<String,String> tx_hex);
 
-    @POST("getTxRecords/")
-    Observable<DataResult<RawTxList>> getTxRecords(@Body Map<String,String> address);
+    @POST("gettxsrecords")
+    Observable<RawTxList> getTxRecords(@Body Map<String,String> address);
 
-    @POST("getTauHeight/")
-    Observable<DataResult<String>> getBlockHeight();
+    @GET("getchaininfo")
+    Observable<ChainBean> getBlockHeight();
 }

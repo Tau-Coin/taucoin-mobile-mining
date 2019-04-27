@@ -103,9 +103,6 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         groupViewHolder.tvAmount.setText(amount);
 
         String time = DateUtil.formatTime(tx.getCreateTime(), DateUtil.pattern6);
-        if(StringUtil.isEmpty(time) && tx.getBlockTime() > 0){
-            time = DateUtil.formatTime(tx.getBlockTime(), DateUtil.pattern6);
-        }
         groupViewHolder.tvTime.setText(time);
         // The user is the sender
         int color = R.color.color_red;

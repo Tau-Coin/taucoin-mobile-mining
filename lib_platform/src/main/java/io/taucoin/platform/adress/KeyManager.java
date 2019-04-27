@@ -18,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.platform.core.Base58;
 
+import org.spongycastle.util.encoders.Hex;
+
+
 import static io.taucoin.platform.adress.KeyGenerator.debug;
 
 public class KeyManager {
@@ -56,20 +59,31 @@ public class KeyManager {
 
     public static Key validateKey(String privateKey){
         Key key = new Key();
-        key.SetPrivKey(privateKey);
+        key.setPriKey(privateKey);
 
         String publicKey = generatorPublicKey(privateKey);
         if(StringUtil.isEmpty(publicKey)){
             return null;
         }
-        key.SetPubKey(publicKey);
+        key.setPubKey(publicKey);
 
         String address = generatorAddress(publicKey);
         if(StringUtil.isEmpty(address)){
             return null;
         }
-        key.SetAddress(address);
+        key.setAddress(address);
+
+        String rawAddress = generatorRawAddress(publicKey);
+        if(StringUtil.isEmpty(rawAddress)){
+            return null;
+        }
+        key.setRawAddress(rawAddress);
         return key;
+    }
+
+    private static String generatorRawAddress(String compressedPk) {
+        byte[] rawAddress = io.taucoin.core.Utils.sha256hash160(Hex.decode(compressedPk));
+        return Hex.toHexString(rawAddress);
     }
 
     private static String generatorAddress(String compressedPk) {

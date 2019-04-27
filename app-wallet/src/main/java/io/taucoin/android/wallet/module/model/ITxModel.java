@@ -19,22 +19,22 @@ import java.util.List;
 
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
+import io.taucoin.android.wallet.module.bean.AccountBean;
+import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
-import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.core.Transaction;
-import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public interface ITxModel {
     /** Get balance from the server */
-    void getBalance(TAUObserver<DataResult<BalanceBean>> observer);
+    void getBalance(TxObserver<AccountBean> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
-    void checkRawTransaction(TransactionHistory transaction, LogicObserver<Boolean> observer);
+    void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer);
 
     /** Get the list of transactions to be Pending */
-    void getTxPendingList(LogicObserver<List<TransactionHistory>> observer);
+    void getTxPendingList(LogicObserver<List<List<String>>> observer);
 
     /** Create transaction data */
     void createTransaction(TransactionHistory txHistory, LogicObserver<Transaction> observer);
@@ -52,16 +52,16 @@ public interface ITxModel {
     void queryTransactionHistory(int pageNo, String time, LogicObserver<List<TransactionHistory>> logicObserver);
 
     /** Get the transaction history of the server  */
-    void getTxRecords(TAUObserver<DataResult<RawTxList>> observer);
+    void getTxRecords(TxObserver<RawTxList> observer);
 
     /** Save the transaction history of the server  */
     void saveTxRecords(RawTxList rawTxList, LogicObserver<Boolean> observer);
 
     /** get block height from the server */
-    void getBlockHeight(TAUObserver<DataResult<String>> observer);
+    void getBlockHeight(TxObserver<ChainBean> observer);
 
     /** Update balance from the server */
-    void updateBalance(BalanceBean balance, LogicObserver<KeyValue> observer);
+    void updateBalance(AccountBean accountInfo, LogicObserver<KeyValue> observer);
 
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);

@@ -39,9 +39,10 @@ public class UserModel implements IUserModel{
                 Key key = KeyManager.generatorKey();
                 if(key != null){
                     kv = new KeyValue();
-                    kv.setPriKey(key.getPrivkey());
-                    kv.setPubKey(key.getPubkey());
+                    kv.setPriKey(key.getPriKey());
+                    kv.setPubKey(key.getPubKey());
                     kv.setAddress(key.getAddress());
+                    kv.setRawAddress(key.getRawAddress());
                 }else {
                     emitter.onError(CodeException.getError());
                     return;
@@ -77,8 +78,9 @@ public class UserModel implements IUserModel{
             if(keyValue != null && StringUtil.isNotEmpty(keyValue.getPriKey())){
                 Key key = KeyManager.validateKey(keyValue.getPriKey());
                 if(key != null){
-                    keyValue.setPubKey(key.getPubkey());
+                    keyValue.setPubKey(key.getPubKey());
                     keyValue.setAddress(key.getAddress());
+                    keyValue.setRawAddress(key.getRawAddress());
                     KeyValueDaoUtils.getInstance().update(keyValue);
                 }
                 emitter.onNext(keyValue);

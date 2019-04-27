@@ -4,6 +4,7 @@ import com.github.naturs.logger.Logger;
 
 import org.spongycastle.crypto.digests.RIPEMD160Digest;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.util.encoders.Hex;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -153,7 +154,7 @@ public class KeyGenerator {
             //Log.i("key",compressedPk);
             System.out.println("compressed pubkey: " + compressedPk);
         }
-        key.SetPubKey(compressedPk);
+        key.setPubKey(compressedPk);
 
         // We now need to perform a SHA-256 digest on the public key,
         // followed by a RIPEMD-160 digest.
@@ -232,7 +233,7 @@ public class KeyGenerator {
             System.out.println("before base58: " + TauUtils.BytesToHex(a1).toUpperCase());
         }
 
-        key.SetAddress(Base58.encode(a1));
+        key.setAddress(Base58.encode(a1));
         if (debug) {
             System.out.println("addr: " + Base58.encode(a1));
         }
@@ -265,11 +266,14 @@ public class KeyGenerator {
         }
         //compressedPrivKey[compressedPrivKey.length - 1] = PrivKeySuffix;
 
-        key.SetPrivKey(Base58.encode(compressedPrivKey));
+        key.setPriKey(Base58.encode(compressedPrivKey));
         if (debug) {
            // Log.i("key",Base58.encode(compressedPrivKey));
             System.out.println("compressed private key: " + Base58.encode(compressedPrivKey));
         }
+
+        byte[] rawAddress = io.taucoin.core.Utils.sha256hash160(Hex.decode(compressedPk));
+        key.setRawAddress(Hex.toHexString(rawAddress));
 
         return true;
     }
