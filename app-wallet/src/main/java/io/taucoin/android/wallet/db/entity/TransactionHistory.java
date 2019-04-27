@@ -34,20 +34,17 @@ public class TransactionHistory {
 
     private String message;
 
-    private long blockNum;
+    private long blockHeight;
 
-    private String blockHash;
-
-    private long blockTime;
     // tx expiration date(expire block num)
     private long transExpiry;
     // Time basis for acquiring transaction records
     private int timeBasis;
-    @Generated(hash = 1686830942)
+    @Generated(hash = 1289841467)
     public TransactionHistory(Long id, String txId, String fromAddress,
             String toAddress, String createTime, String amount, String memo,
-            String fee, String result, String message, long blockNum,
-            String blockHash, long blockTime, long transExpiry, int timeBasis) {
+            String fee, String result, String message, long blockHeight,
+            long transExpiry, int timeBasis) {
         this.id = id;
         this.txId = txId;
         this.fromAddress = fromAddress;
@@ -58,9 +55,7 @@ public class TransactionHistory {
         this.fee = fee;
         this.result = result;
         this.message = message;
-        this.blockNum = blockNum;
-        this.blockHash = blockHash;
-        this.blockTime = blockTime;
+        this.blockHeight = blockHeight;
         this.transExpiry = transExpiry;
         this.timeBasis = timeBasis;
     }
@@ -127,23 +122,11 @@ public class TransactionHistory {
     public void setMessage(String message) {
         this.message = message;
     }
-    public long getBlockNum() {
-        return this.blockNum;
+    public long getBlockHeight() {
+        return this.blockHeight;
     }
-    public void setBlockNum(long blockNum) {
-        this.blockNum = blockNum;
-    }
-    public String getBlockHash() {
-        return this.blockHash;
-    }
-    public void setBlockHash(String blockHash) {
-        this.blockHash = blockHash;
-    }
-    public long getBlockTime() {
-        return this.blockTime;
-    }
-    public void setBlockTime(long blockTime) {
-        this.blockTime = blockTime;
+    public void setBlockHeight(long blockHeight) {
+        this.blockHeight = blockHeight;
     }
     public long getTransExpiry() {
         return this.transExpiry;

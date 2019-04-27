@@ -1,54 +1,60 @@
 package io.taucoin.platform.adress;
 
 public class Key {
-    private String privkey;
-    private String pubkey;
+    private String priKey;
+    private String pubKey;
     private String address;
+    private String rawAddress;
 
-    public Key() {
+    Key() {
         Reset();
     }
 
-    public Key(String privkey, String pubkey, String address) {
-        this.privkey = privkey;
-        this.pubkey  = pubkey;
-        this.address = address;
-    }
-
-    public void Reset() {
-        this.privkey = null;
-        this.pubkey  = null;
+    void Reset() {
+        this.priKey = null;
+        this.pubKey  = null;
         this.address = null;
+        this.rawAddress = null;
     }
 
-    public String getPrivkey() {
-        return privkey;
+    public String getPriKey() {
+        return priKey;
     }
 
-    public String getPubkey() {
-        return pubkey;
+    public void setPriKey(String priKey) {
+        this.priKey = priKey;
+    }
+
+    public String getPubKey() {
+        return pubKey;
+    }
+
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
     }
 
     public String getAddress() {
         return address;
     }
-    public void SetPrivKey(String privkey) {
-        this.privkey = privkey;
-    }
 
-    public void SetPubKey(String pubkey) {
-        this.pubkey = pubkey;
-    }
-
-    public void SetAddress(String address) {
+    public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRawAddress() {
+        return rawAddress;
+    }
+
+    public void setRawAddress(String rawAddress) {
+        this.rawAddress = rawAddress;
     }
 
     public String ToString() {
         return "{\n"
-            + "\t privkey:" + this.privkey + "\n"
-            + "\t pubkey :" + this.pubkey  + "\n"
+            + "\t priKey:" + this.priKey + "\n"
+            + "\t pubKey :" + this.pubKey  + "\n"
             + "\t address:" + this.address + "\n"
+            + "\t rawAddress:" + this.rawAddress + "\n"
             + "}\n";
     }
 }

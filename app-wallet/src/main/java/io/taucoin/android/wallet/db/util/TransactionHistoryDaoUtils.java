@@ -20,6 +20,8 @@ import io.taucoin.android.wallet.db.GreenDaoManager;
 import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.util.DateUtil;
+
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
@@ -53,10 +55,10 @@ public class TransactionHistoryDaoUtils {
 
     public List<TransactionHistory> getTxPendingList(String formAddress) {
         QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
-        return qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
-                qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
-                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)))
-        .list();
+        qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
+            qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
+                TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)));
+        return qb.list();
     }
 
     public List<TransactionHistory> getPendingAmountList(String formAddress) {
@@ -90,17 +92,18 @@ public class TransactionHistoryDaoUtils {
 
     /** It's your latest time to accept your address here.*/
     public String getNewestTxTime(String address) {
-        long time = 0L;
+        // default 2019-05-25
+        String time = "1554048000";
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
         db.where(TransactionHistoryDao.Properties.TimeBasis.eq(1),
             db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                 TransactionHistoryDao.Properties.ToAddress.eq(address))
         )
-        .orderDesc(TransactionHistoryDao.Properties.BlockTime);
+        .orderDesc(TransactionHistoryDao.Properties.CreateTime);
         List<TransactionHistory> list = db.list();
         if(list.size() > 0){
-            time = list.get(0).getBlockTime();
+            time = list.get(0).getCreateTime();
         }
-        return String.valueOf(time);
+        return time;
     }
 }

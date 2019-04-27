@@ -29,18 +29,19 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
+import io.taucoin.android.wallet.module.bean.AccountBean;
+import io.taucoin.android.wallet.module.bean.ChainBean;
+import io.taucoin.android.wallet.module.bean.ChainDetail;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
-import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.foundation.util.StringUtil;
 
 public class TxService extends Service {
@@ -120,29 +121,27 @@ public class TxService extends Service {
 
     private void checkRawTransactionDelay() {
         mIsChecked = true;
-        Observable.timer(60, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .subscribe(new CommonObserver<Long>() {
-                    @Override
-                    public void onComplete() {
-                        checkRawTransaction();
-                    }
-                });
+        Observable.timer(5, TimeUnit.MINUTES)
+            .subscribeOn(Schedulers.io())
+            .subscribe(new CommonObserver<Long>() {
+                @Override
+                public void onComplete() {
+                    checkRawTransaction();
+                }
+            });
     }
 
     private void checkRawTransaction() {
         mIsChecked = true;
-        mTxModel.getTxPendingList(new LogicObserver<List<TransactionHistory>>(){
+        mTxModel.getTxPendingList(new LogicObserver<List<List<String>>>(){
 
             @Override
-            public void handleData(List<TransactionHistory> txHistories) {
-                if(txHistories.size() > 0){
-                    Logger.d("checkRawTransaction start size=" + txHistories.size());
-                    for (int i = 0; i < txHistories.size(); i++) {
+            public void handleData(List<List<String>> txIdsList) {
+                if(txIdsList != null && txIdsList.size() > 0){
+                    Logger.d("checkRawTransaction start size=" + txIdsList.size());
+                    for (int i = 0; i < txIdsList.size(); i++) {
                         try {
-                            String txId = txHistories.get(i).getTxId();
-                            Logger.d("checkRawTransaction TxId=" + txId);
-                            mTxModel.checkRawTransaction(txHistories.get(i), new LogicObserver<Boolean>(){
+                            mTxModel.checkRawTransaction(txIdsList.get(i), new LogicObserver<Boolean>(){
 
                                 @Override
                                 public void handleData(Boolean isRefresh) {
@@ -166,20 +165,31 @@ public class TxService extends Service {
         });
     }
 
+    private void getBalanceDelay(String serviceType) {
+        mIsChecked = true;
+        Observable.timer(5, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .subscribe(new CommonObserver<Long>() {
+                @Override
+                public void onComplete() {
+                    getBalance(serviceType);
+                }
+            });
+    }
+
     private void getBalance(String serviceType) {
-        mTxModel.getBalance(new TAUObserver<DataResult<BalanceBean>>() {
+        mTxModel.getBalance(new TxObserver<AccountBean>() {
             @Override
             public void handleError(String msg, int msgCode) {
                 handleBalanceDisplay(serviceType, false);
             }
 
             @Override
-            public void handleData(DataResult<BalanceBean> balanceResult) {
-                super.handleData(balanceResult);
-                BalanceBean balance = balanceResult.getData();
+            public void handleData(AccountBean account) {
+                super.handleData(account);
                 Logger.i("getBalance success");
-                if(balance != null){
-                    mTxModel.updateBalance(balance, new LogicObserver<KeyValue>() {
+                if(account != null && account.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
+                    mTxModel.updateBalance(account, new LogicObserver<KeyValue>() {
                         @Override
                         public void handleData(KeyValue entry) {
                             MyApplication.setKeyValue(entry);
@@ -204,7 +214,7 @@ public class TxService extends Service {
             if(isSuccess){
                 EventBusUtil.post(MessageEvent.EventCode.ALL);
             }else{
-                getBalance(TransmitKey.ServiceType.GET_BALANCE);
+                getBalanceDelay(TransmitKey.ServiceType.GET_BALANCE);
             }
         }else{
             EventBusUtil.post(MessageEvent.EventCode.BALANCE);
@@ -213,13 +223,15 @@ public class TxService extends Service {
 
     private void getBlockHeight(boolean isDelayRefresh){
         mIsGetBlockHeight = true;
-        mTxModel.getBlockHeight(new TAUObserver<DataResult<String>>(){
+        mTxModel.getBlockHeight(new TxObserver<ChainBean>(){
 
             @Override
-            public void handleData(DataResult<String> result) {
-                if(result != null){
-                    Logger.d("getBlockHeight =" + result.getData());
-                    int blockHeight = StringUtil.getIntString(result.getData());
+            public void handleData(ChainBean result) {
+                if(result != null && result.getStatus() == NetResultCode.MAIN_SUCCESS_CODE &&
+                        result.getPayLoad() != null){
+                    ChainDetail chainDetail = result.getPayLoad();
+                    Logger.d("getBlockHeight =" + chainDetail.getTotalHeight());
+                    int blockHeight = chainDetail.getTotalHeight();
                     mTxModel.updateBlockHeight(blockHeight, new LogicObserver<Boolean>() {
                         @Override
                         public void handleData(Boolean keyValue) {
@@ -234,12 +246,15 @@ public class TxService extends Service {
 
             @Override
             public void handleError(String msg, int msgCode) {
+                if(isDelayRefresh){
+                    getBlockHeightDelay();
+                }
             }
         });
     }
 
     private void getBlockHeightDelay() {
-        Observable.timer(1, TimeUnit.MINUTES)
+        Observable.timer(2, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override

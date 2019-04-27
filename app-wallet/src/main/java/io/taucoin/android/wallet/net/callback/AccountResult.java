@@ -1,20 +1,10 @@
-package io.taucoin.android.wallet.module.bean;
+package io.taucoin.android.wallet.net.callback;
 
-import java.util.List;
-
-public class RawTxList {
-
+public class AccountResult<T> {
     private int status;
     private String message;
-    private List<RawTxBean> records;
+    private T data;
 
-    public List<RawTxBean> getRecords() {
-        return records;
-    }
-
-    public void setRecords(List<RawTxBean> records) {
-        this.records = records;
-    }
 
     public int getStatus() {
         return status;
@@ -30,5 +20,13 @@ public class RawTxList {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 }

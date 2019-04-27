@@ -25,9 +25,11 @@ import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.net.callback.NetResultCode;
 
 public class TxPresenter {
     private ISendReceiveView mSendReceiveView;
@@ -55,8 +57,8 @@ public class TxPresenter {
     }
 
     public void getTxRecords(LogicObserver<Boolean> observer) {
-        Logger.i("getAddOuts start");
-        mTxModel.getTxRecords(new TAUObserver<DataResult<RawTxList>>(){
+        Logger.i("getTxRecords start");
+        mTxModel.getTxRecords(new TxObserver<RawTxList>(){
 
             @Override
             public void handleError(String msg, int msgCode) {
@@ -65,14 +67,13 @@ public class TxPresenter {
             }
 
             @Override
-            public void handleData(DataResult<RawTxList> listDataResult) {
-                super.handleData(listDataResult);
-                Logger.i("getAddOuts success");
-                if(listDataResult != null && listDataResult.getData() != null){
-                    Logger.i("getAddOuts success");
-                    mTxModel.saveTxRecords(listDataResult.getData(), observer);
+            public void handleData(RawTxList listData) {
+                super.handleData(listData);
+                if(listData != null && listData.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
+                    Logger.i("getTxRecords success");
+                    mTxModel.saveTxRecords(listData, observer);
                 }else{
-                    Logger.i("getAddOuts success = 0");
+                    Logger.i("getTxRecords success = 0");
                     observer.onNext(true);
                 }
             }

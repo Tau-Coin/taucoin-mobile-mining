@@ -58,8 +58,9 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
         }else{
             KeyValue keyValue = new KeyValue();
             keyValue.setPriKey(privateKey);
-            keyValue.setPubKey(key.getPubkey());
+            keyValue.setPubKey(key.getPubKey());
             keyValue.setAddress(key.getAddress());
+            keyValue.setRawAddress(key.getRawAddress());
             mUserPresenter.showSureDialog(this, keyValue);
         }
     }

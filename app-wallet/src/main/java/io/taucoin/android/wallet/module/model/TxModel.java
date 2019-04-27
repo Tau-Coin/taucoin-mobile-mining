@@ -16,11 +16,13 @@
 package io.taucoin.android.wallet.module.model;
 
 import com.github.naturs.logger.Logger;
+
 import io.taucoin.android.wallet.R;
 
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,14 +40,18 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
-import io.taucoin.android.wallet.module.bean.BalanceBean;
+import io.taucoin.android.wallet.module.bean.AccountBean;
+import io.taucoin.android.wallet.module.bean.ChainBean;
+import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
-import io.taucoin.android.wallet.module.bean.TxPoolBean;
+import io.taucoin.android.wallet.module.bean.TxStatusBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
+import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -57,19 +63,19 @@ import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.util.ByteUtil;
-import retrofit2.Response;
 
 public class TxModel implements ITxModel {
 
     @Override
-    public void getBalance(TAUObserver<DataResult<BalanceBean>> observer) {
-        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map=new HashMap<>();
-        map.put("address",  address);
-        NetWorkManager.createApiService(TransactionService.class)
+    public void getBalance(TxObserver<AccountBean> observer) {
+        String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  rawAddress);
+        NetWorkManager.createMainApiService(TransactionService.class)
             .getBalance(map)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
@@ -77,17 +83,17 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void updateBalance(BalanceBean balancebean, LogicObserver<KeyValue> observer) {
+    public void updateBalance(AccountBean accountInfo, LogicObserver<KeyValue> observer) {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
 
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
             try {
-                BigInteger balance = new BigInteger(balancebean.getBalance());
-                BigInteger power = new BigInteger(balancebean.getForgepower());
-                keyValue.setBalance(balance.longValue());
-                keyValue.setPower(power.longValue());
-                KeyValueDaoUtils.getInstance().update(keyValue);
+                if(accountInfo != null && StringUtil.isNotEmpty(accountInfo.getAccountInfo())){
+                    keyValue.setBalance(accountInfo.getBalance().longValue());
+                    keyValue.setPower(accountInfo.getPower().longValue());
+                    KeyValueDaoUtils.getInstance().update(keyValue);
+                }
             }catch (Exception ignore){}
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -96,78 +102,128 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getTxPendingList(LogicObserver<List<TransactionHistory>> observer){
+    public void getTxPendingList(LogicObserver<List<List<String>>> observer){
         KeyValue keyValue = MyApplication.getKeyValue();
         String address = keyValue.getAddress();
-        Observable.create((ObservableOnSubscribe<List<TransactionHistory>>) emitter -> {
-            List<TransactionHistory> list = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
-            emitter.onNext(list);
+        Observable.create((ObservableOnSubscribe<List<List<String>>>) emitter -> {
+            List<TransactionHistory> txList = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
+            List<List<String>> lists = new ArrayList<>();
+            if(txList != null && txList.size() > 0){
+                List<String> idsList = new ArrayList<>();
+                for (int i = 0; i < txList.size(); i++) {
+                    if(idsList.size() == 5){
+                        lists.add(idsList);
+                        idsList = new ArrayList<>();
+                    }
+                    idsList.add(txList.get(i).getTxId());
+                }
+                if(idsList.size() > 0){
+                    lists.add(idsList);
+                }
+            }
+            emitter.onNext(lists);
         }).subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
 
     @Override
-    public void checkRawTransaction(TransactionHistory transaction, LogicObserver<Boolean> observer) {
-        String expireTime = String.valueOf(transaction.getTransExpiry());
-        String txId = transaction.getTxId();
-        Map<String,String> map = new HashMap<>();
-        map.put("txid", transaction.getTxId());
-        map.put("ctime", transaction.getCreateTime());
-        map.put("vblock", expireTime);
-        NetWorkManager.createApiService(TransactionService.class)
+    public void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer) {
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("txids", txIds);
+        NetWorkManager.createMainApiService(TransactionService.class)
             .getRawTransaction(map)
             .subscribeOn(Schedulers.io())
-            .subscribe(new TAUObserver<DataResult<TxDataBean>>() {
+            .subscribe(new TxObserver<TxDataBean>() {
                 @Override
-                public void handleData(DataResult<TxDataBean> resResult) {
+                public void handleData(TxDataBean resResult) {
                     super.handleData(resResult);
-                    if(resResult == null){
+                    if(resResult == null || resResult.getStatus() != NetResultCode.MAIN_SUCCESS_CODE){
+                        observer.onNext(false);
                         return;
                     }
-                    TxDataBean rawTx = resResult.getData();
-                    RawTxBean onData = rawTx.getOnData();
-                    TxPoolBean offData = rawTx.getOffData();
-                    TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
-                    if(history == null){
+                    List<TxStatusBean> txsStatus = resResult.getTxsStatus();
+                    if(txsStatus == null){
+                        observer.onNext(false);
                         return;
                     }
-                    Object isRefresh = null;
-                    if(null != onData){
-                        history.setResult(TransmitKey.TxResult.SUCCESSFUL);
-                        history.setBlockTime(onData.getBlockTime());
-                        history.setBlockNum(onData.getBlockNum());
-                        history.setBlockHash(onData.getBlockHash());
-                        isRefresh = true;
-                    }else if(null != offData){
-                       // 0: not broadcast; 1:broadcast success; 10:chain return error; 20:transaction expire
-                       switch (offData.getStatus()){
-                           case 1:
-                               if(StringUtil.isSame(history.getResult(), TransmitKey.TxResult.BROADCASTING)){
-                                   history.setResult(TransmitKey.TxResult.CONFIRMING);
-                                   isRefresh = false;
-                               }
-                               break;
-                           case 10:
-                               history.setResult(TransmitKey.TxResult.FAILED);
-                               history.setMessage(offData.getErrorInfo());
-                               isRefresh = true;
-                               break;
-                           case 20:
-                               history.setResult(TransmitKey.TxResult.FAILED);
-                               history.setMessage(ResourcesUtil.getText(R.string.transaction_expired));
-                               isRefresh = true;
-                               break;
-                           default:
-                               break;
-                       }
+                    boolean isRefresh = false;
+                    for (TxStatusBean txStatus : txsStatus) {
+                        if(updateTransactionStatus(txStatus)){
+                            isRefresh = true;
+                        }
                     }
-                    if(isRefresh != null){
-                        TransactionHistoryDaoUtils.getInstance().insertOrReplace(history);
-                        observer.onNext((Boolean) isRefresh);
-                    }
+                    observer.onNext(isRefresh);
+                }
+
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    super.handleError(msg, msgCode);
                 }
             });
 
+    }
+    /**
+     * update transaction status
+     * 0-合法交易，交易池中等待上链
+     * 1-合法交易，未上链交易过期
+     * 2-合法交易，已上链；Successful
+     *
+     * 11-验证不通过，不合法交易，交易信息有误(无法解析，字段长度不正确)；
+     * 12-验证不通过，不合法交易，签名验证失败
+     * 13-验证不通过，不合法交易，余额不足
+     * 20-链端后台丢失交易，原因未知（未知错误导致的状态数据库中查询不到txId）
+     * */
+    private boolean updateTransactionStatus(TxStatusBean txStatus) {
+        String txId = txStatus.getTxId();
+        TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
+        if(history == null){
+            return false;
+        }
+        Object isRefresh = null;
+        switch (txStatus.getStatus()){
+            case 0:
+                if(StringUtil.isSame(history.getResult(), TransmitKey.TxResult.BROADCASTING)){
+                    history.setResult(TransmitKey.TxResult.CONFIRMING);
+                    isRefresh = false;
+                }
+                break;
+            case 1:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_status_expired));
+                isRefresh = true;
+                break;
+            case 2:
+                history.setResult(TransmitKey.TxResult.SUCCESSFUL);
+                isRefresh = true;
+                break;
+            case 11:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_illegal));
+                isRefresh = true;
+                break;
+            case 12:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_verify_signature));
+                isRefresh = true;
+                break;
+            case 13:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_insufficient_balance));
+                isRefresh = true;
+                break;
+            case 20:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_unknown_error));
+                isRefresh = true;
+                break;
+            default:
+                break;
+        }
+        if(isRefresh != null){
+            TransactionHistoryDaoUtils.getInstance().insertOrReplace(history);
+            return (Boolean) isRefresh;
+        }
+        return false;
     }
 
     @Override
@@ -222,21 +278,32 @@ public class TxModel implements ITxModel {
             .sendRawTransaction(map)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new TxObserver<Response<Void>>() {
+            .subscribe(new TxObserver<NewTxBean>() {
                 @Override
                 public void handleError(String msg, int msgCode) {
                     String result = ResourcesUtil.getText(R.string.send_tx_network_error);
-                    MiningUtil.saveTransactionFail(txId, result);
-                    observer.onNext(false);
+                    handleError(result);
                     super.handleError(result, msgCode);
                 }
 
                 @Override
-                public void handleData(Response<Void> dataResult) {
+                public void handleData(NewTxBean dataResult) {
                     super.handleData(dataResult);
-                    Logger.d("sendRawTransaction.handleData=" +dataResult);
-                    MiningUtil.saveTransactionSuccess();
-                    observer.onNext(true);
+                    if(dataResult != null){
+                        if(dataResult.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
+                            Logger.d("sendRawTransaction.handleData=" +dataResult);
+                            MiningUtil.saveTransactionSuccess();
+                            observer.onNext(true);
+                        }else{
+                            String result = StringUtil.isEmpty(dataResult.getMessage()) ? "" : dataResult.getMessage();
+                            handleError(result);
+                        }
+                    }
+                }
+
+                void handleError(String result) {
+                    MiningUtil.saveTransactionFail(txId, result);
+                    observer.onNext(false);
                 }
             });
     }
@@ -279,7 +346,7 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getTxRecords(TAUObserver<DataResult<RawTxList>> observer) {
+    public void getTxRecords(TxObserver<RawTxList> observer) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null){
             observer.onError(CodeException.getError());
@@ -302,11 +369,11 @@ public class TxModel implements ITxModel {
                     Map<String,String> map = new HashMap<>();
                     map.put("address", address);
                     map.put("time", time);
-                    NetWorkManager.createApiService(TransactionService.class)
-                            .getTxRecords(map)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(observer);
+                    NetWorkManager.createMainApiService(TransactionService.class)
+                        .getTxRecords(map)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(observer);
                 }
             });
 
@@ -319,22 +386,20 @@ public class TxModel implements ITxModel {
                 List<RawTxBean> txList = rawTxList.getRecords();
                 if(null != txList && txList.size() > 0){
                     for (RawTxBean bean : txList) {
-                        TransactionHistory tx = TransactionHistoryDaoUtils.getInstance().queryTransactionById(bean.getTxid());
+                        TransactionHistory tx = TransactionHistoryDaoUtils.getInstance().queryTransactionById(bean.getTxId());
                         if(tx == null){
                             tx = new TransactionHistory();
-                            tx.setFromAddress(bean.getAddin());
-                            tx.setToAddress(bean.getAddout());
+                            tx.setFromAddress(bean.getSender());
+                            tx.setToAddress(bean.getReceiver());
                             // createTime and blockTime need set value here!
-                            tx.setCreateTime(String.valueOf(bean.getBlockTime()));
+                            tx.setCreateTime(DateUtil.formatUTCTime(bean.getTxTime()));
 
-                            tx.setTxId(bean.getTxid());
-                            tx.setAmount(bean.getVout());
-                            tx.setFee(bean.getFee());
+                            tx.setTxId(bean.getTxId());
+                            tx.setAmount(FmtMicrometer.fmtTxValue(bean.getAmount()));
+                            tx.setFee(FmtMicrometer.fmtTxValue(bean.getFee()));
                         }
                         tx.setTimeBasis(1);
-                        tx.setBlockTime(bean.getBlockTime());
-                        tx.setBlockNum(bean.getBlockNum());
-                        tx.setBlockHash(bean.getBlockHash());
+                        tx.setBlockHeight(bean.getBlockHeight());
                         tx.setResult(TransmitKey.TxResult.SUCCESSFUL);
                         TransactionHistoryDaoUtils.getInstance().insertOrReplace(tx);
                     }
@@ -347,8 +412,8 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getBlockHeight(TAUObserver<DataResult<String>> observer) {
-        NetWorkManager.createApiService(TransactionService.class)
+    public void getBlockHeight(TxObserver<ChainBean> observer) {
+        NetWorkManager.createMainApiService(TransactionService.class)
                 .getBlockHeight()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

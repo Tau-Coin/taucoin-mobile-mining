@@ -63,6 +63,8 @@ public class DateUtil {
         try {
             format.applyPattern(parsePattern);
             Date parse = format.parse(time);
+            TimeZone timeZone = TimeZone.getDefault();
+            format.setTimeZone(timeZone);
             format.applyPattern(pattern);
             return format.format(parse);
         } catch (ParseException e) {
@@ -73,6 +75,8 @@ public class DateUtil {
 
     public static String format(long time, String pattern) {
         format.applyPattern(pattern);
+        TimeZone timeZone = TimeZone.getDefault();
+        format.setTimeZone(timeZone);
         return format.format(new Date(time));
     }
 
@@ -156,6 +160,8 @@ public class DateUtil {
     private static long getLong(String time, String pattern) {
         try {
             format.applyPattern(pattern);
+            TimeZone timeZone = TimeZone.getDefault();
+            format.setTimeZone(timeZone);
             return format.parse(time).getTime();
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,5 +174,18 @@ public class DateUtil {
            return getLong(formerTime, pattern) > getLong(latterTime, pattern);
        }
        return false;
+    }
+
+    public static String formatUTCTime(String formerTime) {
+        try {
+            format.applyPattern(pattern6);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date date = format.parse(formerTime);
+            long time = date.getTime();
+            time = time / 100;
+            return String.valueOf(time);
+        } catch (Exception ignore) {
+        }
+        return formerTime;
     }
 }

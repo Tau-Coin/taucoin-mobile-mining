@@ -1,23 +1,36 @@
 package io.taucoin.android.wallet.module.bean;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 public class TxDataBean {
+    private int status;
+    private String message;
+    @SerializedName(value = "txsstatus")
+    private List<TxStatusBean> txsStatus;
 
-    private RawTxBean onData;
-    private TxPoolBean offData;
-
-    public RawTxBean getOnData() {
-        return onData;
+    public int getStatus() {
+        return status;
     }
 
-    public void setOnData(RawTxBean onData) {
-        this.onData = onData;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
-    public TxPoolBean getOffData() {
-        return offData;
+    public String getMessage() {
+        return message;
     }
 
-    public void setOffData(TxPoolBean offData) {
-        this.offData = offData;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public List<TxStatusBean> getTxsStatus() {
+        return txsStatus;
+    }
+
+    public void setTxsStatus(List<TxStatusBean> txsStatus) {
+        this.txsStatus = txsStatus;
     }
 }

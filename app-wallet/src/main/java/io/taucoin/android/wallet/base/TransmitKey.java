@@ -28,9 +28,9 @@ public class TransmitKey {
         public static final String GET_BLOCK_HEIGHT = "get_block_height";
     }
 
-    public static final String PRIVATE_KEY = "Privkey";
-    public static final String PUBLIC_KEY = "Pubkey";
+    public static final String PUBLIC_KEY = "PubKey";
     public static final String ADDRESS = "Address";
+    public static final String RAW_ADDRESS = "RawAddress";
 
     public static final String TITLE = "title";
     public static final String URL = "url";

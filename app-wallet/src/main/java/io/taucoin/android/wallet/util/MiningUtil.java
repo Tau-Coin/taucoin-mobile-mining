@@ -120,27 +120,6 @@ public class MiningUtil {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 
-    public static boolean isFinishState(TransactionHistory history) {
-        long txTime = history.getBlockTime();
-        long currentTime = DateUtil.getTime();
-        long expireTime = history.getTransExpiry();
-        if(txTime <= 0){
-            try {
-                txTime = new BigInteger(history.getCreateTime()).longValue();
-            }catch (Exception ignore){}
-        }
-        return currentTime - txTime > expireTime;
-    }
-
-    public static int parseTxState(int state, TransactionHistory history) {
-        if(state == 1) {
-            if(isFinishState(history)){
-                state = -1;
-            }
-        }
-        return state;
-    }
-
     public static long pendingAmount() {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         List<TransactionHistory> txPendingList = TransactionHistoryDaoUtils.getInstance().getPendingAmountList(address);
