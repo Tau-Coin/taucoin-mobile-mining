@@ -204,12 +204,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             //try to roll back and reconnect
             List<Block> undoBlocks = new ArrayList<>();
             List<Block> newBlocks = new ArrayList<>();
+            // Note: 'getForkBlocksInfo' method will add 'block' into 'newBlocks'.
             if (!blockStore.getForkBlocksInfo(block, undoBlocks, newBlocks)) {
                 logger.error("Can not find continuous branch!");
                 blockStore.delNonChainBlock(block.getPreviousHeaderHash());
                 return DISCONTINUOUS_BRANCH;
             }
-            newBlocks.add(0, block);
 
             if (undoBlocks.size() > config.getMutableRange()) {
                 logger.info("Blocks to be rolled back are out of mutable range !");
@@ -224,7 +224,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 ECKey key;
                 try {
                     key = ECKey.signatureToKey(undoBlock.getRawHash(), undoBlock.getblockSignature().toBase64());
-                }catch (SignatureException e){
+                } catch (SignatureException e) {
                     return DISCONNECTED_FAILED;
                 }
                 if(Hex.toHexString(key.getAddress()).equals("847ca210e2b61e9722d1584fcc0daea4c3639b09")){
