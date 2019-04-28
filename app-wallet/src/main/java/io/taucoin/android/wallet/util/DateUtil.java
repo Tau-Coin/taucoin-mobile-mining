@@ -182,7 +182,7 @@ public class DateUtil {
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date date = format.parse(formerTime);
             long time = date.getTime();
-            time = time / 100;
+            time = time / 1000;
             return String.valueOf(time);
         } catch (Exception ignore) {
         }

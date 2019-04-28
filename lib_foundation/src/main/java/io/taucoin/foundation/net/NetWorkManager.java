@@ -2,7 +2,6 @@ package io.taucoin.foundation.net;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.github.naturs.logger.Logger;
@@ -23,9 +22,7 @@ import javax.net.ssl.X509TrustManager;
 
 import io.taucoin.foundation.BuildConfig;
 import io.taucoin.foundation.util.PropertyUtils;
-import io.taucoin.foundation.util.StringUtil;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -59,30 +56,11 @@ public class NetWorkManager {
         // Set request timeout
         okHttpClientBuilder.connectTimeout(30, TimeUnit.SECONDS);
 
-        okHttpClientBuilder.addInterceptor(chain -> {
-            Request.Builder requestBuilder = chain.request().newBuilder();
-            try {
-                Uri uri = Uri.parse(PropertyUtils.getMainApiUrl());
-                if(StringUtil.isNotEmpty(uri.getHost())){
-                    requestBuilder.addHeader("Host", uri.getHost());
-                }
-            }catch (Exception ignore){}
-            return chain.proceed(requestBuilder.build());
-        });
-
         // Add Log to OkHttp
         if (BuildConfig.DEBUG) {
             // Enable Log
             okHttpClientBuilder.addNetworkInterceptor(new StethoInterceptor());
         }
-
-       /* okHttpClientBuilder.sslSocketFactory(getSSLSocketFactory(NetWorkManager.this, new int[]{R.raw.https_certificate}));
-        okHttpClientBuilder.hostnameVerifier(org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);*/
-
-       /*
-        okHttpClientBuilder.sslSocketFactory(IgnoreCertificateUtil.sslContext().getSocketFactory());
-        okHttpClientBuilder.hostnameVerifier(IgnoreCertificateUtil.hostnameVerifier());*/
-
 
         // Certificate of verification
         try {
@@ -93,23 +71,23 @@ public class NetWorkManager {
 
         OkHttpClient okHttpClient = okHttpClientBuilder.build();
 
-        // init Retrofit
-        retrofit = new Retrofit.Builder()
-                .client(okHttpClient)
-                .baseUrl(PropertyUtils.getApiBaseUrl())
-                .addConverterFactory(GsonConverterFactory.create())
-                // Configure callback libraries using RxJava
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-
-        // init Retrofit
+        // init main retrofit
         retrofitMain = new Retrofit.Builder()
-                .client(okHttpClient)
-                .baseUrl(PropertyUtils.getMainApiUrl())
-                .addConverterFactory(GsonConverterFactory.create())
-                // Configure callback libraries using RxJava
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+            .client(okHttpClient)
+            .baseUrl(PropertyUtils.getMainApiUrl())
+            .addConverterFactory(GsonConverterFactory.create())
+            // Configure callback libraries using RxJava
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build();
+
+        // init retrofit
+        retrofit = new Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(PropertyUtils.getApiBaseUrl())
+            .addConverterFactory(GsonConverterFactory.create())
+            // Configure callback libraries using RxJava
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build();
 
     }
 
