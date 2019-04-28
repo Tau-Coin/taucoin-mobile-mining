@@ -148,7 +148,7 @@
     <string name="mining_generate_private_key">Please stop mining first</string>
 
     <string name="setting_title">Settings</string>
-    <string name="setting_transaction_expiry_limit">Transaction Expiry in blocks not less than 5 or more than 720</string>
+    <string name="setting_transaction_expiry_limit">Transaction Expiry in blocks not less than %d or more than %d</string>
     <string name="setting_transaction_expiry">Transaction Expiry in blocks</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
 

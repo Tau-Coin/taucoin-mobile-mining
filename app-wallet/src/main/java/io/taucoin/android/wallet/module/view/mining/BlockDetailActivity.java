@@ -60,7 +60,7 @@ public class BlockDetailActivity extends BaseActivity {
             byte[] bytesKey = ByteUtil.intToBytes(0);
             try {
                 ECKey key = ECKey.signatureToKey(blockBean.getRawHash(), blockBean.getblockSignature().toBase64());
-                bytesKey = key.getPubKey();
+                bytesKey = key.getCompressedPubKey();
             }catch(SignatureException ignore){ }
             publicKey = Hex.toHexString(bytesKey);
 

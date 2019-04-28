@@ -67,7 +67,9 @@ public class SettingActivity extends BaseActivity {
                 try {
                     long input = new BigInteger(text).longValue();
                     if(input > TransmitKey.MAX_TRANS_EXPIRY || input < TransmitKey.MIN_TRANS_EXPIRY){
-                        ToastUtils.showShortToast(R.string.setting_transaction_expiry_limit);
+                        String expiryLimit = getText(R.string.setting_transaction_expiry_limit).toString();
+                        expiryLimit = String.format(expiryLimit, TransmitKey.MIN_TRANS_EXPIRY, TransmitKey.MAX_TRANS_EXPIRY);
+                        ToastUtils.showShortToast(expiryLimit);
                         return;
                     }
                     mPresenter.saveTransExpiry(input, logicObserver);
