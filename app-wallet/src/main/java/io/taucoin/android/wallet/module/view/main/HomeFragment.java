@@ -4,15 +4,11 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import io.taucoin.android.wallet.BuildConfig;
@@ -78,8 +74,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     LoadingTextView tvMiningMsg;
 
     private MiningPresenter miningPresenter;
-    private AlertDialog mDialog;
-    private ProgressViewHolder mViewHolder;
     private long time = -1;
 
     @Override
@@ -187,12 +181,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case NOTIFY_MINING:
                 starOrStopMining(true);
-                break;
-            case MINING_INIT_PROGRESS:
-                if(object.getData() != null){
-                    int progress = (int) object.getData();
-                    showInitProgressDialog(progress);
-                }
                 break;
             default:
                 break;
@@ -328,59 +316,4 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
         }
     }
-
-    private void showInitProgressDialog(int progress){
-        if(mDialog == null){
-            View view = LinearLayout.inflate(getActivity(), R.layout.dialog_mining_init_progress, null);
-            mViewHolder = new ProgressViewHolder(view);
-            mViewHolder.progressBar.setMax(100);
-            mViewHolder.tvFailMsg.setVisibility(View.VISIBLE);
-            mViewHolder.tvFailMsg.setText(R.string.mining_init_progress_tip);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                    .setCancelable(false)
-                    .setView(view);
-
-            mDialog = builder.create();
-            mDialog.setCanceledOnTouchOutside(false);
-            mDialog.setCancelable(false);
-            mDialog.show();
-        }
-
-        if(progress > 100){
-            progress = 100;
-        }else if(progress < 0){
-            progress = 0;
-        }
-
-        mViewHolder.progressBar.setProgress(progress);
-        String progressStr = progress + "%";
-        mViewHolder.tvProgress.setText(progressStr);
-
-        if(progress == 100){
-            mDialog.cancel();
-            mDialog = null;
-        }else {
-            final int pro = progress + 1;
-            new Handler().postDelayed(() -> {
-                MessageEvent messageEvent = new MessageEvent();
-                messageEvent.setData(pro);
-                messageEvent.setCode(MessageEvent.EventCode.MINING_INIT_PROGRESS);
-                EventBusUtil.post(messageEvent);
-            }, 500);
-        }
-    }
-
-    class ProgressViewHolder {
-        @BindView(R.id.progress_bar)
-        ProgressBar progressBar;
-        @BindView(R.id.tv_progress)
-        TextView tvProgress;
-        @BindView(R.id.tv_fail_msg)
-        TextView tvFailMsg;
-
-        ProgressViewHolder(View view) {
-            ButterKnife.bind(this, view);
-        }
-    }
-
 }

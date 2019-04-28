@@ -76,6 +76,20 @@ public class FmtMicrometer {
         }
     }
 
+    public static String fmtFeeValue(String value) {
+        try{
+            BigDecimal bigDecimal = new BigDecimal(value);
+            bigDecimal = bigDecimal.divide(new BigDecimal(mDecimal), mScale, RoundingMode.HALF_UP);
+
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("0.##");
+            return df.format(bigDecimal);
+        }catch (Exception ignore){
+
+        }
+        return new BigInteger("0").toString();
+    }
+
     public static String fmtTxValue(String value) {
         try{
             BigDecimal bigDecimal = new BigDecimal(value);

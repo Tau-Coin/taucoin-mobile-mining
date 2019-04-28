@@ -31,8 +31,8 @@ class Constants {
     // 100 * 100000000 COIN
     static final BigInteger MAX_AMOUNT = new BigInteger("10000000000", 10).multiply(COIN);
 
-    //  0.01 COIN
-    static final BigInteger MIN_FEE = new BigInteger("1", 10);
+    // 1 COIN
+    static final BigInteger MIN_FEE = new BigInteger("100", 10);
 
     // 100 * 100000000 COIN
     static final BigInteger MAX_FEE = new BigInteger("10000000000", 10).multiply(COIN);

@@ -47,7 +47,6 @@ import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.android.wallet.module.bean.TxStatusBean;
-import io.taucoin.android.wallet.net.callback.TAUObserver;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.DateUtil;
@@ -61,7 +60,6 @@ import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.foundation.net.NetWorkManager;
-import io.taucoin.foundation.net.callback.DataResult;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.foundation.net.exception.CodeException;
@@ -154,24 +152,21 @@ public class TxModel implements ITxModel {
                     }
                     observer.onNext(isRefresh);
                 }
-
-                @Override
-                public void handleError(String msg, int msgCode) {
-                    super.handleError(msg, msgCode);
-                }
             });
 
     }
+
     /**
      * update transaction status
-     * 0-合法交易，交易池中等待上链
-     * 1-合法交易，未上链交易过期
-     * 2-合法交易，已上链；Successful
      *
-     * 11-验证不通过，不合法交易，交易信息有误(无法解析，字段长度不正确)；
-     * 12-验证不通过，不合法交易，签名验证失败
-     * 13-验证不通过，不合法交易，余额不足
-     * 20-链端后台丢失交易，原因未知（未知错误导致的状态数据库中查询不到txId）
+     * 0-Legitimate trading, trading pool waiting for the chain
+     * 1-Legitimate transactions, not overdue on-line transactions
+     * 2-Legitimate transactions are on the chain
+     *
+     * 11-Verification fails, illegal transactions, transaction information is incorrect (unresolved, field length is incorrect)
+     * 12-Verification fails, illegal transactions, signature verification fails
+     * 13-Verification failed, illegal transactions, insufficient balance
+     * 20-Chain-end backend lost transactions for unknown reasons (txId cannot be queried in the status database due to unknown errors)
      * */
     private boolean updateTransactionStatus(TxStatusBean txStatus) {
         String txId = txStatus.getTxId();
