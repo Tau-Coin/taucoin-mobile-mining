@@ -1,13 +1,14 @@
 package io.taucoin.android.service.events;
 import android.os.Parcel;
 import android.os.Parcelable;
+import io.taucoin.forge.ForgeStatus;
 
 public class BlockForgeExceptionStopEvent extends EventData{
     private String reason;
 
-    public  BlockForgeExceptionStopEvent(String reason){
+    public  BlockForgeExceptionStopEvent(ForgeStatus status){
         super();
-        this.reason = reason;
+        this.reason = status.explainStatus();
     }
     @Override
     public int describeContents() {

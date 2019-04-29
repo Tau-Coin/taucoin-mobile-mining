@@ -5,6 +5,7 @@ import io.taucoin.core.Transaction;
 import io.taucoin.core.PendingState;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.forge.BlockForger;
+import io.taucoin.forge.ForgeStatus;
 import io.taucoin.forge.ForgerListener;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
@@ -95,7 +96,7 @@ public class PoolSynchronizer implements ForgerListener {
     }
 
     @Override
-    public void forgingStopped(String outcome) {
+    public void forgingStopped(ForgeStatus status) {
         close();
     }
 

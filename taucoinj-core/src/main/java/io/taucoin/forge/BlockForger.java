@@ -157,13 +157,13 @@ public class BlockForger {
         this.stopForge = true;
         executor.shutdownNow();
         executor = null;
-        fireForgerStopped("normal close");
+        fireForgerStopped(ForgeStatus.FORGE_NORMAL_EXIT);
     }
 
-    public void onForgingStopped(String outcome) {
+    public void onForgingStopped(ForgeStatus status) {
         this.isForging = false;
         this.stopForge = true;
-        fireForgerStopped(outcome);
+        fireForgerStopped(status);
     }
 
     public boolean isForging() {
@@ -221,7 +221,7 @@ public class BlockForger {
         }
     }
 
-    public boolean restartForging(String outcome) {
+    public boolean restartForging(ForgeStatus status) {
 
         Block bestBlock;
         BigInteger baseTarget;
@@ -245,14 +245,14 @@ public class BlockForger {
         BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
         if (forgingPower.longValue() < 0) {
             logger.error("Forging Power < 0!!!");
-            outcome = "Forging Power less than 0,forging not allowed";
+            status = ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
             return false;
         }
         long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
         logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
         if (balance.longValue() < hisAverageFee){
             logger.info("balance less than history average fee");
-            outcome = "balance less than history average fee, forging not allowed";
+            status = ForgeStatus.BALANCE_LESS_THAN_HISTORY_FEE;
             return false;
         }
 
@@ -367,9 +367,9 @@ public class BlockForger {
         }
     }
 
-    protected void fireForgerStopped(String outcome) {
+    protected void fireForgerStopped(ForgeStatus status) {
         for (ForgerListener l : listeners) {
-            l.forgingStopped(outcome);
+            l.forgingStopped(status);
         }
     }
 
@@ -457,14 +457,14 @@ public class BlockForger {
         @Override
         public void run() {
             boolean forgingResult = true;
-            String outcome = "";
+            ForgeStatus status = ForgeStatus.FORGE_NORMAL;
             while (forgingResult && !Thread.interrupted() && !forger.isForgingStopped()
                     && (forgeTargetAmount == -1
                             || (forgeTargetAmount > 0 && forgedBlockAmount < forgeTargetAmount))) {
-               forgingResult = forger.restartForging(outcome);
+               forgingResult = forger.restartForging(status);
             }
 
-            forger.onForgingStopped(outcome);
+            forger.onForgingStopped(status);
         }
 
         @Override
@@ -473,8 +473,8 @@ public class BlockForger {
         }
 
         @Override
-        public void forgingStopped(String outcome) {
-            logger.info("Forging stopped status: {}",outcome);
+        public void forgingStopped(ForgeStatus status) {
+            logger.info("Forging stopped status: {}",status.explainStatus());
         }
 
         @Override

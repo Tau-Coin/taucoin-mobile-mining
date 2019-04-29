@@ -29,6 +29,7 @@ import io.taucoin.core.VersionedChecksummedBytes;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
+import io.taucoin.forge.ForgeStatus;
 import io.taucoin.http.ConnectionManager;
 import io.taucoin.manager.AdminInfo;
 import io.taucoin.net.peerdiscovery.PeerInfo;
@@ -1370,8 +1371,8 @@ public class TaucoinRemoteService extends TaucoinService {
         public void forgingStarted() {}
 
         @Override
-        public void forgingStopped(String outcome) {
-            broadcastEvent(EventFlag.EVENT_BLOCK_FORGE_STOP,new BlockForgeExceptionStopEvent(outcome));
+        public void forgingStopped(ForgeStatus status) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_FORGE_STOP,new BlockForgeExceptionStopEvent(status));
         }
 
         @Override
