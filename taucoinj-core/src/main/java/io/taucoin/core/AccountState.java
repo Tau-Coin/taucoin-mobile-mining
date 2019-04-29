@@ -80,6 +80,10 @@ public class AccountState implements Serializable {
         this.forgePower = forgePower;
     }
 
+    public void setTranHistory(TreeMap<Long,byte[]> tranHistory) {
+        rlpEncoded = null;
+        this.tranHistory = tranHistory;
+    }
     public void incrementforgePower() {
         rlpEncoded = null;
         this.forgePower = forgePower.add(BigInteger.ONE);
@@ -149,6 +153,7 @@ public class AccountState implements Serializable {
         AccountState accountState = new AccountState();
         accountState.addToBalance(this.getBalance());
         accountState.setforgePower(this.getforgePower());
+        accountState.setTranHistory(this.getTranHistory());
         accountState.setDirty(false);
 
         return accountState;
