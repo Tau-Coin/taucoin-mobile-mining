@@ -56,7 +56,7 @@ public class RequestRoundtrip {
     }
 
     public boolean isTimeout() {
-        return retryTimes >= 3 || failTimes >= 3
-                || System.currentTimeMillis() - lastTimestamp > 30000;
+        return retryTimes >= 2 || failTimes >= 2
+                || System.currentTimeMillis() - lastTimestamp > 20000;
     }
 }

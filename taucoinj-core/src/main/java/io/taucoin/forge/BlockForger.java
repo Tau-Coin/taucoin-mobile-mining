@@ -41,7 +41,7 @@ import static io.taucoin.config.SystemProperties.CONFIG;
 public class BlockForger {
     private static final Logger logger = LoggerFactory.getLogger("forge");
 
-    private static final long PULL_TX_POOL_TIMEOUT = 10000;
+    private static final long PULL_TX_POOL_TIMEOUT = 30000;
 
     private static ExecutorService executor = null;//Executors.newSingleThreadExecutor();
 

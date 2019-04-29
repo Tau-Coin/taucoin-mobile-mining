@@ -44,6 +44,9 @@ public class RequestQueue {
         }
     });
 
+    // If two many messages were queued and can't connect to remote peer, clear all.
+    public static final int CAPABILITY = 100;
+
     private Queue<RequestRoundtrip> requestQueue = new ConcurrentLinkedQueue<>();
 
     TaucoinListener ethereumListener;
@@ -71,6 +74,9 @@ public class RequestQueue {
     }
 
     public void activate(ChannelHandlerContext ctx) {
+
+        removeAllTimeoutMessage();
+
         this.ctx = ctx;
         timerTask = timer.scheduleAtFixedRate(new Runnable() {
             public void run() {
@@ -91,6 +97,21 @@ public class RequestQueue {
         int size = requestQueue.size();
         logger.info("Request queue size {}", size);
         return size;
+    }
+
+    public void clear() {
+        requestQueue.clear();
+    }
+
+    private void removeAllTimeoutMessage() {
+        while (requestQueue.peek() != null) {
+            RequestRoundtrip requestRoundtrip = requestQueue.peek();
+            if (requestRoundtrip.isTimeout()) {
+                requestQueue.remove();
+            } else {
+                break;
+            }
+        }
     }
 
     public void receivedMessage(Message msg) throws InterruptedException {

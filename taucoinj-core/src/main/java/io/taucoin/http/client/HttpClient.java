@@ -130,6 +130,9 @@ public class HttpClient {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Connect exception {} ", e);
+            if (requestQueue.size() >= RequestQueue.CAPABILITY) {
+                requestQueue.clear();
+            }
         }
     }
 
