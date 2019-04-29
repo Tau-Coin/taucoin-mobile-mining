@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import butterknife.OnTextChanged;
 import io.taucoin.android.wallet.R;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -36,15 +39,18 @@ import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
 import io.taucoin.android.wallet.module.view.manage.SettingActivity;
 import io.taucoin.android.wallet.util.FixMemLeak;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
+import io.taucoin.android.wallet.widget.BreakTextSpan;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class SendActivity extends BaseActivity implements ISendView {
 
@@ -62,6 +68,10 @@ public class SendActivity extends BaseActivity implements ISendView {
     EditInput etFee;
     @BindView(R.id.btn_send)
     Button btnSend;
+    @BindView(R.id.tv_fee)
+    TextView tvFee;
+    @BindView(R.id.tv_fee_calculate)
+    TextView tvFeeCalculate;
 
     private TxPresenter mTxPresenter;
     private ViewHolder mViewHolder ;
@@ -77,8 +87,9 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void initView() {
+        tvFee.setTag("");
         etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
-        initTxFeeView();
+//        initTxFeeView();
 
         KeyboardUtils.registerSoftInputChangedListener(this, height -> {
             if(etFee != null){
@@ -103,12 +114,38 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void initTxFeeView() {
-        etFee.setText(R.string.send_normal_value);
         SelectionEditText editText = etFee.getEditText();
         editText.setTextAppearance(this, R.style.style_normal_yellow);
         editText.setFilters(new InputFilter[]{new MoneyValueFilter().setDigits(2).setEndSpace()});
         editText.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
         editText.setMaxLines(1);
+    }
+
+    @OnTextChanged({R.id.et_amount})
+    void onTextChanged(CharSequence text){
+        String feeCalculate = getText(R.string.send_tx_range_fee).toString();
+        String amount = text.toString();
+        String rangeFee = "";
+        if(StringUtil.isNotEmpty(amount)){
+            String feeRate = "3%=";
+            String fee = FmtMicrometer.fmtFormatFee(amount, "0.03");
+            rangeFee = FmtMicrometer.fmtFormatRangeFee(fee);
+            feeCalculate = String.format(feeCalculate, amount, feeRate, fee);
+        }else {
+            feeCalculate = "";
+        }
+        String feeStr = "";
+        if(StringUtil.isNotEmpty(rangeFee)){
+            feeStr = getText(R.string.send_tx_fee).toString();
+            feeStr = String.format(feeStr, rangeFee);
+        }
+        tvFee.setText(feeStr);
+        tvFee.setTag(rangeFee);
+
+        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+        stringBuilder.append(feeCalculate);
+        stringBuilder.setSpan(new BreakTextSpan(tvFeeCalculate, feeCalculate), 0, stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvFeeCalculate.setText(stringBuilder, TextView.BufferType.SPANNABLE);
     }
 
     @OnClick({R.id.iv_fee})
@@ -134,7 +171,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         String address = etAddress.getText().toString().trim();
         String amount = etAmount.getText().toString().trim();
         String memo = etMemo.getText().toString().trim();
-        String fee = etFee.getText();
+        String fee = tvFee.getTag().toString().trim();
 
         TransactionHistory tx = new TransactionHistory();
         tx.setToAddress(address);
@@ -191,8 +228,6 @@ public class SendActivity extends BaseActivity implements ISendView {
             if(isSuccess){
                 // clear all editText data
                 clearAllForm();
-            }else {
-                ToastUtils.showShortToast(R.string.send_tx_invalid_error);
             }
         }
     };
@@ -221,7 +256,6 @@ public class SendActivity extends BaseActivity implements ISendView {
         etAddress.getText().clear();
         etAmount.getText().clear();
         etMemo.getText().clear();
-        etFee.setText(R.string.send_normal_value);
     }
 
     private void showSoftInput() {

@@ -176,7 +176,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case FORGED_TIME:
                 if(object.getData() != null){
                     time = (long) object.getData();
-                    showMiningMsg();
+                    if(time > 0){
+                        showMiningMsg();
+                    }
                 }
                 break;
             case NOTIFY_MINING:
@@ -196,7 +198,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     if(time > -1){
                         msg += "\n";
                         msg += getString(R.string.mining_mining_internal);
-                        tvMiningMsg.setLoadingText(msg, time);
+                        tvMiningMsg.setLoadingText(msg, time, msgReid);
                     }else{
                         tvMiningMsg.setNormalText(msg);
                     }
@@ -222,7 +224,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public synchronized void handleMiningView(boolean isNeedInit) {
-        showMiningMsg();
         if (UserUtil.isImportKey() && btnMining != null) {
             miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
                 @Override
@@ -240,6 +241,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         tvBlockMined.setRightText(MiningUtil.parseMinedBlocks(blockInfo));
                         tvMiningIncome.setRightText(MiningUtil.parseMiningIncome(blockInfo));
                     }
+                    if(isStart){
+                        showMiningMsg();
+                    }else {
+                        tvMiningMsg.setNormalText(R.string.mining_generation_rate);
+                    }
                     boolean isInit = MyApplication.getRemoteConnector().isInit();
                     boolean isSyncMe = MyApplication.getRemoteConnector().isSyncMe();
                     tvMiningDetails.setEnable(isStart && !isNeedInit && isInit && isSyncMe);
@@ -256,14 +262,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     if(btnMining.isEnabled()){
                         btnMining.setBackgroundResource(isStart ? R.drawable.black_rect_round_bg : R.drawable.yellow_rect_round_bg);
                     }
-                    if(!isStart){
-                        tvMiningMsg.setNormalText(R.string.mining_generation_rate);
-                        if(!btnMining.isEnabled()){
-                            tvMiningMsg.setNormalText(R.string.mining_generation_rate);
-                        }
-                    }
                 }
             });
+        }else{
+            showMiningMsg();
         }
     }
 

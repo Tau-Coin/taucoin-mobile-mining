@@ -22,6 +22,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
 import io.taucoin.android.wallet.base.BaseHandler;
+import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.foundation.util.ThreadPool;
 
 public class LoadingTextView extends AppCompatTextView implements BaseHandler.HandleCallBack{
@@ -30,6 +31,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     private long pointNum = 0;
     private boolean isTime = false;
     private String text = "";
+    private String stopMsg = "";
     private BaseHandler mHandler;
 
     public LoadingTextView(Context context) {
@@ -45,9 +47,10 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         mHandler = new BaseHandler(this);
     }
 
-    public void setLoadingText(String text, long time) {
+    public void setLoadingText(String text, long time, int stopMsg) {
         this.text = text;
         this.pointNum = time;
+        this.stopMsg = getResources().getString(stopMsg);
         isTime = true;
         if(!isLoading){
             mHandler.sendEmptyMessage(0);
@@ -79,26 +82,28 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     }
 
     private void initTime() {
+        StringBuilder stringBuilder = new StringBuilder();
         if(pointNum < 0){
             pointNum = 0;
             isLoading = false;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(text);
-        long min = pointNum / 60;
-        long second = pointNum % 60;
+            setNormalText(stopMsg);
+        }else{
+            stringBuilder.append(text);
+            long min = pointNum / 60;
+            long second = pointNum % 60;
 
-        stringBuilder.append(": ");
-        if(min < 10){
-            stringBuilder.append(0);
+            stringBuilder.append(": ");
+            if(min < 10){
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(min);
+            stringBuilder.append(":");
+            if(second < 10){
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(second);
+            setText(stringBuilder.toString(), mBufferType);
         }
-        stringBuilder.append(min);
-        stringBuilder.append(":");
-        if(second < 10){
-            stringBuilder.append(0);
-        }
-        stringBuilder.append(second);
-        setText(stringBuilder.toString(), mBufferType);
     }
 
     private void initData() {
@@ -140,7 +145,9 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     public void setNormalText(String text) {
         this.text = text;
         isLoading = false;
-        setText(text, mBufferType);
+        if(StringUtil.isNotSame(text, StringUtil.getText(this))){
+            setText(text, mBufferType);
+        }
     }
 
     public void setNormalText(int reid) {

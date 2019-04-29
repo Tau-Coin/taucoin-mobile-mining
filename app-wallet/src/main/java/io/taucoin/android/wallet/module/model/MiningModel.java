@@ -15,7 +15,6 @@
  */
 package io.taucoin.android.wallet.module.model;
 
-import io.taucoin.android.wallet.R;
 
 import io.taucoin.crypto.ECKey;
 import io.taucoin.util.ByteUtil;
@@ -175,7 +174,7 @@ public class MiningModel implements IMiningModel{
                 Block block = blockEvent.block;
                 if(block != null){
                     long blockNumber = block.getNumber();
-                    updateSynchronizedBlockNum((int) blockNumber + 1);
+                    updateSynchronizedBlockNum((int) blockNumber);
                     saveMiningInfo(block, isConnect, true);
                 }
             }
@@ -202,8 +201,6 @@ public class MiningModel implements IMiningModel{
                             if(isSuccess){
                                 // clear all editText data
                                 EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
-                            }else {
-                                ToastUtils.showShortToast(R.string.send_tx_invalid_error);
                             }
                         }
                     });

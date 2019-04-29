@@ -22,6 +22,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import io.taucoin.android.wallet.core.Constants;
+
 public class FmtMicrometer {
     
     private static String mDecimal = "100";
@@ -102,5 +104,34 @@ public class FmtMicrometer {
 
         }
         return new BigInteger("0").toString();
+    }
+
+    public static String fmtFormatFee(String num, String multiply) {
+        try {
+            BigDecimal number = new BigDecimal(num);
+            number = number.multiply(new BigDecimal(multiply));
+
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("0.00");
+            return df.format(number);
+        } catch (Exception e) {
+            return num;
+        }
+    }
+
+    public static String fmtFormatRangeFee(String num) {
+        try {
+            BigDecimal number = new BigDecimal(num);
+            number = number.multiply(new BigDecimal(mDecimal));
+            if(number.toBigInteger().compareTo(Constants.MIN_FEE) < 0){
+                number = new BigDecimal(Constants.MIN_FEE);
+            }
+            number = number.divide(new BigDecimal(mDecimal), 2, RoundingMode.HALF_UP);
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("0.00");
+            return df.format(number);
+        } catch (Exception e) {
+            return num;
+        }
     }
 }

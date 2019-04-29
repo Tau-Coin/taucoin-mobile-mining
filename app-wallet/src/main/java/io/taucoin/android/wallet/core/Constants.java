@@ -18,9 +18,9 @@ package io.taucoin.android.wallet.core;
 
 import java.math.BigInteger;
 
-class Constants {
+public class Constants {
     // 1 COIN
-    private static final BigInteger COIN = new BigInteger("100", 10);
+//    private static final BigInteger COIN = new BigInteger("100", 10);
 
     // 0.01 COIN
     private static final BigInteger CENT = new BigInteger("1", 10);
@@ -29,11 +29,11 @@ class Constants {
     static final BigInteger MIN_AMOUNT = CENT;
 
     // 100 * 100000000 COIN
-    static final BigInteger MAX_AMOUNT = new BigInteger("10000000000", 10).multiply(COIN);
+//    static final BigInteger MAX_AMOUNT = new BigInteger("10000000000", 10).multiply(COIN);
 
-    // 1 COIN
-    static final BigInteger MIN_FEE = new BigInteger("100", 10);
+    // 0.01 COIN
+    public static final BigInteger MIN_FEE = new BigInteger("1", 10);
 
     // 100 * 100000000 COIN
-    static final BigInteger MAX_FEE = new BigInteger("10000000000", 10).multiply(COIN);
+//    static final BigInteger MAX_FEE = new BigInteger("10000000000", 10).multiply(COIN);
 }

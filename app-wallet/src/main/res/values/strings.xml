@@ -51,23 +51,24 @@
     <string name="send_amount">Amount</string>
     <string name="send_memo">Memo</string>
     <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction Expiry in blocks <font color="#0E88EF">%s</font> (≈%s min)]]> </Data></string>
-    <string name="send_normal_value">1</string>
     <string name="send_to">To</string>
     <string name="send_dialog_yes">Proceed</string>
     <string name="send_dialog_no">Back</string>
     <string name="send_tx_success">Transaction sent</string>
     <string name="send_tx_network_error">Error in network, send failed</string>
-    <string name="send_tx_invalid_error">Send failed, please try again later</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
+
+    <string name="send_tx_range_fee">%s×%s%s</string>
+    <string name="send_tx_fee">%s&#160;tau</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
     <string name="send_tx_invalid_fee">Invalid Transaction Fee</string>
     <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="send_amount_too_low">Transaction amount is too low</string>
-    <string name="send_amount_too_high">Transaction amount is too high</string>
+    <!--<string name="send_amount_too_high">Transaction amount is too high</string>-->
     <string name="send_fee_too_low">Transaction fee is too low</string>
-    <string name="send_fee_too_high">Transaction fee is too high</string>
+    <!--<string name="send_fee_too_high">Transaction fee is too high</string>-->
 
     <string name="send_tx_status_expired">Failed, transaction expired.</string>
     <string name="send_tx_illegal">Failed, illegal transaction.</string>

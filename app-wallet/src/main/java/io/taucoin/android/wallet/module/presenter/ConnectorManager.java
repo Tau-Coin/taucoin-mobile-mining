@@ -285,7 +285,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
      * */
 
     public void getBlockList(long height){
-        getBlockList(-1, height);
+        getBlockList(0, height);
     }
 
     public void getBlockList(int num, long height){

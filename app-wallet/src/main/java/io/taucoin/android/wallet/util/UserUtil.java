@@ -22,14 +22,9 @@ import android.widget.TextView;
 import com.github.naturs.logger.Logger;
 import io.taucoin.android.wallet.R;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 
 public class UserUtil {
@@ -71,19 +66,20 @@ public class UserUtil {
             setBalance(tvBalance, 0L);
             return;
         }
-        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
-            long balance = keyValue.getBalance();
-            balance -= MiningUtil.pendingAmount();
-            balance = balance < 0 ? 0 : balance;
-            emitter.onNext(balance);
-        }).observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(new LogicObserver<Long>() {
-                @Override
-                public void handleData(Long balance) {
-                    setBalance(tvBalance, balance);
-                }
-            });
+        setBalance(tvBalance, keyValue.getBalance());
+//        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+//            long balance = keyValue.getBalance();
+//            balance -= MiningUtil.pendingAmount();
+//            balance = balance < 0 ? 0 : balance;
+//            emitter.onNext(balance);
+//        }).observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(Schedulers.io())
+//            .subscribe(new LogicObserver<Long>() {
+//                @Override
+//                public void handleData(Long balance) {
+//                    setBalance(tvBalance, balance);
+//                }
+//            });
     }
 
     private static void setBalance(TextView tvBalance, long balance) {
