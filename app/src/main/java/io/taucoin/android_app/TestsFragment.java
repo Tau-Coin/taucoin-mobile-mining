@@ -26,6 +26,7 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
     Button blockButton;
     Button txButton;
     Button accountButton;
+    Button txLoopButton;
 
     boolean isMiningStart = false;
     int targetAmount = -1;
@@ -68,6 +69,7 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
         blockButton = (Button)view.findViewById(R.id.blockButton);
         txButton = (Button)view.findViewById(R.id.txButton);
         accountButton = (Button)view.findViewById(R.id.accountButton);
+        txLoopButton = (Button)view.findViewById(R.id.txloop);
 
         keyButton.setOnClickListener(this);
         syncButton.setOnClickListener(this);
@@ -76,6 +78,7 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
         blockButton.setOnClickListener(this);
         txButton.setOnClickListener(this);
         accountButton.setOnClickListener(this);
+        txLoopButton.setOnClickListener(this);
 
         changeButtonState(false);
         return view;
@@ -150,6 +153,11 @@ public class TestsFragment extends Fragment implements View.OnClickListener {
 
             case R.id.accountButton:
                 intent = new Intent(getActivity(), AccountStateActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.txloop:
+                intent = new Intent(getActivity(), LoopSendActivity.class);
                 startActivity(intent);
                 break;
         }

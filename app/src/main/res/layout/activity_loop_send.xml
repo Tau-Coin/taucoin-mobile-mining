@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    tools:context=".KeyActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="14sp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:textColor="@color/background_material_dark"
+        android:text="Send"/>
+
+    <TextView
+        android:id="@+id/statusTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:textColor="@color/background_material_dark"/>
+
+    <TextView
+        android:id="@+id/countTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:textColor="@color/background_material_dark"/>
+
+    <EditText
+        android:id="@+id/addressET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:hint="Receiver`s Address"/>
+
+
+    <EditText
+        android:id="@+id/amountET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:gravity="left"
+        android:inputType="numberDecimal|number"
+        android:layout_marginTop="10dp"
+        android:hint="Amount"/>
+
+
+    <EditText
+        android:id="@+id/feeET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:inputType="numberDecimal|number"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:hint="Transaction Fee"/>
+
+    <EditText
+        android:id="@+id/internalET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:inputType="numberDecimal|number"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:hint="Time Internal"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/startStopButton"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="12sp" />
+
+</LinearLayout>
