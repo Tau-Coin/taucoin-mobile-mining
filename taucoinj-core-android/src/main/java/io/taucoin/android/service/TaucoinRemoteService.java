@@ -1356,7 +1356,7 @@ public class TaucoinRemoteService extends TaucoinService {
              height = taucoin.getBlockchain().getSize();
          }
 
-         replyData.putLong("height", height);
+         replyData.putLong("height", height - 1);
          replyMessage.setData(replyData);
          try {
              message.replyTo.send(replyMessage);
