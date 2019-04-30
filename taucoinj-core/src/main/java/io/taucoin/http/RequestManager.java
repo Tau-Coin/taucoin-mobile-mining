@@ -444,7 +444,11 @@ public class RequestManager implements RequestQueue.MessageListener {
                 changeSyncState(DONE_HASH_RETRIEVING);
             }
         } else if (message instanceof GetBlocksMessage) {
-            returnBlockNumbers();
+            // Note: when 'GetBlocksMessage' is timeout, don't return
+            // block numbers into syncqueue. Next 'chaininfo' will trigger
+            // block sync again.
+            //returnBlockNumbers();
+            sentNumbers.clear();
         }
     }
 

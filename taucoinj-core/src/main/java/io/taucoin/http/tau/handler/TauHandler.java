@@ -111,6 +111,7 @@ public class TauHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("Tau handling failed ", cause);
+        httpClient.deactivate(ctx);
         ctx.close();
     }
 
