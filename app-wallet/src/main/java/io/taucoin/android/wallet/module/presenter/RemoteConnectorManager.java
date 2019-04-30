@@ -28,6 +28,7 @@ import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
+import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.BlockForgedInternalEventData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
@@ -42,6 +43,7 @@ import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.net.p2p.HelloMessage;
 
@@ -191,6 +193,16 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         messageEvent.setData(blockForgedInternal.blockForgedInternal);
                         messageEvent.setCode(MessageEvent.EventCode.FORGED_TIME);
                         EventBusUtil.post(messageEvent);
+                        break;
+                    case EVENT_BLOCK_FORGE_STOP:
+                        BlockForgeExceptionStopEvent blockForgeExceptionStop = data.getParcelable("data");
+                        logMessage = "Block forged internal " + blockForgeExceptionStop.getMsg();
+                        ToastUtils.showShortToast(blockForgeExceptionStop.getMsg());
+//                        addLogEntry(time, logMessage);
+//                        MessageEvent messageEvent = new MessageEvent();
+//                        messageEvent.setData(blockForgedInternal.blockForgedInternal);
+//                        messageEvent.setCode(MessageEvent.EventCode.FORGED_TIME);
+//                        EventBusUtil.post(messageEvent);
                         break;
 
                 }

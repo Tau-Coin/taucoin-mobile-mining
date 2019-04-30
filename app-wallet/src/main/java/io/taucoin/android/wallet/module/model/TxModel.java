@@ -146,7 +146,8 @@ public class TxModel implements ITxModel {
                     }
                     boolean isRefresh = false;
                     for (TxStatusBean txStatus : txsStatus) {
-                        if(updateTransactionStatus(txStatus)){
+                        boolean isSuccess = updateTransactionStatus(txStatus);
+                        if(isSuccess){
                             isRefresh = true;
                         }
                     }

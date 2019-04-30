@@ -1,25 +1,17 @@
 package io.taucoin.forge;
 
 
-import io.taucoin.facade.TaucoinImpl;
 import io.taucoin.util.ByteUtil;
-import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
-import io.taucoin.db.ByteArrayWrapper;
-import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListenerAdapter;
 import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.util.Utils;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.BigIntegers;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -29,7 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static java.lang.Math.max;
 import static io.taucoin.config.SystemProperties.CONFIG;
 
 
@@ -474,7 +465,7 @@ public class BlockForger {
 
         @Override
         public void forgingStopped(ForgeStatus status) {
-            logger.info("Forging stopped status: {}",status.explainStatus());
+            logger.info("Forging stopped status: {}",status.getMsg());
         }
 
         @Override

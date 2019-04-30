@@ -4,11 +4,13 @@ import android.os.Parcelable;
 import io.taucoin.forge.ForgeStatus;
 
 public class BlockForgeExceptionStopEvent extends EventData{
-    private String reason;
+    private int code;
+    private String msg;
 
     public  BlockForgeExceptionStopEvent(ForgeStatus status){
         super();
-        this.reason = status.explainStatus();
+        this.code = status.getCode();
+        this.msg = status.getMsg();
     }
     @Override
     public int describeContents() {
@@ -18,11 +20,35 @@ public class BlockForgeExceptionStopEvent extends EventData{
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
-        parcel.writeString(reason);
+        parcel.writeInt(code);
+        parcel.writeString(msg);
     }
 
-    public BlockForgeExceptionStopEvent(Parcel in) {
+    public static final Parcelable.Creator<BlockForgeExceptionStopEvent> CREATOR
+            = new Parcelable.Creator<BlockForgeExceptionStopEvent>() {
+
+        public BlockForgeExceptionStopEvent createFromParcel(Parcel in) {
+
+            return new BlockForgeExceptionStopEvent(in);
+        }
+
+        public BlockForgeExceptionStopEvent[] newArray(int size) {
+
+            return new BlockForgeExceptionStopEvent[size];
+        }
+    };
+
+    private BlockForgeExceptionStopEvent(Parcel in) {
         super(in);
-        this.reason = in.readString();
+        this.code = in.readInt();
+        this.msg = in.readString();
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMsg() {
+        return msg;
     }
 }

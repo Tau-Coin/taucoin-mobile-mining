@@ -58,6 +58,7 @@ public class TransactionHistoryDaoUtils {
         qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
             qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
                 TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)));
+        qb.orderAsc(TransactionHistoryDao.Properties.CreateTime);
         return qb.list();
     }
 
