@@ -212,7 +212,7 @@ public class BlockForger {
         }
     }
 
-    public boolean restartForging(ForgeStatus status) {
+    public ForgeStatus restartForging() {
 
         Block bestBlock;
         BigInteger baseTarget;
@@ -226,25 +226,23 @@ public class BlockForger {
             } catch (InterruptedException e) {
                 logger.warn("Forging task is interrupted when waiting for sync done");
                 isWaitingSyncDone.set(false);
-                return false;
+                return ForgeStatus.FORGE_TASK_INTERRUPTED_NOT_SYNCED;
             }
-            return true;
+            return ForgeStatus.BLOCK_SYNC_PROCESSING;
         }
 
         baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
         BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
-        if (forgingPower.longValue() < 0) {
+        if (forgingPower.longValue() <= 0) {
             logger.error("Forging Power < 0!!!");
-            status = ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
-            return false;
+            return ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
         }
         long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
         logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
         if (balance.longValue() < hisAverageFee){
             logger.info("balance less than history average fee");
-            status = ForgeStatus.BALANCE_LESS_THAN_HISTORY_FEE;
-            return false;
+            return ForgeStatus.BALANCE_LESS_THAN_HISTORY_FEE;
         }
 
         logger.info("base target {}, forging power {}", baseTarget, forgingPower);
@@ -274,7 +272,7 @@ public class BlockForger {
                     blockchain.getLockObject().wait(sleepTime * 1000);
                 } catch (InterruptedException e) {
                     logger.warn("Forging task is interrupted");
-                    return false;
+                    return ForgeStatus.FORGE_TASK_INTERRUPTED;
                 }
             }
         } else {
@@ -284,21 +282,21 @@ public class BlockForger {
 
         if (stopForge) {
             logger.info("~~~~~~~~~~~~~~~~~~Stop forging!!!~~~~~~~~~~~~~~~~~~");
-            return false;
+            return ForgeStatus.FORGE_NORMAL_EXIT;
         }
 
         try {
             waitForPullTxPool();
         } catch (InterruptedException e) {
             logger.warn("Forging task is interrupted");
-            return false;
+            return ForgeStatus.FORGE_TASK_INTERRUPTED;
         }
 
         logger.info("Forging thread wakeup...");
 
         if (!txsGot) {
             logger.warn("Pull pool tx timeout, retry again.");
-            return true;
+            return ForgeStatus.PULL_POOL_TX_TIMEOUT;
         }
 
         cumulativeDifficulty = ProofOfTransaction.
@@ -308,7 +306,7 @@ public class BlockForger {
             logger.info("~~~~~~~~~~~~~~~~~~Forging a new block...~~~~~~~~~~~~~~~~~~");
         } else {
             logger.info("~~~~~~~~~~~~~~~~~~Got a new best block, continue forging...~~~~~~~~~~~~~~~~~~");
-            return true;
+            return ForgeStatus.FORGE_CONTINUE;
         }
 
         miningBlock = blockchain.createNewBlock(bestBlock, baseTarget,
@@ -319,14 +317,14 @@ public class BlockForger {
             blockForged(miningBlock);
         } catch (InterruptedException | CancellationException e) {
             // OK, we've been cancelled, just exit
-            return false;
+            return ForgeStatus.FORGE_INTERRUPTED_OR_CANCELED;
         } catch (Exception e) {
             logger.warn("Exception during mining: ", e);
-            return false;
+            return ForgeStatus.EXCEPTION_DURING_FORGING;
         }
 
         fireBlockStarted(miningBlock);
-        return true;
+        return ForgeStatus.FORGE_NORMAL;
     }
 
     protected void blockForged(Block newBlock) throws InterruptedException {
@@ -447,15 +445,14 @@ public class BlockForger {
 
         @Override
         public void run() {
-            boolean forgingResult = true;
-            ForgeStatus status = ForgeStatus.FORGE_NORMAL;
-            while (forgingResult && !Thread.interrupted() && !forger.isForgingStopped()
+            ForgeStatus forgingResult = ForgeStatus.FORGE_NORMAL;
+            while (forgingResult.isContinue() && !Thread.interrupted() && !forger.isForgingStopped()
                     && (forgeTargetAmount == -1
                             || (forgeTargetAmount > 0 && forgedBlockAmount < forgeTargetAmount))) {
-               forgingResult = forger.restartForging(status);
+               forgingResult = forger.restartForging();
             }
 
-            forger.onForgingStopped(status);
+            forger.onForgingStopped(forgingResult);
         }
 
         @Override
