@@ -234,7 +234,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
                 for (Transaction tx : undoBlock.getTransactionsList()){
                     //roll back
-                    TransactionExecutor executor = new TransactionExecutor(tx, track);
+                    TransactionExecutor executor = new TransactionExecutor(tx, track,this);
                     executor.setCoinbase(key.getAddress());
                     executor.undoTransaction();
                 }
@@ -790,7 +790,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             stateLogger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
-            TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack);
+            TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
             if (!executor.init()) {
