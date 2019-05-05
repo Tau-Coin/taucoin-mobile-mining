@@ -141,7 +141,6 @@ public class TransactionExecutor {
 
 
         AccountState accountState = track.getAccountState(tx.getSender());
-        System.out.println("======> before size is: "+ accountState.getTranHistory().size());
         if(blockchain.getSize() > MaxHistoryCount){
             long txTime = Collections.min(accountState.getTranHistory().keySet());
             // if earliest transaction is beyond expire time
@@ -157,7 +156,6 @@ public class TransactionExecutor {
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
             accountState.getTranHistory().put(txTime,tx.getHash());
         }
-        System.out.println("======> after size is: "+ accountState.getTranHistory().size());
 
     }
 
