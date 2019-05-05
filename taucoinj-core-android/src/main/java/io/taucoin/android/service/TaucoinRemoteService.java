@@ -65,6 +65,8 @@ public class TaucoinRemoteService extends TaucoinService {
     protected String remoteIdBootstrap = null;
 
     private ConnectionManager connectionManager = null;
+    private IntentFilter intentFilter = null;
+    private NetworkStateListener networkStateListener = null;
 
     public TaucoinRemoteService() {
 
@@ -119,6 +121,7 @@ public class TaucoinRemoteService extends TaucoinService {
     public void onDestroy() {
         // super.onDestroy will call taucoin.close()
         super.onDestroy();
+        unregisterNetworkStateListener();
         TaucoinModule.close();
         isTaucoinStarted = false;
     }
@@ -410,9 +413,14 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     private void registerNetworkStateListener() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        this.registerReceiver(new NetworkStateListener(connectionManager), filter);
+        intentFilter = new IntentFilter();
+        networkStateListener = new NetworkStateListener(connectionManager);
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(networkStateListener, intentFilter);
+    }
+
+    private void unregisterNetworkStateListener() {
+        this.unregisterReceiver(networkStateListener);
     }
 
     private static class NetworkStateListener extends BroadcastReceiver {
