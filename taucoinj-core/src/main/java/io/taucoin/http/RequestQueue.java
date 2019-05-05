@@ -37,7 +37,7 @@ public class RequestQueue {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(4, new ThreadFactory() {
+    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(1, new ThreadFactory() {
         private AtomicInteger cnt = new AtomicInteger(0);
         public Thread newThread(Runnable r) {
             return new Thread(r, "RequestQueueTimer-" + cnt.getAndIncrement());
@@ -55,6 +55,7 @@ public class RequestQueue {
     private List<MessageListener> listeners = new ArrayList<>();
 
     private ChannelHandlerContext ctx = null;
+    private final Object ctxLock = new Object();
 
     @Inject
     public RequestQueue(TaucoinListener listener) {
@@ -77,7 +78,10 @@ public class RequestQueue {
 
         removeAllTimeoutMessage();
 
-        this.ctx = ctx;
+        synchronized(ctxLock) {
+            this.ctx = ctx;
+        }
+
         timerTask = timer.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 try {
@@ -146,9 +150,18 @@ public class RequestQueue {
     }
 
     private void nudgeQueue() {
-        if (this.ctx == null) {
-            logger.warn("channel deactived");
+
+        if (Thread.interrupted()) {
+            logger.warn("Timer is interrupted");
             return;
+        }
+
+        synchronized(ctxLock) {
+            if (this.ctx == null) {
+                logger.warn("Interrupt timer task");
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
 
         // remove timeout message
@@ -162,7 +175,7 @@ public class RequestQueue {
     private void sendToWire(RequestRoundtrip requestRoundtrip) {
 
         if (requestRoundtrip != null && (requestRoundtrip.getRetryTimes() == 0
-                || requestRoundtrip.hasToRetry())) {
+                /*|| requestRoundtrip.hasToRetry()*/)) {
 
             Message msg = requestRoundtrip.getMsg();
 
@@ -181,7 +194,9 @@ public class RequestQueue {
     }
 
     public void deactivate() {
-        this.ctx = null;
+        synchronized(ctxLock) {
+            this.ctx = null;
+        }
         if (timerTask != null) {
             timerTask.cancel(true);
         }
