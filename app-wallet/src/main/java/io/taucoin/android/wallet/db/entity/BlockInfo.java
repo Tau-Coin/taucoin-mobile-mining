@@ -19,7 +19,7 @@ public class BlockInfo {
     private int blockSync;
 
     @Transient
-    private List<MiningInfo> miningInfo;
+    private List<MiningBlock> miningBlocks;
 
     @Generated(hash = 1356593060)
     public BlockInfo(Long id, int blockHeight, int blockSync) {
@@ -32,12 +32,12 @@ public class BlockInfo {
     public BlockInfo() {
     }
 
-    public List<MiningInfo> getMiningInfo() {
-        return miningInfo;
+    public List<MiningBlock> getMiningInfo() {
+        return miningBlocks;
     }
 
-    public void setMiningInfo(List<MiningInfo> miningInfo) {
-        this.miningInfo = miningInfo;
+    public void setMiningBlocks(List<MiningBlock> miningBlocks) {
+        this.miningBlocks = miningBlocks;
     }
 
     public Long getId() {

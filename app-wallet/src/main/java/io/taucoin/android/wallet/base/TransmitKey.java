@@ -51,6 +51,7 @@ public class TransmitKey {
         public static final String Start = "Start";
         public static final String Stop = "Stop";
         public static final String LOADING = "Loading";
+        public static final String ERROR = "Error";
     }
 
     public static final String BEAN = "bean";

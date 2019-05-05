@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinConnector;
+import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
@@ -54,6 +55,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     private boolean isTaucoinConnected = false;
     boolean isInit = false;
     boolean isSyncMe = false;
+    BlockForgeExceptionStopEvent mExceptionStop;
 
     private final static int CONSOLE_LENGTH = 10000;
     private static final int BOOT_UP_DELAY_INIT_SECONDS = 2;
@@ -94,10 +96,19 @@ public abstract class ConnectorManager implements ConnectorHandler {
         isInit = false;
         isSyncMe = false;
         isTaucoinConnected = false;
+        mExceptionStop = null;
     }
 
     public boolean isInit() {
         return isInit;
+    }
+
+    public boolean isError() {
+        return mExceptionStop != null;
+    }
+
+    public String getErrorMsg() {
+        return isError() ? mExceptionStop.getMsg() : "";
     }
 
     public boolean isSyncMe() {

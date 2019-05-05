@@ -8,12 +8,14 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
-import io.taucoin.android.wallet.db.entity.MiningInfo;
+import io.taucoin.android.wallet.db.entity.MiningReward;
+import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 
-import io.taucoin.android.wallet.db.greendao.MiningInfoDao;
+import io.taucoin.android.wallet.db.greendao.MiningRewardDao;
+import io.taucoin.android.wallet.db.greendao.MiningBlockDao;
 import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 import io.taucoin.android.wallet.db.greendao.BlockInfoDao;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
@@ -27,12 +29,14 @@ import io.taucoin.android.wallet.db.greendao.KeyValueDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
-    private final DaoConfig miningInfoDaoConfig;
+    private final DaoConfig miningRewardDaoConfig;
+    private final DaoConfig miningBlockDaoConfig;
     private final DaoConfig transactionHistoryDaoConfig;
     private final DaoConfig blockInfoDaoConfig;
     private final DaoConfig keyValueDaoConfig;
 
-    private final MiningInfoDao miningInfoDao;
+    private final MiningRewardDao miningRewardDao;
+    private final MiningBlockDao miningBlockDao;
     private final TransactionHistoryDao transactionHistoryDao;
     private final BlockInfoDao blockInfoDao;
     private final KeyValueDao keyValueDao;
@@ -41,8 +45,11 @@ public class DaoSession extends AbstractDaoSession {
             daoConfigMap) {
         super(db);
 
-        miningInfoDaoConfig = daoConfigMap.get(MiningInfoDao.class).clone();
-        miningInfoDaoConfig.initIdentityScope(type);
+        miningRewardDaoConfig = daoConfigMap.get(MiningRewardDao.class).clone();
+        miningRewardDaoConfig.initIdentityScope(type);
+
+        miningBlockDaoConfig = daoConfigMap.get(MiningBlockDao.class).clone();
+        miningBlockDaoConfig.initIdentityScope(type);
 
         transactionHistoryDaoConfig = daoConfigMap.get(TransactionHistoryDao.class).clone();
         transactionHistoryDaoConfig.initIdentityScope(type);
@@ -53,26 +60,33 @@ public class DaoSession extends AbstractDaoSession {
         keyValueDaoConfig = daoConfigMap.get(KeyValueDao.class).clone();
         keyValueDaoConfig.initIdentityScope(type);
 
-        miningInfoDao = new MiningInfoDao(miningInfoDaoConfig, this);
+        miningRewardDao = new MiningRewardDao(miningRewardDaoConfig, this);
+        miningBlockDao = new MiningBlockDao(miningBlockDaoConfig, this);
         transactionHistoryDao = new TransactionHistoryDao(transactionHistoryDaoConfig, this);
         blockInfoDao = new BlockInfoDao(blockInfoDaoConfig, this);
         keyValueDao = new KeyValueDao(keyValueDaoConfig, this);
 
-        registerDao(MiningInfo.class, miningInfoDao);
+        registerDao(MiningReward.class, miningRewardDao);
+        registerDao(MiningBlock.class, miningBlockDao);
         registerDao(TransactionHistory.class, transactionHistoryDao);
         registerDao(BlockInfo.class, blockInfoDao);
         registerDao(KeyValue.class, keyValueDao);
     }
     
     public void clear() {
-        miningInfoDaoConfig.clearIdentityScope();
+        miningRewardDaoConfig.clearIdentityScope();
+        miningBlockDaoConfig.clearIdentityScope();
         transactionHistoryDaoConfig.clearIdentityScope();
         blockInfoDaoConfig.clearIdentityScope();
         keyValueDaoConfig.clearIdentityScope();
     }
 
-    public MiningInfoDao getMiningInfoDao() {
-        return miningInfoDao;
+    public MiningRewardDao getMiningRewardDao() {
+        return miningRewardDao;
+    }
+
+    public MiningBlockDao getMiningBlockDao() {
+        return miningBlockDao;
     }
 
     public TransactionHistoryDao getTransactionHistoryDao() {

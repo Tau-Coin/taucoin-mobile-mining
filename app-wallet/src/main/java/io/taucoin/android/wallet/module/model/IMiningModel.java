@@ -6,6 +6,7 @@ import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
@@ -24,4 +25,6 @@ public interface IMiningModel {
     void updateTransactionHistory(Transaction transaction);
 
     void getMaxBlockNum(long height, LogicObserver<Integer> logicObserver);
+
+    void getMiningRewards(LogicObserver<List<MiningReward>> logicObserver);
 }

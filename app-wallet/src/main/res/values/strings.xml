@@ -9,7 +9,6 @@
     <string name="common_yes">Yes</string>
     <string name="common_no">No</string>
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font> TAU]]> </Data></string>
-    <string name="common_power" formatted="false"><Data><![CDATA[Power: <font color="#f19322">%s</font>]]> </Data></string>
     <string name="common_exit" formatted="false">\nDo you want to stop mining?\n</string>
     <string name="common_balance_unit">TAU</string>
 
@@ -118,14 +117,19 @@
         Please allow the installation of TAUcoin application permissions.
     </string>
 
-    <string name="home_mining_start">Start Mining</string>
-    <string name="home_mining_stop">Stop Mining</string>
+    <string name="home_mining_on">On</string>
+    <string name="home_mining_off">Off</string>
+    <string name="home_mining_connecting">Connecting</string>
 
-    <string name="home_block_height">Current Block Height</string>
-    <string name="home_block_synchronized">Current Synchronized Block</string>
-    <string name="home_block_mined">Total Mined Blocks</string>
-    <string name="home_mining_income">Total Mining Income</string>
-    <string name="home_mining_details">Mining Details</string>
+    <string name="home_mining_income">Mining income</string>
+    <string name="home_power">Power</string>
+    <string name="home_synchronized">Synchronized</string>
+    <string name="home_mined">Mined</string>
+    <string name="home_mining_transaction">You have verified following transactions</string>
+
+    <string name="home_mining_hash">TX hash</string>
+    <string name="home_mining_fee">TX Fee</string>
+    <string name="home_mining_status">Status</string>
 
     <string name="block_list_title">Mining Details</string>
     <string name="block_list_all">ALL</string>
@@ -138,12 +142,12 @@
     <string name="block_transaction_id">Transaction&#160;ID&#160;&#160;</string>
     <string name="bloc_transaction_fee">Transaction&#160;Fee&#160;&#160;%sTAU</string>
 
-    <string name="bloc_in_synchronization">Synchronizing Block Data</string>
-    <string name="mining_init_data">Initializing Database</string>
-    <string name="mining_sync_block">Synchronizing Block Data</string>
-    <string name="mining_in_progress">Mining in progress</string>
-    <string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>
-    <string name="mining_mining_internal">Expected block time</string>
+    <!--<string name="bloc_in_synchronization">Synchronizing Block Data</string>-->
+    <!--<string name="mining_init_data">Initializing Database</string>-->
+    <!--<string name="mining_sync_block">Synchronizing Block Data</string>-->
+    <!--<string name="mining_in_progress">Mining in progress</string>-->
+    <!--<string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>-->
+    <!--<string name="mining_mining_internal">Expected block time</string>-->
     <string name="mining_new_block">You have mined a new block. Income: %sTAU</string>
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>

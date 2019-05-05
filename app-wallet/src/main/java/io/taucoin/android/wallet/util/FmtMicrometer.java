@@ -38,6 +38,15 @@ public class FmtMicrometer {
         return df.format(bigDecimal);
     }
 
+    static String fmtMiningIncome(Long balance) {
+        DecimalFormat df = getDecimalFormatInstance();
+        df.applyPattern("###,##0.00");
+        df.setRoundingMode(RoundingMode.FLOOR);
+        BigDecimal bigDecimal = new BigDecimal(balance);
+        bigDecimal = bigDecimal.divide(new BigDecimal(mDecimal), mScale, RoundingMode.HALF_UP);
+        return df.format(bigDecimal);
+    }
+
     static String fmtPower(Long power) {
         DecimalFormat df = getDecimalFormatInstance();
         df.applyPattern("###,##0");

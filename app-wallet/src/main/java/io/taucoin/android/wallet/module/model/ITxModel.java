@@ -34,7 +34,7 @@ public interface ITxModel {
     void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer);
 
     /** Get the list of transactions to be Pending */
-    void getTxPendingList(LogicObserver<List<List<String>>> observer);
+    void getTxPendingListDelay(LogicObserver<List<List<String>>> observer);
 
     /** Create transaction data */
     void createTransaction(TransactionHistory txHistory, LogicObserver<Transaction> observer);

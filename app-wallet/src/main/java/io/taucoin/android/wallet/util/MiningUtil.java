@@ -15,6 +15,8 @@
  */
 package io.taucoin.android.wallet.util;
 
+import android.widget.TextView;
+
 import com.github.naturs.logger.Logger;
 import io.taucoin.android.wallet.R;
 
@@ -26,17 +28,15 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
-import io.taucoin.android.wallet.db.entity.MiningInfo;
+import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.service.TxService;
-import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
@@ -44,7 +44,7 @@ public class MiningUtil {
 
     public static int parseMinedBlocks(BlockInfo blockInfo) {
         if(blockInfo != null){
-            List<MiningInfo> list= blockInfo.getMiningInfo();
+            List<MiningBlock> list= blockInfo.getMiningInfo();
             if(list != null){
                 return list.size();
             }
@@ -55,19 +55,19 @@ public class MiningUtil {
     public static String parseMiningIncome(BlockInfo blockInfo) {
         BigDecimal number = new BigDecimal("0");
         if(blockInfo != null){
-            List<MiningInfo> list= blockInfo.getMiningInfo();
+            List<MiningBlock> list= blockInfo.getMiningInfo();
             if(list != null && list.size() > 0){
-                for (MiningInfo bean : list) {
+                for (MiningBlock bean : list) {
                     try {
                         number = number.add(new BigDecimal(bean.getReward()));
                     }catch (Exception ignore){}
                 }
             }
         }
-        return FmtMicrometer.fmtFormat(number.toString());
+        return FmtMicrometer.fmtMiningIncome(number.longValue());
     }
 
-    public static void setBlockHeight(ItemTextView textView) {
+    public static void setBlockHeight(TextView textView) {
         if(textView == null){
             return;
         }
@@ -80,7 +80,7 @@ public class MiningUtil {
                     @Override
                     public void handleData(Integer blockHeight) {
                         Logger.d("UserUtil.setBlockHeight=" + blockHeight);
-                        textView.setRightText(blockHeight);
+                        textView.setText(blockHeight);
                     }
                 });
     }
@@ -133,14 +133,5 @@ public class MiningUtil {
             }
         }
         return pendingAmount.longValue();
-    }
-
-    public static int getMiningMsg(){
-        int msg = R.string.mining_in_progress;
-        boolean isInit = MyApplication.getRemoteConnector().isInit();
-        if(!isInit){
-            msg = R.string.mining_init_data;
-        }
-        return msg;
     }
 }

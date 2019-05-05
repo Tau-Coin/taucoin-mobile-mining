@@ -7,10 +7,10 @@ import org.greenrobot.greendao.annotation.Property;
 
 /**
  * @version 1.0
- * mining information
+ * mining block
  */
 @Entity
-public class MiningInfo {
+public class MiningBlock {
 
     @Id
     private Long id;
@@ -20,8 +20,8 @@ public class MiningInfo {
     private String reward;
     private int valid;
     private int total;
-    @Generated(hash = 1481233812)
-    public MiningInfo(Long id, String pubKey, String blockNo, String blockHash,
+    @Generated(hash = 422600099)
+    public MiningBlock(Long id, String pubKey, String blockNo, String blockHash,
             String reward, int valid, int total) {
         this.id = id;
         this.pubKey = pubKey;
@@ -31,8 +31,8 @@ public class MiningInfo {
         this.valid = valid;
         this.total = total;
     }
-    @Generated(hash = 636345119)
-    public MiningInfo() {
+    @Generated(hash = 1637629893)
+    public MiningBlock() {
     }
     public Long getId() {
         return this.id;

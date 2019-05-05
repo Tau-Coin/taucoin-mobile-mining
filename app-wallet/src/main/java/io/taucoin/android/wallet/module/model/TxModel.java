@@ -100,11 +100,11 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getTxPendingList(LogicObserver<List<List<String>>> observer){
+    public void getTxPendingListDelay(LogicObserver<List<List<String>>> observer){
         KeyValue keyValue = MyApplication.getKeyValue();
         String address = keyValue.getAddress();
         Observable.create((ObservableOnSubscribe<List<List<String>>>) emitter -> {
-            List<TransactionHistory> txList = TransactionHistoryDaoUtils.getInstance().getTxPendingList(address);
+            List<TransactionHistory> txList = TransactionHistoryDaoUtils.getInstance().getTxPendingListDelay(address);
             List<List<String>> lists = new ArrayList<>();
             if(txList != null && txList.size() > 0){
                 List<String> idsList = new ArrayList<>();

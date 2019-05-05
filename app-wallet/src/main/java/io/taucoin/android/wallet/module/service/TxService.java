@@ -133,7 +133,7 @@ public class TxService extends Service {
 
     private void checkRawTransaction() {
         mIsChecked = true;
-        mTxModel.getTxPendingList(new LogicObserver<List<List<String>>>(){
+        mTxModel.getTxPendingListDelay(new LogicObserver<List<List<String>>>(){
 
             @Override
             public void handleData(List<List<String>> txIdsList) {

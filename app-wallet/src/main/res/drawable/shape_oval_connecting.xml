@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval" >
+    <!-- 描边 -->
+    <stroke
+        android:dashGap="10dp"
+        android:dashWidth="10dp"
+        android:width="2dp"
+        android:color="@color/color_young" />
+    <solid android:color="@color/color_young" />
+
+    <size
+        android:height="@dimen/dimen_size_60"
+        android:width="@dimen/dimen_size_60" />
+
+    <gradient
+        android:angle="90"
+        android:centerColor="@color/color_young"
+        android:endColor="@color/color_young"
+        android:gradientRadius="90"
+        android:startColor="@color/color_young"
+        android:type="linear" />
+</shape>

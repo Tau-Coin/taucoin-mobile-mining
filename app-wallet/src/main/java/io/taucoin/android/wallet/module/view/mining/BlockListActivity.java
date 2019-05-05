@@ -62,8 +62,8 @@ public class BlockListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_block_list);
         ButterKnife.bind(this);
-        initView();
         miningPresenter = new MiningPresenter();
+        initView();
         getData();
     }
 
@@ -116,6 +116,13 @@ public class BlockListActivity extends BaseActivity {
         refreshLayout.setOnLoadmoreListener(this);
         mAdapter = new BlockAdapter();
         listViewHelp.setAdapter(mAdapter);
+
+        int type = getIntent().getIntExtra(TransmitKey.TYPE, 0);
+        if(type == 1){
+            onClick(tvFilterSelect);
+        }else{
+            getData();
+        }
     }
 
     @Override
@@ -150,6 +157,7 @@ public class BlockListActivity extends BaseActivity {
                 mIsMe = !mIsMe;
                 tvFilter.setText(mIsMe ? R.string.block_list_me : R.string.block_list_all);
                 tvFilterSelect.setVisibility(View.GONE);
+                ivFilter.setImageResource(R.mipmap.icon_down);
                 onRefresh(null);
                 break;
         }

@@ -93,15 +93,13 @@ public class UserUtil {
         if(tvPower == null){
             return;
         }
-        long power = 0L;
+        String power = "0";
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
-            power = keyValue.getPower();
+            power = String.valueOf(keyValue.getPower());
         }
-        String powerStr = MyApplication.getInstance().getResources().getString(R.string.common_power);
-        powerStr = String.format(powerStr, FmtMicrometer.fmtPower(power));
-        tvPower.setText(Html.fromHtml(powerStr));
-        Logger.d("UserUtil.setPower=" + powerStr);
+        tvPower.setText(power);
+        Logger.d("UserUtil.setPower=" + power);
     }
 
     public static boolean isImportKey() {

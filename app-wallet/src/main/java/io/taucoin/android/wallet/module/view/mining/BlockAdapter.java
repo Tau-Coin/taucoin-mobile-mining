@@ -12,7 +12,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.taucoin.android.wallet.db.entity.MiningInfo;
+import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -21,9 +21,9 @@ public class BlockAdapter extends BaseAdapter {
     private int listSize = 0;
     private int dataSize = 0;
     private boolean isMe = false;
-    private List<MiningInfo> list = new ArrayList<>();
+    private List<MiningBlock> list = new ArrayList<>();
 
-    void setListData(List<MiningInfo> list) {
+    void setListData(List<MiningBlock> list) {
         this.list = list;
     }
 
@@ -62,7 +62,7 @@ public class BlockAdapter extends BaseAdapter {
         String title = parent.getContext().getText(R.string.block_no).toString();
         int num = dataSize - position - 1;
         if(isMe){
-            MiningInfo bean = list.get(position);
+            MiningBlock bean = list.get(position);
             num = StringUtil.getIntString(bean.getBlockNo());
         }
         title = String.format(title, num);

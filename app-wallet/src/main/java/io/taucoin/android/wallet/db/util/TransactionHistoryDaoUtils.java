@@ -53,17 +53,24 @@ public class TransactionHistoryDaoUtils {
         return daoManager.getDaoSession().getTransactionHistoryDao();
     }
 
-    public List<TransactionHistory> getTxPendingList(String formAddress) {
+    public List<TransactionHistory> getTxPendingListDelay(String formAddress) {
+        long time = DateUtil.getTime() - 5 * 60; // delay 5min
+        QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
+        qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
+                TransactionHistoryDao.Properties.CreateTime.lt(time),
+                qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
+                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)));
+        qb.orderAsc(TransactionHistoryDao.Properties.CreateTime);
+        return qb.list();
+    }
+
+    public List<TransactionHistory> getPendingAmountList(String formAddress) {
         QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
         qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
             qb.or(TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.BROADCASTING),
                 TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.CONFIRMING)));
         qb.orderAsc(TransactionHistoryDao.Properties.CreateTime);
         return qb.list();
-    }
-
-    public List<TransactionHistory> getPendingAmountList(String formAddress) {
-        return getTxPendingList(formAddress);
     }
 
     public TransactionHistory queryTransactionById(String txId) {
