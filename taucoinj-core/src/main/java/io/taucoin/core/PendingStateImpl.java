@@ -60,12 +60,13 @@ public class PendingStateImpl implements PendingState {
     private TaucoinListener ProcessBlockListener = new TaucoinListenerAdapter() {
         @Override
         public void onBlockConnected(final Block block) {
-            EventDispatchThread.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    processBest(block);
-                }
-            });
+            processBest(block);
+//            EventDispatchThread.invokeLater(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                }
+//            });
         }
     };
 
