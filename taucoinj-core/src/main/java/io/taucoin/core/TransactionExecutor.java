@@ -133,9 +133,9 @@ public class TransactionExecutor {
         track.addBalance(coinbase, toBI(tx.transactionCost()));
 
         // Increase forge power.
-        logger.error("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.increaseforgePower(tx.getSender());
-        logger.error("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
 
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
@@ -178,9 +178,9 @@ public class TransactionExecutor {
         }
 
         // Increase forge power.
-        logger.error("before undo sender address is {} forge power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        logger.info("before undo sender address is {} forge power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.reduceForgePower(tx.getSender());
-        logger.error("after undo sender address is {} forge power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        logger.info("after undo sender address is {} forge power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
     }
 
 	/**
