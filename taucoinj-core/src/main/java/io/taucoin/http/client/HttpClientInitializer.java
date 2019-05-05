@@ -10,11 +10,15 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import static io.taucoin.config.SystemProperties.CONFIG;
 
 public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -49,6 +53,9 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
     public void initChannel(SocketChannel ch) {
 
         ChannelPipeline p = ch.pipeline();
+
+        p.addLast("readTimeoutHandler",
+                new ReadTimeoutHandler(CONFIG.httpConnectionReadTimeout(), TimeUnit.SECONDS));
 
         p.addLast(new HttpClientCodec());
 

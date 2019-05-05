@@ -770,6 +770,11 @@ public class SystemProperties {
     }
 
     @ValidateMe
+    public int httpConnectionReadTimeout() {
+        return config.getInt("http.client.channel.read.timeout");
+    }
+
+    @ValidateMe
     public long pullChainInfoPeriod() {
         return config.getInt("sync2.chaininfo.pull.period") * 1000;
     }
