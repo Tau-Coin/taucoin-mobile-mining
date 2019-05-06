@@ -64,7 +64,7 @@ public class TransactionExecutor {
 
         // Check In Transaction Fee
         basicTxFee = toBI(tx.transactionCost()).longValue();
-        if (basicTxFee < 0 ) {
+        if (basicTxFee < 1 ) {
             if (logger.isWarnEnabled())
                 logger.warn("Transaction fee [{}] is invalid!", basicTxFee);
             tx.TRANSACTION_STATUS = "Not enough fee for transaction";
@@ -129,8 +129,40 @@ public class TransactionExecutor {
 		// Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
 
-        // Transfer fees to miner
-        track.addBalance(coinbase, toBI(tx.transactionCost()));
+        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+
+        if (feeDistributor.distributeFee()) {
+            // Transfer fees to forger
+            track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
+            // Transfer fees to receiver
+            track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
+            if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
+                // Transfer fees to last witness
+                track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
+                        toBI(feeDistributor.getLastWitFee()));
+            }
+
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress() != null) {
+                // Transfer fees to last associate
+                track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress(),
+                        toBI(feeDistributor.getLastAssociFee()));
+            }
+
+            /**
+             * 2 special situation is dealt by distribute associated fee to current forger
+             */
+            if (track.getAccountState(tx.getSender()).getWitnessAddress() == null) {
+                // Transfer fees to last witness
+                track.addBalance(coinbase,
+                        toBI(feeDistributor.getLastWitFee()));
+            }
+
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress() == null) {
+                // Transfer fees to last associate
+                track.addBalance(coinbase,
+                        toBI(feeDistributor.getLastAssociFee()));
+            }
+        }
 
         // Increase forge power.
         logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
@@ -156,6 +188,10 @@ public class TransactionExecutor {
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
             accountState.getTranHistory().put(txTime,tx.getHash());
         }
+
+        StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
+                new StakeHolderIdentityUpdate(tx, track, coinbase);
+        stakeHolderIdentityUpdate.updateStakeHolderIdentity();
 
     }
 
