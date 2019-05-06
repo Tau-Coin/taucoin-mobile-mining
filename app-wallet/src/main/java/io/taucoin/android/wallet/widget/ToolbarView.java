@@ -31,6 +31,7 @@ import io.taucoin.android.wallet.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.MainActivity;
 import io.taucoin.android.wallet.util.NotchUtil;
 import io.taucoin.android.wallet.util.KeyboardUtils;
@@ -41,6 +42,7 @@ public class ToolbarView extends RelativeLayout {
     private String titleText;
     private int titleBackground;
     private int leftImage;
+    private int rightImage;
     private int leftImagePadding;
     private ViewHolder viewHolder;
     private int statusBarHeight;
@@ -63,6 +65,7 @@ public class ToolbarView extends RelativeLayout {
     private void initData(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ToolbarView);
         this.leftImage = a.getResourceId(R.styleable.ToolbarView_leftBackImage, -1);
+        this.rightImage = a.getResourceId(R.styleable.ToolbarView_rightImage, -1);
         this.leftImagePadding = a.getDimensionPixelSize(R.styleable.ToolbarView_leftImagePadding, -1);
         this.titleText = a.getString(R.styleable.ToolbarView_titleText);
         this.titleBackground = a.getColor(R.styleable.ToolbarView_titleBackground, -1);
@@ -88,6 +91,11 @@ public class ToolbarView extends RelativeLayout {
         } else {
             viewHolder.ivLeftBack.setVisibility(INVISIBLE);
         }
+        if (rightImage != -1) {
+            viewHolder.ivRight.setImageResource(rightImage);
+        } else {
+            viewHolder.ivRight.setVisibility(INVISIBLE);
+        }
         if (StringUtil.isNotEmpty(titleText)) {
             viewHolder.tvTitle.setText(titleText);
         }
@@ -109,6 +117,8 @@ public class ToolbarView extends RelativeLayout {
     class ViewHolder {
         @BindView(R.id.iv_left_back)
         ImageButton ivLeftBack;
+        @BindView(R.id.iv_right)
+        ImageButton ivRight;
         @BindView(R.id.tv_title)
         TextView tvTitle;
         @BindView(R.id.rl_tool_bar)

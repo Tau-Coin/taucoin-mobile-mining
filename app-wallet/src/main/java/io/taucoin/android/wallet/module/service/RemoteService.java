@@ -23,6 +23,7 @@ import android.support.v4.app.NotificationCompat;
 
 import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.TaucoinServiceMessage;
+import io.taucoin.android.wallet.base.TransmitKey;
 
 public class RemoteService extends TaucoinRemoteService {
     private NotificationCompat.Builder builder;
@@ -42,6 +43,12 @@ public class RemoteService extends TaucoinRemoteService {
         if(intent != null){
             NotifyManager.NotifyData mData = intent.getParcelableExtra("bean");
             NotifyManager.getInstance().sendNotify(this, builder, mData);
+
+            int type = intent.getIntExtra(TransmitKey.SERVICE_TYPE, -1);
+            if(type == TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS){
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(0);
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }

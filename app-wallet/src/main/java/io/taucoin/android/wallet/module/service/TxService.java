@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.AccountBean;
@@ -37,9 +38,12 @@ import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
+import io.taucoin.android.wallet.module.view.main.HomeFragment;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.ProgressManager;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.foundation.util.StringUtil;
@@ -209,6 +213,7 @@ public class TxService extends Service {
     }
 
     private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
+        ProgressManager.closeProgressDialog();
         if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
                 StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
             if(isSuccess){
@@ -217,6 +222,10 @@ public class TxService extends Service {
                 getBalanceDelay(TransmitKey.ServiceType.GET_BALANCE);
             }
         }else{
+            if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_BALANCE) && !isSuccess){
+                ToastUtils.showShortToast(R.string.common_refresh_failed);
+                HomeFragment.mIsToast = false;
+            }
             EventBusUtil.post(MessageEvent.EventCode.BALANCE);
         }
     }

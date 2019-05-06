@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leftBackImage="@mipmap/icon_close"
-        app:leftImagePadding="2dp"
+        app:leftImagePadding="0dp"
         app:titleText="@string/main_manage" />
 
     <RelativeLayout

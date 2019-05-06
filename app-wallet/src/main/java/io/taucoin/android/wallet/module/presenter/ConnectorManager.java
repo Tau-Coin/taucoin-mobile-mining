@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.presenter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Parcelable;
 
 import com.github.naturs.logger.Logger;
@@ -34,9 +35,11 @@ import java.util.concurrent.TimeUnit;
 
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinConnector;
+import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
@@ -82,9 +85,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
     public void cancelRemoteProgress(){
         Logger.d("cancelRemoteProgress");
         closeTaucoin();
-        if(mTaucoinConnector != null){
-            mTaucoinConnector.cancelMiningProgress();
-        }
+
+        Context context = MyApplication.getInstance();
+        Intent intent = new Intent(context, RemoteService.class);
+        intent.putExtra(TransmitKey.SERVICE_TYPE, TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS);
+        context.startService(intent);
     }
 
     void cancelLocalConnector(){

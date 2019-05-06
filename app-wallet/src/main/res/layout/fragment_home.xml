@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leftBackImage="@mipmap/icon_close"
-        app:leftImagePadding="2dp"
+        app:rightImage="@mipmap/icon_refresh"
+        app:leftImagePadding="0dp"
         app:titleText="@string/main_home_title" />
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout

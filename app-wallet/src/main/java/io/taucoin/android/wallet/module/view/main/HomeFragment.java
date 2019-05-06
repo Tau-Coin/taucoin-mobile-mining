@@ -41,6 +41,7 @@ import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
+import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.LoadingTextView;
@@ -77,6 +78,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
+    public static boolean mIsToast = false;
 //    private long time = -1;
 
     @Override
@@ -92,7 +94,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
 
-    @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined})
+    @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined, R.id.iv_right})
     public void onClick(View view) {
         if (!UserUtil.isImportKey()) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -119,6 +121,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 intent = new Intent();
                 intent.putExtra(TransmitKey.TYPE, 1);
                 ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
+                break;
+            case R.id.iv_right:
+                ProgressManager.showProgressDialog(getActivity());
+                mIsToast = true;
+                onRefresh(null);
+                handleMiningView(false);
                 break;
             default:
                 break;

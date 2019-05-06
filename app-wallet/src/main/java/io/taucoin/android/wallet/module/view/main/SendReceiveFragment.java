@@ -72,6 +72,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     private HistoryExpandableListAdapter mAdapter;
     private int mPageNo = 1;
     private String mTime;
+    private boolean mIsToast = false;
 
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,7 +116,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         DrawablesUtil.setEndDrawable(tvAddress, R.mipmap.icon_copy, 22);
     }
 
-    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address})
+    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right})
     void onClick(View view) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue == null && view.getId() != R.id.iv_tx_log_tips) {
@@ -133,6 +134,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                 break;
             case R.id.tv_address:
                 copyData();
+                break;
+            case R.id.iv_right:
+                mIsToast = true;
+                ProgressManager.showProgressDialog(getActivity());
+                onRefresh(null);
                 break;
             default:
                 break;
@@ -231,11 +237,22 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                 public void handleData(Boolean isSuccess) {
                     ProgressManager.closeProgressDialog();
                     startRefresh();
+
+                    if(mIsToast && !isSuccess){
+                        handleError();
+                    }
+                }
+
+                void handleError() {
+                    ToastUtils.showShortToast(R.string.common_refresh_failed);
+                    mIsToast = false;
                 }
 
                 @Override
                 public void handleError(int code, String msg) {
+                    ProgressManager.closeProgressDialog();
                     startRefresh();
+                    handleError();
                 }
             });
         }else {
