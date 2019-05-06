@@ -238,14 +238,16 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                     ProgressManager.closeProgressDialog();
                     startRefresh();
 
-                    if(mIsToast && !isSuccess){
+                    if(!isSuccess){
                         handleError();
                     }
                 }
 
-                void handleError() {
-                    ToastUtils.showShortToast(R.string.common_refresh_failed);
-                    mIsToast = false;
+                synchronized void handleError() {
+                    if(mIsToast){
+                        ToastUtils.showShortToast(R.string.common_refresh_failed);
+                        mIsToast = false;
+                    }
                 }
 
                 @Override
