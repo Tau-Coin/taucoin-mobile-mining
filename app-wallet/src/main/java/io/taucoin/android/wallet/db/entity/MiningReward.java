@@ -17,16 +17,18 @@ public class MiningReward {
     private String txId;
     private String txHash;
     private String fee;
+    private String time;
     private int status;
     private int valid;
-    @Generated(hash = 596416597)
+    @Generated(hash = 122383812)
     public MiningReward(Long id, String pubKey, String txId, String txHash,
-            String fee, int status, int valid) {
+            String fee, String time, int status, int valid) {
         this.id = id;
         this.pubKey = pubKey;
         this.txId = txId;
         this.txHash = txHash;
         this.fee = fee;
+        this.time = time;
         this.status = status;
         this.valid = valid;
     }
@@ -62,6 +64,12 @@ public class MiningReward {
     }
     public void setFee(String fee) {
         this.fee = fee;
+    }
+    public String getTime() {
+        return this.time;
+    }
+    public void setTime(String time) {
+        this.time = time;
     }
     public int getStatus() {
         return this.status;

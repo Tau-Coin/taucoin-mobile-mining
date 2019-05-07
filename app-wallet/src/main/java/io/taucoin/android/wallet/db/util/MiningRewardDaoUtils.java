@@ -17,10 +17,9 @@ package io.taucoin.android.wallet.db.util;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.GreenDaoManager;
-import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.MiningReward;
-import io.taucoin.android.wallet.db.greendao.MiningBlockDao;
 import io.taucoin.android.wallet.db.greendao.MiningRewardDao;
 
 /**
@@ -49,11 +48,13 @@ public class MiningRewardDaoUtils {
     }
 
 
-    public List<MiningReward> queryByPubicKey(String pubicKey) {
+    public List<MiningReward> queryData(int pageNo, String time, String pubicKey) {
         return getMiningRewardDao().queryBuilder()
-                .where(MiningRewardDao.Properties.PubKey.eq(pubicKey),
-                        MiningRewardDao.Properties.Valid.eq(1))
-                .orderDesc(MiningRewardDao.Properties.Id)
+                .where(MiningRewardDao.Properties.Time.lt(time),
+                    MiningRewardDao.Properties.PubKey.eq(pubicKey),
+                    MiningRewardDao.Properties.Valid.eq(1))
+                .orderDesc(MiningRewardDao.Properties.Time)
+                .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE)
                 .list();
     }
 
@@ -62,9 +63,10 @@ public class MiningRewardDaoUtils {
         return result > -1;
     }
 
-    public MiningReward queryByTxHash(String txHash) {
+    public MiningReward query(String txId, String pubicKey) {
         List<MiningReward> list = getMiningRewardDao().queryBuilder()
-                .where(MiningRewardDao.Properties.TxHash.eq(txHash))
+                .where(MiningRewardDao.Properties.TxHash.eq(txId),
+                        MiningRewardDao.Properties.PubKey.eq(pubicKey))
                 .orderDesc(MiningRewardDao.Properties.Id)
                 .list();
         if(list != null && list.size() > 0){

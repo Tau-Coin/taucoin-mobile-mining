@@ -20,19 +20,13 @@ public class MiningRewardAdapter extends BaseAdapter {
     private List<MiningReward> list = new ArrayList<>();
 
 
-    void setListData(List<MiningReward> data) {
-        list.clear();
-        if (data != null) {
-            this.list = data;
+    void setListData(List<MiningReward> data, boolean isAdd) {
+        if (!isAdd) {
+           list.clear();
         }
-//        for (int i = 0; i < 10; i++) {
-//            MiningReward bean = new MiningReward();
-//            bean.setTxHash("asd123123asd123123asd123123asd123123asd123123asd123123asd123123");
-//            bean.setFee("10000");
-//            bean.setStatus(1);
-//            this.list.add(bean);
-//        }
-
+        if (data != null) {
+            list.addAll(data);
+        }
         notifyDataSetChanged();
     }
 

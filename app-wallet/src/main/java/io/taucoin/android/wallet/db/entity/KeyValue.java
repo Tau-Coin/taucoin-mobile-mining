@@ -23,10 +23,11 @@ public class KeyValue {
     private String nickName;
     private String miningState;
     private long transExpiry;
-    @Generated(hash = 726499634)
+    private long syncBlockNum;
+    @Generated(hash = 982514948)
     public KeyValue(Long id, String pubKey, String priKey, String address,
             String rawAddress, long balance, long power, String nickName,
-            String miningState, long transExpiry) {
+            String miningState, long transExpiry, long syncBlockNum) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -37,6 +38,7 @@ public class KeyValue {
         this.nickName = nickName;
         this.miningState = miningState;
         this.transExpiry = transExpiry;
+        this.syncBlockNum = syncBlockNum;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
@@ -100,5 +102,11 @@ public class KeyValue {
     }
     public void setTransExpiry(long transExpiry) {
         this.transExpiry = transExpiry;
+    }
+    public long getSyncBlockNum() {
+        return this.syncBlockNum;
+    }
+    public void setSyncBlockNum(long syncBlockNum) {
+        this.syncBlockNum = syncBlockNum;
     }
 }

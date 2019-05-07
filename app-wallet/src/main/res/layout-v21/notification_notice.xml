@@ -150,7 +150,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_centerHorizontal="true"
-                android:src="@mipmap/icon_notify_data"
+                android:src="@mipmap/icon_notify_wifi"
                 android:contentDescription="@null" />
 
             <TextView

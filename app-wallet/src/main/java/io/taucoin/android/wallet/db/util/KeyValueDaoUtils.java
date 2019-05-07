@@ -20,6 +20,7 @@ import java.util.List;
 import io.taucoin.android.wallet.db.GreenDaoManager;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
+import io.taucoin.foundation.util.StringUtil;
 
 /**
  * @version 1.0
@@ -56,6 +57,20 @@ public class KeyValueDaoUtils {
             return list.get(0);
         }
         return null;
+    }
+
+    public String querySignatureKey(String signatureKey) {
+        String pubicKey = "";
+        List<KeyValue> list = getKeyValueDao().queryBuilder().list();
+        if(list.size() > 0){
+            for (KeyValue keyValue : list) {
+                if(StringUtil.isSame(keyValue.getPubKey().toLowerCase(), signatureKey.toLowerCase())){
+                    pubicKey = keyValue.getPubKey();
+                    break;
+                }
+            }
+        }
+        return pubicKey;
     }
 
     public KeyValue insertOrReplace(KeyValue keyValue) {

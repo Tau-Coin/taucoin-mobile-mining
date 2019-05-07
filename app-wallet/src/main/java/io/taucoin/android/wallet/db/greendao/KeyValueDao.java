@@ -34,6 +34,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property NickName = new Property(7, String.class, "nickName", false, "NICK_NAME");
         public final static Property MiningState = new Property(8, String.class, "miningState", false, "MINING_STATE");
         public final static Property TransExpiry = new Property(9, long.class, "transExpiry", false, "TRANS_EXPIRY");
+        public final static Property SyncBlockNum = new Property(10, long.class, "syncBlockNum", false, "SYNC_BLOCK_NUM");
     }
 
 
@@ -58,7 +59,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"POWER\" INTEGER NOT NULL ," + // 6: power
                 "\"NICK_NAME\" TEXT," + // 7: nickName
                 "\"MINING_STATE\" TEXT," + // 8: miningState
-                "\"TRANS_EXPIRY\" INTEGER NOT NULL );"); // 9: transExpiry
+                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 9: transExpiry
+                "\"SYNC_BLOCK_NUM\" INTEGER NOT NULL );"); // 10: syncBlockNum
     }
 
     /** Drops the underlying database table. */
@@ -108,6 +110,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(9, miningState);
         }
         stmt.bindLong(10, entity.getTransExpiry());
+        stmt.bindLong(11, entity.getSyncBlockNum());
     }
 
     @Override
@@ -151,6 +154,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(9, miningState);
         }
         stmt.bindLong(10, entity.getTransExpiry());
+        stmt.bindLong(11, entity.getSyncBlockNum());
     }
 
     @Override
@@ -170,7 +174,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.getLong(offset + 6), // power
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // nickName
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // miningState
-            cursor.getLong(offset + 9) // transExpiry
+            cursor.getLong(offset + 9), // transExpiry
+            cursor.getLong(offset + 10) // syncBlockNum
         );
         return entity;
     }
@@ -187,6 +192,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setNickName(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setMiningState(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setTransExpiry(cursor.getLong(offset + 9));
+        entity.setSyncBlockNum(cursor.getLong(offset + 10));
      }
     
     @Override

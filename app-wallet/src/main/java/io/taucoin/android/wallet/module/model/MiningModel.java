@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.model;
 
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
+import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.platform.adress.KeyManager;
 import org.spongycastle.util.encoders.Hex;
 
@@ -115,7 +116,8 @@ public class MiningModel implements IMiningModel{
                 }
                 Block block = blockEvent.block;
 
-                saveMiningInfo(block, true, false);
+                saveMiningBlock(block, true, false);
+                saveMiningReward(block, true);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -123,40 +125,79 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private void saveMiningInfo(Block block, boolean isConnect, boolean isSendNotify) {
-        String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+    private synchronized void saveMiningBlock(Block block, boolean isConnect, boolean isSendNotify) {
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
 
         String generatorPublicKey = KeyManager.signatureToKey(block);
+        String pubicKey = KeyValueDaoUtils.getInstance().querySignatureKey(generatorPublicKey);
+        if(StringUtil.isNotEmpty(pubicKey)){
+            MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
+            if(entry == null){
+                if(isConnect){
+                    entry = new MiningBlock();
+                    entry.setBlockNo(blockNo);
+                    entry.setPubKey(pubicKey);
+                    entry.setBlockHash(blockHash);
+                    entry.setValid(1);
 
-        MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
-        boolean isMine = StringUtil.isSame(pubicKey.toLowerCase(), generatorPublicKey.toLowerCase());
-        if(entry == null){
-            if(isMine && isConnect){
-                entry = new MiningBlock();
-                entry.setBlockNo(blockNo);
-                entry.setPubKey(pubicKey);
-                entry.setBlockHash(blockHash);
-                entry.setValid(1);
+                    List<Transaction> txList = block.getTransactionsList();
+                    int total = 0;
+                    String reward = "0";
+                    if(txList != null){
+                        total = txList.size();
+                        reward = MiningUtil.parseBlockReward(txList);
+                    }
+                    entry.setTotal(total);
+                    entry.setReward(reward);
+                    MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
 
-                List<Transaction> txList = block.getTransactionsList();
-                int total = 0;
-                String reward = "0";
-                if(txList != null){
-                    total = txList.size();
-                    reward = MiningUtil.parseBlockReward(txList);
+                    // TODO Whether to send notification or not
+                    if(isSendNotify){
+                        NotifyManager.getInstance().sendBlockNotify(reward);
+                    }
                 }
-                entry.setTotal(total);
-                entry.setReward(reward);
+            }else{
+                entry.setValid(isConnect ? 1 : 0);
                 MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
-                if(isSendNotify){
-                    NotifyManager.getInstance().sendBlockNotify(reward);
+            }
+        }
+
+        String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(currentPubicKey);
+        if(keyValue != null){
+            keyValue.setSyncBlockNum((int)block.getNumber());
+            KeyValueDaoUtils.getInstance().update(keyValue);
+        }
+    }
+
+    private synchronized void saveMiningReward(Block block, boolean isConnect) {
+        String generatorPublicKey = KeyManager.signatureToKey(block);
+        KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(generatorPublicKey);
+        // Update data for all local private keys
+        if(keyValue != null){
+            List<Transaction> transactions = block.getTransactionsList();
+            if(transactions != null && transactions.size() > 0){
+                for (Transaction reward : transactions) {
+                    MiningReward entry = MiningRewardDaoUtils.getInstance().query(reward.getTxid(), keyValue.getPubKey());
+                    if(null == entry){
+                        String txFee = Hex.toHexString(reward.getFee());
+                        String txId = reward.getTxid();
+                        String txHash = Hex.toHexString(reward.getHash());
+                        entry = new MiningReward();
+                        entry.setTxId(txId);
+                        entry.setTxHash(txHash);
+                        entry.setFee(txFee);
+                        entry.setPubKey(keyValue.getPubKey());
+                        entry.setTime(DateUtil.getCurrentTime());
+                        entry.setValid(1);
+                        entry.setStatus(1);
+                    }else{
+                        entry.setValid(isConnect ? 1 : 0);
+                        MiningRewardDaoUtils.getInstance().insertOrReplace(entry);
+                    }
                 }
             }
-        }else{
-            entry.setValid(isConnect ? 1 : 0);
-            MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
         }
     }
 
@@ -169,7 +210,8 @@ public class MiningModel implements IMiningModel{
                 if(block != null){
                     long blockNumber = block.getNumber();
                     updateSynchronizedBlockNum((int) blockNumber);
-                    saveMiningInfo(block, isConnect, true);
+                    saveMiningBlock(block, isConnect, true);
+                    saveMiningReward(block, isConnect);
                 }
             }
             emitter.onNext(eventCode);
@@ -213,21 +255,16 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void getMaxBlockNum(long height, LogicObserver<Integer> logicObserver){
-        Observable.create((ObservableOnSubscribe<Integer>) emitter -> {
+    public void getMaxBlockNum(long height, LogicObserver<Long> logicObserver){
+        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-           List<MiningBlock> list = MiningBlockDaoUtils.getInstance().queryByPubicKey(pubicKey);
-           int maxBlockNum = 0;
-           if(list != null && list.size() > 0){
-               for (MiningBlock info : list) {
-                   int blockNo = StringUtil.getIntString(info.getBlockNo());
-                   if(blockNo > maxBlockNum){
-                       maxBlockNum = blockNo;
-                   }
-               }
+           KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
+           long maxBlockNum = 0;
+           if(keyValue != null){
+               maxBlockNum = keyValue.getSyncBlockNum();
            }
            if(maxBlockNum > height ){
-               maxBlockNum = (int) height;
+               maxBlockNum = height;
            }
            emitter.onNext(maxBlockNum);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -236,12 +273,12 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void getMiningRewards(LogicObserver<List<MiningReward>> logicObserver){
+    public void getMiningRewards(int pageNo, String time, LogicObserver<List<MiningReward>> logicObserver){
         Observable.create((ObservableOnSubscribe<List<MiningReward>>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             List<MiningReward> list = null;
             if(StringUtil.isNotEmpty(pubicKey)){
-                list = MiningRewardDaoUtils.getInstance().queryByPubicKey(pubicKey);
+                list = MiningRewardDaoUtils.getInstance().queryData(pageNo, time, pubicKey);
             }
             if(list == null){
                 list = new ArrayList<>();

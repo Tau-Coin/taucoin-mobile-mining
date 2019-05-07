@@ -38,6 +38,7 @@ import io.taucoin.android.wallet.module.view.main.iview.IHomeView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.mining.BlockListActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
+import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
@@ -79,6 +80,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
     public static boolean mIsToast = false;
+    private int mPageNo = 1;
+    private String mTime;
 //    private long time = -1;
 
     @Override
@@ -88,6 +91,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         miningPresenter = new MiningPresenter(this);
         initView();
         handleMiningView();
+        handleMiningRewardView();
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
         return view;
@@ -126,7 +130,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ProgressManager.showProgressDialog(getActivity());
                 mIsToast = true;
                 onRefresh(null);
-                handleMiningView(false);
                 break;
             default:
                 break;
@@ -184,6 +187,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case NOTIFY_MINING:
                 starOrStopMining(true);
                 break;
+            case MINING_REWARD:
+                handleMiningRewardView();
+                break;
             default:
                 break;
         }
@@ -206,27 +212,24 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             return;
         }
         int tag = StringUtil.getIntTag(tvMiningTransaction);
-        tvMiningTransaction.setTag(tag == 0 ? 1 : 0);
-        int mipmap = tag == 0 ? R.mipmap.icon_tx_up : R.mipmap.icon_tx_down;
+        tag = tag == 0 ? 1 : 0;
+        tvMiningTransaction.setTag(tag);
+        int mipmap = tag == 1 ? R.mipmap.icon_tx_up : R.mipmap.icon_tx_down;
         DrawablesUtil.setEndDrawable(tvMiningTransaction, mipmap, 16);
-        llMiningTx.setVisibility(tag == 0 ? View.VISIBLE : View.GONE);
-        if(tag == 0){
-            handleMiningRewardView();
-        }
+        llMiningTx.setVisibility(tag == 1 ? View.VISIBLE : View.GONE);
+        handleMiningRewardView();
+
     }
 
     public void showMiningView(BlockInfo blockInfo){
         int blockSync  = 0;
         int blockMined  = 0;
-        String miningIncome  = "0";
         if(blockInfo != null){
             blockSync = blockInfo.getBlockSync();
             blockMined = MiningUtil.parseMinedBlocks(blockInfo);
-            miningIncome = MiningUtil.parseMiningIncome(blockInfo);
         }
         tvSynchronized.setText(String.valueOf(blockSync));
         tvMined.setText(String.valueOf(blockMined));
-        tvMiningIncome.setText(miningIncome);
     }
 
     @Override
@@ -266,6 +269,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     }else if(!isStart){
                         MyApplication.getRemoteConnector().cancelRemoteConnector();
                         refreshOffOnView(TransmitKey.MiningState.Stop);
+                        ivMiningSwitch.setEnabled(true);
                     }else{
                         refreshOffOnView(TransmitKey.MiningState.Start);
                     }
@@ -277,12 +281,24 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void handleMiningRewardView(){
-        miningPresenter.getMiningRewards();
+        if(mPageNo == 1){
+            mTime = DateUtil.getCurrentTime();
+        }
+        miningPresenter.getMiningRewards(mPageNo, mTime);
     }
 
     @Override
     public void handleMiningRewardView(List<MiningReward> miningRewards){
-        mMiningRewardAdapter.setListData(miningRewards);
+        String miningIncome = MiningUtil.parseMiningIncome(miningRewards);
+        tvMiningIncome.setText(miningIncome);
+
+        int tag = StringUtil.getIntTag(tvMiningTransaction);
+        if(tag == 1){
+            mMiningRewardAdapter.setListData(miningRewards, mPageNo != 1);
+            refreshLayout.setEnableLoadmore(miningRewards.size() % TransmitKey.PAGE_SIZE == 0 && miningRewards.size() > 0);
+        }else{
+            refreshLayout.setEnableLoadmore(false);
+        }
     }
 
     private void refreshOffOnView(String miningState) {
@@ -317,10 +333,19 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
         TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+        handleMiningView(false);
+        mPageNo = 1;
+        handleMiningRewardView();
 
         if (!UserUtil.isImportKey()) {
             refreshLayout.finishRefresh(1000);
         }
+    }
+
+    @Override
+    public void onLoadmore(RefreshLayout refreshlayout) {
+        mPageNo += 1;
+        handleMiningRewardView();
     }
 
     @Override

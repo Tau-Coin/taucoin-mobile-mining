@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.MiningBlock;
+import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
@@ -52,16 +53,13 @@ public class MiningUtil {
         return 0;
     }
 
-    public static String parseMiningIncome(BlockInfo blockInfo) {
+    public static String parseMiningIncome(List<MiningReward> rewards) {
         BigDecimal number = new BigDecimal("0");
-        if(blockInfo != null){
-            List<MiningBlock> list= blockInfo.getMiningInfo();
-            if(list != null && list.size() > 0){
-                for (MiningBlock bean : list) {
-                    try {
-                        number = number.add(new BigDecimal(bean.getReward()));
-                    }catch (Exception ignore){}
-                }
+        if(rewards != null && rewards.size() > 0){
+            for (MiningReward bean : rewards) {
+                try {
+                    number = number.add(new BigDecimal(bean.getFee()));
+                }catch (Exception ignore){}
             }
         }
         return FmtMicrometer.fmtMiningIncome(number.longValue());

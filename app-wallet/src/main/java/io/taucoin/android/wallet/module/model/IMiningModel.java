@@ -24,7 +24,7 @@ public interface IMiningModel {
     /** handle send transaction return data and updateTransactionHistory*/
     void updateTransactionHistory(Transaction transaction);
 
-    void getMaxBlockNum(long height, LogicObserver<Integer> logicObserver);
+    void getMaxBlockNum(long height, LogicObserver<Long> logicObserver);
 
-    void getMiningRewards(LogicObserver<List<MiningReward>> logicObserver);
+    void getMiningRewards(int pageNo, String time, LogicObserver<List<MiningReward>> logicObserver);
 }

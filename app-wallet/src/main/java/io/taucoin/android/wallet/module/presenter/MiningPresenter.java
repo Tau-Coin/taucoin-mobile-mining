@@ -50,8 +50,8 @@ public class MiningPresenter {
         });
     }
 
-    public void getMiningRewards() {
-        mMiningModel.getMiningRewards(new LogicObserver<List<MiningReward>>() {
+    public void getMiningRewards(int pageNo, String time) {
+        mMiningModel.getMiningRewards(pageNo, time, new LogicObserver<List<MiningReward>>() {
             @Override
             public void handleData(List<MiningReward> miningRewards) {
                 mHomeView.handleMiningRewardView(miningRewards);

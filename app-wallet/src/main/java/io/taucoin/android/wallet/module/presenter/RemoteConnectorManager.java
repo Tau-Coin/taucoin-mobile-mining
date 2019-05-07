@@ -301,21 +301,20 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         getMiningModel().updateTransactionHistory(transaction);
     }
 
-//    @Override
-//    public void getBlockList(int num, long height) {
-//        super.getBlockList(num, height);
-//        getMiningModel().getMaxBlockNum(height, new LogicObserver<Integer>(){
-//
-//            @Override
-//            public void handleData(Integer integer) {
-//                isSyncMe = false;
-//                int num = integer;
-//                int limit = (int) height - num + 1;
-//                if(mTaucoinConnector != null){
-//                    mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
-//                }
-//            }
-//        });
-//
-//    }
+    @Override
+    public void getBlockList(int num, long height) {
+        getMiningModel().getMaxBlockNum(height, new LogicObserver<Long>(){
+
+            @Override
+            public void handleData(Long integer) {
+                isSyncMe = false;
+                long num = integer;
+                int limit = (int) (height - num + 1);
+                if(mTaucoinConnector != null){
+                    mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+                }
+            }
+        });
+
+    }
 }

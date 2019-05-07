@@ -29,8 +29,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         public final static Property TxId = new Property(2, String.class, "txId", false, "TX_ID");
         public final static Property TxHash = new Property(3, String.class, "txHash", false, "TX_HASH");
         public final static Property Fee = new Property(4, String.class, "fee", false, "FEE");
-        public final static Property Status = new Property(5, int.class, "status", false, "STATUS");
-        public final static Property Valid = new Property(6, int.class, "valid", false, "VALID");
+        public final static Property Time = new Property(5, String.class, "time", false, "TIME");
+        public final static Property Status = new Property(6, int.class, "status", false, "STATUS");
+        public final static Property Valid = new Property(7, int.class, "valid", false, "VALID");
     }
 
 
@@ -51,8 +52,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
                 "\"TX_ID\" TEXT," + // 2: txId
                 "\"TX_HASH\" TEXT," + // 3: txHash
                 "\"FEE\" TEXT," + // 4: fee
-                "\"STATUS\" INTEGER NOT NULL ," + // 5: status
-                "\"VALID\" INTEGER NOT NULL );"); // 6: valid
+                "\"TIME\" TEXT," + // 5: time
+                "\"STATUS\" INTEGER NOT NULL ," + // 6: status
+                "\"VALID\" INTEGER NOT NULL );"); // 7: valid
     }
 
     /** Drops the underlying database table. */
@@ -89,8 +91,13 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         if (fee != null) {
             stmt.bindString(5, fee);
         }
-        stmt.bindLong(6, entity.getStatus());
-        stmt.bindLong(7, entity.getValid());
+ 
+        String time = entity.getTime();
+        if (time != null) {
+            stmt.bindString(6, time);
+        }
+        stmt.bindLong(7, entity.getStatus());
+        stmt.bindLong(8, entity.getValid());
     }
 
     @Override
@@ -121,8 +128,13 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         if (fee != null) {
             stmt.bindString(5, fee);
         }
-        stmt.bindLong(6, entity.getStatus());
-        stmt.bindLong(7, entity.getValid());
+ 
+        String time = entity.getTime();
+        if (time != null) {
+            stmt.bindString(6, time);
+        }
+        stmt.bindLong(7, entity.getStatus());
+        stmt.bindLong(8, entity.getValid());
     }
 
     @Override
@@ -138,8 +150,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // txId
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // txHash
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // fee
-            cursor.getInt(offset + 5), // status
-            cursor.getInt(offset + 6) // valid
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // time
+            cursor.getInt(offset + 6), // status
+            cursor.getInt(offset + 7) // valid
         );
         return entity;
     }
@@ -151,8 +164,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         entity.setTxId(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setTxHash(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setFee(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setStatus(cursor.getInt(offset + 5));
-        entity.setValid(cursor.getInt(offset + 6));
+        entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setStatus(cursor.getInt(offset + 6));
+        entity.setValid(cursor.getInt(offset + 7));
      }
     
     @Override

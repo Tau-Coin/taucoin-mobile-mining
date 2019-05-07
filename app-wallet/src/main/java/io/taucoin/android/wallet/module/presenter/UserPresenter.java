@@ -103,6 +103,7 @@ public class UserPresenter {
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
         EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
         EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
+        EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
     }
 
     private void getAddOuts() {
