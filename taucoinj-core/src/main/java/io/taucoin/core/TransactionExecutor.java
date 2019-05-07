@@ -135,7 +135,7 @@ public class TransactionExecutor {
             // Transfer fees to forger
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             // Transfer fees to receiver
-            track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
+            //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
                 // Transfer fees to last witness
                 track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),

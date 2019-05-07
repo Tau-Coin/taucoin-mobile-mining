@@ -170,7 +170,7 @@ public class Block {
             if(block.size() > 11) {
                 // Parse Transactions
                 RLPList txTransactions = (RLPList) block.get(11);
-                this.parseTxs(txTransactions);
+                this.parseTxs(txTransactions, true);
             }
         } else {
             RLPList params = RLP.decode2(rlpEncodedMsg);
@@ -194,7 +194,7 @@ public class Block {
             // Parse Transactions
             if(block.size() > 5){
                 RLPList txTransactions = (RLPList) block.get(5);
-                this.parseTxs(txTransactions);
+                this.parseTxs(txTransactions, false);
             }
 
         }
@@ -355,7 +355,7 @@ public class Block {
         toStringBuff.append("hash=").append(ByteUtil.toHexString(this.getHash()));
 //        toStringBuff.append(header.toFlatString());
 //        toStringBuff.append("blocksig=" + ByteUtil.toHexString(this.blockSignature));
-        //toStringBuff.append("option=" + ByteUtil.toHexString(this.option));
+//        toStringBuff.append("option=" + ByteUtil.toHexString(this.option));
 
         for (Transaction tx : getTransactionsList()) {
             toStringBuff.append("\n");
@@ -366,11 +366,11 @@ public class Block {
         return toStringBuff.toString();
     }
 
-    private void parseTxs(RLPList txTransactions) {
+    private void parseTxs(RLPList txTransactions, boolean isComposite) {
 
         for (int i = 0; i < txTransactions.size(); i++) {
             RLPElement transactionRaw = txTransactions.get(i);
-            this.transactionsList.add(new Transaction(transactionRaw.getRLPData()));
+            this.transactionsList.add(new Transaction(transactionRaw.getRLPData(), isComposite));
         }
     }
 
@@ -635,7 +635,7 @@ public class Block {
                 if (transactions.size() == 0){
 
                 } else{
-                   block.parseTxs(transactions);
+                   block.parseTxs(transactions, false);
                 }
                //delete txState may be stupid....
                //we avoid trie,because we think block header doesn't have large capacity
