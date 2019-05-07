@@ -37,12 +37,7 @@ public class RequestQueue {
 
     private static final Logger logger = LoggerFactory.getLogger("http");
 
-    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-        private AtomicInteger cnt = new AtomicInteger(0);
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "RequestQueueTimer-" + cnt.getAndIncrement());
-        }
-    });
+    private ScheduledExecutorService timer = null;
 
     // If two many messages were queued and can't connect to remote peer, clear all.
     public static final int CAPABILITY = 100;
@@ -80,17 +75,19 @@ public class RequestQueue {
 
         synchronized(ctxLock) {
             this.ctx = ctx;
-        }
 
-        timerTask = timer.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                try {
-                    nudgeQueue();
-                } catch (Throwable t) {
-                    logger.error("Unhandled exception ", t);
+            timer = Executors.newScheduledThreadPool(0);
+
+            timerTask = timer.scheduleAtFixedRate(new Runnable() {
+                public void run() {
+                    try {
+                        nudgeQueue();
+                    } catch (Throwable t) {
+                        logger.error("Unhandled exception ", t);
+                    }
                 }
-            }
-        }, 100, 100, TimeUnit.MILLISECONDS);
+            }, 100, 100, TimeUnit.MILLISECONDS);
+        }
     }
 
     public void sendMessage(Message msg) {
@@ -107,11 +104,12 @@ public class RequestQueue {
         requestQueue.clear();
     }
 
-    private void removeAllTimeoutMessage() {
+    public void removeAllTimeoutMessage() {
         while (requestQueue.peek() != null) {
             RequestRoundtrip requestRoundtrip = requestQueue.peek();
             if (requestRoundtrip.isTimeout()) {
                 requestQueue.remove();
+                notifyListenersTimeout(requestRoundtrip.getMsg());
             } else {
                 break;
             }
@@ -160,7 +158,7 @@ public class RequestQueue {
             if (this.ctx == null) {
                 logger.warn("Interrupt timer task");
                 Thread.currentThread().interrupt();
-                return;
+                //return;
             }
         }
 
@@ -196,9 +194,14 @@ public class RequestQueue {
     public void deactivate() {
         synchronized(ctxLock) {
             this.ctx = null;
-        }
-        if (timerTask != null) {
-            timerTask.cancel(true);
+
+            if (timerTask != null && timer != null) {
+                timerTask.cancel(true);
+                timerTask = null;
+                timer.shutdownNow();
+                timer = null;
+                System.gc();
+            }
         }
     }
 

@@ -72,6 +72,8 @@ public class HttpClient {
     });
     private ScheduledFuture<?> timerTask;
 
+    private long connectFailTimes = 0;
+
     @Inject
     public HttpClient(TaucoinListener listener, Provider<HttpClientInitializer> provider,
             PeersManager peersManager) {
@@ -105,22 +107,29 @@ public class HttpClient {
     }
 
     public void activate(ChannelHandlerContext ctx) {
-        isConnected.set(true);
-        isConnecting.set(false);
-        requestQueue.activate(ctx);
-        channel = ctx.channel();
-        logger.info("Peer {} connected", channel);
+        if (!isConnected.get()) {
+            isConnected.set(true);
+            isConnecting.set(false);
+            requestQueue.activate(ctx);
+            channel = ctx.channel();
+
+            // Reset connecting fail times.
+            connectFailTimes = 0;
+            logger.info("Peer {} connected", channel);
+        }
     }
 
     public void deactivate(ChannelHandlerContext ctx) {
-        isConnected.set(false);
-        isConnecting.set(false);
-        requestQueue.deactivate();
-        logger.info("Peer {} disconnected", ctx.channel());
-        channel = null;
+        if (isConnected.get()) {
+            isConnected.set(false);
+            isConnecting.set(false);
+            requestQueue.deactivate();
+            logger.info("Peer {} disconnected", ctx.channel());
+            channel = null;
 
-        if (requestQueue.size() > 0) {
-            tryConnect();
+            if (requestQueue.size() > 0) {
+                tryConnect();
+            }
         }
     }
 
@@ -181,6 +190,13 @@ public class HttpClient {
 
                     setIsConnecting(false);
                     tryConnect();
+
+                    connectFailTimes++;
+                    // If connecting failed for long time, remove timeout msg.
+                    if (connectFailTimes % 10 == 0) {
+                        logger.warn("Remove timeout msg, connect fail times {}", connectFailTimes);
+                        requestQueue.removeAllTimeoutMessage();
+                    }
                 }
             }
         });

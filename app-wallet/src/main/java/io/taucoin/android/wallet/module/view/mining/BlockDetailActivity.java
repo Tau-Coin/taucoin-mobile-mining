@@ -7,11 +7,7 @@ import android.view.View;
 import io.taucoin.android.wallet.R;
 
 import io.taucoin.android.wallet.util.ResourcesUtil;
-import io.taucoin.crypto.ECKey;
-import io.taucoin.util.ByteUtil;
-import org.spongycastle.util.encoders.Hex;
-
-import java.security.SignatureException;
+import io.taucoin.platform.adress.KeyManager;
 import java.util.List;
 
 import butterknife.BindView;
@@ -57,12 +53,8 @@ public class BlockDetailActivity extends BaseActivity {
         blockEvent = getIntent().getParcelableExtra(TransmitKey.BEAN);
         if(blockEvent != null && blockEvent.block != null){
             Block blockBean = blockEvent.block;
-            byte[] bytesKey = ByteUtil.intToBytes(0);
-            try {
-                ECKey key = ECKey.signatureToKey(blockBean.getRawHash(), blockBean.getblockSignature().toBase64());
-                bytesKey = key.getCompressedPubKey();
-            }catch(SignatureException ignore){ }
-            publicKey = Hex.toHexString(bytesKey);
+
+            publicKey = KeyManager.signatureToKey(blockBean);
 
             tvMiner.setRightText(publicKey);
             List<Transaction> txList = blockBean.getTransactionsList();
