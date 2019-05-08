@@ -144,8 +144,25 @@ public class TransactionExecutor {
 
             if (track.getAccountState(tx.getSender()).getAssociatedAddress() != null) {
                 // Transfer fees to last associate
-                track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress(),
-                        toBI(feeDistributor.getLastAssociFee()));
+                AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
+                        track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
+                        feeDistributor.getLastAssociFee());
+
+                if (assDistributor.assDistributeFee()) {
+                    for (int i = 0; i < track.getAccountState(tx.getSender()).getAssociatedAddress().size(); ++i) {
+                        if(i != track.getAccountState(tx.getSender()).getAssociatedAddress().size() -1) {
+//                            logger.info("transaction execuated associated address size is====> {}",
+//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().size());
+//                            logger.info("associated address is {} index is {}",Hex.toHexString(
+//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),i);
+                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    toBI(assDistributor.getAverageShare()));
+                        } else {
+                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    toBI(assDistributor.getLastShare()));
+                        }
+                    }
+                }
             }
 
             /**
@@ -190,7 +207,7 @@ public class TransactionExecutor {
         }
 
         StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
-                new StakeHolderIdentityUpdate(tx, track, coinbase);
+                new StakeHolderIdentityUpdate(tx, track, coinbase,blockchain);
         stakeHolderIdentityUpdate.updateStakeHolderIdentity();
 
     }
