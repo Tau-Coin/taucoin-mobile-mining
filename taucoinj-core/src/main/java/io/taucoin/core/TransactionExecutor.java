@@ -133,16 +133,23 @@ public class TransactionExecutor {
 
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
+//            logger.error("1 current witness share {}",feeDistributor.getCurrentWitFee());
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
+//                logger.error("2 last witness {} share {}",
+//                        Hex.toHexString(track.getAccountState(tx.getSender()).getWitnessAddress()),
+//                        feeDistributor.getLastWitFee());
                 // Transfer fees to last witness
                 track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
                         toBI(feeDistributor.getLastWitFee()));
             }
 
-            if (track.getAccountState(tx.getSender()).getAssociatedAddress() != null) {
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() != 0) {
+//                logger.error("3 associated size {} share {}",
+//                        track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
+//                        feeDistributor.getLastAssociFee());
                 // Transfer fees to last associate
                 AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
                         track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
@@ -169,12 +176,18 @@ public class TransactionExecutor {
              * 2 special situation is dealt by distribute associated fee to current forger
              */
             if (track.getAccountState(tx.getSender()).getWitnessAddress() == null) {
+//                logger.error("4 coinbase {} share {}",
+//                        Hex.toHexString(coinbase),
+//                        feeDistributor.getLastWitFee());
                 // Transfer fees to last witness
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastWitFee()));
             }
 
-            if (track.getAccountState(tx.getSender()).getAssociatedAddress() == null) {
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() == 0) {
+//                logger.error("5 coinbase {} share {}",
+//                        Hex.toHexString(coinbase),
+//                        feeDistributor.getLastAssociFee());
                 // Transfer fees to last associate
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastAssociFee()));
@@ -205,10 +218,6 @@ public class TransactionExecutor {
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
             accountState.getTranHistory().put(txTime,tx.getHash());
         }
-
-        StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
-                new StakeHolderIdentityUpdate(tx, track, coinbase,blockchain);
-        stakeHolderIdentityUpdate.updateStakeHolderIdentity();
 
     }
 
