@@ -16,6 +16,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.security.SignatureException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.apache.commons.lang3.ArrayUtils.getLength;
@@ -76,7 +77,7 @@ public class Transaction {
     /**
      *account address that associated to last account state change.
      */
-    private byte[] associatedAddress;
+    private ArrayList<byte[]> associatedAddress = new ArrayList<>();
 
     public static final int TTIME = 144;
     public static final int HASH_LENGTH = 32;
@@ -192,7 +193,7 @@ public class Transaction {
         this.witnessAddress = witnessAddress;
     }
 
-    public void setAssociatedAddress(byte[] associatedAddress) {
+    public void setAssociatedAddress(ArrayList<byte[]> associatedAddress) {
         this.associatedAddress = associatedAddress;
     }
 
@@ -200,7 +201,7 @@ public class Transaction {
         return witnessAddress;
     }
 
-    public byte[] getAssociatedAddress() {
+    public ArrayList<byte[]> getAssociatedAddress() {
         return associatedAddress;
     }
 
@@ -218,7 +219,7 @@ public class Transaction {
         if (!isCompositeTx) {
             RLPList decodedTxList = RLP.decode2(rlpEncoded);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            logger.info("transaction item size is {}", transaction.size());
+            logger.info("pure transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
@@ -242,7 +243,7 @@ public class Transaction {
         } else {
             RLPList decodedTxList = RLP.decode2(rlpEncodedComposite);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            logger.info("transaction item size is {}", transaction.size());
+            logger.info("composite transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
@@ -254,7 +255,11 @@ public class Transaction {
             this.fee = transaction.get(5).getRLPData();
             this.expireTime = transaction.get(6).getRLPData();
             this.witnessAddress = transaction.get(7).getRLPData();
-            this.associatedAddress = transaction.get(8).getRLPData();
+
+            RLPList associateList = (RLPList) transaction.get(8);
+            for(int i=0;i < associateList.size();++i) {
+                this.associatedAddress.add(associateList.get(i).getRLPData());
+            }
 
             // only parse signature in case tx is signed
             if (transaction.get(9).getRLPData() != null) {
@@ -461,7 +466,14 @@ public class Transaction {
         byte[] fee = RLP.encodeElement(this.fee);
         byte[] expireTime = RLP.encodeElement(this.expireTime);
         byte[] witnessAddress = RLP.encodeElement(this.witnessAddress);
-        byte[] associatedAddress = RLP.encodeElement(this.associatedAddress);
+        byte[][] tempAssociate = new byte[this.associatedAddress.size()][];
+        for (int i=0; i< this.associatedAddress.size();++i) {
+            tempAssociate[i] = RLP.encodeElement(this.associatedAddress.get(i));
+//            logger.info("associated address is {} index is {}",Hex.toHexString(
+//                    tempAssociate[i]),i);
+        }
+//        logger.info("in transaction associated temporary size is====> {}",tempAssociate.length);
+        byte[] associatedAddress = RLP.encodeList(tempAssociate);
 
         byte[] v, r, s;
 

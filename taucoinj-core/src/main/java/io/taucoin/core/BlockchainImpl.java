@@ -767,10 +767,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         if (!block.isGenesis()) {
             for (Transaction tr : block.getTransactionsList()) {
                 if(tr.getSender() != null) {
-                    logger.error("tx sender address is ====> {}",Hex.toHexString(tr.getSender()));
-                    logger.error("is sender account empty ====> {}",track.getAccountState(tr.getSender()) == null);
+//                    logger.info("tx sender address is ====> {}",Hex.toHexString(tr.getSender()));
+//                    logger.info("is sender account empty ====> {}",track.getAccountState(tr.getSender()) == null);
                     byte[] witnessAddress = track.getAccountState(tr.getSender()).getWitnessAddress();
-                    byte[] associateAddress = track.getAccountState(tr.getSender()).getAssociatedAddress();
+                    ArrayList<byte[]> associateAddress = track.getAccountState(tr.getSender()).getAssociatedAddress();
 
                     if (witnessAddress != null) {
                         tr.setWitnessAddress(witnessAddress);
