@@ -286,7 +286,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     private void handleMiningRewardView(){
         if(mPageNo == 1){
-            mTime = DateUtil.getCurrentTime();
+            mTime = DateUtil.getDateTime();
         }
         miningPresenter.getMiningRewards(mPageNo, mTime);
     }

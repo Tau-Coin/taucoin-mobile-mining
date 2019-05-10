@@ -22,6 +22,7 @@ import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
 import io.taucoin.android.wallet.module.bean.RewardBean;
 import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
 import io.taucoin.platform.adress.KeyManager;
@@ -177,9 +178,9 @@ public class MiningModel implements IMiningModel{
         if(outCome == null){
             return;
         }
-        saveMiningReward(outCome.getCurrentWintess(), outCome);
-        saveMiningReward(outCome.getLastWintess(), outCome);
-        saveMiningReward(outCome.getSenderAssociated(), outCome);
+        saveMiningReward(outCome.getCurrentWintess(), outCome, true);
+        saveMiningReward(outCome.getLastWintess(), outCome, false);
+        saveMiningReward(outCome.getSenderAssociated(), outCome, false);
 
         if(outCome.isTxComplete()){
             String blockHash = Hex.toHexString(outCome.getBlockhash());
@@ -187,30 +188,35 @@ public class MiningModel implements IMiningModel{
         }
     }
 
-    private void saveMiningReward(Map<byte[], Long> addressMap, TransactionExecuatedOutcome outCome) {
+    private void saveMiningReward(Map<byte[], Long> addressMap, TransactionExecuatedOutcome outCome, boolean isMiner) {
         if(null == addressMap || addressMap.size() == 0){
             return;
         }
         String blockHash = Hex.toHexString(outCome.getBlockhash());
         String txHash = Hex.toHexString(outCome.getTxid());
+//        String formAddress = Hex.toHexString(outCome.getSenderAddress());
+//        String toAddress = Hex.toHexString(outCome.getReceiveAddress());
+//        Logger.i("*****************************");
+//        Logger.i("txHash=" + txHash);
+//        Logger.i("form=" + formAddress + "\tto=" +toAddress);
         for (Map.Entry<byte[], Long> entry : addressMap.entrySet()) {
             String rewardAddress = Hex.toHexString(entry.getKey());
             long rewardFee = entry.getValue();
+//            Logger.i("reward=" + rewardAddress + "\t," + rewardFee);
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByRawAddress(rewardAddress);
             // Update data for all local private keys
             if (keyValue != null) {
                 MiningReward reward = MiningRewardDaoUtils.getInstance().query(txHash, keyValue.getRawAddress());
-                boolean isMiner = StringUtil.isSame(keyValue.getRawAddress(), rewardAddress);
                 if (null == reward) {
                     reward = new MiningReward();
                     reward.setTxHash(txHash);
                     reward.setAddress(keyValue.getRawAddress());
-                    reward.setTime(DateUtil.getCurrentTime());
+                    reward.setTime(DateUtil.getDateTime());
                 } else {
                     if (reward.getValid() == 0) {
                         reward.setMinerFee(0);
                         reward.setPartFee(0);
-                        reward.setTime(DateUtil.getCurrentTime());
+                        reward.setTime(DateUtil.getDateTime());
                     }
                 }
                 reward.setBlockHash(blockHash);
@@ -251,13 +257,15 @@ public class MiningModel implements IMiningModel{
             }
             if(bean.getMinerReward() > 0){
                 String minerMsg = ResourcesUtil.getText(minerRes);
-                minerMsg = String.format(minerMsg, bean.getMinerReward());
+                String reward = FmtMicrometer.fmtFormat(String.valueOf(bean.getMinerReward()));
+                minerMsg = String.format(minerMsg, reward);
                 NotifyManager.getInstance().sendBlockNotify(minerMsg);
                 Logger.d(minerMsg);
             }
             if(bean.getPartReward() > 0){
                 String partMsg = ResourcesUtil.getText(partRes);
-                partMsg = String.format(partMsg, bean.getPartReward());
+                String reward = FmtMicrometer.fmtFormat(String.valueOf(bean.getPartReward()));
+                partMsg = String.format(partMsg, reward);
                 NotifyManager.getInstance().sendBlockNotify(partMsg);
                 Logger.d(partMsg);
             }
