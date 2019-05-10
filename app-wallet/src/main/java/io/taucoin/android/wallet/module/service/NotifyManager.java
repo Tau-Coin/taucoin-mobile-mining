@@ -214,19 +214,16 @@ public class NotifyManager {
         service.startForeground(NOTIFICATION_ID, mNotification);
     }
 
-    public void sendBlockNotify(String reward) {
+    public void sendBlockNotify(String rewardMsg) {
         if(mService == null || !PermissionUtils.isNotificationEnabled()){
             return;
         }
-        reward = FmtMicrometer.fmtAmount(reward);
-        String msg = MyApplication.getInstance().getString(R.string.mining_new_block);
-        msg = String.format(msg, reward);
 
         int notifyId = (int) (System.currentTimeMillis() / 1000);
         RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_mining);
         remoteViews.setImageViewResource(R.id.iv_logo, mService.getApplicationInfo().icon);
         remoteViews.setTextViewText(R.id.tv_msg, mService.getString(R.string.app_name));
-        remoteViews.setTextViewText(R.id.tv_tip, msg);
+        remoteViews.setTextViewText(R.id.tv_tip, rewardMsg);
 
         long time = new Date().getTime();
         remoteViews.setTextViewText(R.id.tv_time, DateUtil.format(time, DateUtil.pattern0));

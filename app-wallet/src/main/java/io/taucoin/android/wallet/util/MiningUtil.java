@@ -36,6 +36,7 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.bean.RewardBean;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.core.Transaction;
@@ -66,6 +67,30 @@ public class MiningUtil {
         return FmtMicrometer.fmtMiningIncome(number.longValue());
     }
 
+    public static RewardBean parseMiningReward(List<MiningReward> rewards) {
+        RewardBean reward = new RewardBean();
+        BigDecimal minerReward = new BigDecimal("0");
+        BigDecimal partReward = new BigDecimal("0");
+        if(rewards != null && rewards.size() > 0){
+            for (MiningReward bean : rewards) {
+                try {
+                    if(bean.getMinerFee() == 0){
+                        partReward = partReward.add(new BigDecimal(bean.getPartFee()));
+                    }else{
+                        if(bean.getPartFee() > 0){
+                            reward.setPart(true);
+                            minerReward = minerReward.add(new BigDecimal(bean.getPartFee()));
+                        }
+                        minerReward = minerReward.add(new BigDecimal(bean.getMinerFee()));
+                    }
+                }catch (Exception ignore){}
+            }
+            reward.setMinerReward(minerReward.longValue());
+            reward.setPartReward(partReward.longValue());
+        }
+        return reward;
+    }
+
     public static void setBlockHeight(TextView textView) {
         if(textView == null){
             return;
@@ -84,7 +109,7 @@ public class MiningUtil {
                 });
     }
 
-    public static String parseBlockReward(List<Transaction> txList) {
+    public static String parseBlockTxFee(List<Transaction> txList) {
         BigInteger reward = new BigInteger("0");
         if(txList != null && txList.size() > 0){
             for (Transaction transaction : txList) {

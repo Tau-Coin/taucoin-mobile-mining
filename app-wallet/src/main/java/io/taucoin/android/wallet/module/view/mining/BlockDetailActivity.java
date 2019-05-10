@@ -60,7 +60,7 @@ public class BlockDetailActivity extends BaseActivity {
             List<Transaction> txList = blockBean.getTransactionsList();
             if(txList != null){
                 tvTotalTransaction.setRightText(txList.size());
-                String totalFee = MiningUtil.parseBlockReward(txList);
+                String totalFee = MiningUtil.parseBlockTxFee(txList);
                 String income = FmtMicrometer.fmtFormat(totalFee);
                 income += ResourcesUtil.getText(R.string.common_balance_unit);
                 tvMiningIncome.setRightText(income);

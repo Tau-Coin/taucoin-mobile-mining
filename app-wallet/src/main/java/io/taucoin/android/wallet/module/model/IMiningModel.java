@@ -7,6 +7,7 @@ import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.core.TransactionExecuatedOutcome;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public interface IMiningModel {
@@ -27,5 +28,5 @@ public interface IMiningModel {
     /** get mining rewards*/
     void getMiningRewards(int pageNo, String time, LogicObserver<List<MiningReward>> logicObserver);
     /** save mining reward*/
-    void saveMiningReward();
+    void saveMiningReward(TransactionExecuatedOutcome outCome);
 }

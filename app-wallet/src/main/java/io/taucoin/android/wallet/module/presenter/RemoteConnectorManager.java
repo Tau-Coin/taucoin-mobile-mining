@@ -21,6 +21,8 @@ import android.os.Message;
 
 import com.github.naturs.logger.Logger;
 
+import org.spongycastle.util.encoders.Hex;
+
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import io.taucoin.android.service.events.MessageEventData;
 import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
+import io.taucoin.android.service.events.TransactionExecuatedEvent;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
@@ -43,6 +46,7 @@ import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.core.TransactionExecuatedOutcome;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.net.p2p.HelloMessage;
 
@@ -166,7 +170,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         startSyncAll();
                         if(event == EVENT_TAUCOIN_CREATED){
                             mExceptionStop = null;
-//                            startBlockForging();
+                            startBlockForging();
                         }
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                         break;
@@ -203,6 +207,15 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                             messageEvent = new MessageEvent();
                             messageEvent.setCode(MessageEvent.EventCode.MINING_STATE);
                             EventBusUtil.post(messageEvent);
+                        }
+                        break;
+                    case EVENT_TRANSACTION_EXECUATED:
+                        TransactionExecuatedEvent txExe = data.getParcelable("data");
+                        if(txExe != null && txExe.outcome != null){
+                            String txId = Hex.toHexString(txExe.outcome.getTxid());
+                            logMessage = "transaction executed id=" + txId;
+                            addLogEntry(time, logMessage);
+                            saveMiningReward(txExe.outcome);
                         }
                         break;
 
@@ -255,6 +268,10 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 isClaimed = false;
         }
         return isClaimed;
+    }
+
+    private void saveMiningReward(TransactionExecuatedOutcome outCome) {
+        getMiningModel().saveMiningReward(outCome);
     }
 
     private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {
