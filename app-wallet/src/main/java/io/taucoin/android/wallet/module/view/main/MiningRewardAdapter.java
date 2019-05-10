@@ -19,7 +19,6 @@ public class MiningRewardAdapter extends BaseAdapter {
 
     private List<MiningReward> list = new ArrayList<>();
 
-
     void setListData(List<MiningReward> data, boolean isAdd) {
         if (!isAdd) {
            list.clear();
@@ -28,6 +27,13 @@ public class MiningRewardAdapter extends BaseAdapter {
             list.addAll(data);
         }
         notifyDataSetChanged();
+    }
+
+    String getTxHash(int pos) {
+        if(pos < 0 || pos > getCount()){
+            return "";
+        }
+        return list.get(pos).getTxHash();
     }
 
     @Override
@@ -57,8 +63,16 @@ public class MiningRewardAdapter extends BaseAdapter {
         }
         MiningReward bean = list.get(position);
         viewHolder.tvHash.setText(bean.getTxHash());
-        viewHolder.tvFee.setText(FmtMicrometer.fmtFormat(bean.getFee()));
-        viewHolder.tvStatus.setText(bean.getStatus() + "");
+        long fee = bean.getMinerFee() + bean.getPartFee();
+        String feeStr = String.valueOf(fee);
+        viewHolder.tvFee.setText(FmtMicrometer.fmtFormat(feeStr));
+        int reStatus = R.string.home_mining_miner_participant;
+        if(bean.getMinerFee() == 0){
+            reStatus = R.string.home_mining_participant;
+        }else if(bean.getPartFee() == 0){
+            reStatus = R.string.home_mining_miner;
+        }
+        viewHolder.tvStatus.setText(reStatus);
         return convertView;
     }
 

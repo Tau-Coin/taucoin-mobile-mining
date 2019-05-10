@@ -131,6 +131,9 @@
     <string name="home_mining_hash">TX hash</string>
     <string name="home_mining_fee">TX Fee</string>
     <string name="home_mining_status">Status</string>
+    <string name="home_mining_miner">miner</string>
+    <string name="home_mining_participant">participant</string>
+    <string name="home_mining_miner_participant">miner\n&#38;\nparticipant</string>
 
     <string name="block_list_title">Mining Details</string>
     <string name="block_list_all">ALL</string>

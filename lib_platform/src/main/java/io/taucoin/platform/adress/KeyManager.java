@@ -96,7 +96,7 @@ public class KeyManager {
 
     private static String generatorRawAddress(String compressedPk) {
         byte[] rawAddress = io.taucoin.core.Utils.sha256hash160(Hex.decode(compressedPk));
-        return Hex.toHexString(rawAddress);
+        return Hex.toHexString(rawAddress).toLowerCase();
     }
 
     private static String generatorAddress(String compressedPk) {

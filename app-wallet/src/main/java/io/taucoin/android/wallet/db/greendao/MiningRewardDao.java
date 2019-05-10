@@ -25,12 +25,12 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property PubKey = new Property(1, String.class, "pubKey", false, "PUB_KEY");
-        public final static Property TxId = new Property(2, String.class, "txId", false, "TX_ID");
-        public final static Property TxHash = new Property(3, String.class, "txHash", false, "TX_HASH");
-        public final static Property Fee = new Property(4, String.class, "fee", false, "FEE");
+        public final static Property Address = new Property(1, String.class, "address", false, "ADDRESS");
+        public final static Property TxHash = new Property(2, String.class, "txHash", false, "TX_HASH");
+        public final static Property MinerFee = new Property(3, long.class, "minerFee", false, "MINER_FEE");
+        public final static Property PartFee = new Property(4, long.class, "partFee", false, "PART_FEE");
         public final static Property Time = new Property(5, String.class, "time", false, "TIME");
-        public final static Property Status = new Property(6, int.class, "status", false, "STATUS");
+        public final static Property BlockHash = new Property(6, String.class, "blockHash", false, "BLOCK_HASH");
         public final static Property Valid = new Property(7, int.class, "valid", false, "VALID");
     }
 
@@ -48,12 +48,12 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MINING_REWARD\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"PUB_KEY\" TEXT," + // 1: pubKey
-                "\"TX_ID\" TEXT," + // 2: txId
-                "\"TX_HASH\" TEXT," + // 3: txHash
-                "\"FEE\" TEXT," + // 4: fee
+                "\"ADDRESS\" TEXT," + // 1: address
+                "\"TX_HASH\" TEXT," + // 2: txHash
+                "\"MINER_FEE\" INTEGER NOT NULL ," + // 3: minerFee
+                "\"PART_FEE\" INTEGER NOT NULL ," + // 4: partFee
                 "\"TIME\" TEXT," + // 5: time
-                "\"STATUS\" INTEGER NOT NULL ," + // 6: status
+                "\"BLOCK_HASH\" TEXT," + // 6: blockHash
                 "\"VALID\" INTEGER NOT NULL );"); // 7: valid
     }
 
@@ -72,31 +72,27 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             stmt.bindLong(1, id);
         }
  
-        String pubKey = entity.getPubKey();
-        if (pubKey != null) {
-            stmt.bindString(2, pubKey);
-        }
- 
-        String txId = entity.getTxId();
-        if (txId != null) {
-            stmt.bindString(3, txId);
+        String address = entity.getAddress();
+        if (address != null) {
+            stmt.bindString(2, address);
         }
  
         String txHash = entity.getTxHash();
         if (txHash != null) {
-            stmt.bindString(4, txHash);
+            stmt.bindString(3, txHash);
         }
- 
-        String fee = entity.getFee();
-        if (fee != null) {
-            stmt.bindString(5, fee);
-        }
+        stmt.bindLong(4, entity.getMinerFee());
+        stmt.bindLong(5, entity.getPartFee());
  
         String time = entity.getTime();
         if (time != null) {
             stmt.bindString(6, time);
         }
-        stmt.bindLong(7, entity.getStatus());
+ 
+        String blockHash = entity.getBlockHash();
+        if (blockHash != null) {
+            stmt.bindString(7, blockHash);
+        }
         stmt.bindLong(8, entity.getValid());
     }
 
@@ -109,31 +105,27 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             stmt.bindLong(1, id);
         }
  
-        String pubKey = entity.getPubKey();
-        if (pubKey != null) {
-            stmt.bindString(2, pubKey);
-        }
- 
-        String txId = entity.getTxId();
-        if (txId != null) {
-            stmt.bindString(3, txId);
+        String address = entity.getAddress();
+        if (address != null) {
+            stmt.bindString(2, address);
         }
  
         String txHash = entity.getTxHash();
         if (txHash != null) {
-            stmt.bindString(4, txHash);
+            stmt.bindString(3, txHash);
         }
- 
-        String fee = entity.getFee();
-        if (fee != null) {
-            stmt.bindString(5, fee);
-        }
+        stmt.bindLong(4, entity.getMinerFee());
+        stmt.bindLong(5, entity.getPartFee());
  
         String time = entity.getTime();
         if (time != null) {
             stmt.bindString(6, time);
         }
-        stmt.bindLong(7, entity.getStatus());
+ 
+        String blockHash = entity.getBlockHash();
+        if (blockHash != null) {
+            stmt.bindString(7, blockHash);
+        }
         stmt.bindLong(8, entity.getValid());
     }
 
@@ -146,12 +138,12 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
     public MiningReward readEntity(Cursor cursor, int offset) {
         MiningReward entity = new MiningReward( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // pubKey
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // txId
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // txHash
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // fee
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // address
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // txHash
+            cursor.getLong(offset + 3), // minerFee
+            cursor.getLong(offset + 4), // partFee
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // time
-            cursor.getInt(offset + 6), // status
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // blockHash
             cursor.getInt(offset + 7) // valid
         );
         return entity;
@@ -160,12 +152,12 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
     @Override
     public void readEntity(Cursor cursor, MiningReward entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setPubKey(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setTxId(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setTxHash(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setFee(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setAddress(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setTxHash(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setMinerFee(cursor.getLong(offset + 3));
+        entity.setPartFee(cursor.getLong(offset + 4));
         entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setStatus(cursor.getInt(offset + 6));
+        entity.setBlockHash(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setValid(cursor.getInt(offset + 7));
      }
     

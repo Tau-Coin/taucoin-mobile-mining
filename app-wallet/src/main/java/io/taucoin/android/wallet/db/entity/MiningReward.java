@@ -13,23 +13,23 @@ public class MiningReward {
 
     @Id
     private Long id;
-    private String pubKey;
-    private String txId;
+    private String address;
     private String txHash;
-    private String fee;
+    private long minerFee;
+    private long partFee;
     private String time;
-    private int status;
+    private String blockHash;
     private int valid;
-    @Generated(hash = 122383812)
-    public MiningReward(Long id, String pubKey, String txId, String txHash,
-            String fee, String time, int status, int valid) {
+    @Generated(hash = 1361468491)
+    public MiningReward(Long id, String address, String txHash, long minerFee,
+            long partFee, String time, String blockHash, int valid) {
         this.id = id;
-        this.pubKey = pubKey;
-        this.txId = txId;
+        this.address = address;
         this.txHash = txHash;
-        this.fee = fee;
+        this.minerFee = minerFee;
+        this.partFee = partFee;
         this.time = time;
-        this.status = status;
+        this.blockHash = blockHash;
         this.valid = valid;
     }
     @Generated(hash = 364800917)
@@ -41,17 +41,11 @@ public class MiningReward {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getPubKey() {
-        return this.pubKey;
+    public String getAddress() {
+        return this.address;
     }
-    public void setPubKey(String pubKey) {
-        this.pubKey = pubKey;
-    }
-    public String getTxId() {
-        return this.txId;
-    }
-    public void setTxId(String txId) {
-        this.txId = txId;
+    public void setAddress(String address) {
+        this.address = address;
     }
     public String getTxHash() {
         return this.txHash;
@@ -59,11 +53,17 @@ public class MiningReward {
     public void setTxHash(String txHash) {
         this.txHash = txHash;
     }
-    public String getFee() {
-        return this.fee;
+    public long getMinerFee() {
+        return this.minerFee;
     }
-    public void setFee(String fee) {
-        this.fee = fee;
+    public void setMinerFee(long minerFee) {
+        this.minerFee = minerFee;
+    }
+    public long getPartFee() {
+        return this.partFee;
+    }
+    public void setPartFee(long partFee) {
+        this.partFee = partFee;
     }
     public String getTime() {
         return this.time;
@@ -71,11 +71,11 @@ public class MiningReward {
     public void setTime(String time) {
         this.time = time;
     }
-    public int getStatus() {
-        return this.status;
+    public String getBlockHash() {
+        return this.blockHash;
     }
-    public void setStatus(int status) {
-        this.status = status;
+    public void setBlockHash(String blockHash) {
+        this.blockHash = blockHash;
     }
     public int getValid() {
         return this.valid;
@@ -83,5 +83,4 @@ public class MiningReward {
     public void setValid(int valid) {
         this.valid = valid;
     }
-
 }

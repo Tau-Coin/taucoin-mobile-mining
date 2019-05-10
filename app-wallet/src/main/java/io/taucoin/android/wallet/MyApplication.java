@@ -64,7 +64,7 @@ public class MyApplication extends MultiDexApplication {
         GreenDaoManager.getInstance();
 
         // Logger init
-        Logger.addLogAdapter(new AndroidLogAdapter("TAUCOIN", true));
+        Logger.addLogAdapter(new AndroidLogAdapter("TAUCOIN", false));
         Logger.setLogConverter(new AndroidLogConverter());
 
         // Crashlytics

@@ -222,7 +222,8 @@ public class TxService extends Service {
                 getBalanceDelay(TransmitKey.ServiceType.GET_BALANCE);
             }
         }else{
-            if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_BALANCE) && !isSuccess){
+            if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_BALANCE) && !isSuccess
+                    && HomeFragment.mIsToast){
                 ToastUtils.showShortToast(R.string.common_refresh_failed);
                 HomeFragment.mIsToast = false;
             }

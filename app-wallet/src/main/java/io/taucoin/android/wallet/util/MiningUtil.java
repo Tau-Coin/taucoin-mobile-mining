@@ -58,7 +58,8 @@ public class MiningUtil {
         if(rewards != null && rewards.size() > 0){
             for (MiningReward bean : rewards) {
                 try {
-                    number = number.add(new BigDecimal(bean.getFee()));
+                    number = number.add(new BigDecimal(bean.getMinerFee()));
+                    number = number.add(new BigDecimal(bean.getPartFee()));
                 }catch (Exception ignore){}
             }
         }

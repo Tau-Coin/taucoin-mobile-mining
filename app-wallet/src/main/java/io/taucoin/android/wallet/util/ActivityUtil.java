@@ -18,6 +18,7 @@ package io.taucoin.android.wallet.util;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -79,5 +80,11 @@ public class ActivityUtil {
         Intent intentSplash = new Intent(context, SplashActivity.class);
         intentSplash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intentSplash);
+    }
+
+    public static void openUri(Context context, String uriStr) {
+        Uri uri = Uri.parse(uriStr);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        context.startActivity(intent);
     }
 }

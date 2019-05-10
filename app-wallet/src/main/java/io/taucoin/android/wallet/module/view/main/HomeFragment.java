@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
@@ -117,14 +119,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 showMiningTransactionView();
                 break;
             case R.id.tv_synchronized:
-                Intent intent = new Intent();
-                intent.putExtra(TransmitKey.TYPE, 0);
-                ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
-                break;
             case R.id.tv_mined:
-                intent = new Intent();
-                intent.putExtra(TransmitKey.TYPE, 1);
-                ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
+                if(MyApplication.getRemoteConnector().isInit()){
+                    Intent intent = new Intent();
+                    intent.putExtra(TransmitKey.TYPE, view.getId() == R.id.tv_mined ? 1 : 0);
+                    ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
+                }
                 break;
             case R.id.iv_right:
                 ProgressManager.showProgressDialog(getActivity());
@@ -134,6 +134,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             default:
                 break;
         }
+    }
+
+    @OnItemClick(R.id.list_view_mining_tx)
+    void onItemClick(AdapterView<?> parent, View view, int position, long id){
+        String txId = mMiningRewardAdapter.getTxHash(position);
+        String tauExplorerTxUr = TransmitKey.ExternalUrl.TAU_EXPLORER_TX_URL;
+        tauExplorerTxUr += txId;
+        ActivityUtil.openUri(view.getContext(), tauExplorerTxUr);
     }
 
     private void starOrStopMining(boolean isNotice) {
@@ -250,11 +258,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                     }
                     boolean isInit = MyApplication.getRemoteConnector().isInit();
-                    boolean isSyncMe = MyApplication.getRemoteConnector().isSyncMe();
                     boolean isError = MyApplication.getRemoteConnector().isError();
-
-                    tvSynchronized.setEnabled(isInit && isSyncMe);
-                    tvMined.setEnabled(isInit && isSyncMe);
 
                     if(isStart && isNeedInit){
                         if(!isInit){

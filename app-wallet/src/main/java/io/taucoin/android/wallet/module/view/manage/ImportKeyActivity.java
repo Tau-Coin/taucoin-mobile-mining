@@ -68,7 +68,7 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
     public void onHowImportClicked() {
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra(TransmitKey.TITLE, getText(R.string.manager_help));
-        intent.putExtra(TransmitKey.URL, TransmitKey.HOW_IMPORT_KEY_URL);
+        intent.putExtra(TransmitKey.URL, TransmitKey.ExternalUrl.HOW_IMPORT_KEY_URL);
         startActivity(intent);
     }
 

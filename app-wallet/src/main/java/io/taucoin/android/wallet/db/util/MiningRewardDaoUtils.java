@@ -48,10 +48,10 @@ public class MiningRewardDaoUtils {
     }
 
 
-    public List<MiningReward> queryData(int pageNo, String time, String pubicKey) {
+    public List<MiningReward> queryData(int pageNo, String time, String rawAddress) {
         return getMiningRewardDao().queryBuilder()
                 .where(MiningRewardDao.Properties.Time.lt(time),
-                    MiningRewardDao.Properties.PubKey.eq(pubicKey),
+                    MiningRewardDao.Properties.Address.eq(rawAddress),
                     MiningRewardDao.Properties.Valid.eq(1))
                 .orderDesc(MiningRewardDao.Properties.Time)
                 .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE)
@@ -63,15 +63,35 @@ public class MiningRewardDaoUtils {
         return result > -1;
     }
 
-    public MiningReward query(String txId, String pubicKey) {
+    public List<MiningReward> queryData(String blockHash, String rawAddress) {
+        return getMiningRewardDao().queryBuilder()
+                .where(MiningRewardDao.Properties.BlockHash.eq(blockHash),
+                        MiningRewardDao.Properties.Address.eq(rawAddress))
+                .orderDesc(MiningRewardDao.Properties.Id)
+                .list();
+    }
+
+    public MiningReward query(String txHash, String rawAddress) {
         List<MiningReward> list = getMiningRewardDao().queryBuilder()
-                .where(MiningRewardDao.Properties.TxHash.eq(txId),
-                        MiningRewardDao.Properties.PubKey.eq(pubicKey))
+                .where(MiningRewardDao.Properties.TxHash.eq(txHash),
+                        MiningRewardDao.Properties.Address.eq(rawAddress))
                 .orderDesc(MiningRewardDao.Properties.Id)
                 .list();
         if(list != null && list.size() > 0){
             return list.get(0);
         }
         return null;
+    }
+
+    public void rollBackByBlockHash(String blockHash) {
+        List<MiningReward> list = getMiningRewardDao().queryBuilder()
+                .where(MiningRewardDao.Properties.BlockHash.eq(blockHash))
+                .list();
+        if(list != null && list.size() > 0){
+            for (MiningReward reward : list) {
+                reward.setValid(0);
+                insertOrReplace(reward);
+            }
+        }
     }
 }

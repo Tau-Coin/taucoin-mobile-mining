@@ -273,7 +273,7 @@ public class KeyGenerator {
         }
 
         byte[] rawAddress = io.taucoin.core.Utils.sha256hash160(Hex.decode(compressedPk));
-        key.setRawAddress(Hex.toHexString(rawAddress));
+        key.setRawAddress(Hex.toHexString(rawAddress).toLowerCase());
 
         return true;
     }

@@ -34,7 +34,6 @@ public class TransmitKey {
 
     public static final String TITLE = "title";
     public static final String URL = "url";
-    public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";
 
     public static final int PAGE_SIZE = 20;
     public static final long MIN_TRANS_EXPIRY = 5;
@@ -69,4 +68,9 @@ public class TransmitKey {
 
     }
     public static final String TYPE = "type";
+
+    public static class ExternalUrl{
+        public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";
+        public static final String TAU_EXPLORER_TX_URL = "http://tau.taucoin.io/tx/";
+    }
 }

@@ -21,6 +21,7 @@ import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.platform.adress.KeyManager;
 import org.spongycastle.util.encoders.Hex;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,8 +117,7 @@ public class MiningModel implements IMiningModel{
                 }
                 Block block = blockEvent.block;
 
-                saveMiningBlock(block, true, false);
-                saveMiningReward(block, true);
+                saveMiningBlock(block, true);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -125,7 +125,7 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private synchronized void saveMiningBlock(Block block, boolean isConnect, boolean isSendNotify) {
+    private synchronized void saveMiningBlock(Block block, boolean isConnect) {
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
 
@@ -151,11 +151,6 @@ public class MiningModel implements IMiningModel{
                     entry.setTotal(total);
                     entry.setReward(reward);
                     MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
-
-                    // TODO Whether to send notification or not
-                    if(isSendNotify){
-                        NotifyManager.getInstance().sendBlockNotify(reward);
-                    }
                 }
             }else{
                 entry.setValid(isConnect ? 1 : 0);
@@ -171,34 +166,61 @@ public class MiningModel implements IMiningModel{
         }
     }
 
-    private synchronized void saveMiningReward(Block block, boolean isConnect) {
-        String generatorPublicKey = KeyManager.signatureToKey(block);
-        KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(generatorPublicKey);
+    @Override
+    public synchronized void saveMiningReward() {
+        Transaction transaction = new Transaction();
+        String rewardAddress = Hex.toHexString(transaction.getSender());
+        KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByRawAddress(rewardAddress);
         // Update data for all local private keys
         if(keyValue != null){
-            List<Transaction> transactions = block.getTransactionsList();
-            if(transactions != null && transactions.size() > 0){
-                for (Transaction reward : transactions) {
-                    MiningReward entry = MiningRewardDaoUtils.getInstance().query(reward.getTxid(), keyValue.getPubKey());
-                    if(null == entry){
-                        String txFee = Hex.toHexString(reward.getFee());
-                        String txId = reward.getTxid();
-                        String txHash = Hex.toHexString(reward.getHash());
-                        entry = new MiningReward();
-                        entry.setTxId(txId);
-                        entry.setTxHash(txHash);
-                        entry.setFee(txFee);
-                        entry.setPubKey(keyValue.getPubKey());
-                        entry.setTime(DateUtil.getCurrentTime());
-                        entry.setValid(1);
-                        entry.setStatus(1);
-                    }else{
-                        entry.setValid(isConnect ? 1 : 0);
-                        MiningRewardDaoUtils.getInstance().insertOrReplace(entry);
-                    }
+            String txHash = Hex.toHexString(transaction.getHash());
+            MiningReward entry = MiningRewardDaoUtils.getInstance().query(txHash, keyValue.getRawAddress());
+            boolean isMiner = StringUtil.isSame(keyValue.getRawAddress(), rewardAddress);
+            String feeStr = Hex.toHexString(transaction.getFee());
+            long rewardFee = new BigDecimal(feeStr).longValue();
+            if(null == entry){
+                entry = new MiningReward();
+                entry.setTxHash(txHash);
+                entry.setAddress(keyValue.getRawAddress());
+                entry.setTime(DateUtil.getCurrentTime());
+            }else{
+                if(entry.getValid() == 0){
+                    entry.setMinerFee(0);
+                    entry.setPartFee(0);
+                    entry.setTime(DateUtil.getCurrentTime());
                 }
             }
+//            entry.setBlockHash();
+            entry.setValid(1);
+            if(isMiner){
+                entry.setMinerFee(rewardFee);
+            }else{
+                entry.setPartFee(rewardFee + entry.getPartFee());
+            }
+            MiningRewardDaoUtils.getInstance().insertOrReplace(entry);
         }
+        if(transaction.isCompositeTx()){
+            String blockHash = "";
+            handleRefreshNotify(blockHash);
+        }
+    }
+
+    private void handleRefreshNotify(String blockHash) {
+        String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
+        List<MiningReward> list = MiningRewardDaoUtils.getInstance().queryData(blockHash, rawAddress);
+        if(list.size() > 0){
+            EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
+
+            NotifyManager.getInstance().sendBlockNotify("1.0");
+        }
+    }
+
+    /**
+     * roll back mining reward
+     * */
+    private synchronized void rollBackMiningReward(String blockHash) {
+        MiningRewardDaoUtils.getInstance().rollBackByBlockHash(blockHash);
+        handleRefreshNotify(blockHash);
     }
 
     @Override
@@ -210,8 +232,12 @@ public class MiningModel implements IMiningModel{
                 if(block != null){
                     long blockNumber = block.getNumber();
                     updateSynchronizedBlockNum((int) blockNumber);
-                    saveMiningBlock(block, isConnect, true);
-                    saveMiningReward(block, isConnect);
+                    saveMiningBlock(block, isConnect);
+
+                    if(!isConnect){
+                        String blockHash = Hex.toHexString(block.getHash());
+                        rollBackMiningReward(blockHash);
+                    }
                 }
             }
             emitter.onNext(eventCode);
@@ -275,14 +301,28 @@ public class MiningModel implements IMiningModel{
     @Override
     public void getMiningRewards(int pageNo, String time, LogicObserver<List<MiningReward>> logicObserver){
         Observable.create((ObservableOnSubscribe<List<MiningReward>>) emitter -> {
-            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+            String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
             List<MiningReward> list = null;
-            if(StringUtil.isNotEmpty(pubicKey)){
-                list = MiningRewardDaoUtils.getInstance().queryData(pageNo, time, pubicKey);
+            if(StringUtil.isNotEmpty(rawAddress)){
+                list = MiningRewardDaoUtils.getInstance().queryData(pageNo, time, rawAddress);
             }
             if(list == null){
                 list = new ArrayList<>();
             }
+//            for (int i = 0; i < 20; i++) {
+//                MiningReward bean = new MiningReward();
+//                bean.setTxHash("4803d5a9e597f5a9c0a7c38365f428afd6e0b34a623f7903359e47a8e697e839");
+//                bean.setPartFee(1000);
+//                bean.setMinerFee(1000);
+//                if(i > 6){
+//                    bean.setMinerFee(1000);
+//                    bean.setPartFee(0);
+//                }else if(i > 3){
+//                    bean.setMinerFee(0);
+//                    bean.setPartFee(1000);
+//                }
+//                list.add(bean);
+//            }
             emitter.onNext(list);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

@@ -59,6 +59,17 @@ public class KeyValueDaoUtils {
         return null;
     }
 
+    public KeyValue queryByRawAddress(String rawAddress) {
+        List<KeyValue> list = getKeyValueDao().queryBuilder()
+                .where(KeyValueDao.Properties.RawAddress.eq(rawAddress))
+                .orderDesc(KeyValueDao.Properties.Id)
+                .list();
+        if(list.size() > 0){
+            return list.get(0);
+        }
+        return null;
+    }
+
     public String querySignatureKey(String signatureKey) {
         String pubicKey = "";
         List<KeyValue> list = getKeyValueDao().queryBuilder().list();
