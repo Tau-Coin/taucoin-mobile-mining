@@ -80,4 +80,9 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     public void onPeerAddedToSyncPool(Channel peer) {
 
     }
+
+    @Override
+    public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
+
+    }
 }

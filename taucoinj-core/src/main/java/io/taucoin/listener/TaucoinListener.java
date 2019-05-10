@@ -45,4 +45,7 @@ public interface TaucoinListener {
     void onNoConnections();
 
     void onPeerAddedToSyncPool(Channel peer);
+
+    void onTransactionExecuated(TransactionExecuatedOutcome outcome);
+
 }

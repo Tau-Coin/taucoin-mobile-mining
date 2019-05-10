@@ -1,6 +1,7 @@
 package io.taucoin.core;
 
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class TransactionExecutor {
     private Repository track;
     private byte[] coinbase;
     private Blockchain blockchain;
+    private TaucoinListener listener;
     /**
      * this is a temporary strategy.
      * a transaction per second.
@@ -43,10 +45,11 @@ public class TransactionExecutor {
     long basicTxFee = 0;
 
     //constructor
-    public TransactionExecutor(Transaction tx, Repository track,Blockchain blockchain) {
+    public TransactionExecutor(Transaction tx, Repository track,Blockchain blockchain,TaucoinListener listener) {
         this.tx= tx;
         this.track= track;
         this.blockchain = blockchain;
+        this.listener = listener;
     }
 
     /**
@@ -120,14 +123,21 @@ public class TransactionExecutor {
      * 1. add balance to received address 
      * 2. add transaction fee to actually miner 
      */
-    public void executeFinal() {
+    public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
 		// Sender subtract balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
         logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
         track.addBalance(tx.getSender(), totalCost.negate());
 
+        TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
+        outcome.setBlockHash(blockhash);
+        outcome.setTxComplete(isTxCompleted);
+        outcome.setTxid(tx.getHash());
+        outcome.setSenderAddress(tx.getSender());
+
 		// Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
+        outcome.setReceiveAddress(tx.getReceiveAddress());
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
 
@@ -135,6 +145,10 @@ public class TransactionExecutor {
             // Transfer fees to forger
 //            logger.error("1 current witness share {}",feeDistributor.getCurrentWitFee());
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
+            HashMap<byte[],Long> currentWintess = new HashMap<>();
+            currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
+            outcome.setCurrentWintess(currentWintess);
+
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
@@ -144,6 +158,10 @@ public class TransactionExecutor {
                 // Transfer fees to last witness
                 track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
                         toBI(feeDistributor.getLastWitFee()));
+                HashMap<byte[],Long> lastWintess = new HashMap<>();
+                lastWintess.put(track.getAccountState(tx.getSender()).getWitnessAddress(),
+                        feeDistributor.getLastWitFee());
+                outcome.setLastWintess(lastWintess);
             }
 
             if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() != 0) {
@@ -158,15 +176,17 @@ public class TransactionExecutor {
                 if (assDistributor.assDistributeFee()) {
                     for (int i = 0; i < track.getAccountState(tx.getSender()).getAssociatedAddress().size(); ++i) {
                         if(i != track.getAccountState(tx.getSender()).getAssociatedAddress().size() -1) {
-//                            logger.info("transaction execuated associated address size is====> {}",
-//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().size());
-//                            logger.info("associated address is {} index is {}",Hex.toHexString(
-//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),i);
+//                            logger.info("3-1 associated address is {} average is {}",Hex.toHexString(
+//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),assDistributor.getAverageShare());
                             track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
                                     toBI(assDistributor.getAverageShare()));
+                            outcome.updateSenderAssociated(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    assDistributor.getAverageShare());
                         } else {
                             track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
                                     toBI(assDistributor.getLastShare()));
+                            outcome.updateSenderAssociated(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    assDistributor.getLastShare());
                         }
                     }
                 }
@@ -182,6 +202,7 @@ public class TransactionExecutor {
                 // Transfer fees to last witness
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastWitFee()));
+                outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastWitFee());
             }
 
             if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() == 0) {
@@ -191,13 +212,15 @@ public class TransactionExecutor {
                 // Transfer fees to last associate
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastAssociFee()));
+                outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
+            listener.onTransactionExecuated(outcome);
         }
 
         // Increase forge power.
-        logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+//        logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.increaseforgePower(tx.getSender());
-        logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+//        logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
 
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 

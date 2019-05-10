@@ -132,4 +132,11 @@ public class CompositeTaucoinListener implements TaucoinListener {
             listener.onPeerAddedToSyncPool(peer);
         }
     }
+
+    @Override
+    public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
+        for (TaucoinListener listener : listeners) {
+            listener.onTransactionExecuated(outcome);
+        }
+    }
 }

@@ -95,6 +95,10 @@ public enum EventFlag {
     /**
      * forge exit event
      */
-    EVENT_BLOCK_FORGE_STOP
+    EVENT_BLOCK_FORGE_STOP,
 
+    /**
+     * new transaction on block have an effect on chain state
+     */
+    EVENT_TRANSACTION_EXECUATED
 }

@@ -10,17 +10,11 @@ import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.components.TaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.rpc.server.JsonRpcServer;
-import io.taucoin.android.service.events.BlockEventData;
-import io.taucoin.android.service.events.EventData;
-import io.taucoin.android.service.events.EventFlag;
-import io.taucoin.android.service.events.MessageEventData;
-import io.taucoin.android.service.events.PeerDisconnectEventData;
-import io.taucoin.android.service.events.PendingTransactionsEventData;
-import io.taucoin.android.service.events.TraceEventData;
-import io.taucoin.android.service.events.VMTraceCreatedEventData;
+import io.taucoin.android.service.events.*;
 import io.taucoin.core.Genesis;
 import io.taucoin.core.PendingState;
 import io.taucoin.core.Transaction;
+import io.taucoin.core.TransactionExecuatedOutcome;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
 import io.taucoin.net.message.Message;
@@ -199,6 +193,13 @@ public class TaucoinService extends Service {
 
         @Override
         public void onPeerAddedToSyncPool(Channel peer) {
+        }
+
+        @Override
+        public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
+            System.out.println("outcome is: "+ Hex.toHexString(outcome.getBlockhash())
+                              +" \ntxid: "+Hex.toHexString(outcome.getTxid()));
+            broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(outcome));
         }
     }
 }

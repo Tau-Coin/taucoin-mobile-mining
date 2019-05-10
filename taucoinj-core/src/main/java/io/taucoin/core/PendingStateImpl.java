@@ -196,7 +196,7 @@ public class PendingStateImpl implements PendingState {
 			return false;
         }
         
-        TransactionExecutor executor = new TransactionExecutor(tx, getRepository(),blockchain);
+        TransactionExecutor executor = new TransactionExecutor(tx, getRepository(),blockchain,listener);
 
         return executor.init();
     }
