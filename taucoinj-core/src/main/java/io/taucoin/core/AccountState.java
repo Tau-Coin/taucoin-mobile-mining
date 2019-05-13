@@ -140,6 +140,13 @@ public class AccountState implements Serializable {
         }
     }
 
+    public void updateAssociatedAddress(List<byte[]> associatedAddressList,long stateHeight) {
+        rlpEncoded = null;
+        this.stateHeight = stateHeight;
+        this.associatedAddress.clear();
+        this.associatedAddress.addAll(associatedAddressList);
+    }
+
     public void setAssociatedAddress(ArrayList<byte[]> associatedAddress) {
         rlpEncoded = null;
         this.associatedAddress = associatedAddress;

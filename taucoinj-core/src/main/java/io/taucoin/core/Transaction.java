@@ -72,12 +72,15 @@ public class Transaction {
     /**
      *account address that forger who confirm this last state change.
      */
-    private byte[] witnessAddress;
+    private byte[] senderWitnessAddress;
+
+    private byte[] receiverWitnessAddress;
 
     /**
      *account address that associated to last account state change.
      */
-    private ArrayList<byte[]> associatedAddress = new ArrayList<>();
+    private ArrayList<byte[]> senderAssociatedAddress = new ArrayList<>();
+    private ArrayList<byte[]> receiverAssociatedAddress = new ArrayList<>();
 
     public static final int TTIME = 144;
     public static final int HASH_LENGTH = 32;
@@ -186,23 +189,43 @@ public class Transaction {
         }
 
         return true;
-    }
+    }  
 
     //method to manufacture composite transaction to roll back
-    public void setWitnessAddress(byte[] witnessAddress) {
-        this.witnessAddress = witnessAddress;
+    public void setSenderWitnessAddress(byte[] senderWitnessAddress) {
+        this.senderWitnessAddress = senderWitnessAddress;
     }
 
-    public void setAssociatedAddress(ArrayList<byte[]> associatedAddress) {
-        this.associatedAddress = associatedAddress;
+    public void setReceiverWitnessAddress(byte[] receiverWitnessAddress) {
+        this.receiverWitnessAddress = receiverWitnessAddress;
     }
 
-    public byte[] getWitnessAddress() {
-        return witnessAddress;
+    public void setSenderAssociatedAddress(ArrayList<byte[]> senderAssociatedAddress) {
+                this.senderAssociatedAddress = senderAssociatedAddress;
     }
 
-    public ArrayList<byte[]> getAssociatedAddress() {
-        return associatedAddress;
+    public void setReceiverAssociatedAddress(ArrayList<byte[]> receiverAssociatedAddress) {
+        this.receiverAssociatedAddress = receiverAssociatedAddress;
+    }
+
+    public byte[] getSenderWitnessAddress() {
+        if (!parsed) rlpParse();
+        return senderWitnessAddress;
+    }
+
+    public byte[] getReceiverWitnessAddress() {
+        if (!parsed) rlpParse();
+        return receiverWitnessAddress;
+    }
+
+    public ArrayList<byte[]> getSenderAssociatedAddress() {
+        if (!parsed) rlpParse();
+        return senderAssociatedAddress;
+    }
+
+    public ArrayList<byte[]> getReceiverAssociatedAddress() {
+        if (!parsed) rlpParse();
+        return receiverAssociatedAddress;
     }
 
     //NowTime - TransactionTime < 1440s;
@@ -254,24 +277,29 @@ public class Transaction {
             this.amount = transaction.get(4).getRLPData();
             this.fee = transaction.get(5).getRLPData();
             this.expireTime = transaction.get(6).getRLPData();
-            this.witnessAddress = transaction.get(7).getRLPData();
+            this.senderWitnessAddress = transaction.get(7).getRLPData();
+            this.receiverWitnessAddress = transaction.get(8).getRLPData();
 
-            RLPList associateList = (RLPList) transaction.get(8);
-            for(int i=0;i < associateList.size();++i) {
-                this.associatedAddress.add(associateList.get(i).getRLPData());
+            RLPList senderList = (RLPList) transaction.get(9);
+            for(int i=0;i < senderList.size();++i) {
+                this.senderAssociatedAddress.add(senderList.get(i).getRLPData());
+            }
+
+            RLPList reveiverList = (RLPList) transaction.get(10);
+            for(int i=0;i < reveiverList.size();++i) {
+                this.receiverAssociatedAddress.add(reveiverList.get(i).getRLPData());
             }
 
             // only parse signature in case tx is signed
-            if (transaction.get(9).getRLPData() != null) {
-                byte v = transaction.get(9).getRLPData()[0];
-                byte[] r = transaction.get(10).getRLPData();
-                byte[] s = transaction.get(11).getRLPData();
+            if (transaction.get(11).getRLPData() != null) {
+                byte v = transaction.get(11).getRLPData()[0];
+                byte[] r = transaction.get(12).getRLPData();
+                byte[] s = transaction.get(13).getRLPData();
                 this.signature = ECDSASignature.fromComponents(r, s, v);
             } else {
                 logger.debug("RLP encoded tx is not signed!");
             }
         }
-
         this.parsed = true;
         this.hash = getHash();
     }
@@ -446,7 +474,7 @@ public class Transaction {
         }
 
         this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee,expireTime, v, r, s);
+                toAddress, amount, fee, expireTime, v, r, s);
 
         this.hash = this.getHash();
 
@@ -465,15 +493,25 @@ public class Transaction {
         byte[] amount = RLP.encodeElement(this.amount);
         byte[] fee = RLP.encodeElement(this.fee);
         byte[] expireTime = RLP.encodeElement(this.expireTime);
-        byte[] witnessAddress = RLP.encodeElement(this.witnessAddress);
-        byte[][] tempAssociate = new byte[this.associatedAddress.size()][];
-        for (int i=0; i< this.associatedAddress.size();++i) {
-            tempAssociate[i] = RLP.encodeElement(this.associatedAddress.get(i));
+        byte[] senderWitnessAddress = RLP.encodeElement(this.senderWitnessAddress);
+        byte[] receiverWitnessAddress = RLP.encodeElement(this.receiverWitnessAddress);
+        byte[][] senderAssociate = new byte[this.senderAssociatedAddress.size()][];
+        for (int i=0; i< this.senderAssociatedAddress.size();++i) {
+            senderAssociate[i] = RLP.encodeElement(this.senderAssociatedAddress.get(i));
 //            logger.info("associated address is {} index is {}",Hex.toHexString(
-//                    tempAssociate[i]),i);
+//                                tempAssociate[i]),i);
         }
 //        logger.info("in transaction associated temporary size is====> {}",tempAssociate.length);
-        byte[] associatedAddress = RLP.encodeList(tempAssociate);
+        byte[] senderAssociatedAddress = RLP.encodeList(senderAssociate);
+
+        byte[][] receiverAssociate = new byte[this.receiverAssociatedAddress.size()][];
+        for (int i=0; i< this.receiverAssociatedAddress.size();++i) {
+            receiverAssociate[i] = RLP.encodeElement(this.receiverAssociatedAddress.get(i));
+//            logger.info("associated address is {} index is {}",Hex.toHexString(
+//                                tempAssociate[i]),i);
+        }
+//        logger.info("in transaction associated temporary size is====> {}",tempAssociate.length);
+        byte[] receiverAssociatedAddress = RLP.encodeList(receiverAssociate);
 
         byte[] v, r, s;
 
@@ -488,7 +526,7 @@ public class Transaction {
         }
 
         this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee,expireTime, witnessAddress, associatedAddress,v, r, s);
+                toAddress, amount, fee,expireTime, senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,v, r, s);
         this.hash = this.getHash();
 
         return rlpEncodedComposite;

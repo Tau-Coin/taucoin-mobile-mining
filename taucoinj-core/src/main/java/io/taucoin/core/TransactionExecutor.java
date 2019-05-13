@@ -253,8 +253,57 @@ public class TransactionExecutor {
         // Subtract receiver balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
 
-        // Transfer fees to miner
-        track.addBalance(coinbase, toBI(tx.transactionCost()).negate());
+        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+
+        if (feeDistributor.distributeFee()) {
+            // Transfer fees to forger
+            track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()).negate());
+            // Transfer fees to receiver
+            //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
+            if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
+                // Transfer fees to last witness
+                track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
+                        toBI(feeDistributor.getLastWitFee()).negate());
+            }
+
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() != 0) {
+                // Transfer fees to last associate
+                AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
+                        track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
+                        feeDistributor.getLastAssociFee());
+
+                if (assDistributor.assDistributeFee()) {
+                    for (int i = 0; i < track.getAccountState(tx.getSender()).getAssociatedAddress().size(); ++i) {
+                        if(i != track.getAccountState(tx.getSender()).getAssociatedAddress().size() -1) {
+//                            logger.info("transaction execuated associated address size is====> {}",
+//                                                                track.getAccountState(tx.getSender()).getAssociatedAddress().size());
+//                            logger.info("associated address is {} index is {}",Hex.toHexString(
+//                                                                track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),i);
+                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    toBI(assDistributor.getAverageShare()).negate());
+                        } else {
+                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                                    toBI(assDistributor.getLastShare()).negate());
+                        }
+                    }
+                }
+            }
+
+            /**
+             * 2 special situation is dealt by distribute associated fee to current forger
+             */
+            if (track.getAccountState(tx.getSender()).getWitnessAddress() == null) {
+                // Transfer fees to last witness
+                track.addBalance(coinbase,
+                        toBI(feeDistributor.getLastWitFee()).negate());
+            }
+
+            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() == 0) {
+                // Transfer fees to last associate
+                track.addBalance(coinbase,
+                        toBI(feeDistributor.getLastAssociFee()).negate());
+            }
+        }
 
         // undo account transaction history
         AccountState accountState = track.getAccountState(tx.getSender());
