@@ -32,6 +32,8 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         public final static Property Time = new Property(5, String.class, "time", false, "TIME");
         public final static Property BlockHash = new Property(6, String.class, "blockHash", false, "BLOCK_HASH");
         public final static Property Valid = new Property(7, int.class, "valid", false, "VALID");
+        public final static Property SenderAddress = new Property(8, String.class, "senderAddress", false, "SENDER_ADDRESS");
+        public final static Property ReceiverAddress = new Property(9, String.class, "receiverAddress", false, "RECEIVER_ADDRESS");
     }
 
 
@@ -54,7 +56,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
                 "\"PART_FEE\" INTEGER NOT NULL ," + // 4: partFee
                 "\"TIME\" TEXT," + // 5: time
                 "\"BLOCK_HASH\" TEXT," + // 6: blockHash
-                "\"VALID\" INTEGER NOT NULL );"); // 7: valid
+                "\"VALID\" INTEGER NOT NULL ," + // 7: valid
+                "\"SENDER_ADDRESS\" TEXT," + // 8: senderAddress
+                "\"RECEIVER_ADDRESS\" TEXT);"); // 9: receiverAddress
     }
 
     /** Drops the underlying database table. */
@@ -94,6 +98,16 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             stmt.bindString(7, blockHash);
         }
         stmt.bindLong(8, entity.getValid());
+ 
+        String senderAddress = entity.getSenderAddress();
+        if (senderAddress != null) {
+            stmt.bindString(9, senderAddress);
+        }
+ 
+        String receiverAddress = entity.getReceiverAddress();
+        if (receiverAddress != null) {
+            stmt.bindString(10, receiverAddress);
+        }
     }
 
     @Override
@@ -127,6 +141,16 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             stmt.bindString(7, blockHash);
         }
         stmt.bindLong(8, entity.getValid());
+ 
+        String senderAddress = entity.getSenderAddress();
+        if (senderAddress != null) {
+            stmt.bindString(9, senderAddress);
+        }
+ 
+        String receiverAddress = entity.getReceiverAddress();
+        if (receiverAddress != null) {
+            stmt.bindString(10, receiverAddress);
+        }
     }
 
     @Override
@@ -144,7 +168,9 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             cursor.getLong(offset + 4), // partFee
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // time
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // blockHash
-            cursor.getInt(offset + 7) // valid
+            cursor.getInt(offset + 7), // valid
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // senderAddress
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // receiverAddress
         );
         return entity;
     }
@@ -159,6 +185,8 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         entity.setTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setBlockHash(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setValid(cursor.getInt(offset + 7));
+        entity.setSenderAddress(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setReceiverAddress(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     @Override

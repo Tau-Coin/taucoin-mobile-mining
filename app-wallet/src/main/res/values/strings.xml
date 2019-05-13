@@ -152,19 +152,19 @@
     <!--<string name="mining_in_progress">Mining in progress</string>-->
     <!--<string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>-->
     <!--<string name="mining_mining_internal">Expected block time</string>-->
-    <string name="income_miner">You have mined a new block. Income: %sTAU</string>
-    <string name="income_miner_participant">You have mined a new block and participated a transaction. Income: %sTAU</string>
-    <string name="income_participant">You have participated a transaction. Income: %sTAU</string>
+    <string name="income_miner">New block reward %s TAU.</string>
+    <string name="income_miner_participant">New block and transaction participation reward %s TAU.</string>
+    <string name="income_participant">Transaction participation reward %s TAU.</string>
 
-    <string name="income_miner_rollback">[Rollback]You have mined a new block. Income: %sTAU</string>
-    <string name="income_miner_participant_rollback">[Rollback]You have mined a new block and participated a transaction. Income: %sTAU</string>
-    <string name="income_participant_rollback">[Rollback]You have participated a transaction. Income: %sTAU</string>
+    <string name="income_miner_rollback">[Rollback]New block reward %s TAU.</string>
+    <string name="income_miner_participant_rollback">[Rollback]New block and transaction participation reward %s TAU.</string>
+    <string name="income_participant_rollback">[Rollback]Transaction participation reward %s TAU.</string>
 
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
 
     <string name="setting_title">Settings</string>
-    <string name="setting_transaction_expiry_limit">Transaction Expiry in blocks not less than %d or more than %d</string>
+    <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
     <string name="setting_transaction_expiry">Transaction Expiry in blocks</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
 

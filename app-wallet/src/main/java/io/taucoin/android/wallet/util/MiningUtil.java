@@ -113,8 +113,12 @@ public class MiningUtil {
         BigInteger reward = new BigInteger("0");
         if(txList != null && txList.size() > 0){
             for (Transaction transaction : txList) {
-                BigInteger fee = new BigInteger(transaction.getFee());
-                reward = reward.add(fee);
+                try{
+                    BigInteger fee = new BigInteger(transaction.getFee());
+                    reward = reward.add(fee);
+                }catch (Exception e){
+                    Logger.e(e, "parseBlockTxFee is error");
+                }
             }
         }
         return reward.toString();

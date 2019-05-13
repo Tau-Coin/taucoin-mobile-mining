@@ -194,8 +194,8 @@ public class MiningModel implements IMiningModel{
         }
         String blockHash = Hex.toHexString(outCome.getBlockhash());
         String txHash = Hex.toHexString(outCome.getTxid());
-//        String formAddress = Hex.toHexString(outCome.getSenderAddress());
-//        String toAddress = Hex.toHexString(outCome.getReceiveAddress());
+        String formAddress = Hex.toHexString(outCome.getSenderAddress());
+        String toAddress = Hex.toHexString(outCome.getReceiveAddress());
 //        Logger.i("*****************************");
 //        Logger.i("txHash=" + txHash);
 //        Logger.i("form=" + formAddress + "\tto=" +toAddress);
@@ -212,6 +212,8 @@ public class MiningModel implements IMiningModel{
                     reward.setTxHash(txHash);
                     reward.setAddress(keyValue.getRawAddress());
                     reward.setTime(DateUtil.getDateTime());
+                    reward.setSenderAddress(formAddress);
+                    reward.setReceiverAddress(toAddress);
                 } else {
                     if (reward.getValid() == 0) {
                         reward.setMinerFee(0);

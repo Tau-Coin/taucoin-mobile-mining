@@ -170,7 +170,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         startSyncAll();
                         if(event == EVENT_TAUCOIN_CREATED){
                             mExceptionStop = null;
-//                            startBlockForging();
+                            startBlockForging();
                         }
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                         break;

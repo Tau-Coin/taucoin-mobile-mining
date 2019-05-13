@@ -42,7 +42,8 @@ public class KeyManager {
         try {
             io.taucoin.crypto.ECKey key = io.taucoin.crypto.ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
             bytesKey = key.getCompressedPubKey();
-        }catch(Exception ignore){
+        }catch(Exception e){
+            Logger.e(e, "signatureToKey is error");
         }
         return Hex.toHexString(bytesKey);
     }

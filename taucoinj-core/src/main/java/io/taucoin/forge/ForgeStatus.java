@@ -4,8 +4,8 @@ public class  ForgeStatus {
 
     public static ForgeStatus FORGE_NORMAL = new ForgeStatus(1, "forging normal running");
     public static ForgeStatus FORGE_NORMAL_EXIT = new ForgeStatus(2, "forging normal exit");
-    public static ForgeStatus FORGE_POWER_LESS_THAN_ZERO = new ForgeStatus(3, "forge power is less than 0");
-    public static ForgeStatus BALANCE_LESS_THAN_HISTORY_FEE = new ForgeStatus(4, "balance less than history average fee");
+    public static ForgeStatus FORGE_POWER_LESS_THAN_ZERO = new ForgeStatus(3, "Mining power is less than 0");
+    public static ForgeStatus BALANCE_LESS_THAN_HISTORY_FEE = new ForgeStatus(4, "Address balance shall be larger than average block transaction fee ");
     public static ForgeStatus FORGE_TASK_INTERRUPTED_NOT_SYNCED
                               = new ForgeStatus(5,"Forging task is interrupted when waiting for sync done");
     public static ForgeStatus BLOCK_SYNC_PROCESSING = new ForgeStatus(6,"wait to block sync completed");
