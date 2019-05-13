@@ -241,7 +241,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 }
                 for (int i = txs.size() - 1; i >= 0; i--) {
                     //roll back
-                    TransactionExecutor executor = new TransactionExecutor(txs.get(i), cacheTrack,this);
+                    TransactionExecutor executor = new TransactionExecutor(txs.get(i), cacheTrack, this, listener);
                     executor.setCoinbase(key.getAddress());
                     executor.undoTransaction();
                 }
