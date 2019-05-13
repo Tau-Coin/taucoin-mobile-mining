@@ -109,6 +109,7 @@ public class Transaction {
         } else {
             this.rlpEncodedComposite = rawData;
         }
+        this.isCompositeTx = isComposite;
         parsed = false;
     }
 
