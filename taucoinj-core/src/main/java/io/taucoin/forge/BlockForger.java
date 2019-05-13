@@ -242,7 +242,8 @@ public class BlockForger {
         logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
         if (balance.longValue() < hisAverageFee){
             logger.info("balance less than history average fee");
-            return ForgeStatus.BALANCE_LESS_THAN_HISTORY_FEE;
+            return new ForgeStatus(4,
+                    "Address balance shall be larger than average block transaction fee "+hisAverageFee/100);
         }
 
         logger.info("base target {}, forging power {}", baseTarget, forgingPower);
