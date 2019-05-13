@@ -135,8 +135,10 @@ public class MiningModel implements IMiningModel{
     private synchronized void saveMiningBlock(Block block, boolean isConnect) {
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
-
         String generatorPublicKey = KeyManager.signatureToKey(block);
+        Logger.d("blockNo=" + blockNo);
+        Logger.d("blockHash=" + blockHash);
+        Logger.d("generatorPublicKey=" + generatorPublicKey);
         String pubicKey = KeyValueDaoUtils.getInstance().querySignatureKey(generatorPublicKey);
         if(StringUtil.isNotEmpty(pubicKey)){
             MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
@@ -196,13 +198,13 @@ public class MiningModel implements IMiningModel{
         String txHash = Hex.toHexString(outCome.getTxid());
         String formAddress = Hex.toHexString(outCome.getSenderAddress());
         String toAddress = Hex.toHexString(outCome.getReceiveAddress());
-//        Logger.i("*****************************");
-//        Logger.i("txHash=" + txHash);
-//        Logger.i("form=" + formAddress + "\tto=" +toAddress);
+        Logger.i("*****************************");
+        Logger.i("txHash=" + txHash);
+        Logger.i("form=" + formAddress + "\tto=" +toAddress);
         for (Map.Entry<byte[], Long> entry : addressMap.entrySet()) {
             String rewardAddress = Hex.toHexString(entry.getKey());
             long rewardFee = entry.getValue();
-//            Logger.i("reward=" + rewardAddress + "\t," + rewardFee);
+            Logger.i("reward=" + rewardAddress + "\t," + rewardFee);
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByRawAddress(rewardAddress);
             // Update data for all local private keys
             if (keyValue != null) {
@@ -238,39 +240,30 @@ public class MiningModel implements IMiningModel{
         List<MiningReward> list = MiningRewardDaoUtils.getInstance().queryData(blockHash, rawAddress);
         if(list.size() > 0){
             EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
-
+            int notifyRes;
+            long reward;
+            String notifyStr;
             RewardBean bean = MiningUtil.parseMiningReward(list);
-            int minerRes;
-            int partRes;
             if(isRollBack){
-                if(bean.isPart()){
-                    minerRes = R.string.income_miner_participant_rollback;
-                }else{
-                    minerRes = R.string.income_miner_rollback;
-                }
-                partRes = R.string.income_participant_rollback;
+                notifyRes = R.string.income_miner_rollback;
+                notifyStr = ResourcesUtil.getText(notifyRes);
             }else{
-                if(bean.isPart()){
-                    minerRes = R.string.income_miner_participant;
+                if(bean.getMinerReward() > 0 && bean.getPartReward() > 0){
+                    notifyRes = R.string.income_miner_participant;
+                    reward = bean.getTotalReward();
+                }else if(bean.getMinerReward() > 0){
+                    notifyRes = R.string.income_miner;
+                    reward = bean.getMinerReward();
                 }else{
-                    minerRes = R.string.income_miner;
+                    notifyRes = R.string.income_participant;
+                    reward = bean.getPartReward();
                 }
-                partRes = R.string.income_participant;
+                notifyStr = ResourcesUtil.getText(notifyRes);
+                String rewardStr = FmtMicrometer.fmtFormat(String.valueOf(reward));
+                notifyStr = String.format(notifyStr, rewardStr);
             }
-            if(bean.getMinerReward() > 0){
-                String minerMsg = ResourcesUtil.getText(minerRes);
-                String reward = FmtMicrometer.fmtFormat(String.valueOf(bean.getMinerReward()));
-                minerMsg = String.format(minerMsg, reward);
-                NotifyManager.getInstance().sendBlockNotify(minerMsg);
-                Logger.d(minerMsg);
-            }
-            if(bean.getPartReward() > 0){
-                String partMsg = ResourcesUtil.getText(partRes);
-                String reward = FmtMicrometer.fmtFormat(String.valueOf(bean.getPartReward()));
-                partMsg = String.format(partMsg, reward);
-                NotifyManager.getInstance().sendBlockNotify(partMsg);
-                Logger.d(partMsg);
-            }
+            NotifyManager.getInstance().sendBlockNotify(notifyStr);
+            Logger.d(notifyStr);
         }
     }
 
@@ -368,20 +361,6 @@ public class MiningModel implements IMiningModel{
             if(list == null){
                 list = new ArrayList<>();
             }
-//            for (int i = 0; i < 20; i++) {
-//                MiningReward bean = new MiningReward();
-//                bean.setTxHash("4803d5a9e597f5a9c0a7c38365f428afd6e0b34a623f7903359e47a8e697e839");
-//                bean.setPartFee(1000);
-//                bean.setMinerFee(1000);
-//                if(i > 6){
-//                    bean.setMinerFee(1000);
-//                    bean.setPartFee(0);
-//                }else if(i > 3){
-//                    bean.setMinerFee(0);
-//                    bean.setPartFee(1000);
-//                }
-//                list.add(bean);
-//            }
             emitter.onNext(list);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

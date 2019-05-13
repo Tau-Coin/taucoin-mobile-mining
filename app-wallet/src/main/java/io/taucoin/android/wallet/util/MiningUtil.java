@@ -74,17 +74,12 @@ public class MiningUtil {
         if(rewards != null && rewards.size() > 0){
             for (MiningReward bean : rewards) {
                 try {
-                    if(bean.getMinerFee() == 0){
-                        partReward = partReward.add(new BigDecimal(bean.getPartFee()));
-                    }else{
-                        if(bean.getPartFee() > 0){
-                            reward.setPart(true);
-                            minerReward = minerReward.add(new BigDecimal(bean.getPartFee()));
-                        }
-                        minerReward = minerReward.add(new BigDecimal(bean.getMinerFee()));
-                    }
+                    partReward = partReward.add(new BigDecimal(bean.getPartFee()));
+                    minerReward = minerReward.add(new BigDecimal(bean.getMinerFee()));
                 }catch (Exception ignore){}
             }
+            long totalReward = partReward.add(minerReward).longValue();
+            reward.setTotalReward(totalReward);
             reward.setMinerReward(minerReward.longValue());
             reward.setPartReward(partReward.longValue());
         }

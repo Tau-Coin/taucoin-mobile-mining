@@ -115,7 +115,7 @@
     </string>
 
     <string name="permission_install_unknown_apk_note">
-        Please allow the installation of TAUcoin application permissions.
+        Please allow installation of TAUcoin.
     </string>
 
     <string name="home_mining_on">On</string>
@@ -156,9 +156,7 @@
     <string name="income_miner_participant">New block and transaction participation reward %s TAU.</string>
     <string name="income_participant">Transaction participation reward %s TAU.</string>
 
-    <string name="income_miner_rollback">[Rollback]New block reward %s TAU.</string>
-    <string name="income_miner_participant_rollback">[Rollback]New block and transaction participation reward %s TAU.</string>
-    <string name="income_participant_rollback">[Rollback]Transaction participation reward %s TAU.</string>
+    <string name="income_miner_rollback"> Blocks roll back.</string>
 
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>

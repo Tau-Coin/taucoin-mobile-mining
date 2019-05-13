@@ -2,16 +2,16 @@ package io.taucoin.android.wallet.module.bean;
 
 public class RewardBean{
 
-    private boolean isPart;
     private long minerReward;
     private long partReward;
+    private long totalReward;
 
-    public boolean isPart() {
-        return isPart;
+    public long getTotalReward() {
+        return totalReward;
     }
 
-    public void setPart(boolean part) {
-        isPart = part;
+    public void setTotalReward(long totalReward) {
+        this.totalReward = totalReward;
     }
 
     public long getMinerReward() {
