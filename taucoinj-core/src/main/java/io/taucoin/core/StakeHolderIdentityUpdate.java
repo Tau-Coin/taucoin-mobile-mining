@@ -43,6 +43,14 @@ public class StakeHolderIdentityUpdate {
         AccountState senderAccount = track.getAccountState(senderAddress);
         AccountState receiverAccount = track.getAccountState(receiverAddress);
 
+        logger.error("Sender:{}, witness address:{}", tx.getSender(), tx.getSenderWitnessAddress());
+        for(byte[] address : tx.getSenderAssociatedAddress()) {
+            logger.error("associate address:{}", address);
+        }
+        logger.error("Receiver:{}, witness address:{}", tx.getReceiveAddress(), tx.getReceiverWitnessAddress());
+        for(byte[] address : tx.getReceiverAssociatedAddress()) {
+            logger.error("associate address:{}", address);
+        }
         senderAccount.updateAssociatedAddress(tx.getSenderAssociatedAddress(), blockNumber);
         senderAccount.setWitnessAddress(tx.getSenderWitnessAddress());
         receiverAccount.updateAssociatedAddress(tx.getReceiverAssociatedAddress(), blockNumber);
