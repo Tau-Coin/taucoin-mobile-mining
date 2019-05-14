@@ -44,14 +44,22 @@ public class StakeHolderIdentityUpdate {
         AccountState senderAccount = track.getAccountState(senderAddress);
         AccountState receiverAccount = track.getAccountState(receiverAddress);
 
-        logger.error("Sender:{}, witness address:{}", Hex.toHexString(tx.getSender()),
-                Hex.toHexString(tx.getSenderWitnessAddress()));
-        for(byte[] address : tx.getSenderAssociatedAddress()) {
+        if (tx.getSenderWitnessAddress() != null) {
+            logger.error("Sender:{}, witness address:{}", Hex.toHexString(tx.getSender()),
+                    Hex.toHexString(tx.getSenderWitnessAddress()));
+        } else {
+            logger.error("Sender:{}, witness address is null!", Hex.toHexString(tx.getSender()));
+        }
+        for (byte[] address : tx.getSenderAssociatedAddress()) {
             logger.error("associate address:{}", Hex.toHexString(address));
         }
-        logger.error("Receiver:{}, witness address:{}", Hex.toHexString(tx.getReceiveAddress()),
-                Hex.toHexString(tx.getReceiverWitnessAddress()));
-        for(byte[] address : tx.getReceiverAssociatedAddress()) {
+        if (tx.getReceiverWitnessAddress() != null) {
+            logger.error("Receiver:{}, witness address:{}", Hex.toHexString(tx.getReceiveAddress()),
+                    Hex.toHexString(tx.getReceiverWitnessAddress()));
+        } else {
+            logger.error("Receiver:{}, witness address is null", Hex.toHexString(tx.getReceiveAddress()));
+        }
+        for (byte[] address : tx.getReceiverAssociatedAddress()) {
             logger.error("associate address:{}", Hex.toHexString(address));
         }
         senderAccount.updateAssociatedAddress(tx.getSenderAssociatedAddress(), blockNumber);
