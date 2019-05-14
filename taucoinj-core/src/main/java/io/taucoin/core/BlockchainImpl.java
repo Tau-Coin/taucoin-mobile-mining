@@ -789,7 +789,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 }
 
                 if (senderAssociateAddress != null && senderAssociateAddress.size()> 0) {
-                    logger.info("t111 is ====> {}",Hex.toHexString(senderAssociateAddress.get(0)));
                     tx.setSenderAssociatedAddress(senderAssociateAddress);
                 }
 
@@ -798,9 +797,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 }
 
                 tx.setIsCompositeTx(true);
-//                if (senderWitnessAddress != null || senderAssociateAddress != null) {
-//                    tx.setIsCompositeTx(true);
-//                }
             }
         }
     }
