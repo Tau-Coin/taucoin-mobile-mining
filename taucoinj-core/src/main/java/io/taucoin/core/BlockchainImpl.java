@@ -239,6 +239,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                             new StakeHolderIdentityUpdate(txs.get(i), cacheTrack, key.getAddress(), undoBlock.getNumber());
                     stakeHolderIdentityUpdate.rollbackStakeHolderIdentity();
                 }
+                cacheTrack.commit();
+                cacheTrack = track.startTracking();
                 for (int i = txs.size() - 1; i >= 0; i--) {
                     //roll back
                     TransactionExecutor executor = new TransactionExecutor(txs.get(i), cacheTrack, this, listener);

@@ -38,14 +38,14 @@ public class StakeHolderIdentityUpdate {
     public void rollbackStakeHolderIdentity(){
         tx.setIsCompositeTx(true);
         byte[] senderAddress = tx.getSender();
-        byte[] receiveAddress = tx.getReceiveAddress();
+        byte[] receiverAddress = tx.getReceiveAddress();
 
         AccountState senderAccount = track.getAccountState(senderAddress);
         AccountState receiveAccount = track.getAccountState(receiveAddress);
 
         senderAccount.updateAssociatedAddress(tx.getSenderAssociatedAddress(), blockNumber);
         senderAccount.setWitnessAddress(tx.getSenderWitnessAddress());
-        receiveAccount.updateAssociatedAddress(tx.getReceiverAssociatedAddress(), blockNumber);
-        receiveAccount.setWitnessAddress(tx.getReceiverWitnessAddress());
+        receiverAccount.updateAssociatedAddress(tx.getReceiverAssociatedAddress(), blockNumber);
+        receiverAccount.setWitnessAddress(tx.getReceiverWitnessAddress());
     }
 }
