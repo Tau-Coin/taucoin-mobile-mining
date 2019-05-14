@@ -262,10 +262,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 logger.info("Try to connect block, block number: {}, hash: {}",
                         newBlock.getNumber(), Hex.toHexString(newBlock.getHash()));
 
-                for (Transaction tx : newBlock.getTransactionsList()) {
-                    tx.setIsCompositeTx(false);
-                }
-
                 if (!isValid(newBlock, track)) {
                     isValid = false;
                     logger.info("Connect block fail! Cannot verify block, block number: {}, hash: {}",
