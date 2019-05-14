@@ -23,16 +23,16 @@ public class StakeHolderIdentityUpdate {
 
     public AssociatedAccount updateStakeHolderIdentity(){
         byte[] senderAddress = tx.getSender();
-        byte[] receiveAddress = tx.getReceiveAddress();
+        byte[] receiverAddress = tx.getReceiveAddress();
 
         AccountState senderAccount = track.getAccountState(senderAddress);
-        AccountState receiveAccount = track.getAccountState(receiveAddress);
+        AccountState receiverAccount = track.getAccountState(receiverAddress);
 
-        senderAccount.updateAssociatedAddress(receiveAddress, blockNumber);
+        senderAccount.updateAssociatedAddress(receiverAddress, blockNumber);
         senderAccount.setWitnessAddress(this.forgeAddress);
-        receiveAccount.updateAssociatedAddress(senderAddress, blockNumber);
-        receiveAccount.setWitnessAddress(this.forgeAddress);
-        return new AssociatedAccount(senderAddress,senderAccount,receiveAddress,receiveAccount);
+        receiverAccount.updateAssociatedAddress(senderAddress, blockNumber);
+        receiverAccount.setWitnessAddress(this.forgeAddress);
+        return new AssociatedAccount(senderAddress,senderAccount,receiverAddress,receiverAccount);
     }
 
     public void rollbackStakeHolderIdentity(){
@@ -41,7 +41,7 @@ public class StakeHolderIdentityUpdate {
         byte[] receiverAddress = tx.getReceiveAddress();
 
         AccountState senderAccount = track.getAccountState(senderAddress);
-        AccountState receiveAccount = track.getAccountState(receiveAddress);
+        AccountState receiverAccount = track.getAccountState(receiverAddress);
 
         senderAccount.updateAssociatedAddress(tx.getSenderAssociatedAddress(), blockNumber);
         senderAccount.setWitnessAddress(tx.getSenderWitnessAddress());
