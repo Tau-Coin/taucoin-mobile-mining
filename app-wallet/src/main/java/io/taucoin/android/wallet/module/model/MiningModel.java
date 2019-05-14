@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.model;
 
 import com.github.naturs.logger.Logger;
 
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
@@ -25,7 +26,6 @@ import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
-import io.taucoin.platform.adress.KeyManager;
 import org.spongycastle.util.encoders.Hex;
 
 import java.util.ArrayList;
@@ -124,7 +124,7 @@ public class MiningModel implements IMiningModel{
                 }
                 Block block = blockEvent.block;
 
-                saveMiningBlock(block, true);
+                saveMiningBlock(block, true, true);
             }
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -132,10 +132,10 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    private synchronized void saveMiningBlock(Block block, boolean isConnect) {
+    private synchronized void saveMiningBlock(Block block, boolean isConnect, boolean isNeedSync) {
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
-        String generatorPublicKey = KeyManager.signatureToKey(block);
+        String generatorPublicKey = Hex.toHexString(block.getGeneratorPublicKey());
         Logger.d("blockNo=" + blockNo);
         Logger.d("blockHash=" + blockHash);
         Logger.d("generatorPublicKey=" + generatorPublicKey);
@@ -167,11 +167,13 @@ public class MiningModel implements IMiningModel{
             }
         }
 
-        String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-        KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(currentPubicKey);
-        if(keyValue != null){
-            keyValue.setSyncBlockNum((int)block.getNumber());
-            KeyValueDaoUtils.getInstance().update(keyValue);
+        if(isNeedSync){
+            String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(currentPubicKey);
+            if(keyValue != null){
+                keyValue.setSyncBlockNum((int)block.getNumber());
+                KeyValueDaoUtils.getInstance().update(keyValue);
+            }
         }
     }
 
@@ -284,7 +286,7 @@ public class MiningModel implements IMiningModel{
                 if(block != null){
                     long blockNumber = block.getNumber();
                     updateSynchronizedBlockNum((int) blockNumber);
-                    saveMiningBlock(block, isConnect);
+                    saveMiningBlock(block, isConnect, MyApplication.getRemoteConnector().isSyncMe());
 
                     if(!isConnect){
                         String blockHash = Hex.toHexString(block.getHash());

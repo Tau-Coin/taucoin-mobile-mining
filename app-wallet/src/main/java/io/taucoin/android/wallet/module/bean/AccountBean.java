@@ -47,8 +47,12 @@ public class AccountBean {
         byte[] rlpEncoded = Hex.decode(accountInfo);
         RLPList decodedAccountList = RLP.decode2(rlpEncoded);
         RLPList account = (RLPList) decodedAccountList.get(0);
-        this.balance = new BigInteger(1, account.get(0).getRLPData());
-        this.power = new BigInteger(1, account.get(1).getRLPData());
+        if(account.get(0) != null && account.get(0).getRLPData() != null){
+            this.balance = new BigInteger(1, account.get(0).getRLPData());
+        }
+        if(account.get(1) != null && account.get(1).getRLPData() != null){
+            this.power = new BigInteger(1, account.get(1).getRLPData());
+        }
         this.parsed = true;
     }
 

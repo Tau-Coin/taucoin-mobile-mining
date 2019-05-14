@@ -14,12 +14,8 @@ import org.spongycastle.crypto.digests.RIPEMD160Digest;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-
-import io.taucoin.core.Block;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.platform.core.Base58;
-import io.taucoin.util.ByteUtil;
 
 import org.spongycastle.util.encoders.Hex;
 
@@ -35,17 +31,6 @@ public class KeyManager {
 
         }
         return privateKey;
-    }
-
-    public static String signatureToKey(Block block){
-        byte[] bytesKey = ByteUtil.intToBytes(0);
-        try {
-            io.taucoin.crypto.ECKey key = io.taucoin.crypto.ECKey.signatureToKey(block.getRawHash(), block.getblockSignature().toBase64());
-            bytesKey = key.getCompressedPubKey();
-        }catch(Exception e){
-            Logger.e(e, "signatureToKey is error");
-        }
-        return Hex.toHexString(bytesKey);
     }
 
     public static Key generatorKey(){
