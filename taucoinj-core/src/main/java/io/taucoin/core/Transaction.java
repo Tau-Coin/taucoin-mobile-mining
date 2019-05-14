@@ -6,6 +6,7 @@ import io.taucoin.crypto.ECKey.MissingPrivateKeyException;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.RLP;
+import io.taucoin.util.RLPElement;
 import io.taucoin.util.RLPList;
 
 import org.slf4j.Logger;
@@ -72,9 +73,9 @@ public class Transaction {
     /**
      *account address that forger who confirm this last state change.
      */
-    private byte[] senderWitnessAddress;
+    private byte[] senderWitnessAddress = null;
 
-    private byte[] receiverWitnessAddress;
+    private byte[] receiverWitnessAddress = null;
 
     /**
      *account address that associated to last account state change.
@@ -282,13 +283,13 @@ public class Transaction {
             this.receiverWitnessAddress = transaction.get(8).getRLPData();
 
             RLPList senderList = (RLPList) transaction.get(9);
-            for(int i=0;i < senderList.size();++i) {
-                this.senderAssociatedAddress.add(senderList.get(i).getRLPData());
+            for (RLPElement senderAssociate : senderList) {
+                this.senderAssociatedAddress.add(senderAssociate.getRLPData());
             }
 
-            RLPList reveiverList = (RLPList) transaction.get(10);
-            for(int i=0;i < reveiverList.size();++i) {
-                this.receiverAssociatedAddress.add(reveiverList.get(i).getRLPData());
+            RLPList receiverList = (RLPList) transaction.get(10);
+            for (RLPElement receiverAssociate : receiverList) {
+                this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
             }
 
             // only parse signature in case tx is signed

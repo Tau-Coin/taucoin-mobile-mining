@@ -405,6 +405,17 @@ public class Block {
         return option;
     }
 
+    private byte[] getFullTransactionsEncoded() {
+
+        byte[][] transactionsEncoded = new byte[transactionsList.size()][];
+        int i = 0;
+        for (Transaction tx : transactionsList) {
+            transactionsEncoded[i] = tx.getEncodedComposite();
+            ++i;
+        }
+        return RLP.encodeList(transactionsEncoded);
+    }
+
     private byte[] getTransactionsEncoded() {
 
         byte[][] transactionsEncoded = new byte[transactionsList.size()][];
@@ -541,7 +552,7 @@ public class Block {
         byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);
         byte[] forgerpubkey = RLP.encodeElement(this.forgerPubkey);
         byte[] option = getOptionEncoded();
-        byte[] transactions = getTransactionsEncoded();
+        byte[] transactions = getFullTransactionsEncoded();
 
         List<byte[]> body = new ArrayList<>();
         body.add(number);

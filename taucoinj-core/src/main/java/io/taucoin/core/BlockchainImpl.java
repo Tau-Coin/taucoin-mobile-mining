@@ -262,6 +262,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 logger.info("Try to connect block, block number: {}, hash: {}",
                         newBlock.getNumber(), Hex.toHexString(newBlock.getHash()));
 
+                for (Transaction tx : newBlock.getTransactionsList()) {
+                    tx.setIsCompositeTx(false);
+                }
+
                 if (!isValid(newBlock, track)) {
                     isValid = false;
                     logger.info("Connect block fail! Cannot verify block, block number: {}, hash: {}",
@@ -381,37 +385,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
             // retry of well known block
             return EXIST;
-        }
-
-        for (Transaction tr : block.getTransactionsList()) {
-            if(tr.getSender() != null) {
-                logger.info("tx sender address is ====> {}",Hex.toHexString(tr.getSender()));
-                logger.info("is sender account empty ====> {}",track.getAccountState(tr.getSender()) == null);
-                byte[] senderWitnessAddress = track.getAccountState(tr.getSender()).getWitnessAddress();
-                ArrayList<byte[]> senderAssociateAddress = track.getAccountState(tr.getSender()).getAssociatedAddress();
-                byte[] receiverWitnessAddress = track.getAccountState(tr.getReceiveAddress()).getWitnessAddress();
-                ArrayList<byte[]> receiverAssociateAddress = track.getAccountState(tr.getReceiveAddress()).getAssociatedAddress();
-
-                if (senderWitnessAddress != null) {
-                    tr.setSenderWitnessAddress(senderWitnessAddress);
-                }
-
-                if (receiverWitnessAddress != null) {
-                    tr.setReceiverWitnessAddress(receiverWitnessAddress);
-                }
-
-                if (senderAssociateAddress != null) {
-                    tr.setSenderAssociatedAddress(senderAssociateAddress);
-                }
-
-                if (receiverAssociateAddress != null) {
-                    tr.setReceiverAssociatedAddress(receiverAssociateAddress);
-                }
-
-                if (senderWitnessAddress != null || senderAssociateAddress != null) {
-                    tr.setIsCompositeTx(true);
-                }
-            }
         }
 
         // The simple case got the block
@@ -799,9 +772,45 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return true;
     }
 
+    private void wrapBlockTransactions(Block block, Repository repo) {
+        for (Transaction tx : block.getTransactionsList()) {
+            tx.setIsCompositeTx(false);
+            if(tx.getSender() != null) {
+                logger.info("tx sender address is ====> {}",Hex.toHexString(tx.getSender()));
+                logger.info("is sender account empty ====> {}",repo.getAccountState(tx.getSender()) == null);
+                byte[] senderWitnessAddress = repo.getAccountState(tx.getSender()).getWitnessAddress();
+                ArrayList<byte[]> senderAssociateAddress = repo.getAccountState(tx.getSender()).getAssociatedAddress();
+                byte[] receiverWitnessAddress = repo.getAccountState(tx.getReceiveAddress()).getWitnessAddress();
+                ArrayList<byte[]> receiverAssociateAddress = repo.getAccountState(tx.getReceiveAddress()).getAssociatedAddress();
+                if (senderWitnessAddress != null) {
+                    tx.setSenderWitnessAddress(senderWitnessAddress);
+                }
+
+                if (receiverWitnessAddress != null) {
+                    tx.setReceiverWitnessAddress(receiverWitnessAddress);
+                }
+
+                if (senderAssociateAddress != null) {
+                    tx.setSenderAssociatedAddress(senderAssociateAddress);
+                }
+
+                if (receiverAssociateAddress != null) {
+                    tx.setReceiverAssociatedAddress(receiverAssociateAddress);
+                }
+
+                tx.setIsCompositeTx(true);
+//                if (senderWitnessAddress != null || senderAssociateAddress != null) {
+//                    tx.setIsCompositeTx(true);
+//                }
+            }
+        }
+    }
+
     private boolean processBlock(Block block, Repository repo) {
 
         if (!block.isGenesis()) {
+            wrapBlockTransactions(block, repo);
+
             if (!config.blockChainOnly()) {
 //                wallet.addTransactions(block.getTransactionsList());
                 return applyBlock(block, repo);
