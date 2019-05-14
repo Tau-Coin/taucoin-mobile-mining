@@ -421,13 +421,8 @@ public class Block {
         byte[][] transactionsEncoded = new byte[transactionsList.size()][];
         int i = 0;
         for (Transaction tx : transactionsList) {
-            if (!tx.isCompositeTx()) {
-               transactionsEncoded[i] = tx.getEncoded();
-               ++i;
-            } else {
-                transactionsEncoded[i] = tx.getEncodedComposite();
-                ++i;
-            }
+           transactionsEncoded[i] = tx.getEncoded();
+           ++i;
         }
         return RLP.encodeList(transactionsEncoded);
     }
