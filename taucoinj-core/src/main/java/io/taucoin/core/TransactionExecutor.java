@@ -249,25 +249,25 @@ public class TransactionExecutor {
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
         logger.info("Tx sender is "+Hex.toHexString(tx.getSender()));
         track.addBalance(tx.getSender(), totalCost);
-        logger.error("0------address:{}, value:{}", tx.getSender(), totalCost);
+        logger.error("0------address:{}, value:{}", Hex.toHexString(tx.getSender()), totalCost);
 
         // Subtract receiver balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
-        logger.error("1------address:{}, value:{}", tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
+        logger.error("1------address:{}, value:{}", Hex.toHexString(tx.getReceiveAddress()), toBI(tx.getAmount()).negate());
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
 
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()).negate());
-            logger.error("2------address:{}, value:{}", coinbase, toBI(feeDistributor.getCurrentWitFee()).negate());
+            logger.error("2------address:{}, value:{}", Hex.toHexString(coinbase), toBI(feeDistributor.getCurrentWitFee()).negate());
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
                 // Transfer fees to last witness
                 track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
                         toBI(feeDistributor.getLastWitFee()).negate());
-                logger.error("3------address:{}, value:{}", track.getAccountState(tx.getSender()).getWitnessAddress(),
+                logger.error("3------address:{}, value:{}", Hex.toHexString(track.getAccountState(tx.getSender()).getWitnessAddress()),
                         toBI(feeDistributor.getLastWitFee()).negate());
             }
 
@@ -286,12 +286,12 @@ public class TransactionExecutor {
 //                                                                track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),i);
                             track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
                                     toBI(assDistributor.getAverageShare()).negate());
-                            logger.error("4------address:{}, value:{}", track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                            logger.error("4------address:{}, value:{}", Hex.toHexString(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),
                                     toBI(assDistributor.getAverageShare()).negate());
                         } else {
                             track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
                                     toBI(assDistributor.getLastShare()).negate());
-                            logger.error("5------address:{}, value:{}", track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
+                            logger.error("5------address:{}, value:{}", Hex.toHexString(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),
                                     toBI(assDistributor.getLastShare()).negate());
                         }
                     }
@@ -305,7 +305,7 @@ public class TransactionExecutor {
                 // Transfer fees to last witness
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastWitFee()).negate());
-                logger.error("6------address:{}, value:{}", coinbase,
+                logger.error("6------address:{}, value:{}", Hex.toHexString(coinbase),
                         toBI(feeDistributor.getLastWitFee()).negate());
             }
 
@@ -313,7 +313,7 @@ public class TransactionExecutor {
                 // Transfer fees to last associate
                 track.addBalance(coinbase,
                         toBI(feeDistributor.getLastAssociFee()).negate());
-                logger.error("7------address:{}, value:{}", coinbase,
+                logger.error("7------address:{}, value:{}", Hex.toHexString(coinbase),
                         toBI(feeDistributor.getLastAssociFee()).negate());
             }
         }

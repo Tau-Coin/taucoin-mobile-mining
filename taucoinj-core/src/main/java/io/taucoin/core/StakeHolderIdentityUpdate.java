@@ -35,7 +35,7 @@ public class StakeHolderIdentityUpdate {
         return new AssociatedAccount(senderAddress,senderAccount,receiverAddress,receiverAccount);
     }
 
-    public void rollbackStakeHolderIdentity(){
+    public void rollbackStakeHolderIdentity() {
         tx.setIsCompositeTx(true);
         byte[] senderAddress = tx.getSender();
         byte[] receiverAddress = tx.getReceiveAddress();
@@ -43,13 +43,15 @@ public class StakeHolderIdentityUpdate {
         AccountState senderAccount = track.getAccountState(senderAddress);
         AccountState receiverAccount = track.getAccountState(receiverAddress);
 
-        logger.error("Sender:{}, witness address:{}", tx.getSender(), tx.getSenderWitnessAddress());
+        logger.error("Sender:{}, witness address:{}", Hex.toHexString(tx.getSender()),
+                Hex.toHexString(tx.getSenderWitnessAddress()));
         for(byte[] address : tx.getSenderAssociatedAddress()) {
-            logger.error("associate address:{}", address);
+            logger.error("associate address:{}", Hex.toHexString(address));
         }
-        logger.error("Receiver:{}, witness address:{}", tx.getReceiveAddress(), tx.getReceiverWitnessAddress());
+        logger.error("Receiver:{}, witness address:{}", Hex.toHexString(tx.getReceiveAddress()),
+                Hex.toHexString(tx.getReceiverWitnessAddress()));
         for(byte[] address : tx.getReceiverAssociatedAddress()) {
-            logger.error("associate address:{}", address);
+            logger.error("associate address:{}", Hex.toHexString(address));
         }
         senderAccount.updateAssociatedAddress(tx.getSenderAssociatedAddress(), blockNumber);
         senderAccount.setWitnessAddress(tx.getSenderWitnessAddress());
