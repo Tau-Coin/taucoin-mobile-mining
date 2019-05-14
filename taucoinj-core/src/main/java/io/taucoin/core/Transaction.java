@@ -204,11 +204,13 @@ public class Transaction {
     }
 
     public void setSenderAssociatedAddress(ArrayList<byte[]> senderAssociatedAddress) {
-                this.senderAssociatedAddress = senderAssociatedAddress;
+        this.senderAssociatedAddress.clear();
+        this.senderAssociatedAddress.addAll(senderAssociatedAddress);
     }
 
     public void setReceiverAssociatedAddress(ArrayList<byte[]> receiverAssociatedAddress) {
-        this.receiverAssociatedAddress = receiverAssociatedAddress;
+        this.receiverAssociatedAddress.clear();
+        this.receiverAssociatedAddress.addAll(receiverAssociatedAddress);
     }
 
     public byte[] getSenderWitnessAddress() {

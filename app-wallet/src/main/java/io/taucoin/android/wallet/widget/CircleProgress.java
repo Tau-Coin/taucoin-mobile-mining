@@ -24,9 +24,9 @@ public class CircleProgress extends View {
 
     // Ring color
     private static int[] doughnutColors = new int[]{
-            Color.argb(MAX_ALPHA, RED, GREEN, BLUE),
             Color.argb(MIN_ALPHA, RED, GREEN, BLUE),
-            Color.argb(MIN_ALPHA, RED, GREEN, BLUE)};
+            Color.argb(MIN_ALPHA, RED, GREEN, BLUE),
+            Color.argb(MAX_ALPHA, RED, GREEN, BLUE)};
 
     private Paint paint = new Paint();
     private float width;
@@ -91,23 +91,19 @@ public class CircleProgress extends View {
     private void init(){
         circleWidth = dp2px(getContext(), 8);
         sweepGradient = new SweepGradient(0, 0, doughnutColors, null);
-//        ThreadPool.getThreadPool().execute
-        new Thread(){
-            @Override
-            public void run() {
-                while(isLoading){
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    postInvalidate();
+        ThreadPool.getThreadPool().execute(() -> {
+            while(isLoading){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                if(!isLoading){
-                    postInvalidate();
-                }
+                postInvalidate();
             }
-        }.start();
+            if(!isLoading){
+                postInvalidate();
+            }
+        });
     }
 
     private void resetParams() {
@@ -146,7 +142,7 @@ public class CircleProgress extends View {
 //        }
         if(isLoading){
             // Turn around
-            canvas.rotate(-currentAngle, 0, 0);
+            canvas.rotate(currentAngle, 0, 0);
             if (currentAngle >= 360f){
                 currentAngle = currentAngle - 360f;
             } else{
