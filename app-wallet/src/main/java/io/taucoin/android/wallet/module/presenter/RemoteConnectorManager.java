@@ -202,7 +202,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         BlockForgeExceptionStopEvent exceptionStop = data.getParcelable("data");
                         logMessage = "Block forged internal " + exceptionStop.getMsg();
                         addLogEntry(time, logMessage);
-                        if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4){
+                        if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4 || exceptionStop.getCode() == 11){
                             mExceptionStop = exceptionStop;
                             messageEvent = new MessageEvent();
                             messageEvent.setCode(MessageEvent.EventCode.MINING_STATE);

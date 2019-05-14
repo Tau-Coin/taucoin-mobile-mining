@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import org.spongycastle.util.encoders.Hex;
+
 import io.taucoin.android.wallet.R;
 
 import io.taucoin.android.wallet.util.ResourcesUtil;
-import io.taucoin.platform.adress.KeyManager;
 import java.util.List;
 
 import butterknife.BindView;
@@ -54,7 +55,7 @@ public class BlockDetailActivity extends BaseActivity {
         if(blockEvent != null && blockEvent.block != null){
             Block blockBean = blockEvent.block;
 
-            publicKey = KeyManager.signatureToKey(blockBean);
+            publicKey = Hex.toHexString(blockBean.getGeneratorPublicKey());
 
             tvMiner.setRightText(publicKey);
             List<Transaction> txList = blockBean.getTransactionsList();
