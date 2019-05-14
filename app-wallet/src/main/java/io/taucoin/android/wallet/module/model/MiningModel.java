@@ -136,9 +136,9 @@ public class MiningModel implements IMiningModel{
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
         String generatorPublicKey = Hex.toHexString(block.getGeneratorPublicKey());
-        Logger.d("blockNo=" + blockNo);
-        Logger.d("blockHash=" + blockHash);
-        Logger.d("generatorPublicKey=" + generatorPublicKey);
+//        Logger.d("blockNo=" + blockNo);
+//        Logger.d("blockHash=" + blockHash);
+//        Logger.d("generatorPublicKey=" + generatorPublicKey);
         String pubicKey = KeyValueDaoUtils.getInstance().querySignatureKey(generatorPublicKey);
         if(StringUtil.isNotEmpty(pubicKey)){
             MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
@@ -200,13 +200,13 @@ public class MiningModel implements IMiningModel{
         String txHash = Hex.toHexString(outCome.getTxid());
         String formAddress = Hex.toHexString(outCome.getSenderAddress());
         String toAddress = Hex.toHexString(outCome.getReceiveAddress());
-        Logger.i("*****************************");
-        Logger.i("txHash=" + txHash);
-        Logger.i("form=" + formAddress + "\tto=" +toAddress);
+//        Logger.i("*****************************");
+//        Logger.i("txHash=" + txHash);
+//        Logger.i("form=" + formAddress + "\tto=" +toAddress);
         for (Map.Entry<byte[], Long> entry : addressMap.entrySet()) {
             String rewardAddress = Hex.toHexString(entry.getKey());
             long rewardFee = entry.getValue();
-            Logger.i("reward=" + rewardAddress + "\t," + rewardFee);
+//            Logger.i("reward=" + rewardAddress + "\t," + rewardFee);
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByRawAddress(rewardAddress);
             // Update data for all local private keys
             if (keyValue != null) {
