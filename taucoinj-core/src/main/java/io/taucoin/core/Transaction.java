@@ -105,12 +105,15 @@ public class Transaction {
         parsed = false;
     }
     public Transaction(byte[] rawData ,boolean isComposite) {
+        this.isCompositeTx = isComposite;
         if (!isComposite) {
             this.rlpEncoded = rawData;
         } else {
             this.rlpEncodedComposite = rawData;
+            rlpParse();
+            this.rlpEncoded = this.getEncoded();
         }
-        this.isCompositeTx = isComposite;
+
         parsed = false;
     }
 
