@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,7 @@ import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
 import io.taucoin.android.wallet.module.view.main.iview.IMainView;
+import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.util.ActivityManager;
@@ -144,8 +147,18 @@ public class MainActivity extends BaseActivity implements IMainView {
         TxService.stopService();
         UpgradeService.stopUpdateService();
         MyApplication.getRemoteConnector().cancelRemoteProgress();
-        android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(0);
+
+        // wait service destroy
+        Observable.timer(300, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new CommonObserver<Long>() {
+
+                @Override
+                public void onComplete() {
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                }
+            });
     }
 
     @Override

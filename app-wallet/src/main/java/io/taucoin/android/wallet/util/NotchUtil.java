@@ -93,12 +93,7 @@ public class NotchUtil {
                 Method get = HwNotchSizeUtil.getMethod("hasNotchInScreen");
                 ret = (boolean) get.invoke(HwNotchSizeUtil);
             }
-        } catch (ClassNotFoundException e) {
-            Logger.e("test", "hasNotchInScreen ClassNotFoundException");
-        } catch (NoSuchMethodException e) {
-            Logger.e("test", "hasNotchInScreen NoSuchMethodException");
-        } catch (Exception e) {
-            Logger.e("test", "hasNotchInScreen Exception");
+        }  catch (Exception ignore) {
         }
         return ret;
     }
@@ -111,12 +106,7 @@ public class NotchUtil {
             Class HwNotchSizeUtil = cl.loadClass("com.huawei.android.util.HwNotchSizeUtil");
             Method get = HwNotchSizeUtil.getMethod("getNotchSize");
             ret = (int[]) get.invoke(HwNotchSizeUtil);
-        } catch (ClassNotFoundException e) {
-            Logger.e("test", "getNotchSize ClassNotFoundException");
-        } catch (NoSuchMethodException e) {
-            Logger.e("test", "getNotchSize NoSuchMethodException");
-        } catch (Exception e) {
-            Logger.e("test", "getNotchSize Exception");
+        } catch (Exception ignore) {
         }
         return ret[1];
     }
