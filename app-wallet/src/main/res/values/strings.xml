@@ -38,6 +38,7 @@
         \'+\' represents income,\n
         \'-\' represents payout
     </string>
+    <string name="tx_hash_copy">TX hash copied</string>
     <string name="tx_address_copy">Address copied</string>
     <string name="tx_id_copy">Transaction ID copied</string>
 

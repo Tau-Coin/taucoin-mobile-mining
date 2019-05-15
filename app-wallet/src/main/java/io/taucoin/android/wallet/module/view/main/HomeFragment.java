@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,7 +22,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnItemClick;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
@@ -134,14 +132,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             default:
                 break;
         }
-    }
-
-    @OnItemClick(R.id.list_view_mining_tx)
-    void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        String txId = mMiningRewardAdapter.getTxHash(position);
-        String tauExplorerTxUr = TransmitKey.ExternalUrl.TAU_EXPLORER_TX_URL;
-        tauExplorerTxUr += txId;
-        ActivityUtil.openUri(view.getContext(), tauExplorerTxUr);
     }
 
     private void starOrStopMining(boolean isNotice) {

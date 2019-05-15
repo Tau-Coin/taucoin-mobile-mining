@@ -1,19 +1,27 @@
 package io.taucoin.android.wallet.module.view.main;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.taucoin.android.wallet.R;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.MiningReward;
+import io.taucoin.android.wallet.util.ActivityUtil;
+import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.foundation.util.DimensionsUtil;
+import io.taucoin.foundation.util.StringUtil;
 
 public class MiningRewardAdapter extends BaseAdapter {
 
@@ -73,8 +81,38 @@ public class MiningRewardAdapter extends BaseAdapter {
             reStatus = R.string.home_mining_miner;
         }
         viewHolder.tvStatus.setText(reStatus);
+
+        convertView.setOnTouchListener((v, event) -> {
+            if(event.getAction() == MotionEvent.ACTION_UP && clickDownTime > 0){
+                long currentTime = new Date().getTime();
+                long delayTime = currentTime - clickDownTime;
+                if(delayTime < 300){
+                    String txId = getTxHash(position);
+                    String tauExplorerTxUr = TransmitKey.ExternalUrl.TAU_EXPLORER_TX_URL;
+                    tauExplorerTxUr += txId;
+                    ActivityUtil.openUri(v.getContext(), tauExplorerTxUr);
+                }else{
+                    int tvHashWidth = viewHolder.tvHash.getWidth() + DimensionsUtil.dip2px(v.getContext(), 15);
+                    if(tvHashWidth >= event.getX()){
+                        if(StringUtil.isNotEmpty(bean.getTxHash())){
+                            CopyManager.copyText(bean.getTxHash());
+                            ToastUtils.showShortToast(R.string.tx_hash_copy);
+                        }
+                    }
+                }
+                clickDownTime = 0;
+            }else if(event.getAction() == MotionEvent.ACTION_OUTSIDE ||
+                    event.getAction() == MotionEvent.ACTION_CANCEL){
+                clickDownTime = 0;
+            }else if(event.getAction() == MotionEvent.ACTION_DOWN){
+                clickDownTime = new Date().getTime();
+            }
+            return true;
+        });
         return convertView;
     }
+
+    private long clickDownTime = 0;
 
     class ViewHolder {
         @BindView(R.id.tv_hash)
