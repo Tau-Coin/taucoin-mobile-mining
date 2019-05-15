@@ -28,6 +28,7 @@ import io.taucoin.android.wallet.widget.ToolbarView;
 import io.taucoin.core.Block;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.platform.adress.KeyManager;
 
 public class BlockDetailActivity extends BaseActivity {
 
@@ -41,7 +42,7 @@ public class BlockDetailActivity extends BaseActivity {
     ItemTextView tvTotalTransaction;
 
     private BlockEventData blockEvent;
-    private String publicKey;
+    private String address;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +56,10 @@ public class BlockDetailActivity extends BaseActivity {
         if(blockEvent != null && blockEvent.block != null){
             Block blockBean = blockEvent.block;
 
-            publicKey = Hex.toHexString(blockBean.getGeneratorPublicKey());
+            String publicKey = Hex.toHexString(blockBean.getGeneratorPublicKey());
+            address = KeyManager.generatorAddress(publicKey);
+            tvMiner.setRightText(address);
 
-            tvMiner.setRightText(publicKey);
             List<Transaction> txList = blockBean.getTransactionsList();
             if(txList != null){
                 tvTotalTransaction.setRightText(txList.size());
@@ -74,8 +76,8 @@ public class BlockDetailActivity extends BaseActivity {
 
     @OnLongClick({R.id.tv_miner})
     boolean copyData(View view) {
-        if(StringUtil.isNotEmpty(publicKey)){
-            CopyManager.copyText(publicKey);
+        if(StringUtil.isNotEmpty(address)){
+            CopyManager.copyText(address);
             ToastUtils.showShortToast(R.string.tx_address_copy);
         }
         return false;

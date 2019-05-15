@@ -139,7 +139,7 @@
     <string name="block_list_all">ALL</string>
     <string name="block_list_me">ME</string>
     <string name="block_no">Block No.%d</string>
-    <string name="block_mining_income">Mining Income</string>
+    <string name="block_mining_income">Total Transaction Fee</string>
     <string name="block_miner">Miner</string>
     <string name="block_total_transaction">Total Transaction</string>
     <string name="block_transaction">Transaction</string>

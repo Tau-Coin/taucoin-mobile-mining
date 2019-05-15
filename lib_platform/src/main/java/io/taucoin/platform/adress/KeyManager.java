@@ -85,7 +85,7 @@ public class KeyManager {
         return Hex.toHexString(rawAddress).toLowerCase();
     }
 
-    private static String generatorAddress(String compressedPk) {
+    public static String generatorAddress(String compressedPk) {
         // We now need to perform a SHA-256 digest on the public key,
         // followed by a RIPEMD-160 digest.
         byte[] s1 = null;
