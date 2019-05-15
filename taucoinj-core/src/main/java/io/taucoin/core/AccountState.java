@@ -135,8 +135,8 @@ public class AccountState implements Serializable {
             this.stateHeight = stateHeight;
         }
         for (int i=0; i <this.associatedAddress.size();++i) {
-            log.info("At state height {} address {} index {}",
-                    this.stateHeight,Hex.toHexString(this.associatedAddress.get(i)),i);
+//            log.info("At state height {} address {} index {}",
+//                    this.stateHeight,Hex.toHexString(this.associatedAddress.get(i)),i);
         }
     }
 

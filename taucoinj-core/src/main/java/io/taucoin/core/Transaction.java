@@ -247,7 +247,7 @@ public class Transaction {
         if (!isCompositeTx) {
             RLPList decodedTxList = RLP.decode2(rlpEncoded);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            logger.info("pure transaction item size is {}", transaction.size());
+            //logger.info("pure transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
@@ -271,7 +271,7 @@ public class Transaction {
         } else {
             RLPList decodedTxList = RLP.decode2(rlpEncodedComposite);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            logger.info("composite transaction item size is {}", transaction.size());
+            //logger.info("composite transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);

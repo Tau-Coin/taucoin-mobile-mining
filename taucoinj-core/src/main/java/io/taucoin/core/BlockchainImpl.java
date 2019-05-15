@@ -773,8 +773,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         for (Transaction tx : block.getTransactionsList()) {
             tx.setIsCompositeTx(false);
             if(tx.getSender() != null) {
-                logger.info("tx sender address is ====> {}",Hex.toHexString(tx.getSender()));
-                logger.info("is sender account empty ====> {}",repo.getAccountState(tx.getSender()) == null);
+//                logger.info("tx sender address is ====> {}",Hex.toHexString(tx.getSender()));
+//                logger.info("is sender account empty ====> {}",repo.getAccountState(tx.getSender()) == null);
                 byte[] senderWitnessAddress = repo.getAccountState(tx.getSender()).getWitnessAddress();
                 ArrayList<byte[]> senderAssociateAddress = repo.getAccountState(tx.getSender()).getAssociatedAddress();
                 byte[] receiverWitnessAddress = repo.getAccountState(tx.getReceiveAddress()).getWitnessAddress();
