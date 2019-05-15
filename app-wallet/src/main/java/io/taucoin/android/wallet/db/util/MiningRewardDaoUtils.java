@@ -15,6 +15,8 @@
  */
 package io.taucoin.android.wallet.db.util;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
 import io.taucoin.android.wallet.base.TransmitKey;
@@ -49,21 +51,24 @@ public class MiningRewardDaoUtils {
 
 
     public List<MiningReward> queryData(int pageNo, String time, String rawAddress) {
-        return getMiningRewardDao().queryBuilder()
-                .where(MiningRewardDao.Properties.Time.lt(time),
-                    MiningRewardDao.Properties.Address.eq(rawAddress),
-                    MiningRewardDao.Properties.Valid.eq(1))
-                .orderDesc(MiningRewardDao.Properties.Time)
-                .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE)
-                .list();
+        QueryBuilder<MiningReward> qb = getMiningRewardDao().queryBuilder();
+        qb.where(MiningRewardDao.Properties.Time.lt(time),
+            MiningRewardDao.Properties.Address.eq(rawAddress),
+            MiningRewardDao.Properties.Valid.eq(1),
+            qb.or(MiningRewardDao.Properties.MinerFee.gt(0),
+                    MiningRewardDao.Properties.PartFee.gt(0)))
+            .orderDesc(MiningRewardDao.Properties.Time)
+            .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
+        return qb.list();
     }
 
     public List<MiningReward> queryData(String rawAddress) {
-        return getMiningRewardDao().queryBuilder()
-            .where(MiningRewardDao.Properties.Address.eq(rawAddress),
-                    MiningRewardDao.Properties.Valid.eq(1))
-            .orderDesc(MiningRewardDao.Properties.Time)
-            .list();
+        QueryBuilder<MiningReward> qb = getMiningRewardDao().queryBuilder();
+        qb.where(MiningRewardDao.Properties.Address.eq(rawAddress),
+                MiningRewardDao.Properties.Valid.eq(1),
+                qb.or(MiningRewardDao.Properties.MinerFee.gt(0),
+                    MiningRewardDao.Properties.PartFee.gt(0)));
+        return qb.list();
     }
 
     public synchronized boolean insertOrReplace(MiningReward miningReward) {
