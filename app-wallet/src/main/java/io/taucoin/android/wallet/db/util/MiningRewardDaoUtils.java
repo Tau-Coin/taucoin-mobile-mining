@@ -58,6 +58,14 @@ public class MiningRewardDaoUtils {
                 .list();
     }
 
+    public List<MiningReward> queryData(String rawAddress) {
+        return getMiningRewardDao().queryBuilder()
+            .where(MiningRewardDao.Properties.Address.eq(rawAddress),
+                    MiningRewardDao.Properties.Valid.eq(1))
+            .orderDesc(MiningRewardDao.Properties.Time)
+            .list();
+    }
+
     public synchronized boolean insertOrReplace(MiningReward miningReward) {
         long result = getMiningRewardDao().insertOrReplace(miningReward);
         return result > -1;

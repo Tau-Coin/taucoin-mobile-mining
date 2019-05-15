@@ -34,6 +34,7 @@ import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
+import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.RewardBean;
@@ -156,5 +157,24 @@ public class MiningUtil {
             }
         }
         return pendingAmount.longValue();
+    }
+
+    public static void setMiningIncome(TextView tvMiningIncome) {
+        Observable.create((ObservableOnSubscribe<List<MiningReward>>) emitter -> {
+            String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
+            List<MiningReward> miningRewards = MiningRewardDaoUtils.getInstance().queryData(rawAddress);
+            emitter.onNext(miningRewards);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<List<MiningReward>>() {
+                @Override
+                public void handleData(List<MiningReward> miningRewards) {
+                    if(tvMiningIncome != null){
+                        String miningIncome = MiningUtil.parseMiningIncome(miningRewards);
+                        tvMiningIncome.setText(miningIncome);
+                        Logger.d("MiningUtil.setMiningIncome=" + miningIncome);
+                    }
+                }
+            });
     }
 }

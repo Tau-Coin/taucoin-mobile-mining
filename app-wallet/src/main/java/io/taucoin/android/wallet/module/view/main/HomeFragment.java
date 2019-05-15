@@ -196,7 +196,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 starOrStopMining(true);
                 break;
             case MINING_REWARD:
-                handleMiningRewardView();
+                onRefresh(null);
                 break;
             default:
                 break;
@@ -294,8 +294,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     @Override
     public void handleMiningRewardView(List<MiningReward> miningRewards){
-        String miningIncome = MiningUtil.parseMiningIncome(miningRewards);
-        tvMiningIncome.setText(miningIncome);
+        MiningUtil.setMiningIncome(tvMiningIncome);
 
         int tag = StringUtil.getIntTag(tvMiningTransaction);
         if(tag == 1){
