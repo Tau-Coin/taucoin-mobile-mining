@@ -1,5 +1,6 @@
 package io.taucoin.android.wallet.module.view.main;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +23,7 @@ import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.util.DimensionsUtil;
 import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.foundation.util.ThreadPool;
 
 public class MiningRewardAdapter extends BaseAdapter {
 
@@ -35,13 +37,6 @@ public class MiningRewardAdapter extends BaseAdapter {
             list.addAll(data);
         }
         notifyDataSetChanged();
-    }
-
-    String getTxHash(int pos) {
-        if(pos < 0 || pos > getCount()){
-            return "";
-        }
-        return list.get(pos).getTxHash();
     }
 
     @Override
@@ -82,37 +77,53 @@ public class MiningRewardAdapter extends BaseAdapter {
         }
         viewHolder.tvStatus.setText(reStatus);
 
+        handleMiningRewardEvent(convertView, viewHolder, bean);
+        return convertView;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void handleMiningRewardEvent(View convertView, ViewHolder viewHolder, MiningReward bean) {
         convertView.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_UP && clickDownTime > 0){
                 long currentTime = new Date().getTime();
                 long delayTime = currentTime - clickDownTime;
-                if(delayTime < 300){
-                    String txId = getTxHash(position);
+                if(delayTime < longClickTime){
+                    String txId = bean.getTxHash();
                     String tauExplorerTxUr = TransmitKey.ExternalUrl.TAU_EXPLORER_TX_URL;
                     tauExplorerTxUr += txId;
                     ActivityUtil.openUri(v.getContext(), tauExplorerTxUr);
-                }else{
-                    int tvHashWidth = viewHolder.tvHash.getWidth() + DimensionsUtil.dip2px(v.getContext(), 15);
-                    if(tvHashWidth >= event.getX()){
-                        if(StringUtil.isNotEmpty(bean.getTxHash())){
-                            CopyManager.copyText(bean.getTxHash());
-                            ToastUtils.showShortToast(R.string.tx_hash_copy);
-                        }
-                    }
+                    isLongClick = false;
                 }
                 clickDownTime = 0;
             }else if(event.getAction() == MotionEvent.ACTION_OUTSIDE ||
                     event.getAction() == MotionEvent.ACTION_CANCEL){
                 clickDownTime = 0;
+                isLongClick = false;
             }else if(event.getAction() == MotionEvent.ACTION_DOWN){
                 clickDownTime = new Date().getTime();
+                isLongClick = true;
+                final int tvHashWidth = viewHolder.tvHash.getWidth() + DimensionsUtil.dip2px(v.getContext(), 15);
+                ThreadPool.getThreadPool().execute(() -> {
+                    try {
+                        Thread.sleep(longClickTime);
+                        if(isLongClick && tvHashWidth >= event.getX()){
+                            if(StringUtil.isNotEmpty(bean.getTxHash())){
+                                CopyManager.copyText(bean.getTxHash());
+                                ToastUtils.showShortToast(R.string.tx_hash_copy);
+                            }
+                            isLongClick = false;
+                        }
+                    } catch (Exception ignore) {
+                    }
+                });
             }
             return true;
         });
-        return convertView;
     }
 
     private long clickDownTime = 0;
+    private boolean isLongClick = false;
+    private int longClickTime = 500;
 
     class ViewHolder {
         @BindView(R.id.tv_hash)
