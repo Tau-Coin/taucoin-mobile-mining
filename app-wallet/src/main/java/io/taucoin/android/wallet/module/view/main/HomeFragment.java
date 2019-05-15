@@ -207,6 +207,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void initView() {
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setOnLoadmoreListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
         DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 16);
 
@@ -303,6 +304,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }else{
             refreshLayout.setEnableLoadmore(false);
         }
+        refreshLayout.finishRefresh(1000);
+        refreshLayout.finishLoadmore(1000);
     }
 
     private void refreshOffOnView(String miningState) {
