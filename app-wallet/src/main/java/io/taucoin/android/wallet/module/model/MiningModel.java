@@ -243,7 +243,7 @@ public class MiningModel implements IMiningModel{
         if(list.size() > 0){
             EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
             int notifyRes;
-            long reward;
+            long reward = 0;
             String notifyStr;
             RewardBean bean = MiningUtil.parseMiningReward(list);
             if(isRollBack){
@@ -264,8 +264,10 @@ public class MiningModel implements IMiningModel{
                 String rewardStr = FmtMicrometer.fmtFormat(String.valueOf(reward));
                 notifyStr = String.format(notifyStr, rewardStr);
             }
-            NotifyManager.getInstance().sendBlockNotify(notifyStr);
-            Logger.d(notifyStr);
+            if(isRollBack || reward > 0){
+                NotifyManager.getInstance().sendBlockNotify(notifyStr);
+                Logger.d(notifyStr);
+            }
         }
     }
 
