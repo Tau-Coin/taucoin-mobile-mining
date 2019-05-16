@@ -313,15 +313,15 @@ public class MiningModel implements IMiningModel{
                     MiningUtil.saveTransactionSuccess();
                     EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
                 }else if(StringUtil.isSame(result, TaucoinImpl.TRANSACTION_SUBMITFAIL)){
-                    new TxPresenter().sendRawTransaction(transaction, new LogicObserver<Boolean>() {
-                        @Override
-                        public void handleData(Boolean isSuccess) {
-                            if(isSuccess){
-                                // clear all editText data
-                                EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
-                            }
-                        }
-                    });
+//                    new TxPresenter().sendRawTransaction(transaction, new LogicObserver<Boolean>() {
+//                        @Override
+//                        public void handleData(Boolean isSuccess) {
+//                            if(isSuccess){
+//                                // clear all editText data
+//                                EventBusUtil.post(MessageEvent.EventCode.CLEAR_SEND);
+//                            }
+//                        }
+//                    });
                 }else{
                     if(StringUtil.isNotEmpty(result)){
                         ToastUtils.showShortToast(result);

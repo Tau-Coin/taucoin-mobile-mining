@@ -42,18 +42,22 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.TransactionBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.android.wallet.module.bean.TxStatusBean;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.Utils;
@@ -169,19 +173,17 @@ public class TxModel implements ITxModel {
      * 13-Verification failed, illegal transactions, insufficient balance
      * 20-Chain-end backend lost transactions for unknown reasons (txId cannot be queried in the status database due to unknown errors)
      * */
-    private boolean updateTransactionStatus(TxStatusBean txStatus) {
+    private synchronized boolean updateTransactionStatus(TxStatusBean txStatus) {
         String txId = txStatus.getTxId();
         TransactionHistory history = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
         if(history == null){
             return false;
         }
-        Object isRefresh = null;
+        boolean isRefresh = false;
         switch (txStatus.getStatus()){
             case 0:
-                if(StringUtil.isSame(history.getResult(), TransmitKey.TxResult.BROADCASTING)){
-                    history.setResult(TransmitKey.TxResult.CONFIRMING);
-                    isRefresh = false;
-                }
+                history.setResult(TransmitKey.TxResult.CONFIRMING);
+                isRefresh = true;
                 break;
             case 1:
                 history.setResult(TransmitKey.TxResult.FAILED);
@@ -215,16 +217,16 @@ public class TxModel implements ITxModel {
             default:
                 break;
         }
-        if(isRefresh != null){
+
+        if(isRefresh){
             TransactionHistoryDaoUtils.getInstance().insertOrReplace(history);
-            return (Boolean) isRefresh;
         }
-        return false;
+        return isRefresh;
     }
 
     @Override
-    public void createTransaction(TransactionHistory txHistory, LogicObserver<io.taucoin.core.Transaction> observer) {
-        Observable.create((ObservableOnSubscribe<io.taucoin.core.Transaction>) emitter -> {
+    public void createTransaction(TransactionHistory txHistory, LogicObserver<TransactionBean> observer) {
+        Observable.create((ObservableOnSubscribe<TransactionBean>) emitter -> {
             KeyValue keyValue = MyApplication.getKeyValue();
             if(keyValue == null || StringUtil.isEmpty(keyValue.getPriKey())){
                 emitter.onError(CodeException.getError());
@@ -256,15 +258,20 @@ public class TxModel implements ITxModel {
             txHistory.setCreateTime(String.valueOf(timeStamp));
             txHistory.setTransExpiry(expiryBlock);
 
-            insertTransactionHistory(txHistory);
-            emitter.onNext(transaction);
+//            insertTransactionHistory(txHistory);
+            TransactionBean transactionBean = new TransactionBean();
+            transactionBean.setLocalData(txHistory);
+            transactionBean.setRawData(transaction);
+            emitter.onNext(transactionBean);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(observer);
     }
 
     @Override
-    public void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer) {
+    public void sendRawTransaction(TransactionBean transactionBean, LogicObserver<Boolean> observer) {
+        Transaction transaction = transactionBean.getRawData();
+        TransactionHistory transactionHistory = transactionBean.getLocalData();
         String txHash = Hex.toHexString(transaction.getEncoded());
         String txId = transaction.getTxid();
         Logger.d("txId=" + txId  + "\ttxHash=" + txHash);
@@ -288,7 +295,15 @@ public class TxModel implements ITxModel {
                     if(dataResult != null){
                         if(dataResult.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
                             Logger.d("sendRawTransaction.handleData=" +dataResult);
-                            MiningUtil.saveTransactionSuccess();
+                            insertTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
+                                @Override
+                                public void handleData(Boolean aBoolean) {
+                                    ToastUtils.showShortToast(R.string.send_tx_success);
+                                    EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                                    EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+                                    MiningUtil.checkRawTransaction();
+                                }
+                            });
                             observer.onNext(true);
                         }else{
                             String result = StringUtil.isEmpty(dataResult.getMessage()) ? "" : dataResult.getMessage();
@@ -298,7 +313,14 @@ public class TxModel implements ITxModel {
                 }
 
                 void handleError(String result) {
-                    MiningUtil.saveTransactionFail(txId, result);
+                    transactionHistory.setResult(TransmitKey.TxResult.FAILED);
+                    transactionHistory.setMessage(result);
+                    insertTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean aBoolean) {
+                            EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                        }
+                    });
                     observer.onNext(false);
                 }
             });
@@ -317,14 +339,13 @@ public class TxModel implements ITxModel {
                 .subscribe(observer);
     }
 
-    @Override
-    public void insertTransactionHistory(TransactionHistory txHistory){
-        Observable.create((ObservableOnSubscribe<TransactionHistory>) emitter -> {
+    private void insertTransactionHistory(TransactionHistory txHistory, LogicObserver<Boolean> logicObserver){
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
-            emitter.onNext(txHistory);
+            emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe();
+                .subscribe(logicObserver);
     }
 
     @Override

@@ -125,7 +125,7 @@ public class TxService extends Service {
 
     private void checkRawTransactionDelay() {
         mIsChecked = true;
-        Observable.timer(5, TimeUnit.MINUTES)
+        Observable.timer(5 * 60, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override
@@ -141,7 +141,7 @@ public class TxService extends Service {
 
             @Override
             public void handleData(List<List<String>> txIdsList) {
-                if(txIdsList != null && txIdsList.size() > 0){
+                if(txIdsList != null){
                     Logger.d("checkRawTransaction start size=" + txIdsList.size());
                     for (int i = 0; i < txIdsList.size(); i++) {
                         try {

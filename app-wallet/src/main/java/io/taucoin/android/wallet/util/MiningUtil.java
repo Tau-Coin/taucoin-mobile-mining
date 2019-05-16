@@ -140,7 +140,7 @@ public class MiningUtil {
         checkRawTransaction();
     }
 
-    private static void checkRawTransaction() {
+    public static void checkRawTransaction() {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 

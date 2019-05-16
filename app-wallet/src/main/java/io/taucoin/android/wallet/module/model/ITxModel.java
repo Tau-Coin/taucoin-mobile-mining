@@ -22,8 +22,8 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.TransactionBean;
 import io.taucoin.android.wallet.net.callback.TxObserver;
-import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public interface ITxModel {
@@ -37,16 +37,13 @@ public interface ITxModel {
     void getTxPendingListDelay(LogicObserver<List<List<String>>> observer);
 
     /** Create transaction data */
-    void createTransaction(TransactionHistory txHistory, LogicObserver<Transaction> observer);
+    void createTransaction(TransactionHistory txHistory, LogicObserver<TransactionBean> observer);
 
     /** Send transaction to the server */
-    void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer);
+    void sendRawTransaction(TransactionBean transaction, LogicObserver<Boolean> observer);
 
     /** Update local transaction history */
     void updateTransactionHistory(TransactionHistory txHistory, LogicObserver<Boolean> observer);
-
-    /** Insert local transaction history */
-    void insertTransactionHistory(TransactionHistory txHistory);
 
     /** Get local transaction history */
     void queryTransactionHistory(int pageNo, String time, LogicObserver<List<TransactionHistory>> logicObserver);

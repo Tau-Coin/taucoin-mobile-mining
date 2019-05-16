@@ -21,6 +21,7 @@ import java.util.List;
 
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.TransactionBean;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
@@ -83,9 +84,9 @@ public class TxPresenter {
     }
 
     private void createTransaction(TransactionHistory txBean, LogicObserver<Boolean> observer){
-        mTxModel.createTransaction(txBean, new LogicObserver<Transaction>() {
+        mTxModel.createTransaction(txBean, new LogicObserver<TransactionBean>() {
             @Override
-            public void handleData(Transaction transaction) {
+            public void handleData(TransactionBean transaction) {
                 sendRawTransaction(transaction, observer);
             }
 
@@ -96,7 +97,7 @@ public class TxPresenter {
         });
     }
 
-    public void sendRawTransaction(Transaction transaction, LogicObserver<Boolean> observer){
+    public void sendRawTransaction(TransactionBean transaction, LogicObserver<Boolean> observer){
         mTxModel.sendRawTransaction(transaction, observer);
     }
 }
