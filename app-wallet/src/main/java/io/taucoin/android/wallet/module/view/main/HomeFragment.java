@@ -56,6 +56,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     @BindView(R.id.refresh_layout)
     SmartRefreshLayout refreshLayout;
+    @BindView(R.id.refresh_layout_list)
+    SmartRefreshLayout refreshLayoutList;
     @BindView(R.id.iv_mining_switch)
     ProgressView ivMiningSwitch;
     @BindView(R.id.tv_mining_switch)
@@ -214,7 +216,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void initView() {
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setOnLoadmoreListener(this);
+        refreshLayoutList.setEnableLoadmore(false);
+        refreshLayoutList.setEnableRefresh(false);
+        refreshLayoutList.setOnLoadmoreListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
         DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 16);
         DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 14);
@@ -308,12 +312,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         int tag = StringUtil.getIntTag(tvMiningTransaction);
         if(tag == 1){
             mMiningRewardAdapter.setListData(miningRewards, mPageNo != 1);
-            refreshLayout.setEnableLoadmore(miningRewards.size() % TransmitKey.PAGE_SIZE == 0 && miningRewards.size() > 0);
+            refreshLayoutList.setEnableLoadmore(miningRewards.size() % TransmitKey.PAGE_SIZE == 0 && miningRewards.size() > 0);
         }else{
-            refreshLayout.setEnableLoadmore(false);
+            refreshLayoutList.setEnableLoadmore(false);
         }
         refreshLayout.finishRefresh(1000);
-        refreshLayout.finishLoadmore(1000);
+        refreshLayoutList.finishLoadmore(1000);
     }
 
     private void refreshOffOnView(String miningState) {

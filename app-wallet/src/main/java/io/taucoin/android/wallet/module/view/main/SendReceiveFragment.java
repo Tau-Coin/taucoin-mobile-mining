@@ -232,6 +232,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     public void onRefresh(RefreshLayout refreshlayout) {
         if(UserUtil.isImportKey() && mTxPresenter != null){
             TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+            TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
             mTxPresenter.getTxRecords(new LogicObserver<Boolean>() {
                 @Override
                 public void handleData(Boolean isSuccess) {
