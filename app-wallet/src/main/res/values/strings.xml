@@ -130,7 +130,7 @@
     <string name="home_cpu">CPU (%)</string>
     <string name="home_memory">Memory (M)</string>
     <string name="home_data_storage">Data (M)</string>
-    <string name="home_mining_transaction">Your phone has verified following transactions</string>
+    <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
 
     <string name="home_mining_hash">TX hash</string>
