@@ -1,5 +1,7 @@
 package io.taucoin.android_app;
 
+import android.Manifest;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,11 @@ public class RemoteMainActivity extends AppCompatActivity implements ActivityInt
         tabs.setViewPager(viewPager);
 
         TaucoinApplication.getRemoteConnector().createRemoteConnector();
+
+        String[] permission = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permission, 100);
+        }
     }
 
     @Override

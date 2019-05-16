@@ -1280,30 +1280,33 @@ public class TaucoinRemoteService extends TaucoinService {
 
                 if (hashList != null) {
                     for (byte[] hash : hashList) {
-                        Block block = taucoin.getBlockchain().getBlockByHash(hash);
-                        if (block != null) {
-                            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, obj);
-                            Bundle replyData = new Bundle();
-                            if (number != -1) {
-                                replyData.putLong("number", number);
-                            }
-                            if (hash != null) {
-                                replyData.putByteArray("hash", hash);
-                            }
-                            replyData.putInt("limit", limit);
-                            replyData.putParcelable("block", new io.taucoin.android.service.events.BlockEventData(block));
-                            replyMessage.setData(replyData);
-                            try {
+                        try {
+                            Block block = taucoin.getBlockchain().getBlockByHash(hash);
+                           if (block != null) {
+                                Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, obj);
+                                Bundle replyData = new Bundle();
+                                if (number != -1) {
+                                    replyData.putLong("number", number);
+                                }
+                                if (hash != null) {
+                                    replyData.putByteArray("hash", hash);
+                                }
+                                replyData.putInt("limit", limit);
+                                replyData.putParcelable("block", new io.taucoin.android.service.events.BlockEventData(block));
+                                replyMessage.setData(replyData);
                                 if (isTaucoinStarted) {
                                     messenger.send(replyMessage);
                                     logger.info("Sent blocks to app");
                                 } else {
                                     break;
                                 }
-                            } catch (RemoteException e) {
-                                logger.error("Exception sending blocks to client: " + e.getMessage());
-                            }
+
                             number++;
+                           }
+                        } catch (RemoteException e) {
+                            logger.error("Exception sending blocks to client: " + e.getMessage());
+                        } catch (Exception ignore) {
+
                         }
                     }
                 }
@@ -1398,7 +1401,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
             if(txHistory != null && txHistory.size() < 10){
                 for (Long index : txHistory.keySet()) {
-                    System.out.println("======> size is: "+txHistory.size());
+                    //System.out.println("======> size is: "+txHistory.size());
                     byte[] txid = txHistory.get(index);
                     retHistory.add("time: " + index.toString() + " hash: " + Hex.toHexString(txid).substring(0, 5));
                 }
