@@ -1,12 +1,15 @@
 package io.taucoin.android.wallet.module.view.main;
 
 import android.annotation.SuppressLint;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.github.naturs.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,8 +111,10 @@ public class MiningRewardAdapter extends BaseAdapter {
                         Thread.sleep(longClickTime);
                         if(isLongClick && tvHashWidth >= event.getX()){
                             if(StringUtil.isNotEmpty(bean.getTxHash())){
+                                Looper.prepare();
                                 CopyManager.copyText(bean.getTxHash());
                                 ToastUtils.showShortToast(R.string.tx_hash_copy);
+                                Looper.loop();
                             }
                             isLongClick = false;
                         }
