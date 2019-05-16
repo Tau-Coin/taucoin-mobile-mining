@@ -44,6 +44,7 @@ import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ResourcesUtil;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
@@ -138,6 +139,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     Intent intent = new Intent();
                     intent.putExtra(TransmitKey.TYPE, isMined ? 1 : 0);
                     ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
+                }else{
+                    ToastUtils.showShortToast(R.string.home_no_turn_on);
                 }
                 break;
             case R.id.iv_right:
@@ -221,8 +224,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         refreshLayoutList.setOnLoadmoreListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
         DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 16);
-        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 14);
-        DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 14);
+        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 11);
+        DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 11);
 
         mMiningRewardAdapter = new MiningRewardAdapter();
         listViewMiningTx.setAdapter(mMiningRewardAdapter);

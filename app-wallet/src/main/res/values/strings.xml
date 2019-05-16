@@ -131,6 +131,7 @@
     <string name="home_memory">Memory (M)</string>
     <string name="home_data_storage">Data (M)</string>
     <string name="home_mining_transaction">Your phone has verified following transactions</string>
+    <string name="home_no_turn_on">Please turn on the mining function.</string>
 
     <string name="home_mining_hash">TX hash</string>
     <string name="home_mining_fee">TX Fee</string>
