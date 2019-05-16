@@ -89,6 +89,7 @@ public class TransactionExecutor {
         if(!txHistory.isEmpty()) {
             long txTimeCeil = Collections.max(txHistory);
             long txTimeFloor = Collections.min(txHistory);
+
             /**
              * System should be concurrency high rather than 1 transaction per second.
              */
@@ -100,7 +101,12 @@ public class TransactionExecutor {
 
                 if (tranTime < txTimeFloor && blockchain.getSize() > MaxHistoryCount) {
                     long freshTime = blockchain.getSize() - MaxHistoryCount;
-                    if (tranTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime).getTimestamp())) {
+                    if(freshTime == 1 && tranTime < ByteUtil.byteArrayToLong(CONFIG.getGenesis().getTimestamp())){
+                        logger.error("overflow attacking transaction ,tx is: {}", ByteUtil.toHexString(tx.getHash()));
+                        return false;
+                    }
+
+                    if (tranTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1).getTimestamp())) {
                         logger.error("attacking transaction ,tx is: {}", ByteUtil.toHexString(tx.getHash()));
                         return false;
                     }
@@ -234,7 +240,7 @@ public class TransactionExecutor {
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
-            if (txTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime).getTimestamp())) {
+            if (freshTime > 1 && txTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp())) {
                 accountState.getTranHistory().remove(txTime);
             } else {
                 long txTimeTemp = ByteUtil.byteArrayToLong(tx.getTime());

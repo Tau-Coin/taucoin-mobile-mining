@@ -1213,6 +1213,60 @@ public class TaucoinRemoteService extends TaucoinService {
             }
         }
 
+//        protected ArrayList<Block> doInBackground(Taucoin... args) {
+//
+//            ArrayList<Block> blockList = new ArrayList<Block>();
+//            List<byte[]> hashList = null;
+//            if (taucoin != null) {
+//                if (number != -1) {
+//                    hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(number, limit);
+//                } else if (hash != null) {
+//                    hashList = taucoin.getBlockchain().getListOfHashesStartFrom(hash, limit);
+//                }
+//
+//                if (hashList != null) {
+//                    for (byte[] hash : hashList) {
+//                        Block block = taucoin.getBlockchain().getBlockByHash(hash);
+//                        if (block != null) {
+//                            blockList.add(block);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            return blockList;
+//        }
+//
+//        protected void onPostExecute(ArrayList<Block> blockList) {
+//
+//            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, obj);
+//            Bundle replyData = new Bundle();
+//            if (number != -1) {
+//                replyData.putLong("number", number);
+//            }
+//            if (hash != null) {
+//                replyData.putByteArray("hash", hash);
+//            }
+//            replyData.putInt("limit", limit);
+//            ArrayList<io.taucoin.android.service.events.BlockEventData> parcelBlockList
+//                    = new ArrayList<>();
+//            for (Block block : blockList) {
+//                parcelBlockList.add(new io.taucoin.android.service.events.BlockEventData(block));
+//            }
+//            replyData.putParcelableArrayList("blocks", parcelBlockList);
+//            replyMessage.setData(replyData);
+//            try {
+//                messenger.send(replyMessage);
+//                logger.info("Sent blocks to app");
+//            } catch (RemoteException e) {
+//                logger.error("Exception sending blocks to client: " + e.getMessage());
+//            }
+//        }
+        /**
+         * a test is that informing android block by block rather than a block list
+         * which may lead to android parcel crash case of pay load lager than 1000*1000*1000
+         * bytes
+         */
         protected ArrayList<Block> doInBackground(Taucoin... args) {
 
             ArrayList<Block> blockList = new ArrayList<Block>();
@@ -1228,7 +1282,28 @@ public class TaucoinRemoteService extends TaucoinService {
                     for (byte[] hash : hashList) {
                         Block block = taucoin.getBlockchain().getBlockByHash(hash);
                         if (block != null) {
-                            blockList.add(block);
+                            Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_BLOCKS, 0, 0, obj);
+                            Bundle replyData = new Bundle();
+                            if (number != -1) {
+                                replyData.putLong("number", number);
+                            }
+                            if (hash != null) {
+                                replyData.putByteArray("hash", hash);
+                            }
+                            replyData.putInt("limit", limit);
+                            replyData.putParcelable("block", new io.taucoin.android.service.events.BlockEventData(block));
+                            replyMessage.setData(replyData);
+                            try {
+                                if (isTaucoinStarted) {
+                                    messenger.send(replyMessage);
+                                    logger.info("Sent blocks to app");
+                                } else {
+                                    break;
+                                }
+                            } catch (RemoteException e) {
+                                logger.error("Exception sending blocks to client: " + e.getMessage());
+                            }
+                            number++;
                         }
                     }
                 }
@@ -1248,12 +1323,7 @@ public class TaucoinRemoteService extends TaucoinService {
                 replyData.putByteArray("hash", hash);
             }
             replyData.putInt("limit", limit);
-            ArrayList<io.taucoin.android.service.events.BlockEventData> parcelBlockList
-                    = new ArrayList<>();
-            for (Block block : blockList) {
-                parcelBlockList.add(new io.taucoin.android.service.events.BlockEventData(block));
-            }
-            replyData.putParcelableArrayList("blocks", parcelBlockList);
+            replyData.putBoolean("isfinish", isTaucoinStarted);
             replyMessage.setData(replyData);
             try {
                 messenger.send(replyMessage);
