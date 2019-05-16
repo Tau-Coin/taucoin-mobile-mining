@@ -45,7 +45,6 @@ import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningBlockDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
-import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
@@ -116,16 +115,14 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void updateMyMiningBlock(List<BlockEventData> blocks, LogicObserver<Boolean> observer) {
+    public void updateMyMiningBlock(BlockEventData blockData, LogicObserver<Boolean> observer) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            for (BlockEventData blockEvent : blocks) {
-                if(blockEvent == null || blockEvent.block == null){
-                    continue;
-                }
-                Block block = blockEvent.block;
-
-                saveMiningBlock(block, true, true);
+            Block block = blockData.block;
+            if(block == null){
+                emitter.onNext(false);
+                return;
             }
+            saveMiningBlock(block, true, true);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

@@ -313,10 +313,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         MiningUtil.setMiningIncome(tvMiningIncome);
 
         int tag = StringUtil.getIntTag(tvMiningTransaction);
-        if(tag == 1){
-            mMiningRewardAdapter.setListData(miningRewards, mPageNo != 1);
-            refreshLayoutList.setEnableLoadmore(miningRewards.size() % TransmitKey.PAGE_SIZE == 0 && miningRewards.size() > 0);
-        }else{
+
+        mMiningRewardAdapter.setListData(miningRewards, mPageNo != 1);
+        refreshLayoutList.setEnableLoadmore(miningRewards.size() % TransmitKey.PAGE_SIZE == 0 && miningRewards.size() > 0);
+        if(tag != 1){
             refreshLayoutList.setEnableLoadmore(false);
         }
         refreshLayout.finishRefresh(1000);

@@ -24,7 +24,6 @@ import com.github.naturs.logger.Logger;
 import org.spongycastle.util.encoders.Hex;
 
 import java.util.Date;
-import java.util.List;
 
 import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
@@ -243,8 +242,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             case TaucoinClientMessage.MSG_BLOCKS:
                 replyData = message.getData();
                 replyData.setClassLoader(BlockEventData.class.getClassLoader());
-                List<BlockEventData> blocks = replyData.getParcelableArrayList(TransmitKey.RemoteResult.BLOCKS);
-                updateMyMiningBlock(blocks);
+                BlockEventData blocks = replyData.getParcelable(TransmitKey.RemoteResult.BLOCK);
+                boolean isFinish = replyData.getBoolean(TransmitKey.RemoteResult.IS_FINISH, false);
+                updateMyMiningBlock(blocks, isFinish);
                 break;
             // get block chain height return
             case TaucoinClientMessage.MSG_CHAIN_HEIGHT:
@@ -292,15 +292,24 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         }
     }
 
-    private void updateMyMiningBlock(List<BlockEventData> blocks) {
-        if(blocks != null){
-            getMiningModel().updateMyMiningBlock(blocks, new LogicObserver<Boolean>() {
-                @Override
-                public void handleData(Boolean aBoolean) {
-                    isSyncMe = true;
-                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                }
-            });
+    private void updateMyMiningBlock(BlockEventData blockData, boolean isFinish) {
+        if((null == blockData || blockData.block == null) && isFinish){
+            Logger.d("number= null, " + true);
+            isSyncMe = true;
+            EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+        }else{
+            if(blockData != null && blockData.block != null){
+//                Logger.d("number=" + blockData.block.getNumber() + ", " + isFinish);
+                getMiningModel().updateMyMiningBlock(blockData, new LogicObserver<Boolean>() {
+                    @Override
+                    public void handleData(Boolean aBoolean) {
+                        if(isFinish){
+                            isSyncMe = true;
+                            EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -323,15 +332,22 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         getMiningModel().getMaxBlockNum(height, new LogicObserver<Long>(){
 
             @Override
-            public void handleData(Long integer) {
-                isSyncMe = false;
-                long num = integer;
-                int limit = (int) (height - num + 1);
-                if(mTaucoinConnector != null){
-                    mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+            public void handleData(Long max) {
+                Logger.d("number=getBlockListByStartNumberSuccess(" + max +","+ height+")");
+                if(max == height){
+                    isSyncMe = true;
+                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                }else{
+                    long num = max;
+                    int limit = (int) (height - num) + 1;
+                    isSyncMe = false;
+                    Logger.d("number=getBlockListByStartNumber(" + num +","+ limit+")");
+                    if(mTaucoinConnector != null && limit > 0){
+                        mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
+                    }
                 }
+
             }
         });
-
     }
 }
