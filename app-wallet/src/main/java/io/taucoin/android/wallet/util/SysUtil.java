@@ -156,6 +156,9 @@ public class SysUtil {
                 double cpu = sampleCPU(stat, processName.equals(context.getPackageName()));
                 memoryInfo.cpuUsageRate += cpu;
             }
+            if(memoryInfo.cpuUsageRate < 0){
+                memoryInfo.cpuUsageRate = 0;
+            }
         } catch (Exception e) {
             Logger.i("loadAppProcess.is error", e);
             e.printStackTrace();
@@ -182,6 +185,14 @@ public class SysUtil {
         } else if (length >= 0) {
             result = Long.toString(length) + "B";
         }
+        return result;
+    }
+
+    public static String formatFileSizeMb(long length) {
+        String result = null;
+        int sub_string = String.valueOf((float) length / 1048576).indexOf(".");
+        result = ((float) length / 1048576 + "000").substring(0,
+                sub_string + 3) + "M";
         return result;
     }
 

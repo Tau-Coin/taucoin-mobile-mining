@@ -66,8 +66,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvPower;
     @BindView(R.id.tv_synchronized)
     TextView tvSynchronized;
+    @BindView(R.id.tv_synchronized_title)
+    TextView tvSynchronizedTitle;
     @BindView(R.id.tv_mined)
     TextView tvMined;
+    @BindView(R.id.tv_mined_title)
+    TextView tvMinedTitle;
     @BindView(R.id.tv_mining_transaction)
     TextView tvMiningTransaction;
     @BindView(R.id.ll_mining_tx)
@@ -76,6 +80,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ListView listViewMiningTx;
     @BindView(R.id.tv_error_msg)
     TextView tvErrorMsg;
+    @BindView(R.id.tv_cpu)
+    TextView tvCPU;
+    @BindView(R.id.tv_memory)
+    TextView tvMemory;
+    @BindView(R.id.tv_data_storage)
+    TextView tvDataStorage;
 
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
@@ -98,7 +108,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
 
-    @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined, R.id.iv_right})
+    @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined,
+            R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right})
     public void onClick(View view) {
         if (!UserUtil.isImportKey()) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -116,11 +127,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case R.id.tv_mining_transaction:
                 showMiningTransactionView();
                 break;
+            case R.id.tv_synchronized_title:
             case R.id.tv_synchronized:
+            case R.id.tv_mined_title:
             case R.id.tv_mined:
                 if(MyApplication.getRemoteConnector().isInit()){
+                    boolean isMined = view.getId() == R.id.tv_mined_title || view.getId() == R.id.tv_mined;
                     Intent intent = new Intent();
-                    intent.putExtra(TransmitKey.TYPE, view.getId() == R.id.tv_mined ? 1 : 0);
+                    intent.putExtra(TransmitKey.TYPE, isMined ? 1 : 0);
                     ActivityUtil.startActivity(intent, getActivity(), BlockListActivity.class);
                 }
                 break;
@@ -188,6 +202,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case MINING_REWARD:
                 onRefresh(null);
                 break;
+            case APPLICATION_INFO:
+                UserUtil.setApplicationInfo(tvCPU, tvMemory, tvDataStorage, object.getData());
+                break;
             default:
                 break;
         }
@@ -200,6 +217,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         refreshLayout.setOnLoadmoreListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
         DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 16);
+        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 14);
+        DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 14);
 
         mMiningRewardAdapter = new MiningRewardAdapter();
         listViewMiningTx.setAdapter(mMiningRewardAdapter);
@@ -300,17 +319,17 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private void refreshOffOnView(String miningState) {
         int state = R.string.home_mining_off;
         int color = R.color.color_grey;
-        tvErrorMsg.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setVisibility(View.GONE);
         tvErrorMsg.setText("");
         if(StringUtil.isSame(miningState, TransmitKey.MiningState.Start)){
             ivMiningSwitch.setOn();
             state = R.string.home_mining_on;
-            color = R.color.color_young;
+            color = R.color.color_yellow;
             tvMiningSwitch.setNormalText(state);
         }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.LOADING)){
             ivMiningSwitch.setConnecting();
             state = R.string.home_mining_connecting;
-            color = R.color.color_young;
+            color = R.color.color_yellow;
             tvMiningSwitch.setLoadingText(ResourcesUtil.getText(state));
         }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.ERROR)){
             ivMiningSwitch.setError();

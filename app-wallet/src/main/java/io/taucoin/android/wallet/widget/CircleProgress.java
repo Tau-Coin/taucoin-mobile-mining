@@ -17,15 +17,16 @@ import io.taucoin.foundation.util.ThreadPool;
  */
 public class CircleProgress extends View {
     private static final int DEFAULT_MIN_WIDTH = 400;
-    private static int RED = 124, GREEN = 186, BLUE = 89;
+    private static int RED = 241, GREEN = 147, BLUE = 34;
     private static final int MIN_ALPHA = 90;
+    private static final int MID_ALPHA = 230;
     private static final int MAX_ALPHA = 255;
     private static float circleWidth = 20;
 
     // Ring color
     private static int[] doughnutColors = new int[]{
             Color.argb(MIN_ALPHA, RED, GREEN, BLUE),
-            Color.argb(MIN_ALPHA, RED, GREEN, BLUE),
+            Color.argb(MID_ALPHA, RED, GREEN, BLUE),
             Color.argb(MAX_ALPHA, RED, GREEN, BLUE)};
 
     private Paint paint = new Paint();
@@ -43,16 +44,16 @@ public class CircleProgress extends View {
     }
 
     public void setOn() {
-        RED = 124;
-        GREEN = 186;
-        BLUE = 89;
+        RED = 241;
+        GREEN = 147;
+        BLUE = 34;
         closeConnecting();
     }
 
     public void setConnecting() {
-        RED = 124;
-        GREEN = 186;
-        BLUE = 89;
+        RED = 241;
+        GREEN = 147;
+        BLUE = 34;
         isLoading = true;
         init();
     }

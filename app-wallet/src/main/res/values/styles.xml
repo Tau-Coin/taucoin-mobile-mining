@@ -211,7 +211,7 @@
     </style>
 
     <style name="style_power_black">
-        <item name="android:textSize">@dimen/dimen_size_30</item>
+        <item name="android:textSize">@dimen/dimen_size_28</item>
         <item name="android:textColor">@color/color_black</item>
     </style>
 

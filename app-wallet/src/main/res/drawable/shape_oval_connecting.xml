@@ -6,8 +6,8 @@
         android:dashGap="10dp"
         android:dashWidth="10dp"
         android:width="2dp"
-        android:color="@color/color_young" />
-    <solid android:color="@color/color_young" />
+        android:color="@color/color_yellow" />
+    <solid android:color="@color/color_yellow" />
 
     <size
         android:height="@dimen/dimen_size_60"
@@ -15,9 +15,9 @@
 
     <gradient
         android:angle="90"
-        android:centerColor="@color/color_young"
-        android:endColor="@color/color_young"
+        android:centerColor="@color/color_yellow"
+        android:endColor="@color/color_yellow"
         android:gradientRadius="90"
-        android:startColor="@color/color_young"
+        android:startColor="@color/color_yellow"
         android:type="linear" />
 </shape>

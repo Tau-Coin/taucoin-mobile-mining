@@ -44,7 +44,6 @@ import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.ActivityManager;
@@ -169,6 +168,10 @@ public class NotifyManager {
             return;
         }
         sendNotify(mService, mBuilder, mNotifyData);
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.setData(mNotifyData);
+        messageEvent.setCode(MessageEvent.EventCode.APPLICATION_INFO);
+        EventBusUtil.post(messageEvent);
     }
 
     synchronized void sendNotify(Service service, NotificationCompat.Builder builder, NotifyManager.NotifyData notifyData) {
@@ -322,10 +325,10 @@ public class NotifyManager {
         });
     }
 
-    static class NotifyData implements Parcelable {
-        String cpuUsage;
-        String memorySize;
-        String dataSize;
+    public static class NotifyData implements Parcelable {
+        public String cpuUsage;
+        public String memorySize;
+        public String dataSize;
         String miningState;
 
         NotifyData() {}

@@ -55,7 +55,7 @@ public class MiningUtil {
         return 0;
     }
 
-    public static String parseMiningIncome(List<MiningReward> rewards) {
+    private static String parseMiningIncome(List<MiningReward> rewards) {
         BigDecimal number = new BigDecimal("0");
         if(rewards != null && rewards.size() > 0){
             for (MiningReward bean : rewards) {

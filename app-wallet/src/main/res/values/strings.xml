@@ -123,10 +123,13 @@
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
 
-    <string name="home_mining_income">Mining income</string>
+    <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Power</string>
     <string name="home_synchronized">Synchronized</string>
     <string name="home_mined">Mined</string>
+    <string name="home_cpu">CPU (%)</string>
+    <string name="home_memory">Memory (M)</string>
+    <string name="home_data_storage">Data (M)</string>
     <string name="home_mining_transaction">Your phone has verified following transactions</string>
 
     <string name="home_mining_hash">TX hash</string>

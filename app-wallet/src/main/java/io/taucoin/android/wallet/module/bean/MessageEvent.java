@@ -18,7 +18,8 @@ public class MessageEvent{
         CLEAR_SEND,
         FORGED_TIME,
         NOTIFY_MINING,
-        MINING_REWARD
+        MINING_REWARD,
+        APPLICATION_INFO
     }
     private Object data;
 

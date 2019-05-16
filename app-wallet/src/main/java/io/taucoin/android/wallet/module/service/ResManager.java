@@ -51,7 +51,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                  Bundle bundle = msg.getData();
                  SysUtil.MemoryInfo info = bundle.getParcelable("data");
                  if(info != null){
-                     String memoryInfo = SysUtil.formatFileSize(info.totalMemory);
+                     String memoryInfo = SysUtil.formatFileSizeMb(info.totalMemory);
                      String cpuInfo = String.valueOf(info.cpuUsageRate);
                      int pointIndex = cpuInfo.indexOf(".");
                      int length = cpuInfo.length();
@@ -68,7 +68,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                  PackageStats newPs = msg.getData().getParcelable("data");
                  if (newPs != null) {
                      long dataSize = newPs.dataSize + newPs.cacheSize;
-                     String dataInfo = SysUtil.formatFileSize(dataSize);
+                     String dataInfo = SysUtil.formatFileSizeMb(dataSize);
                      if(mResCallBack != null){
                          mResCallBack.updateDataSize(dataInfo);
                      }
@@ -92,7 +92,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                      Message message = mHandler.obtainMessage(2);
                      message.setData(bundle);
                      mHandler.sendMessage(message);
-                     Thread.sleep(1000);
+                     Thread.sleep(1500);
                      startResThreadDelay();
                  }
              } catch (InterruptedException e) {

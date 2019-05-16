@@ -25,6 +25,7 @@ import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.foundation.util.StringUtil;
 
 public class UserUtil {
@@ -140,5 +141,27 @@ public class UserUtil {
 
     public static long getTransExpiryBlock() {
         return getTransExpiryTime() / 5;
+    }
+
+    public static void setApplicationInfo(TextView tvCPU, TextView tvMemory, TextView tvDataStorage, Object data) {
+        try{
+            if(data != null){
+                NotifyManager.NotifyData notifyData = (NotifyManager.NotifyData)data;
+                if(StringUtil.isNotEmpty(notifyData.cpuUsage)){
+                    String cpuUsage = notifyData.cpuUsage.substring(0, notifyData.cpuUsage.length() - 1);
+                    tvCPU.setText(cpuUsage);
+                }
+                if(StringUtil.isNotEmpty(notifyData.memorySize)){
+                    String memorySize = notifyData.memorySize.substring(0, notifyData.memorySize.length() - 1);
+                    tvMemory.setText(memorySize);
+                }
+                if(StringUtil.isNotEmpty(notifyData.dataSize)){
+                    String dataSize = notifyData.dataSize.substring(0, notifyData.dataSize.length() - 1);
+                    tvDataStorage.setText(dataSize);
+                }
+            }
+        }catch (Exception ignore){
+
+        }
     }
 }
