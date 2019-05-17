@@ -49,9 +49,13 @@ public class AccountBean {
         RLPList account = (RLPList) decodedAccountList.get(0);
         if(account.get(0) != null && account.get(0).getRLPData() != null){
             this.balance = new BigInteger(1, account.get(0).getRLPData());
+        } else {
+            this.balance = BigInteger.ZERO;
         }
         if(account.get(1) != null && account.get(1).getRLPData() != null){
             this.power = new BigInteger(1, account.get(1).getRLPData());
+        } else {
+            this.power = BigInteger.ZERO;
         }
         this.parsed = true;
     }
