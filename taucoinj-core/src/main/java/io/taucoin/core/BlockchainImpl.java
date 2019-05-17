@@ -222,14 +222,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 logger.info("Try to disconnect block, block number: {}, hash: {}",
                         undoBlock.getNumber(), Hex.toHexString(undoBlock.getHash()));
 
+                //roll back
                 List<Transaction> txs = undoBlock.getTransactionsList();
-                for (int i = txs.size() - 1; i >= 0; i--) {
+                int size = txs.size();
+                for (int i = size - 1; i >= 0; i--) {
                     StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
                             new StakeHolderIdentityUpdate(txs.get(i), cacheTrack, undoBlock.getForgerAddress(), undoBlock.getNumber());
                     stakeHolderIdentityUpdate.rollbackStakeHolderIdentity();
                 }
 
-                for (int i = txs.size() - 1; i >= 0; i--) {
+                for (int i = size - 1; i >= 0; i--) {
                     //roll back
                     TransactionExecutor executor = new TransactionExecutor(txs.get(i), cacheTrack, this, listener);
                     executor.setCoinbase(undoBlock.getForgerAddress());
@@ -245,7 +247,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
             boolean isValid = true;
             Repository cacheTrack;
-            for (int i = newBlocks.size() - 1; i >= 0; i--) {
+            int size = newBlocks.size();
+            for (int i = size - 1; i >= 0; i--) {
                 cacheTrack = track.startTracking();
 
                 Block newBlock = newBlocks.get(i);
@@ -441,9 +444,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 parent.getHash(),
                 option,
                 txs);
+
         BigInteger curTotalfee = parent.getCumulativeFee();
-        for(Transaction tr: txs){
-            curTotalfee = curTotalfee.add(new BigInteger(tr.getFee()));
+        if (txs != null) {
+            for (Transaction tr : txs) {
+                curTotalfee = curTotalfee.add(new BigInteger(tr.getFee()));
+            }
         }
 
         block.setNumber(parent.getNumber() + 1);
@@ -452,6 +458,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         block.setCumulativeDifficulty(cumulativeDifficulty);
         block.setCumulativeFee(curTotalfee);
         block.sign(config.getForgerPrikey());
+
         return block;
     }
 
@@ -594,21 +601,20 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      */
     private boolean verifyTransactionTime(Transaction tx, Block block) {
         long blockTime = ByteUtil.byteArrayToLong(block.getTimestamp());
-
         long txTime = ByteUtil.byteArrayToLong(tx.getTime());
-
         long lockTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
-
         if (txTime - Constants.MAX_TIMEDRIFT > blockTime) {
             logger.error("Tx time {} exceeds block time {} by {} seconds", txTime, blockTime, Constants.MAX_TIMEDRIFT);
             return false;
         }
+
         long referenceTime = 0;
         long referenceHeight = bestBlock.getNumber() - lockTime;
         // this is dangerous behavior,a smart node will not accept it because this may be memory overflow hack.
         if (referenceHeight < 0){
             return true;
         }
+
         if (referenceHeight <= bestBlock.getNumber()) {
             referenceTime = ByteUtil.byteArrayToLong(blockStore.
                     getChainBlockByNumber(referenceHeight).getTimestamp());
