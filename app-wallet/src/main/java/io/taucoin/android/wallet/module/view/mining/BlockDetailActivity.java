@@ -56,7 +56,7 @@ public class BlockDetailActivity extends BaseActivity {
         if(blockEvent != null && blockEvent.block != null){
             Block blockBean = blockEvent.block;
 
-            String publicKey = Hex.toHexString(blockBean.getGeneratorPublicKey());
+            String publicKey = Hex.toHexString(blockBean.getForgerPublicKey());
             address = KeyManager.generatorAddress(publicKey);
             tvMiner.setRightText(address);
 

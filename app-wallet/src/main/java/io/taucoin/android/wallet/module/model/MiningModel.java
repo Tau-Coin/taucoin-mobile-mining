@@ -132,7 +132,7 @@ public class MiningModel implements IMiningModel{
     private synchronized void saveMiningBlock(Block block, boolean isConnect, boolean isNeedSync) {
         String blockNo = String.valueOf(block.getNumber());
         String blockHash = Hex.toHexString(block.getHash());
-        String generatorPublicKey = Hex.toHexString(block.getGeneratorPublicKey());
+        String generatorPublicKey = Hex.toHexString(block.getForgerPublicKey());
 //        Logger.d("blockNo=" + blockNo);
 //        Logger.d("blockHash=" + blockHash);
 //        Logger.d("generatorPublicKey=" + generatorPublicKey);
