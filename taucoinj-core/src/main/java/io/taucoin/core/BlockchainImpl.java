@@ -71,7 +71,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
 
     private static final Logger logger = LoggerFactory.getLogger("blockchain");
-    private static final Logger stateLogger = LoggerFactory.getLogger("state");
 
 
     private Repository repository;
@@ -829,7 +828,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
         int txCount = 0;
         for (Transaction tx : block.getTransactionsList()) {
-            stateLogger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
+            logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
