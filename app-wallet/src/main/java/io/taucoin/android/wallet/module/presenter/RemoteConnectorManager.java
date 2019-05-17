@@ -199,7 +199,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         break;
                     case EVENT_BLOCK_FORGE_STOP:
                         BlockForgeExceptionStopEvent exceptionStop = data.getParcelable("data");
-                        logMessage = "Block forged internal " + exceptionStop.getMsg();
+                        logMessage = "Block forged stop: " + exceptionStop.getMsg();
                         addLogEntry(time, logMessage);
                         if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4 || exceptionStop.getCode() == 11){
                             mExceptionStop = exceptionStop;

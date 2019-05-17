@@ -69,6 +69,8 @@ public class TransmitKey {
 
     }
     public static final String TYPE = "type";
+    public static final String TRAFFIC = "traffic";
+    public static final String TRAFFIC_TIME = "trafficTime";
 
     public static class ExternalUrl{
         public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";

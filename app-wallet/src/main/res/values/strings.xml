@@ -51,7 +51,7 @@
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
     <string name="send_memo">Memo</string>
-    <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction Expiry in blocks <font color="#0E88EF">%s</font> (≈%s min)]]> </Data></string>
+    <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction expires in <font color="#0E88EF">%s</font> (≈%s minutes) blocks.]]> </Data></string>
     <string name="send_to">To</string>
     <string name="send_dialog_yes">Proceed</string>
     <string name="send_dialog_no">Back</string>
@@ -60,7 +60,7 @@
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
     <string name="send_tx_range_fee">%s×%s%s</string>
-    <string name="send_tx_fee">%s&#160;tau</string>
+    <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
@@ -124,12 +124,12 @@
     <string name="home_mining_connecting">Connecting</string>
 
     <string name="home_mining_income">Mining Income</string>
-    <string name="home_power">Power</string>
-    <string name="home_synchronized">Synchronized</string>
-    <string name="home_mined">Mined</string>
-    <string name="home_cpu">CPU (%)</string>
-    <string name="home_memory">Memory (M)</string>
-    <string name="home_data_storage">Data (M)</string>
+    <string name="home_power">Mining Power</string>
+    <string name="home_synchronized">Blocks Sync-ed</string>
+    <string name="home_mined">Blocks Mined</string>
+    <string name="home_cpu">CPU&#160;(%)</string>
+    <string name="home_memory">Memory&#160;(M)</string>
+    <string name="home_data_storage">Daily Data (M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
 
@@ -168,7 +168,7 @@
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
-    <string name="setting_transaction_expiry">Transaction Expiry in blocks</string>
+    <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
 
 </resources>

@@ -82,6 +82,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:textColor="@color/color_black"
                         android:gravity="center_horizontal"
                         android:text=""/>
 
@@ -134,6 +135,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:paddingEnd="5dp"
                     android:gravity="center_horizontal"
                     android:text="@string/home_data_storage"/>
 

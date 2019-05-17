@@ -155,8 +155,8 @@ public class UserUtil {
                     String memorySize = notifyData.memorySize.substring(0, notifyData.memorySize.length() - 1);
                     tvMemory.setText(memorySize);
                 }
-                if(StringUtil.isNotEmpty(notifyData.dataSize)){
-                    String dataSize = notifyData.dataSize.substring(0, notifyData.dataSize.length() - 1);
+                if(StringUtil.isNotEmpty(notifyData.netDataSize)){
+                    String dataSize = notifyData.netDataSize.substring(0, notifyData.netDataSize.length() - 1);
                     tvDataStorage.setText(dataSize);
                 }
             }
