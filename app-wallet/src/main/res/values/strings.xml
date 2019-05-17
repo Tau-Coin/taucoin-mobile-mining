@@ -12,6 +12,7 @@
     <string name="common_exit" formatted="false">\nDo you want to stop mining?\n</string>
     <string name="common_balance_unit">TAU</string>
     <string name="common_refresh_failed">Refresh Failed</string>
+    <string name="common_see_more">Click to see more</string>
 
     <string name="splash_title">TAU mWallet %s</string>
     <string name="splash_subheading">Mobile &#038; Decentral\nProof of Transaction</string>
@@ -30,6 +31,7 @@
     <string name="tx_to_address">To Address</string>
     <string name="tx_from_address">From Address</string>
     <string name="tx_transaction_id">Transaction ID</string>
+    <string name="tx_transaction_expiry">Transaction Expiry</string>
     <string name="tx_transaction_fee">Transaction Fee</string>
     <string name="tx_log_tips">
         &#160;Red font indicates a failed transaction,\n
@@ -59,7 +61,7 @@
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
-    <string name="send_tx_range_fee">%s×%s%s</string>
+    <string name="send_tx_range_fee">%s×%s%s&#160;(Total:%s)</string>
     <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
@@ -139,6 +141,7 @@
     <string name="home_mining_miner">Miner</string>
     <string name="home_mining_participant">Participant</string>
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
+    <string name="home_mining_mined_calculating">Calculating</string>
 
     <string name="block_list_title">Mining Details</string>
     <string name="block_list_all">ALL</string>

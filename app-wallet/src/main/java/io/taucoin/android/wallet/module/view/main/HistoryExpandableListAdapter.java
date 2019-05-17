@@ -24,6 +24,7 @@ import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.foundation.util.StringUtil;
 
 public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
@@ -98,8 +99,10 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         groupViewHolder.ivRight.setImageResource(isExpanded ? R.mipmap.icon_up : R.mipmap.icon_down);
 
         boolean isReceiver = isReceiver(tx);
+        String total = FmtMicrometer.fmtFormatAdd(tx.getAmount(), tx.getFee());
         String amount = FmtMicrometer.fmtFormat(tx.getAmount());
-        amount = isReceiver ? "+" + amount : "-" + amount;
+        total = FmtMicrometer.fmtFormat(total);
+        amount = isReceiver ? "+" + amount : "-" + total;
         groupViewHolder.tvAmount.setText(amount);
 
         String time = DateUtil.formatTime(tx.getCreateTime(), DateUtil.pattern6);
@@ -152,6 +155,12 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.tvFeeTitle.setVisibility(isReceiver ? View.GONE : View.VISIBLE);
         childViewHolder.tvTxFee.setVisibility(isReceiver ? View.GONE : View.VISIBLE);
 
+        childViewHolder.tvTransactionExpiryTitle.setVisibility(isReceiver ? View.GONE : View.VISIBLE);
+        childViewHolder.tvTransactionExpiry.setVisibility(isReceiver ? View.GONE : View.VISIBLE);
+        String transactionExpiry = UserUtil.getTransExpiryTime(tx.getTransExpiry());
+        transactionExpiry += "min";
+        childViewHolder.tvTransactionExpiry.setText(transactionExpiry);
+
         childViewHolder.tvMemo.setText(tx.getMemo());
         boolean isHaveMemo = StringUtil.isNotEmpty(tx.getMemo());
         childViewHolder.tvMemo.setVisibility(!isHaveMemo  || isReceiver? View.GONE : View.VISIBLE);
@@ -202,6 +211,10 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         TextView tvMemoTitle;
         @BindView(R.id.tv_memo)
         TextView tvMemo;
+        @BindView(R.id.tv_transaction_expiry)
+        TextView tvTransactionExpiry;
+        @BindView(R.id.tv_transaction_expiry_title)
+        TextView tvTransactionExpiryTitle;
 
         ChildViewHolder(View view) {
             ButterKnife.bind(this, view);

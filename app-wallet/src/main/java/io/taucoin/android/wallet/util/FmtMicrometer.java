@@ -143,4 +143,14 @@ public class FmtMicrometer {
             return num;
         }
     }
+
+    public static String fmtFormatAdd(String amount, String fee) {
+        try {
+            BigDecimal bigDecimal = new BigDecimal(amount);
+            bigDecimal = bigDecimal.add(new BigDecimal(fee));
+            return bigDecimal.toString();
+        } catch (Exception e) {
+            return amount;
+        }
+    }
 }

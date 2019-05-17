@@ -295,7 +295,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     private void updateMyMiningBlock(BlockEventData blockData, boolean isFinish) {
         if((null == blockData || blockData.block == null) && isFinish){
             Logger.d("number= null, " + true);
-            isSyncMe = true;
+            isSyncMe = 1;
             EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
         }else{
             if(blockData != null && blockData.block != null){
@@ -304,7 +304,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     @Override
                     public void handleData(Boolean aBoolean) {
                         if(isFinish){
-                            isSyncMe = true;
+                            isSyncMe = 1;
                             EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                         }
                     }
@@ -335,18 +335,18 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             public void handleData(Long max) {
                 Logger.d("number=getBlockListByStartNumberSuccess(" + max +","+ height+")");
                 if(max == height){
-                    isSyncMe = true;
+                    isSyncMe = 1;
                     EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 }else{
                     long num = max;
                     int limit = (int) (height - num) + 1;
-                    isSyncMe = false;
+                    isSyncMe = 0;
+                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                     Logger.d("number=getBlockListByStartNumber(" + num +","+ limit+")");
                     if(mTaucoinConnector != null && limit > 0){
                         mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
                     }
                 }
-
             }
         });
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +73,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @BindView(R.id.tv_synchronized_title)
     TextView tvSynchronizedTitle;
     @BindView(R.id.tv_mined)
-    TextView tvMined;
+    LoadingTextView tvMined;
     @BindView(R.id.tv_mined_title)
     TextView tvMinedTitle;
     @BindView(R.id.tv_mining_transaction)
@@ -254,7 +255,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             blockMined = MiningUtil.parseMinedBlocks(blockInfo);
         }
         tvSynchronized.setText(String.valueOf(blockSync));
-        tvMined.setText(String.valueOf(blockMined));
+        if(MyApplication.getRemoteConnector().isCalculatingMe()){
+            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            tvMined.setLoadingText(ResourcesUtil.getText(R.string.home_mining_mined_calculating));
+        }else{
+            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 28);
+            tvMined.setNormalText(String.valueOf(blockMined));
+        }
     }
 
     @Override
@@ -381,6 +388,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         if(tvMiningSwitch != null){
             tvMiningSwitch.closeLoading();
             ivMiningSwitch.closeLoading();
+            tvMined.closeLoading();
         }
         super.onDestroy();
     }

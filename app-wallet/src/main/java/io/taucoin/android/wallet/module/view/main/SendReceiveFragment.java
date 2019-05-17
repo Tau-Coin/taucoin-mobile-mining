@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -35,19 +36,18 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.tx.SendActivity;
+import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EmptyLayout;
-import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.DimensionsUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
-import io.taucoin.foundation.util.StringUtil;
 
 public class SendReceiveFragment extends BaseFragment implements ISendReceiveView {
 
@@ -67,6 +67,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     LinearLayout llTip;
     @BindView(R.id.tv_address)
     TextView tvAddress;
+    View seeMoreView;
 
     private TxPresenter mTxPresenter;
     private HistoryExpandableListAdapter mAdapter;
@@ -114,6 +115,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         refreshLayout.setEnableAutoLoadmore(false);
         refreshLayout.setEnableLoadmoreWhenContentNotFull(true);
         DrawablesUtil.setEndDrawable(tvAddress, R.mipmap.icon_copy, 22);
+
+        seeMoreView = LinearLayout.inflate(getActivity(), R.layout.list_view_footer, null);
+        listViewLog.addFooterView(seeMoreView);
+        TextView tvSeeMore = seeMoreView.findViewById(R.id.tv_see_more);
+        tvSeeMore.setOnClickListener(v -> ActivityUtil.openUri(v.getContext(), TransmitKey.ExternalUrl.TAU_EXPLORER_SEE_MORE));
     }
 
     @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right})
@@ -191,7 +197,18 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         mAdapter.setHistoryList(txHistories, mPageNo != 1);
         emptyLayout.setVisibility(mAdapter.getData().size() == 0 ? View.VISIBLE : View.GONE);
         llTip.setVisibility(mAdapter.getData().size() != 0 ? View.VISIBLE : View.GONE);
-        refreshLayout.setEnableLoadmore(txHistories.size() % TransmitKey.PAGE_SIZE == 0 && txHistories.size() > 0);
+        boolean isLoadMore = txHistories.size() % TransmitKey.PAGE_SIZE == 0 && txHistories.size() > 0;
+        refreshLayout.setEnableLoadmore(isLoadMore);
+
+        if(seeMoreView != null){
+            seeMoreView.setVisibility(isLoadMore ? View.GONE : View.VISIBLE);
+            AbsListView.LayoutParams layoutParams = (AbsListView.LayoutParams) seeMoreView.getLayoutParams();
+            layoutParams.height = 0;
+            if(!isLoadMore){
+                layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
+            }
+            seeMoreView.setLayoutParams(layoutParams);
+        }
     }
 
     @Override

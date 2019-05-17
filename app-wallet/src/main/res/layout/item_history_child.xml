@@ -71,6 +71,28 @@
         android:text="" />
 
     <TextView
+        android:id="@+id/tv_transaction_expiry_title"
+        style="@style/style_middle_grey"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:text="@string/tx_transaction_expiry" />
+
+    <TextView
+        android:id="@+id/tv_transaction_expiry"
+        style="@style/style_middle_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_size_30"
+        android:layout_marginEnd="@dimen/dimen_size_30"
+        android:gravity="center_vertical"
+        android:minHeight="30dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="" />
+
+    <TextView
         android:id="@+id/tv_memo_title"
         style="@style/style_middle_grey"
         android:layout_width="wrap_content"

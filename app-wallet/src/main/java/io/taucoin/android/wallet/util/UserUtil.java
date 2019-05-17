@@ -143,6 +143,10 @@ public class UserUtil {
         return getTransExpiryTime() / 5;
     }
 
+    public static String getTransExpiryTime(long blocks) {
+        return String.valueOf(blocks * 5);
+    }
+
     public static void setApplicationInfo(TextView tvCPU, TextView tvMemory, TextView tvDataStorage, Object data) {
         try{
             if(data != null){

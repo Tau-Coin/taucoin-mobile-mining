@@ -57,7 +57,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     private String mConsoleLog = "";
     private boolean isTaucoinConnected = false;
     boolean isInit = false;
-    boolean isSyncMe = false;
+    int isSyncMe = -1;
     BlockForgeExceptionStopEvent mExceptionStop;
 
     private final static int CONSOLE_LENGTH = 10000;
@@ -99,7 +99,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector = null;
         }
         isInit = false;
-        isSyncMe = false;
+        isSyncMe = -1;
         isTaucoinConnected = false;
         mExceptionStop = null;
     }
@@ -117,7 +117,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public boolean isSyncMe() {
-        return isSyncMe;
+        return isSyncMe == 1;
+    }
+
+    public boolean isCalculatingMe() {
+        return isSyncMe == 0;
     }
 
     @Override
@@ -145,7 +149,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.removeListener(mHandlerIdentifier);
             isTaucoinConnected = false;
             isInit = false;
-            isSyncMe = false;
+            isSyncMe = -1;
         }
     }
 
@@ -306,7 +310,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void getBlockList(int num, long height){
         Logger.d("getBlockList num=" + num + "\theight=" + height);
-        isSyncMe = false;
+        isSyncMe = -1;
         int limit = (int) height - num + 1;
         if(mTaucoinConnector != null){
             mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
