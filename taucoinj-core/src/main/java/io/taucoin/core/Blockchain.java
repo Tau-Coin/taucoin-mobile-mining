@@ -10,7 +10,7 @@ public interface Blockchain {
 
     public long getSize();
 
-    public boolean add(Block block);
+    public boolean addBlock(Block block);
 
     public ImportResult tryToConnect(Block block);
 

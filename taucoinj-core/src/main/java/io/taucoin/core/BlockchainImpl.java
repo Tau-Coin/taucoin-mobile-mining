@@ -388,7 +388,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         if (bestBlock.isParentOf(block)) {
             recordBlock(block);
 
-            if (add(block)) {
+            if (addBlock(block)) {
                 listener.onBlockConnected(block);
                 //notify
                 synchronized (lock) {
@@ -468,7 +468,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     @Override
-    public synchronized boolean add(Block block) {
+    public synchronized boolean addBlock(Block block) {
 
         if (exitOn < block.getNumber()) {
             System.out.print("Exiting after block.number: " + bestBlock.getNumber());
@@ -501,12 +501,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         storeBlock(block);
 
-
-//        if (!byTest && needFlush(block)) {
-            repository.flush();
-            blockStore.flush();
-            System.gc();
-//        }
+        //if (!byTest && needFlush(block)) {
+        repository.flush();
+        blockStore.flush();
+        System.gc();
+        //}
 
         // Remove all wallet transactions as they already approved by the net
         wallet.removeTransactions(block.getTransactionsList());
@@ -828,7 +827,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
         int txCount = 0;
         for (Transaction tx : block.getTransactionsList()) {
-            logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
+            //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
