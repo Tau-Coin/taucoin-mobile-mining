@@ -41,12 +41,11 @@ public class Block {
     //160 bits, The SHA256 previous block header and RIPEMD 160 second 160 bits
     private byte[] previousHeaderHash;
 
-    /*this is left for future use 8 bits*/
-    private byte option;
-
     /* Transactions */
     private List<Transaction> transactionsList = new CopyOnWriteArrayList<>();
 
+    /*this is left for future use 8 bits*/
+    private byte option;
     /* A scalar value equal to the number of ancestor blocks.
      * The genesis block has a number of zero */
     private long number;
@@ -54,8 +53,8 @@ public class Block {
     private byte[] generationSignature;
     private BigInteger cumulativeDifficulty = BigInteger.ZERO; //this is total chain difficulty
     private BigInteger cumulativeFee = BigInteger.ZERO;
-    private byte[] forgerPubkey;
-
+    private byte[] forgerPubkey = null;
+    private byte[] forgerAddress = null;
 
     protected byte[] rlpEncoded;
     private byte[] rlpEncodedMsg;
@@ -93,10 +92,6 @@ public class Block {
 
     public Block(byte version, byte[] timestamp, byte[] previousHeaderHash,
                  byte option, List<Transaction> transactionsList) {
-        /*
-         * TODO: calculate GenerationSignature
-         *
-         */
         this.version = version;
         this.timeStamp = timestamp;
         this.previousHeaderHash = previousHeaderHash;
@@ -181,6 +176,7 @@ public class Block {
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
             logger.info("signature size is {}",signature.size());
+
             // Parse blockSignature
             byte[] r = signature.get(0).getRLPData();
             byte[] s = signature.get(1).getRLPData();
@@ -188,7 +184,6 @@ public class Block {
             this.blockSignature = ECDSASignature.fromComponents(r, s,v);
 
             this.previousHeaderHash = block.get(3).getRLPData();
-
             // Parse option
             this.option = block.get(4).getRLPData()[0];
             // Parse Transactions
@@ -196,21 +191,9 @@ public class Block {
                 RLPList txTransactions = (RLPList) block.get(5);
                 this.parseTxs(txTransactions, false);
             }
-
         }
 
         this.parsed = true;
-        if(isMsg){
-            ECKey key;
-            try{
-                key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
-                if(key != null){
-                    forgerPubkey = key.getCompressedPubKey();
-                }
-            }catch (SignatureException e){
-                forgerPubkey = ByteUtil.intToBytes(0);
-            }
-        }
     }
 
 
@@ -248,10 +231,36 @@ public class Block {
         return this.timeStamp;
     }
 
+    public boolean extractForgerPublicKey() {
+        ECKey key;
+        try{
+            key = ECKey.signatureToKey(this.getRawHash(), blockSignature.toBase64());
+            if(key != null){
+                forgerPubkey = key.getCompressedPubKey();
+            } else {
+                return false;
+            }
+        }catch (SignatureException e){
+            logger.error(e.getMessage(), e);
+            return false;
+        }
+        return true;
+    }
 
-    public byte[] getGeneratorPublicKey() {
-        if (!parsed) parseRLP();
+    public byte[] getForgerPublicKey() {
+        if (forgerPubkey == null) {
+            if (!parsed) parseRLP();
+            extractForgerPublicKey();
+        }
         return forgerPubkey;
+    }
+
+    public byte[] getForgerAddress() {
+        if (forgerAddress == null) {
+            ECKey key = ECKey.fromPublicOnly(getForgerPublicKey());
+            forgerAddress = key.getAddress();
+        }
+        return forgerAddress;
     }
 
     public byte getVersion() {
@@ -421,8 +430,8 @@ public class Block {
         byte[][] transactionsEncoded = new byte[transactionsList.size()][];
         int i = 0;
         for (Transaction tx : transactionsList) {
-           transactionsEncoded[i] = tx.getEncoded();
-           ++i;
+            transactionsEncoded[i] = tx.getEncoded();
+            ++i;
         }
         return RLP.encodeList(transactionsEncoded);
     }
@@ -444,22 +453,11 @@ public class Block {
             byte[] signature = getSignatureEncoded();
             byte[] previousHeaderHash = RLP.encodeElement(this.previousHeaderHash);
 
-            ECKey key;
-            try{
-                key = ECKey.signatureToKey(this.getRawHash(),blockSignature.toBase64());
-                if(key != null){
-                    forgerPubkey = key.getCompressedPubKey();
-                }
-            }catch (SignatureException e){
-                forgerPubkey = ByteUtil.intToBytes(0);
-            }
             List<byte[]> block = getFullBodyElements();
-            logger.info("size of encode element is {}",block.size());
             block.add(0, version);
             block.add(1,timestamp);
             block.add(2,signature);
             block.add(3,previousHeaderHash);
-            logger.info("size of encode element is {}",block.size());
             byte[][] elements = block.toArray(new byte[block.size()][]);
 
             this.rlpEncoded = RLP.encodeList(elements);
@@ -527,6 +525,7 @@ public class Block {
 
     private List<byte[]> getBodyElements() {
         if (!parsed) parseRLP();
+
         byte[] option = getOptionEncoded();
         byte[] transactions = getTransactionsEncoded();
 
@@ -579,22 +578,6 @@ public class Block {
         this.blockSignature = key.sign(hash);
         this.rlpEncoded = null;
         this.rlpEncodedMsg = null;
-    }
-
-    /**
-     * verify block signature with readable message and signature
-     * @return
-     */
-    public boolean verifyBlockSignature() {
-        ECKey key;
-        try {
-            key = ECKey.signatureToKey(this.getRawHash(), this.getblockSignature().toBase64());
-        }catch (SignatureException e){
-            logger.error(e.getMessage());
-            return false;
-        }
-        byte[] forger = key.getAddress();
-        return true;
     }
 
     public String getShortDescr() {
