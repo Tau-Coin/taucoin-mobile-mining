@@ -1272,12 +1272,16 @@ public class TaucoinRemoteService extends TaucoinService {
             ArrayList<Block> blockList = new ArrayList<Block>();
             List<byte[]> hashList = null;
             if (taucoin != null) {
-                if (number != -1) {
-                    hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(number, limit);
-                } else if (hash != null) {
-                    hashList = taucoin.getBlockchain().getListOfHashesStartFrom(hash, limit);
-                }
+                try {
+                    if (number != -1) {
+                        hashList = taucoin.getBlockchain().getListOfHashesStartFromBlock(number, limit);
+                    } else if (hash != null) {
+                        hashList = taucoin.getBlockchain().getListOfHashesStartFrom(hash, limit);
+                    }
+                }catch (Exception ignore){
 
+                }
+                
                 if (hashList != null) {
                     for (byte[] hash : hashList) {
                         try {
