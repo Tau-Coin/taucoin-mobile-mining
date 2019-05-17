@@ -252,7 +252,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 logger.info("Try to connect block, block number: {}, hash: {}",
                         newBlock.getNumber(), Hex.toHexString(newBlock.getHash()));
 
-                if (!isValid(newBlock, track)) {
+                if (!isValidBlock(newBlock, track)) {
                     isValid = false;
                     logger.info("Connect block fail! Cannot verify block, block number: {}, hash: {}",
                             newBlock.getNumber(), Hex.toHexString(newBlock.getHash()));
@@ -465,7 +465,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             System.exit(-1);
         }
 
-        if (!isValid(block, repository)) {
+        if (!isValidBlock(block, repository)) {
             logger.warn("Invalid block with number: {}", block.getNumber());
             return false;
         }
@@ -686,9 +686,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-//        if (!isValid(block.getHeader())) {
-//            return false;
-//        }
+        /*
+		if (!isValid(block.getHeader())) {
+            return false;
+        }
+		*/
 
         List<Transaction> txs = block.getTransactionsList();
         if (txs.size() > Constants.MAX_BLOCKTXSIZE) {
@@ -706,7 +708,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * likely next period. Conversely, if the period is too large, the difficulty,
      * and expected time to the next block, is reduced.
      */
-    private boolean isValid(Block block, Repository repo) {
+    private boolean isValidBlock(Block block, Repository repo) {
 
         if (!block.isGenesis()) {
             if (!verifyBlockSimply(block))
