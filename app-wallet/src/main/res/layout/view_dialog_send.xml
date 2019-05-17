@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="20dp"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
+    android:paddingStart="7dp"
+    android:paddingEnd="7dp"
     android:paddingBottom="1dp"
     android:orientation="vertical"
     android:background="@color/color_white"
@@ -74,7 +74,9 @@
         style="@style/style_middle_grey"
         android:layout_width="match_parent"
         android:paddingBottom="1dp"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content" />
+        android:text=""
+        android:textSize="13dp"
+        android:layout_marginTop="15dp"
+        android:layout_height="38dp" />
 
 </LinearLayout>

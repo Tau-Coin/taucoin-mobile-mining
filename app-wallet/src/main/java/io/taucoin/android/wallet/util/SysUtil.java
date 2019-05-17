@@ -31,6 +31,7 @@ import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 import com.jaredrummler.android.processes.models.Stat;
 import com.jaredrummler.android.processes.models.Statm;
+import com.jaredrummler.android.processes.models.Status;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class SysUtil {
     private Long lastMainAppCpuTime;
     private Long lastMiningAppCpuTime;
 
-    public double sampleCPU(Stat appStat, boolean isMain) {
+    private double sampleCPU(Stat appStat, boolean isMain) {
         long cpuTime;
         long appTime;
         double sampleValue = 0.0D;
@@ -134,6 +135,7 @@ public class SysUtil {
         MemoryInfo memoryInfo = new MemoryInfo();
         try {
             List<AndroidAppProcess> processes = AndroidProcesses.getRunningAppProcesses();
+            TrafficInfo trafficInfo = new TrafficInfo();
             for (AndroidAppProcess process : processes) {
                 // Get some information about the process
                 String processName = process.name;
@@ -144,8 +146,10 @@ public class SysUtil {
                         && StringUtil.isNotSame(processName, miningProcess)){
                     continue;
                 }
-                Stat stat = process.stat();
-                int pid = stat.getPid();
+                Status status = process.status();
+                int uid = status.getUid();
+                memoryInfo.netDataSize = trafficInfo.getTrafficInfo(uid);
+                Logger.d("uid=" + uid + ",\t" + memoryInfo.netDataSize);
 
                 Statm statm = process.statm();
                 long totalSizeOfProcess = statm.getSize();
@@ -153,11 +157,17 @@ public class SysUtil {
                 memoryInfo.maxMemory += totalSizeOfProcess;
                 memoryInfo.totalMemory += residentSetSize;
 
+                Stat stat = process.stat();
                 double cpu = sampleCPU(stat, processName.equals(context.getPackageName()));
                 memoryInfo.cpuUsageRate += cpu;
             }
             if(memoryInfo.cpuUsageRate < 0){
                 memoryInfo.cpuUsageRate = 0;
+            }else if(memoryInfo.cpuUsageRate > 100){
+                memoryInfo.cpuUsageRate = 100;
+            }
+            if(memoryInfo.netDataSize < 0){
+                memoryInfo.netDataSize = 0;
             }
         } catch (Exception e) {
             Logger.i("loadAppProcess.is error", e);
@@ -201,6 +211,7 @@ public class SysUtil {
         public long totalMemory;
         public long freeMemory;
         public double cpuUsageRate;
+        public long netDataSize;
 
         MemoryInfo() {
 

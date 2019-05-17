@@ -128,7 +128,7 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="0B" />
+                android:text="0M" />
 
         </RelativeLayout>
 
@@ -162,7 +162,7 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="0B" />
+                android:text="0M" />
 
         </RelativeLayout>
 

@@ -50,6 +50,7 @@ public class CommonDialog extends Dialog {
         private boolean isCanCancel = true;
         private boolean isEnabledPositive = true;
         private boolean isEnabledNegative = true;
+        private boolean isExchange = false;
         private int btnWidth;
         private OnClickListener positiveButtonClickListener;
         private OnClickListener negativeButtonClickListener;
@@ -81,6 +82,11 @@ public class CommonDialog extends Dialog {
 
         public Builder setButtonWidth(int dpWidth) {
             this.btnWidth = dpWidth;
+            return this;
+        }
+
+        public Builder setExchange(boolean isExchange) {
+            this.isExchange = isExchange;
             return this;
         }
 
@@ -129,30 +135,50 @@ public class CommonDialog extends Dialog {
             }
             resetDialogWidth(layout, dialog);
             ViewHolder viewHolder = new ViewHolder(layout);
-            viewHolder.positiveButton.setText(positiveButtonText);
-            if (StringUtil.isEmpty(positiveButtonText)) {
-                viewHolder.positiveButton.setVisibility(View.GONE);
-            }
+
             viewHolder.positiveButton.setEnabled(isEnabledPositive);
             viewHolder.negativeButton.setEnabled(isEnabledNegative);
 
             if(!isEnabledPositive){
                 viewHolder.positiveButton.setBackgroundResource(R.drawable.grey_rect_round_bg);
+            }else{
+                if(isExchange){
+                    viewHolder.positiveButton.setBackgroundResource(R.drawable.red_rect_round_bg);
+                }
             }
             if(!isEnabledNegative){
                 viewHolder.negativeButton.setBackgroundResource(R.drawable.grey_rect_round_bg);
+            }else{
+                if(isExchange){
+                    viewHolder.negativeButton.setBackgroundResource(R.drawable.yellow_rect_round_bg);
+                }
+            }
+            if(isExchange){
+                viewHolder.negativeButton.setText(positiveButtonText);
+                viewHolder.positiveButton.setText(negativeButtonText);
+            }else{
+                viewHolder.negativeButton.setText(negativeButtonText);
+                viewHolder.positiveButton.setText(positiveButtonText);
             }
 
-            viewHolder.negativeButton.setText(negativeButtonText);
+            if (StringUtil.isEmpty(positiveButtonText)) {
+                viewHolder.positiveButton.setVisibility(View.GONE);
+            }
             if (StringUtil.isEmpty(negativeButtonText)) {
                 viewHolder.negativeButton.setVisibility(View.GONE);
             }
 
             if (positiveButtonClickListener != null) {
                 viewHolder.positiveButton.setOnClickListener(v -> positiveButtonClickListener.onClick(dialog, DialogInterface.BUTTON_POSITIVE));
+                if(isExchange){
+                    viewHolder.positiveButton.setOnClickListener(v -> negativeButtonClickListener.onClick(dialog, DialogInterface.BUTTON_POSITIVE));
+                }
             }
             if (negativeButtonClickListener != null) {
                 viewHolder.negativeButton.setOnClickListener(v -> negativeButtonClickListener.onClick(dialog, DialogInterface.BUTTON_NEGATIVE));
+                if(isExchange){
+                    viewHolder.negativeButton.setOnClickListener(v -> positiveButtonClickListener.onClick(dialog, DialogInterface.BUTTON_NEGATIVE));
+                }
             }
 
             if(btnWidth > 0){

@@ -141,9 +141,10 @@ public class NotifyManager {
         mResManager.startResThread(new ResManager.ResCallBack(){
 
             @Override
-            void updateCpuAndMemory(String cpuInfo, String memoryInfo) {
+            void updateCpuAndMemory(String cpuInfo, String memoryInfo, String networkData) {
                 mNotifyData.cpuUsage = cpuInfo;
                 mNotifyData.memorySize = memoryInfo;
+                mNotifyData.netDataSize = networkData;
                 sendNotify();
             }
 
@@ -185,8 +186,8 @@ public class NotifyManager {
         if(StringUtil.isNotEmpty(notifyData.memorySize)){
             remoteViews.setTextViewText(R.id.tv_memory, notifyData.memorySize);
         }
-        if(StringUtil.isNotEmpty(notifyData.dataSize)){
-            remoteViews.setTextViewText(R.id.tv_data, notifyData.dataSize);
+        if(StringUtil.isNotEmpty(notifyData.netDataSize)){
+            remoteViews.setTextViewText(R.id.tv_data, notifyData.netDataSize);
         }
         int miningState = R.mipmap.icon_end;
         boolean isLoading = false;
@@ -328,6 +329,7 @@ public class NotifyManager {
     public static class NotifyData implements Parcelable {
         public String cpuUsage;
         public String memorySize;
+        public String netDataSize;
         public String dataSize;
         String miningState;
 
@@ -336,6 +338,7 @@ public class NotifyManager {
         NotifyData(Parcel in) {
             cpuUsage = in.readString();
             memorySize = in.readString();
+            netDataSize = in.readString();
             dataSize = in.readString();
             miningState = in.readString();
         }
@@ -346,6 +349,7 @@ public class NotifyManager {
             dest.writeString(memorySize);
             dest.writeString(dataSize);
             dest.writeString(miningState);
+            dest.writeString(netDataSize);
         }
 
         @Override

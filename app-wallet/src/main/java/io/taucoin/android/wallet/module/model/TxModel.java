@@ -414,6 +414,7 @@ public class TxModel implements ITxModel {
                             tx.setTxId(bean.getTxId());
                             tx.setAmount(FmtMicrometer.fmtTxValue(bean.getAmount()));
                             tx.setFee(FmtMicrometer.fmtTxValue(bean.getFee()));
+                            tx.setTransExpiry(bean.getExpiredHeight());
                         }
                         tx.setTimeBasis(1);
                         tx.setBlockHeight(bean.getBlockHeight());

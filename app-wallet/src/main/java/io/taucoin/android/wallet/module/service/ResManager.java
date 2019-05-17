@@ -15,7 +15,6 @@
  */
 package io.taucoin.android.wallet.module.service;
 
-import android.content.Context;
 import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageStats;
 import android.os.Bundle;
@@ -26,8 +25,12 @@ import android.support.annotation.NonNull;
 
 import com.github.naturs.logger.Logger;
 
-import io.taucoin.android.wallet.MyApplication;
+import java.util.Date;
+
 import io.taucoin.android.wallet.base.BaseHandler;
+import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.SysUtil;
 import io.taucoin.foundation.util.ThreadPool;
 
@@ -52,6 +55,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                  SysUtil.MemoryInfo info = bundle.getParcelable("data");
                  if(info != null){
                      String memoryInfo = SysUtil.formatFileSizeMb(info.totalMemory);
+
                      String cpuInfo = String.valueOf(info.cpuUsageRate);
                      int pointIndex = cpuInfo.indexOf(".");
                      int length = cpuInfo.length();
@@ -59,8 +63,12 @@ class ResManager implements BaseHandler.HandleCallBack{
                          cpuInfo = cpuInfo.substring(0, pointIndex + 3);
                      }
                      cpuInfo += "%";
+
+                     long dailyTraffic = handleTrafficData(info.netDataSize);
+                     String netDataInfo = SysUtil.formatFileSizeMb(dailyTraffic);
+
                      if(mResCallBack != null){
-                         mResCallBack.updateCpuAndMemory(cpuInfo, memoryInfo);
+                         mResCallBack.updateCpuAndMemory(cpuInfo, memoryInfo, netDataInfo);
                      }
                  }
                  break;
@@ -79,12 +87,30 @@ class ResManager implements BaseHandler.HandleCallBack{
          }
      }
 
-     private synchronized void startResThreadDelay() {
+    private long handleTrafficData(long currentTraffic) {
+        long currentTrafficTime = new Date().getTime();
+        long oldTraffic = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC, 0);
+        long oldTrafficTime = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
+        long dailyTraffic = currentTraffic - oldTraffic;
+
+        if(dailyTraffic < 0){
+            dailyTraffic = 0;
+        }
+
+        if(DateUtil.compareDay(oldTrafficTime, currentTrafficTime) > 0 || oldTraffic <= 0 || oldTrafficTime <= 0){
+            dailyTraffic = 0;
+            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC, currentTraffic);
+            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
+        }
+        return dailyTraffic;
+    }
+
+    private synchronized void startResThreadDelay() {
          ThreadPool.getThreadPool().execute(() -> {
              try {
                  if(isRunning){
-                     Context context = MyApplication.getInstance();
-                     mSysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
+//                     Context context = MyApplication.getInstance();
+//                     mSysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
 
                      SysUtil.MemoryInfo info =  mSysUtil.loadAppProcess();
                      Bundle bundle = new Bundle();
@@ -139,7 +165,7 @@ class ResManager implements BaseHandler.HandleCallBack{
      }
 
      abstract static class ResCallBack{
-         abstract void updateCpuAndMemory(String cpuInfo, String memoryInfo);
+         abstract void updateCpuAndMemory(String cpuInfo, String memoryInfo, String networkData);
          abstract void updateDataSize(String dataInfo);
      }
  }

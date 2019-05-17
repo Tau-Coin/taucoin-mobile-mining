@@ -59,6 +59,7 @@ public class UserPresenter {
         new CommonDialog.Builder(context)
             .setContentView(view)
             .setButtonWidth(240)
+            .setExchange(keyValue == null)
             .setPositiveButton(R.string.send_dialog_yes, (dialog, which) -> {
                 dialog.cancel();
                 saveKeyAndAddress(context, keyValue);

@@ -130,7 +130,8 @@ public class SendActivity extends BaseActivity implements ISendView {
             String feeRate = "3%=";
             String fee = FmtMicrometer.fmtFormatFee(amount, "0.03");
             rangeFee = FmtMicrometer.fmtFormatRangeFee(fee);
-            feeCalculate = String.format(feeCalculate, amount, feeRate, fee);
+            String total = FmtMicrometer.fmtFormatAdd(amount, rangeFee);
+            feeCalculate = String.format(feeCalculate, amount, feeRate, fee, total);
         }else {
             feeCalculate = "";
         }

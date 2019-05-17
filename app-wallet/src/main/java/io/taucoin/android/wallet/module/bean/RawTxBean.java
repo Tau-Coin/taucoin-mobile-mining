@@ -14,6 +14,8 @@ public class RawTxBean {
     private int blockHeight;
     @SerializedName(value = "txtime")
     private String txTime;
+    @SerializedName(value = "expiredheight")
+    private long expiredHeight;
 
     public String getTxId() {
         return txId;
@@ -69,5 +71,13 @@ public class RawTxBean {
 
     public void setTxTime(String txTime) {
         this.txTime = txTime;
+    }
+
+    public long getExpiredHeight() {
+        return expiredHeight;
+    }
+
+    public void setExpiredHeight(long expiredHeight) {
+        this.expiredHeight = expiredHeight;
     }
 }

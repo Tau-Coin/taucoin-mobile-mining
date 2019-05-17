@@ -12,6 +12,7 @@
     <string name="common_exit" formatted="false">\nDo you want to stop mining?\n</string>
     <string name="common_balance_unit">TAU</string>
     <string name="common_refresh_failed">Refresh Failed</string>
+    <string name="common_see_more">Click to see more</string>
 
     <string name="splash_title">TAU mWallet %s</string>
     <string name="splash_subheading">Mobile &#038; Decentral\nProof of Transaction</string>
@@ -30,6 +31,7 @@
     <string name="tx_to_address">To Address</string>
     <string name="tx_from_address">From Address</string>
     <string name="tx_transaction_id">Transaction ID</string>
+    <string name="tx_transaction_expiry">Transaction Expiry</string>
     <string name="tx_transaction_fee">Transaction Fee</string>
     <string name="tx_log_tips">
         &#160;Red font indicates a failed transaction,\n
@@ -51,7 +53,7 @@
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
     <string name="send_memo">Memo</string>
-    <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction Expiry in blocks <font color="#0E88EF">%s</font> (≈%s min)]]> </Data></string>
+    <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction expires in <font color="#0E88EF">%s</font> (≈%s minutes) blocks.]]> </Data></string>
     <string name="send_to">To</string>
     <string name="send_dialog_yes">Proceed</string>
     <string name="send_dialog_no">Back</string>
@@ -59,8 +61,8 @@
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
-    <string name="send_tx_range_fee">%s×%s%s</string>
-    <string name="send_tx_fee">%s&#160;tau</string>
+    <string name="send_tx_range_fee">%s×%s%s&#160;(Total:%s)</string>
+    <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
@@ -124,12 +126,12 @@
     <string name="home_mining_connecting">Connecting</string>
 
     <string name="home_mining_income">Mining Income</string>
-    <string name="home_power">Power</string>
-    <string name="home_synchronized">Synchronized</string>
-    <string name="home_mined">Mined</string>
-    <string name="home_cpu">CPU (%)</string>
-    <string name="home_memory">Memory (M)</string>
-    <string name="home_data_storage">Data (M)</string>
+    <string name="home_power">Mining Power</string>
+    <string name="home_synchronized">Blocks Sync-ed</string>
+    <string name="home_mined">Blocks Mined</string>
+    <string name="home_cpu">CPU&#160;(%)</string>
+    <string name="home_memory">Memory&#160;(M)</string>
+    <string name="home_data_storage">Daily Data (M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
 
@@ -139,6 +141,7 @@
     <string name="home_mining_miner">Miner</string>
     <string name="home_mining_participant">Participant</string>
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
+    <string name="home_mining_mined_calculating">Calculating</string>
 
     <string name="block_list_title">Mining Details</string>
     <string name="block_list_all">ALL</string>
@@ -168,7 +171,7 @@
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
-    <string name="setting_transaction_expiry">Transaction Expiry in blocks</string>
+    <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
 
 </resources>

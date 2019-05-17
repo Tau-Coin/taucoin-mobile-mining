@@ -136,14 +136,14 @@ public class MiningModel implements IMiningModel{
 //        Logger.d("blockNo=" + blockNo);
 //        Logger.d("blockHash=" + blockHash);
 //        Logger.d("generatorPublicKey=" + generatorPublicKey);
-        String pubicKey = KeyValueDaoUtils.getInstance().querySignatureKey(generatorPublicKey);
-        if(StringUtil.isNotEmpty(pubicKey)){
+        String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        if(StringUtil.isSame(generatorPublicKey.toLowerCase(), currentPubicKey.toLowerCase())){
             MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
             if(entry == null){
                 if(isConnect){
                     entry = new MiningBlock();
                     entry.setBlockNo(blockNo);
-                    entry.setPubKey(pubicKey);
+                    entry.setPubKey(currentPubicKey);
                     entry.setBlockHash(blockHash);
                     entry.setValid(1);
 
@@ -165,7 +165,6 @@ public class MiningModel implements IMiningModel{
         }
 
         if(isNeedSync){
-            String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(currentPubicKey);
             if(keyValue != null){
                 keyValue.setSyncBlockNum((int)block.getNumber());

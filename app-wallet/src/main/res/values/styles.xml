@@ -201,7 +201,7 @@
     </style>
 
     <style name="style_mining_yellow">
-        <item name="android:textSize">@dimen/dimen_size_40</item>
+        <item name="android:textSize">@dimen/dimen_size_32</item>
         <item name="android:textColor">@color/color_yellow</item>
     </style>
 

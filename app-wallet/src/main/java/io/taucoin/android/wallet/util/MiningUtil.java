@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.util;
 
+import android.text.Html;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
@@ -170,9 +171,11 @@ public class MiningUtil {
                 @Override
                 public void handleData(List<MiningReward> miningRewards) {
                     if(tvMiningIncome != null){
+                        String miningIncomeText = ResourcesUtil.getText(R.string.common_balance);
                         String miningIncome = MiningUtil.parseMiningIncome(miningRewards);
-                        tvMiningIncome.setText(miningIncome);
-                        Logger.d("MiningUtil.setMiningIncome=" + miningIncome);
+                        miningIncomeText = String.format(miningIncomeText, miningIncome);
+                        tvMiningIncome.setText(Html.fromHtml(miningIncomeText));
+                        Logger.d("MiningUtil.setMiningIncome=" + miningIncomeText);
                     }
                 }
             });
