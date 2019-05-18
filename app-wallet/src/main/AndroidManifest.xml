@@ -20,6 +20,10 @@
     <!--android9.0 Require that the service must be declared to run in the foreground-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
+    <!--android6.0 over Request access to traffic statistics-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
+
     <!--google play Avoiding the filtering mechanism of implicit permissions-->
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
     <!--Android P Support for the platform support of the IEEE802.11mc Wi-Fi protocol
@@ -30,6 +34,7 @@
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE"/>
     <!--Allow programs to access reorder tasks-->
     <uses-permission android:name="android.permission.REORDER_TASKS"/>
+
 
     <application
         android:name="io.taucoin.android.wallet.MyApplication"

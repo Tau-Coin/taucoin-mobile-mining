@@ -104,6 +104,11 @@
         <item name="android:textColor">@color/color_black</item>
     </style>
 
+    <style name="style_middle_red">
+        <item name="android:textSize">@dimen/dimen_size_14</item>
+        <item name="android:textColor">@color/color_red</item>
+    </style>
+
     <style name="style_normal_red">
         <item name="android:textSize">@dimen/dimen_size_16</item>
         <item name="android:textColor">@color/color_red</item>
@@ -201,7 +206,7 @@
     </style>
 
     <style name="style_mining_yellow">
-        <item name="android:textSize">@dimen/dimen_size_32</item>
+        <item name="android:textSize">@dimen/dimen_size_28</item>
         <item name="android:textColor">@color/color_yellow</item>
     </style>
 
@@ -211,7 +216,7 @@
     </style>
 
     <style name="style_power_black">
-        <item name="android:textSize">@dimen/dimen_size_28</item>
+        <item name="android:textSize">@dimen/dimen_size_22</item>
         <item name="android:textColor">@color/color_black</item>
     </style>
 

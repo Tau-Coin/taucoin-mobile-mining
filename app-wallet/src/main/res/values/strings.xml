@@ -121,17 +121,25 @@
         Please allow installation of TAUcoin.
     </string>
 
+    <string name="permission_tip_daily_data_denied">
+        Please enable statistical daily network data rights for TAUcoin, it is disabled.
+    </string>
+
+    <string name="permission_tip_daily_data_never_ask_again">
+        Please enable statistical daily network data rights for TAUcoin, it is forbidden now.
+    </string>
+
     <string name="home_mining_on">On</string>
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
 
     <string name="home_mining_income">Mining Income</string>
-    <string name="home_power">Mining Power</string>
-    <string name="home_synchronized">Blocks Sync-ed</string>
-    <string name="home_mined">Blocks Mined</string>
+    <string name="home_power">Mining&#160;Power</string>
+    <string name="home_synchronized">Blocks&#160;Synchronized</string>
+    <string name="home_mined">Blocks&#160;Mined</string>
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
-    <string name="home_data_storage">Daily Data (M)</string>
+    <string name="home_data_storage">Daily&#160;Data&#160;(M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
 

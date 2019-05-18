@@ -41,6 +41,7 @@ import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
+import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
@@ -119,7 +120,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         seeMoreView = LinearLayout.inflate(getActivity(), R.layout.list_view_footer, null);
         listViewLog.addFooterView(seeMoreView);
         TextView tvSeeMore = seeMoreView.findViewById(R.id.tv_see_more);
-        tvSeeMore.setOnClickListener(v -> ActivityUtil.openUri(v.getContext(), TransmitKey.ExternalUrl.TAU_EXPLORER_SEE_MORE));
+        tvSeeMore.setOnClickListener(v -> {
+            String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+            String seeMoreUrl = TransmitKey.ExternalUrl.TAU_EXPLORER_SEE_MORE + address;
+            ActivityUtil.openUri(v.getContext(), seeMoreUrl);
+        });
     }
 
     @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right})
@@ -201,10 +206,11 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         refreshLayout.setEnableLoadmore(isLoadMore);
 
         if(seeMoreView != null){
-            seeMoreView.setVisibility(isLoadMore ? View.GONE : View.VISIBLE);
+            boolean isMoreShow = !isLoadMore && mAdapter.getData().size() > 0;
+            seeMoreView.setVisibility(isMoreShow ? View.VISIBLE : View.GONE);
             AbsListView.LayoutParams layoutParams = (AbsListView.LayoutParams) seeMoreView.getLayoutParams();
             layoutParams.height = 0;
-            if(!isLoadMore){
+            if(isMoreShow){
                 layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
             }
             seeMoreView.setLayoutParams(layoutParams);

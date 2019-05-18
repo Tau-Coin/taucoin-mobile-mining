@@ -88,7 +88,7 @@
 
                     <TextView
                         android:layout_below="@+id/tv_mining_income"
-                        style="@style/style_normal_grey"
+                        style="@style/style_middle_grey"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
@@ -101,7 +101,7 @@
             <TextView
                 android:visibility="gone"
                 android:id="@+id/tv_error_msg"
-                style="@style/style_normal_red"
+                style="@style/style_middle_red"
                 android:layout_width="match_parent"
                 android:layout_marginTop="6dp"
                 android:text=""
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    style="@style/style_normal_grey"
+                    style="@style/style_small_grey"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -123,7 +123,7 @@
                     android:text="@string/home_cpu"/>
 
                 <TextView
-                    style="@style/style_normal_grey"
+                    style="@style/style_small_grey"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -131,7 +131,7 @@
                     android:text="@string/home_memory"/>
 
                 <TextView
-                    style="@style/style_normal_grey"
+                    style="@style/style_small_grey"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    style="@style/style_normal_grey"
+                    style="@style/style_small_grey"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
 
                     <TextView
                         android:id="@+id/tv_synchronized_title"
-                        style="@style/style_normal_grey"
+                        style="@style/style_small_grey"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_height="wrap_content"
@@ -220,7 +220,7 @@
 
                     <TextView
                         android:id="@+id/tv_mined_title"
-                        style="@style/style_normal_grey"
+                        style="@style/style_small_grey"
                         android:layout_gravity="center_horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -274,7 +274,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/style_normal_yellow"
+                style="@style/style_middle_yellow"
                 android:id="@+id/tv_mining_transaction"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="2dp"
@@ -282,7 +282,6 @@
                 android:layout_marginTop="15dp"
                 android:layout_gravity="center_horizontal"
                 android:drawablePadding="3dp"
-                android:textSize="@dimen/dimen_size_15"
                 android:text="@string/home_mining_transaction"
                 android:layout_height="wrap_content" />
 
@@ -306,14 +305,14 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:gravity="center_horizontal|center"
-                        style="@style/style_normal_grey"
+                        style="@style/style_middle_grey"
                         android:text="@string/home_mining_hash"
                         android:layout_height="wrap_content" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        style="@style/style_normal_grey"
+                        style="@style/style_middle_grey"
                         android:gravity="center_horizontal|center"
                         android:text="@string/home_mining_fee"
                         android:layout_height="wrap_content" />
@@ -321,7 +320,7 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        style="@style/style_normal_grey"
+                        style="@style/style_middle_grey"
                         android:gravity="center_horizontal|center"
                         android:text="@string/home_mining_status"
                         android:layout_height="wrap_content" />

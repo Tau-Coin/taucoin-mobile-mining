@@ -224,9 +224,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         refreshLayoutList.setEnableRefresh(false);
         refreshLayoutList.setOnLoadmoreListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
-        DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 16);
-        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 11);
-        DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 11);
+        DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 14);
+        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 8);
+        DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 8);
 
         mMiningRewardAdapter = new MiningRewardAdapter();
         listViewMiningTx.setAdapter(mMiningRewardAdapter);
@@ -241,10 +241,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         tag = tag == 0 ? 1 : 0;
         tvMiningTransaction.setTag(tag);
         int mipmap = tag == 1 ? R.mipmap.icon_tx_up : R.mipmap.icon_tx_down;
-        DrawablesUtil.setEndDrawable(tvMiningTransaction, mipmap, 16);
+        DrawablesUtil.setEndDrawable(tvMiningTransaction, mipmap, 14);
         llMiningTx.setVisibility(tag == 1 ? View.VISIBLE : View.GONE);
         handleMiningRewardView();
-
     }
 
     public void showMiningView(BlockInfo blockInfo){
@@ -256,10 +255,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
         tvSynchronized.setText(String.valueOf(blockSync));
         if(MyApplication.getRemoteConnector().isCalculatingMe()){
-            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
             tvMined.setLoadingText(ResourcesUtil.getText(R.string.home_mining_mined_calculating));
         }else{
-            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 28);
+            tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
             tvMined.setNormalText(String.valueOf(blockMined));
         }
     }
