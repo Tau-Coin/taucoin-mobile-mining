@@ -131,9 +131,9 @@ public class Transaction {
             //burn some money
             this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
         }
-
         parsed = true;
     }
+
     /* this expire time is default 144*5*60*/
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee) {
         this.version = version;
@@ -154,13 +154,12 @@ public class Transaction {
 
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime, byte[] r, byte[] s, byte v) {
         this(version, option, timeStamp, toAddress, amount, fee,expireTime);
-
         ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
         signature.v = v;
         this.signature = signature;
     }
 
-    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] r, byte[] s, byte v) {
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee, byte[] r, byte[] s, byte v) {
         this(version, option, timeStamp, toAddress, amount, fee);
 
         ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
@@ -169,7 +168,7 @@ public class Transaction {
     }
 
     public void setIsCompositeTx(boolean isCompositeTx){
-       this.isCompositeTx = isCompositeTx;
+        this.isCompositeTx = isCompositeTx;
     }
 
     public boolean isCompositeTx(){
@@ -247,7 +246,7 @@ public class Transaction {
         if (!isCompositeTx) {
             RLPList decodedTxList = RLP.decode2(rlpEncoded);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            //logger.info("pure transaction item size is {}", transaction.size());
+//            logger.info("pure transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
@@ -271,7 +270,7 @@ public class Transaction {
         } else {
             RLPList decodedTxList = RLP.decode2(rlpEncodedComposite);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            //logger.info("composite transaction item size is {}", transaction.size());
+//            logger.info("composite transaction item size is {}", transaction.size());
             this.version = transaction.get(0).getRLPData() == null ? (byte) 0 : transaction.get(0).getRLPData()[0];
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
@@ -286,13 +285,17 @@ public class Transaction {
             this.receiverWitnessAddress = transaction.get(8).getRLPData();
 
             RLPList senderList = (RLPList) transaction.get(9);
-            for (RLPElement senderAssociate : senderList) {
-                this.senderAssociatedAddress.add(senderAssociate.getRLPData());
+            if (senderList != null) {
+                for (RLPElement senderAssociate : senderList) {
+                    this.senderAssociatedAddress.add(senderAssociate.getRLPData());
+                }
             }
 
             RLPList receiverList = (RLPList) transaction.get(10);
-            for (RLPElement receiverAssociate : receiverList) {
-                this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
+            if (receiverList != null) {
+                for (RLPElement receiverAssociate : receiverList) {
+                    this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
+                }
             }
 
             // only parse signature in case tx is signed
@@ -501,21 +504,15 @@ public class Transaction {
         byte[] senderWitnessAddress = RLP.encodeElement(this.senderWitnessAddress);
         byte[] receiverWitnessAddress = RLP.encodeElement(this.receiverWitnessAddress);
         byte[][] senderAssociate = new byte[this.senderAssociatedAddress.size()][];
-        for (int i=0; i< this.senderAssociatedAddress.size();++i) {
+        for (int i=0; i< this.senderAssociatedAddress.size(); ++i) {
             senderAssociate[i] = RLP.encodeElement(this.senderAssociatedAddress.get(i));
-//            logger.info("associated address is {} index is {}",Hex.toHexString(
-//                                tempAssociate[i]),i);
         }
-//        logger.info("in transaction associated temporary size is====> {}",tempAssociate.length);
         byte[] senderAssociatedAddress = RLP.encodeList(senderAssociate);
 
         byte[][] receiverAssociate = new byte[this.receiverAssociatedAddress.size()][];
-        for (int i=0; i< this.receiverAssociatedAddress.size();++i) {
+        for (int i=0; i< this.receiverAssociatedAddress.size(); ++i) {
             receiverAssociate[i] = RLP.encodeElement(this.receiverAssociatedAddress.get(i));
-//            logger.info("associated address is {} index is {}",Hex.toHexString(
-//                                tempAssociate[i]),i);
         }
-//        logger.info("in transaction associated temporary size is====> {}",tempAssociate.length);
         byte[] receiverAssociatedAddress = RLP.encodeList(receiverAssociate);
 
         byte[] v, r, s;
@@ -567,6 +564,7 @@ public class Transaction {
                 BigIntegers.asUnsignedByteArray(amount),
                 BigIntegers.asUnsignedByteArray(fee));
     }
+
     public byte[] getExpireTime() {
         return expireTime;
     }
