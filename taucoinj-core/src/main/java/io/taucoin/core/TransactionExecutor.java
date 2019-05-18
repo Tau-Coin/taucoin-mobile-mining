@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.commons.lang3.ArrayUtils.getLength;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
@@ -133,9 +130,9 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
-		// Sender subtract balance
+        // Sender subtract balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
-//        logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
+        //logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
         track.addBalance(tx.getSender(), totalCost.negate());
 
         TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
@@ -144,15 +141,16 @@ public class TransactionExecutor {
         outcome.setTxid(tx.getHash());
         outcome.setSenderAddress(tx.getSender());
 
-		// Receiver add balance
+        // Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         outcome.setReceiveAddress(tx.getReceiveAddress());
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
-
+        //lookup sender account state.
+        AccountState senderAccountState = track.getAccountState(tx.getSender());
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
-//            logger.error("1 current witness share {}",feeDistributor.getCurrentWitFee());
+            //logger.error("1 current witness share {}",feeDistributor.getCurrentWitFee());
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             HashMap<byte[],Long> currentWintess = new HashMap<>();
             currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
@@ -160,42 +158,38 @@ public class TransactionExecutor {
 
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
-            if (track.getAccountState(tx.getSender()).getWitnessAddress() != null) {
-//                logger.error("2 last witness {} share {}",
-//                        Hex.toHexString(track.getAccountState(tx.getSender()).getWitnessAddress()),
-//                        feeDistributor.getLastWitFee());
+            if (senderAccountState.getWitnessAddress() != null) {
+                //logger.error("2 last witness {} share {}",
+                //Hex.toHexString(track.getAccountState(tx.getSender()).getWitnessAddress()),
+                //feeDistributor.getLastWitFee());
                 // Transfer fees to last witness
-                track.addBalance(track.getAccountState(tx.getSender()).getWitnessAddress(),
-                        toBI(feeDistributor.getLastWitFee()));
+                track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
                 HashMap<byte[],Long> lastWintess = new HashMap<>();
-                lastWintess.put(track.getAccountState(tx.getSender()).getWitnessAddress(),
-                        feeDistributor.getLastWitFee());
+                lastWintess.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
                 outcome.setLastWintess(lastWintess);
             }
 
-            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() != 0) {
-//                logger.error("3 associated size {} share {}",
-//                        track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
-//                        feeDistributor.getLastAssociFee());
+            int senderAssSize = senderAccountState.getAssociatedAddress().size();
+            if (senderAssSize != 0) {
+                //logger.error("3 associated size {} share {}",
+                //track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
+                //feeDistributor.getLastAssociFee());
                 // Transfer fees to last associate
                 AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
-                        track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
+                        senderAssSize,
                         feeDistributor.getLastAssociFee());
 
                 if (assDistributor.assDistributeFee()) {
-                    for (int i = 0; i < track.getAccountState(tx.getSender()).getAssociatedAddress().size(); ++i) {
-                        if(i != track.getAccountState(tx.getSender()).getAssociatedAddress().size() -1) {
-//                            logger.info("3-1 associated address is {} average is {}",Hex.toHexString(
-//                                    track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),assDistributor.getAverageShare());
-                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
-                                    toBI(assDistributor.getAverageShare()));
-                            outcome.updateSenderAssociated(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
-                                    assDistributor.getAverageShare());
+                    ArrayList<byte[]> senderAssAddress = senderAccountState.getAssociatedAddress();
+                    for (int i = 0; i < senderAssSize; ++i) {
+                        if(i != senderAssSize -1) {
+                            //logger.info("3-1 associated address is {} average is {}",Hex.toHexString(
+                            //track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),assDistributor.getAverageShare());
+                            track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getAverageShare()));
+                            outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getAverageShare());
                         } else {
-                            track.addBalance(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
-                                    toBI(assDistributor.getLastShare()));
-                            outcome.updateSenderAssociated(track.getAccountState(tx.getSender()).getAssociatedAddress().get(i),
-                                    assDistributor.getLastShare());
+                            track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getLastShare()));
+                            outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getLastShare());
                         }
                     }
                 }
@@ -204,51 +198,48 @@ public class TransactionExecutor {
             /**
              * 2 special situation is dealt by distribute associated fee to current forger
              */
-            if (track.getAccountState(tx.getSender()).getWitnessAddress() == null) {
-//                logger.error("4 coinbase {} share {}",
-//                        Hex.toHexString(coinbase),
-//                        feeDistributor.getLastWitFee());
-                // Transfer fees to last witness
-                track.addBalance(coinbase,
-                        toBI(feeDistributor.getLastWitFee()));
+            if (senderAccountState.getWitnessAddress() == null) {
+                //logger.error("4 coinbase {} share {}",
+                //Hex.toHexString(coinbase),
+                //feeDistributor.getLastWitFee());
+                // Transfer fees to current witness
+                track.addBalance(coinbase, toBI(feeDistributor.getLastWitFee()));
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastWitFee());
             }
 
-            if (track.getAccountState(tx.getSender()).getAssociatedAddress().size() == 0) {
-//                logger.error("5 coinbase {} share {}",
-//                        Hex.toHexString(coinbase),
-//                        feeDistributor.getLastAssociFee());
-                // Transfer fees to last associate
-                track.addBalance(coinbase,
-                        toBI(feeDistributor.getLastAssociFee()));
+            if (senderAssSize == 0) {
+                //logger.error("5 coinbase {} share {}",
+                //Hex.toHexString(coinbase),
+                //feeDistributor.getLastAssociFee());
+                // Transfer fees to current associate
+                track.addBalance(coinbase, toBI(feeDistributor.getLastAssociFee()));
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
             listener.onTransactionExecuated(outcome);
         }
 
         // Increase forge power.
-//        logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        //logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.increaseforgePower(tx.getSender());
-//        logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
+        //logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
 
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
-
-        AccountState accountState = track.getAccountState(tx.getSender());
-        if(blockchain.getSize() > MaxHistoryCount && accountState.getTranHistory().size() !=0 ){
-            long txTime = Collections.min(accountState.getTranHistory().keySet());
+        //AccountState accountState = track.getAccountState(tx.getSender());
+        if(blockchain.getSize() > MaxHistoryCount && senderAccountState.getTranHistory().size() !=0 ){
+            long txTime = Collections.min(senderAccountState.getTranHistory().keySet());
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
             if (freshTime > 1 && txTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp())) {
-                accountState.getTranHistory().remove(txTime);
+                senderAccountState.getTranHistory().remove(txTime);
             } else {
                 long txTimeTemp = ByteUtil.byteArrayToLong(tx.getTime());
-                accountState.getTranHistory().put(txTimeTemp, tx.getHash());
+                senderAccountState.getTranHistory().put(txTimeTemp, tx.getHash());
             }
         }else{
             long txTime = ByteUtil.byteArrayToLong(tx.getTime());
-            accountState.getTranHistory().put(txTime,tx.getHash());
+            senderAccountState.getTranHistory().put(txTime,tx.getHash());
         }
 
     }
