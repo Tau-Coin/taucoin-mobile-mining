@@ -596,26 +596,28 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     /**
      * verify transaction time
      * @param tx
-     * @param block
+     * @param blockTime
+     * @param bestBlockNum
      * @return
      */
-    private boolean verifyTransactionTime(Transaction tx, Block block) {
-        long blockTime = ByteUtil.byteArrayToLong(block.getTimestamp());
+    private boolean verifyTransactionTime(Transaction tx, long blockTime, long bestBlockNum) {
+
         long txTime = ByteUtil.byteArrayToLong(tx.getTime());
         long lockTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+
         if (txTime - Constants.MAX_TIMEDRIFT > blockTime) {
             logger.error("Tx time {} exceeds block time {} by {} seconds", txTime, blockTime, Constants.MAX_TIMEDRIFT);
             return false;
         }
 
         long referenceTime = 0;
-        long referenceHeight = bestBlock.getNumber() - lockTime;
+        long referenceHeight = bestBlockNum - lockTime;
         // this is dangerous behavior,a smart node will not accept it because this may be memory overflow hack.
         if (referenceHeight < 0){
             return true;
         }
 
-        if (referenceHeight <= bestBlock.getNumber()) {
+        if (referenceHeight <= bestBlockNum) {
             referenceTime = ByteUtil.byteArrayToLong(blockStore.
                     getChainBlockByNumber(referenceHeight).getTimestamp());
         } else {
@@ -721,9 +723,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 return false;
 
             List<Transaction> txs = block.getTransactionsList();
+            long blockTime = ByteUtil.byteArrayToLong(block.getTimestamp());
+            long bestBlockNum= bestBlock.getNumber();
+
             if (!txs.isEmpty()) {
                 for (Transaction tx: txs) {
-                    if (!verifyTransactionTime(tx, block)) {
+                    if (!verifyTransactionTime(tx, blockTime, bestBlockNum)) {
                         logger.error("Block contains expiration transaction, block number {}", block.getNumber());
                         return false;
                     }
