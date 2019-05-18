@@ -741,14 +741,22 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private void wrapBlockTransactions(Block block, Repository repo) {
         for (Transaction tx : block.getTransactionsList()) {
+
             tx.setIsCompositeTx(false);
-            if(tx.getSender() != null) {
-//                logger.info("tx sender address is ====> {}",Hex.toHexString(tx.getSender()));
-//                logger.info("is sender account empty ====> {}",repo.getAccountState(tx.getSender()) == null);
-                byte[] senderWitnessAddress = repo.getAccountState(tx.getSender()).getWitnessAddress();
-                ArrayList<byte[]> senderAssociateAddress = repo.getAccountState(tx.getSender()).getAssociatedAddress();
-                byte[] receiverWitnessAddress = repo.getAccountState(tx.getReceiveAddress()).getWitnessAddress();
-                ArrayList<byte[]> receiverAssociateAddress = repo.getAccountState(tx.getReceiveAddress()).getAssociatedAddress();
+
+            byte[] txSenderAdd= tx.getSender();
+            byte[] txReceiverAdd= tx.getReceiveAddress();
+            AccountState txSenderAccount= repo.getAccountState(txSenderAdd);
+            AccountState txReceiverAccount= repo.getAccountState(txReceiverAdd);
+
+            if(txSenderAdd != null) {
+                // logger.info("tx sender address is ====> {}",Hex.toHexString(txSenderAdd);
+                // logger.info("is sender account empty ====> {}",repo.getAccountState(txSenderAdd) == null);
+                byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
+                ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
+                byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
+                ArrayList<byte[]> receiverAssociateAddress = txReceiverAccount.getAssociatedAddress();
+
                 if (senderWitnessAddress != null) {
                     tx.setSenderWitnessAddress(senderWitnessAddress);
                 }
