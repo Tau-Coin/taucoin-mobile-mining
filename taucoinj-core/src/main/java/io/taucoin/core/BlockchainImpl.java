@@ -470,8 +470,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        track = repository.startTracking();
-
         // keep chain continuity
         if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash()))
             return false;
@@ -479,6 +477,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         if (block.getNumber() >= config.traceStartBlock() && config.traceStartBlock() != -1) {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
         }
+
+        track = repository.startTracking();
 
         if (!processBlock(block, track)) {
             track.rollback();
