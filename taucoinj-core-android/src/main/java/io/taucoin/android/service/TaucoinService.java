@@ -201,5 +201,19 @@ public class TaucoinService extends Service {
                               +" \ntxid: "+Hex.toHexString(outcome.getTxid()));
             broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(outcome));
         }
+
+        @Override
+        public void onSendHttpPayload(String payload) {
+            if (payload != null && payload.length() > 0) {
+                broadcastEvent(EventFlag.EVENT_NETWORK_TRAFFIC, new NetworkTrafficData(payload.length()));
+            }
+        }
+
+        @Override
+        public void onRecvHttpPayload(String payload) {
+            if (payload != null && payload.length() > 0) {
+                broadcastEvent(EventFlag.EVENT_NETWORK_TRAFFIC, new NetworkTrafficData(payload.length()));
+            }
+        }
     }
 }

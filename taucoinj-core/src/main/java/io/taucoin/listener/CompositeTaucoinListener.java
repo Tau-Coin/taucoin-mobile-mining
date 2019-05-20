@@ -139,4 +139,18 @@ public class CompositeTaucoinListener implements TaucoinListener {
             listener.onTransactionExecuated(outcome);
         }
     }
+
+    @Override
+    public void onSendHttpPayload(String payload) {
+        for (TaucoinListener listener : listeners) {
+            listener.onSendHttpPayload(payload);
+        }
+    }
+
+    @Override
+    public void onRecvHttpPayload(String payload) {
+        for (TaucoinListener listener : listeners) {
+            listener.onRecvHttpPayload(payload);
+        }
+    }
 }

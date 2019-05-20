@@ -100,5 +100,10 @@ public enum EventFlag {
     /**
      * new transaction on block have an effect on chain state
      */
-    EVENT_TRANSACTION_EXECUATED
+    EVENT_TRANSACTION_EXECUATED,
+
+    /**
+     * Send or receive http payload event.
+     */
+    EVENT_NETWORK_TRAFFIC
 }
