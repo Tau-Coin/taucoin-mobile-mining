@@ -89,7 +89,7 @@ public class GenesisLoader {
         for(byte[] tcoinbase:coinbase) {
             tr.add(new Transaction(tcoinbase));
         }
-        byte v = (byte) 27;
+        byte v = (byte) 28;
         byte[] r = new byte[32];
         byte[] s = new byte[32];
         System.arraycopy(geneSig, 0, r, 0, 32);

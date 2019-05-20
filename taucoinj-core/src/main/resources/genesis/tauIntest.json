@@ -4,76 +4,79 @@
   "previousHeaderHash": "0x0000000000000000000000000000000000000000",
   "generatorPublicKey": "038ccf4c15b578e734e025d381248ea54c492e3f29f9a432f84ca7e06372ab285c",
 
-  "blockSignature": "380ede1df6601108b52fea8d6d68ebd5d9e2711b5dbcd7721e7218cbb973a0bc73f9ae2849c042b971ce3c82913b2c545d15f39882aa925e27118c1a68a73933",
+  "blockSignature": "141e8cc82d3df0c1a9af8d3aa580bc8cb3b892ae2b63157fcdd248f58000553b1b6fabf96b686bd6f7807628203c4a53940fd476bb1233fd027734ed758603fe",
   "option": "0x01",
   "coinbase": [],
 
   "alloc": {
-    "295a67e1121325e476bfc9639d1e61439d90695b": {
-      "balance": "100000000"
+    "d730c34a4521c2981b2013b931eacb6e7381057e": {
+      "balance": "10000000000"
     },
-    "847ca210e2b61e9722d1584fcc0daea4c3639b09": {
-      "balance": "100000000"
+    "96a37844744a14b6474863612100a4ddff4c6a87": {
+      "balance": "10000000000"
     },
-    "d47d966aca5650047c3331343bff8f6865878b84": {
-      "balance": "100000000"
+    "06aa4bfed0a2ca0d982ee3ce8fa5a1913b89f289": {
+      "balance": "10000000000"
     },
-    "b7ca508616e2538fc58f81119e80f8c041420928": {
-      "balance": "100000000"
-    },
-
-    "d09158dda236784d3603ef2bc70693a7324b1b25": {
-      "balance": "100000000"
-    },
-    "1e1f8acf83c392ce7d579ca2810b46ca13811fa5": {
-      "balance": "100000000"
-    },
-    "4b7ce8b4a061c894d53658df095795e56243b113": {
-      "balance": "100000000"
-    },
-    "0c807e65c30793034a807309978e5fcd68761205": {
-      "balance": "100000000"
-    },
-    "3304b2edd5ce6256eafefaddd85c67ebbe91c533": {
-      "balance": "100000000"
-    },
-    "c002c9d5b6859d7e6824534b5cb4e2e1106d702a": {
-      "balance": "100000000"
+    "8e6e4a3ea4b80fb98e3073de7d3877c4010e4270": {
+      "balance": "10000000000"
     },
 
-    "33576d94b28b7b1a73b56bcb180aa44e073870ad": {
-      "balance": "100000000"
+    "1bb6ddedc45ba52aa41220367bdbfc3308540ada": {
+      "balance": "10000000000"
+    },
+    "afa99383029e8d02c68907e5ca01a983f5b4ae14": {
+      "balance": "10000000000"
+    },
+    "b2499de7461e859df84799087f3f3f1c0a6b1747": {
+      "balance": "10000000000"
+    },
+    "df5ced25bce7d6bf519d8000f0053ae622c7a35e": {
+      "balance": "10000000000"
+    },
+    "a11fb5b3491339e22ef17fa72423c6e6e369ab70": {
+      "balance": "10000000000"
+    },
+    "090699a4619e630e746fad5f8c1173f8c4035088": {
+      "balance": "10000000000"
     },
 
-    "6c062ec73781dc6abde7703aaceab1194c161944": {
-      "balance": "100000000"
+    "df81f5c848dba8f211bb03784a30ffeaa783e859": {
+      "balance": "10000000000"
     },
 
-    "85a4c14987a62196902d9aee4e58b2e58dbc1ab5": {
-      "balance": "100000000"
+    "82a4b06f9dfae3ae11980905fe23930313fa6625": {
+      "balance": "10000000000"
     },
 
-    "f084290ea696e2263f7cde49ccaacee33d98a2a1": {
-      "balance": "100000000"
+    "249f9d6705f6d582237137b2b90fadf401c158b2": {
+      "balance": "10000000000"
     },
 
-    "32e51517695f47930cfe4a02db2c7ff32d2ee59b": {
-      "balance": "100000000"
+    "6229ddda357b7835ea620f78770df0be4b39e3da": {
+      "balance": "10000000000"
     },
-    "bf6ee01fe4e1752865ebb81b427e4f25b4401aaf": {
-      "balance": "100000000"
+
+    "ce94705ff779f0e93d58925491b28afab2ca758f": {
+      "balance": "10000000000"
     },
-    "2f03be1aff7f048f6b14fc6be705f79402597538": {
-      "balance": "100000000"
+    "871e9e21cf764e0fe50946198fe75e5ec1fb379b": {
+      "balance": "10000000000"
     },
-    "fae14f973ad6a715d8a633e0d908fb927ae675b2": {
-      "balance": "100000000"
+    "7cdbb471ac4cb7f9208949649eeb7932094a2be8": {
+      "balance": "10000000000"
     },
-    "dd17b335feafda3b4cd8a3817316a352325b9f1a": {
-      "balance": "100000000"
+    "7022f4db47e0b7b8856eb2fecabccc174852be73": {
+      "balance": "10000000000"
     },
-    "8cc0cd1ade1272f242958f6532478b98d16ab2b4": {
-      "balance": "100000000"
+    "03527184b6748a25488434202c3ce1692645868f": {
+      "balance": "10000000000"
+    },
+    "473c4353b6b8d862ddc78db9d630f91f17ac85ee": {
+      "balance": "10000000000"
+    },
+    "562d67181662dd68145f689a2fa14a8ebd76ebfd": {
+      "balance": "10000000000"
     }
   },
 
