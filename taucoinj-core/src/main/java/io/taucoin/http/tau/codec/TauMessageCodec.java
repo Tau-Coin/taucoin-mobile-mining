@@ -105,6 +105,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
 
         String jsonPayload = msg.toJsonString();
         logger.info("Send request {}", jsonPayload);
+        tauListener.onSendHttpPayload(jsonPayload);
         HttpRequest request;
         if (jsonPayload != null) {
             byte[] bytes = jsonPayload.getBytes();
@@ -133,6 +134,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
         String jsonString = null;
         if (contentsStream.size() > 0) {
             jsonString = new String(contentsStream.toByteArray());
+            tauListener.onRecvHttpPayload(jsonString);
         }
         Message message = MessageFactory.create(jsonString);
         if (message == null) {

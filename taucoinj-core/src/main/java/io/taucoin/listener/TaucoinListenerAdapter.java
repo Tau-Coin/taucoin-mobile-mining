@@ -85,4 +85,15 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
 
     }
+
+    @Override
+    public void onSendHttpPayload(String payload) {
+
+    }
+
+    @Override
+    public void onRecvHttpPayload(String payload) {
+
+    }
+
 }

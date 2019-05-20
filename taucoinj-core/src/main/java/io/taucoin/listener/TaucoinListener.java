@@ -48,4 +48,8 @@ public interface TaucoinListener {
 
     void onTransactionExecuated(TransactionExecuatedOutcome outcome);
 
+    void onSendHttpPayload(String payload);
+
+    void onRecvHttpPayload(String payload);
+
 }
