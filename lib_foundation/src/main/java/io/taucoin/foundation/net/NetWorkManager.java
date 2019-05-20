@@ -56,6 +56,7 @@ public class NetWorkManager {
         // Set request timeout
         okHttpClientBuilder.connectTimeout(30, TimeUnit.SECONDS);
 
+        okHttpClientBuilder.eventListenerFactory(HttpEventListener.FACTORY);
         // Add Log to OkHttp
         if (BuildConfig.DEBUG) {
             // Enable Log
@@ -73,21 +74,21 @@ public class NetWorkManager {
 
         // init main retrofit
         retrofitMain = new Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(PropertyUtils.getMainApiUrl())
-            .addConverterFactory(GsonConverterFactory.create())
-            // Configure callback libraries using RxJava
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
+                .client(okHttpClient)
+                .baseUrl(PropertyUtils.getMainApiUrl())
+                .addConverterFactory(GsonConverterFactory.create())
+                // Configure callback libraries using RxJava
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
 
         // init retrofit
         retrofit = new Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(PropertyUtils.getApiBaseUrl())
-            .addConverterFactory(GsonConverterFactory.create())
-            // Configure callback libraries using RxJava
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
+                .client(okHttpClient)
+                .baseUrl(PropertyUtils.getApiBaseUrl())
+                .addConverterFactory(GsonConverterFactory.create())
+                // Configure callback libraries using RxJava
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
 
     }
 

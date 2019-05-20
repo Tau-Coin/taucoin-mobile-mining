@@ -20,9 +20,10 @@ public class MiningBlock {
     private String reward;
     private int valid;
     private int total;
-    @Generated(hash = 422600099)
+    private int type;
+    @Generated(hash = 529138808)
     public MiningBlock(Long id, String pubKey, String blockNo, String blockHash,
-            String reward, int valid, int total) {
+            String reward, int valid, int total, int type) {
         this.id = id;
         this.pubKey = pubKey;
         this.blockNo = blockNo;
@@ -30,6 +31,7 @@ public class MiningBlock {
         this.reward = reward;
         this.valid = valid;
         this.total = total;
+        this.type = type;
     }
     @Generated(hash = 1637629893)
     public MiningBlock() {
@@ -75,5 +77,11 @@ public class MiningBlock {
     }
     public void setTotal(int total) {
         this.total = total;
+    }
+    public int getType() {
+        return this.type;
+    }
+    public void setType(int type) {
+        this.type = type;
     }
 }

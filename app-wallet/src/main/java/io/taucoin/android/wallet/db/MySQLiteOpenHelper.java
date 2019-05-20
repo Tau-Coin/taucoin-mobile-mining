@@ -8,8 +8,12 @@ import com.github.naturs.logger.Logger;
 
 import org.greenrobot.greendao.database.Database;
 
+import io.taucoin.android.wallet.db.greendao.BlockInfoDao;
 import io.taucoin.android.wallet.db.greendao.DaoMaster;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
+import io.taucoin.android.wallet.db.greendao.MiningBlockDao;
+import io.taucoin.android.wallet.db.greendao.MiningRewardDao;
+import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 import io.taucoin.android.wallet.db.util.MigrationHelper;
 /**
  * Logic for handling database upgrade:
@@ -44,6 +48,6 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
             public void onDropAllTables(Database db, boolean ifExists) {
                 DaoMaster.dropAllTables(db, ifExists);
             }
-        }, KeyValueDao.class);
+        }, KeyValueDao.class, MiningBlockDao.class, TransactionHistoryDao.class, MiningRewardDao.class, BlockInfoDao.class);
     }
 }

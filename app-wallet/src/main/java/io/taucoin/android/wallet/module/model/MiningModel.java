@@ -130,37 +130,39 @@ public class MiningModel implements IMiningModel{
     }
 
     private synchronized void saveMiningBlock(Block block, boolean isConnect, boolean isNeedSync) {
-        String blockNo = String.valueOf(block.getNumber());
-        String blockHash = Hex.toHexString(block.getHash());
         String generatorPublicKey = Hex.toHexString(block.getForgerPublicKey());
-//        Logger.d("blockNo=" + blockNo);
-//        Logger.d("blockHash=" + blockHash);
 //        Logger.d("generatorPublicKey=" + generatorPublicKey);
         String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
         if(StringUtil.isSame(generatorPublicKey.toLowerCase(), currentPubicKey.toLowerCase())){
-            MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash);
-            if(entry == null){
-                if(isConnect){
-                    entry = new MiningBlock();
-                    entry.setBlockNo(blockNo);
-                    entry.setPubKey(currentPubicKey);
-                    entry.setBlockHash(blockHash);
-                    entry.setValid(1);
-
-                    List<Transaction> txList = block.getTransactionsList();
-                    int total = 0;
-                    String reward = "0";
-                    if(txList != null){
-                        total = txList.size();
-                        reward = MiningUtil.parseBlockTxFee(txList);
+            saveMiningBlock(block, isConnect, 0);// miner
+        }else{
+            List<Transaction> transactions = block.getTransactionsList();
+            String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
+            if(transactions != null && transactions.size() > 0){
+                for (Transaction transaction : transactions) {
+                    if(transaction.getSenderWitnessAddress() != null){
+                        String witnessAddress = Hex.toHexString(transaction.getSenderWitnessAddress());
+                        boolean isSave = false;
+                        if(StringUtil.isSame(rawAddress, witnessAddress)){
+                            isSave = true;
+                        }else{
+                            List<byte[]> addresses = transaction.getSenderAssociatedAddress();
+                            if(addresses != null && addresses.size() > 0){
+                                for (byte[] address : addresses) {
+                                    String associatedAddress = Hex.toHexString(address);
+                                    if(StringUtil.isSame(rawAddress, associatedAddress)){
+                                        isSave = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(isSave){
+                            saveMiningBlock(block, isConnect, 1);// participated
+                            break;
+                        }
                     }
-                    entry.setTotal(total);
-                    entry.setReward(reward);
-                    MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
                 }
-            }else{
-                entry.setValid(isConnect ? 1 : 0);
-                MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
             }
         }
 
@@ -169,6 +171,43 @@ public class MiningModel implements IMiningModel{
             if(keyValue != null){
                 keyValue.setSyncBlockNum((int)block.getNumber());
                 KeyValueDaoUtils.getInstance().update(keyValue);
+            }
+        }
+    }
+
+    private void saveMiningBlock(Block block, boolean isConnect, int type) {
+        String blockNo = String.valueOf(block.getNumber());
+        String blockHash = Hex.toHexString(block.getHash());
+//        Logger.d("blockNo=" + blockNo);
+//        Logger.d("blockHash=" + blockHash);
+        String currentPubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        MiningBlock entry = MiningBlockDaoUtils.getInstance().queryByBlockHash(blockHash, currentPubicKey);
+        if(entry == null){
+            if(isConnect){
+                entry = new MiningBlock();
+                entry.setBlockNo(blockNo);
+                entry.setPubKey(currentPubicKey);
+                entry.setBlockHash(blockHash);
+                entry.setValid(1);
+                entry.setType(type);
+
+                List<Transaction> txList = block.getTransactionsList();
+                int total = 0;
+                String reward = "0";
+                if(txList != null){
+                    total = txList.size();
+                    reward = MiningUtil.parseBlockTxFee(txList);
+                }
+                entry.setTotal(total);
+                entry.setReward(reward);
+                MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
+            }
+        }else{
+            entry.setValid(isConnect ? 1 : 0);
+            entry.setValid(type);
+            MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
+            if(!isConnect){
+                MiningBlockDaoUtils.getInstance().rollbackByBlockHash(blockHash);
             }
         }
     }

@@ -25,14 +25,10 @@ import android.support.annotation.NonNull;
 
 import com.github.naturs.logger.Logger;
 
-import java.util.Date;
-
 import io.taucoin.android.wallet.base.BaseHandler;
-import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.util.DateUtil;
-import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.SysUtil;
 import io.taucoin.foundation.util.ThreadPool;
+import io.taucoin.foundation.util.TrafficUtil;
 
 class ResManager implements BaseHandler.HandleCallBack{
 
@@ -64,7 +60,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                      }
                      cpuInfo += "%";
 
-                     long dailyTraffic = handleTrafficData(info.netDataSize);
+                     long dailyTraffic = TrafficUtil.getTrafficTotal();
                      String netDataInfo = SysUtil.formatFileSizeMb(dailyTraffic);
 
                      if(mResCallBack != null){
@@ -86,24 +82,24 @@ class ResManager implements BaseHandler.HandleCallBack{
                  break;
          }
      }
-
-    private long handleTrafficData(long currentTraffic) {
-        long currentTrafficTime = new Date().getTime();
-        long oldTraffic = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC, 0);
-        long oldTrafficTime = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
-        long dailyTraffic = currentTraffic - oldTraffic;
-
-        if(dailyTraffic < 0){
-            dailyTraffic = 0;
-        }
-
-        if(DateUtil.compareDay(oldTrafficTime, currentTrafficTime) > 0 || oldTraffic <= 0 || oldTrafficTime <= 0){
-            dailyTraffic = 0;
-            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC, currentTraffic);
-            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
-        }
-        return dailyTraffic;
-    }
+//
+//    private long handleTrafficData(long currentTraffic) {
+//        long currentTrafficTime = new Date().getTime();
+//        long oldTraffic = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC, 0);
+//        long oldTrafficTime = SharedPreferencesHelper.getInstance().getLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
+//        long dailyTraffic = currentTraffic - oldTraffic;
+//
+//        if(dailyTraffic < 0){
+//            dailyTraffic = 0;
+//        }
+//
+//        if(DateUtil.compareDay(oldTrafficTime, currentTrafficTime) > 0 || oldTraffic <= 0 || oldTrafficTime <= 0){
+//            dailyTraffic = 0;
+//            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC, currentTraffic);
+//            SharedPreferencesHelper.getInstance().putLong(TransmitKey.TRAFFIC_TIME, currentTrafficTime);
+//        }
+//        return dailyTraffic;
+//    }
 
     private synchronized void startResThreadDelay() {
          ThreadPool.getThreadPool().execute(() -> {

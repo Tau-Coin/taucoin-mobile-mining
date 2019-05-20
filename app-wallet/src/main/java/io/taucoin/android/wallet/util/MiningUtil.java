@@ -101,7 +101,7 @@ public class MiningUtil {
                     @Override
                     public void handleData(Integer blockHeight) {
                         Logger.d("UserUtil.setBlockHeight=" + blockHeight);
-                        textView.setText(blockHeight);
+                        textView.setText(String.valueOf(blockHeight));
                     }
                 });
     }

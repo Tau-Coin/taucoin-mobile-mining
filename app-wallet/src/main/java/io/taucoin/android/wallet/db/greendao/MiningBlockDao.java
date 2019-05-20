@@ -31,6 +31,7 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
         public final static Property Reward = new Property(4, String.class, "reward", false, "REWARD");
         public final static Property Valid = new Property(5, int.class, "valid", false, "VALID");
         public final static Property Total = new Property(6, int.class, "total", false, "TOTAL");
+        public final static Property Type = new Property(7, int.class, "type", false, "TYPE");
     }
 
 
@@ -52,7 +53,8 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
                 "\"BLOCK_HASH\" TEXT," + // 3: blockHash
                 "\"REWARD\" TEXT," + // 4: reward
                 "\"VALID\" INTEGER NOT NULL ," + // 5: valid
-                "\"TOTAL\" INTEGER NOT NULL );"); // 6: total
+                "\"TOTAL\" INTEGER NOT NULL ," + // 6: total
+                "\"TYPE\" INTEGER NOT NULL );"); // 7: type
     }
 
     /** Drops the underlying database table. */
@@ -91,6 +93,7 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
         }
         stmt.bindLong(6, entity.getValid());
         stmt.bindLong(7, entity.getTotal());
+        stmt.bindLong(8, entity.getType());
     }
 
     @Override
@@ -123,6 +126,7 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
         }
         stmt.bindLong(6, entity.getValid());
         stmt.bindLong(7, entity.getTotal());
+        stmt.bindLong(8, entity.getType());
     }
 
     @Override
@@ -139,7 +143,8 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // blockHash
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // reward
             cursor.getInt(offset + 5), // valid
-            cursor.getInt(offset + 6) // total
+            cursor.getInt(offset + 6), // total
+            cursor.getInt(offset + 7) // type
         );
         return entity;
     }
@@ -153,6 +158,7 @@ public class MiningBlockDao extends AbstractDao<MiningBlock, Long> {
         entity.setReward(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setValid(cursor.getInt(offset + 5));
         entity.setTotal(cursor.getInt(offset + 6));
+        entity.setType(cursor.getInt(offset + 7));
      }
     
     @Override

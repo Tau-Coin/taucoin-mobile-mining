@@ -146,10 +146,10 @@ public class SysUtil {
                         && StringUtil.isNotSame(processName, miningProcess)){
                     continue;
                 }
-                Status status = process.status();
-                int uid = status.getUid();
-                memoryInfo.netDataSize = trafficInfo.getTrafficInfo(uid);
-                Logger.d("uid=" + uid + ",\t" + memoryInfo.netDataSize);
+//                Status status = process.status();
+//                int uid = status.getUid();
+//                memoryInfo.netDataSize = trafficInfo.getTrafficInfo(uid);
+//                Logger.d("uid=" + uid + ",\t" + memoryInfo.netDataSize);
 
                 Statm statm = process.statm();
                 long totalSizeOfProcess = statm.getSize();
@@ -199,10 +199,10 @@ public class SysUtil {
     }
 
     public static String formatFileSizeMb(long length) {
-        String result = null;
-        int sub_string = String.valueOf((float) length / 1048576).indexOf(".");
-        result = ((float) length / 1048576 + "000").substring(0,
-                sub_string + 3) + "M";
+        float lengthM = (float) length / 1048576;
+        int sub_string = String.valueOf(lengthM).indexOf(".");
+        String result = lengthM + "000";
+        result = result.substring(0, sub_string + 3) + "M";
         return result;
     }
 

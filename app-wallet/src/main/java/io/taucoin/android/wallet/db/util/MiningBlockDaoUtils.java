@@ -60,14 +60,28 @@ public class MiningBlockDaoUtils {
         return result > -1;
     }
 
-    public MiningBlock queryByBlockHash(String blockHash) {
+    public MiningBlock queryByBlockHash(String blockHash, String pubicKey) {
         List<MiningBlock> list = getMiningBlockDao().queryBuilder()
-                .where(MiningBlockDao.Properties.BlockHash.eq(blockHash))
+                .where(MiningBlockDao.Properties.BlockHash.eq(blockHash),
+                    MiningBlockDao.Properties.PubKey.eq(pubicKey))
                 .orderDesc(MiningBlockDao.Properties.Id)
                 .list();
         if(list != null && list.size() > 0){
             return list.get(0);
         }
         return null;
+    }
+
+    public void rollbackByBlockHash(String blockHash) {
+        List<MiningBlock> list = getMiningBlockDao().queryBuilder()
+                .where(MiningBlockDao.Properties.BlockHash.eq(blockHash))
+                .orderDesc(MiningBlockDao.Properties.Id)
+                .list();
+        if(list != null && list.size() > 0){
+            for (MiningBlock block : list) {
+                block.setValid(0);
+                insertOrReplace(block);
+            }
+        }
     }
 }

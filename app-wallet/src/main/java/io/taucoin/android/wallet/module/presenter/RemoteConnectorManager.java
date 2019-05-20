@@ -34,6 +34,7 @@ import io.taucoin.android.service.events.BlockForgedInternalEventData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.MessageEventData;
+import io.taucoin.android.service.events.NetworkTrafficData;
 import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
@@ -44,9 +45,11 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.NotifyManager;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.TrafficUtil;
 import io.taucoin.net.p2p.HelloMessage;
 
 import static io.taucoin.android.service.events.EventFlag.EVENT_TAUCOIN_CREATED;
@@ -217,6 +220,11 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                             saveMiningReward(txExe.outcome);
                         }
                         break;
+                    case EVENT_NETWORK_TRAFFIC:
+                        NetworkTrafficData networkTrafficData = data.getParcelable("data");
+                        int trafficSize = networkTrafficData.trafficSize;
+                        TrafficUtil.saveTrafficMining(trafficSize);
+                        break;
 
                 }
                 break;
@@ -314,6 +322,8 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     }
 
     private void updateSynchronizedBlockNum(long height){
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
+
         int blockHeight = (int) height;
         getMiningModel().updateSynchronizedBlockNum(blockHeight, new LogicObserver<Boolean>() {
             @Override

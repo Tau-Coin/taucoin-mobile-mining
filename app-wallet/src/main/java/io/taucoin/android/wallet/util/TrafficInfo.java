@@ -46,9 +46,10 @@ class TrafficInfo {
      * Acquire total traffic
      */
     long getTrafficInfo(int uid) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return getNetworkMobileData(uid) + getNetworkWifiData(uid);
-        }
+        getSndTraffic1(uid);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            return getNetworkMobileData(uid) + getNetworkWifiData(uid);
+//        }
         // Download traffic
         long rcvTraffic = UNSUPPORTED;
         // Upload traffic
@@ -56,10 +57,14 @@ class TrafficInfo {
 
         rcvTraffic = getRcvTraffic(uid);
         sndTraffic = getSndTraffic(uid);
-        if (rcvTraffic == UNSUPPORTED || sndTraffic == UNSUPPORTED)
-            return UNSUPPORTED;
-        else
-            return rcvTraffic + sndTraffic;
+        long total;
+        if (rcvTraffic == UNSUPPORTED || sndTraffic == UNSUPPORTED) {
+            total = UNSUPPORTED;
+        }else{
+            total = rcvTraffic + sndTraffic;
+        }
+        Logger.d("data_data=" + total);
+        return rcvTraffic + sndTraffic;
     }
 
     /**
@@ -183,92 +188,35 @@ class TrafficInfo {
         return "";
     }
 
-    //    public static long getNetworkRxBytes() {
-//        return TrafficStats.getTotalRxBytes();
-//    }
-//
-//    public static long getNetworkTxBytes() {
-//        return TrafficStats.getTotalTxBytes();
-//    }
-//
-//    public double getNetSpeed() {
-//        long curRxBytes = getNetworkRxBytes();
-//        if (preRxBytes == 0)
-//            preRxBytes = curRxBytes;
-//        long bytes = curRxBytes - preRxBytes;
-//        preRxBytes = curRxBytes;
-//        //int kb = (int) Math.floor(bytes / 1024 + 0.5);
-//        double kb = (double)bytes / (double)1024;
-//        BigDecimal bd = new BigDecimal(kb);
-//
-//        return bd.setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
-//    }
+    private long getSndTraffic1(int uid) {
+        long sndTraffic = UNSUPPORTED;
+        RandomAccessFile rafRcv = null, rafSnd = null;
+        String sndPath = "/proc/net/xt_qtaguid/stats";
+        try {
+            String line;
+            int index = 0;
+            rafSnd = new RandomAccessFile(sndPath, "r");
+            StringBuffer stringBuffer = new StringBuffer();
+            while ((line = rafSnd.readLine()) != null) {
+                Logger.d("data_data\t" + index + "\t" + line);
+                index += 1;
+            }
 
-//    public static long getNetWorkData(int uid) {
-//        long netWorkData = 0;
-//        Logger.d("data_data" + "\t getNetWorkData");
-//        try {
-//            Runtime runtime = Runtime.getRuntime();
-//            Process process = runtime.exec("adb shell cat /proc/net/xt_qtaguid/stats | grep " + uid);
-//            try {
-//                Logger.d("data_data" + "\t getNetWorkData");
-//                if (process.waitFor() != 0) {
-//                    Logger.d("exit value = " + process.exitValue());
-//                }
-//                BufferedReader in = new BufferedReader(new InputStreamReader(
-//                        process.getInputStream()));
-//                StringBuffer stringBuffer = new StringBuffer();
-//                String line;
-//                int index = 0;
-//                while ((line = in.readLine()) != null) {
-//                    stringBuffer.append(line).append(" ");
-//                    Logger.d("data_data" + index + "\t" + line);
-//                    index += 1;
-//                }
-//            } catch (InterruptedException e) {
-//                Logger.e(e, "InterruptedException");
-//            } finally {
-//                try {
-//                    process.destroy();
-//                } catch (Exception e2) {
-//                    Logger.e(e2, "process.destroy is error");
-//                }
-//            }
-//        } catch (Exception ignore) {
-//            Logger.e(ignore, "data_data" + "\t getNetWorkData");
-//        }
-//        return netWorkData;
-//    }
-//    private long getSndTraffic1(int uid) {
-//        long sndTraffic = UNSUPPORTED;
-//        RandomAccessFile rafRcv = null, rafSnd = null;
-//        String sndPath = "/proc/net/xt_qtaguid/stats";
-//        try {
-//
-//            String line;
-//            int index = 0;
-//            rafSnd = new RandomAccessFile(sndPath, "r");
-//            StringBuffer stringBuffer = new StringBuffer();
-//            while ((line = rafSnd.readLine()) != null) {
-//                Logger.d("data_data\t" + index + "\t" + line);
-//                index += 1;
-//            }
-//
-//        } catch (FileNotFoundException e) {
-//            Logger.e(e,  "Close RandomAccessFile exception: ");
-//            sndTraffic = UNSUPPORTED;
-//        } catch (Exception ignore) {
-//            Logger.e(ignore,  "Close RandomAccessFile exception: ");
-//        } finally {
-//            try {
-//                if (rafRcv != null)
-//                    rafRcv.close();
-//                if (rafSnd != null)
-//                    rafSnd.close();
-//            } catch (Exception e) {
-//                Logger.w( "Close RandomAccessFile exception: " + e.getMessage());
-//            }
-//        }
-//        return sndTraffic;
-//    }
+        } catch (FileNotFoundException e) {
+            Logger.e(e,  "Close RandomAccessFile exception: ");
+            sndTraffic = UNSUPPORTED;
+        } catch (Exception ignore) {
+            Logger.e(ignore,  "Close RandomAccessFile exception: ");
+        } finally {
+            try {
+                if (rafRcv != null)
+                    rafRcv.close();
+                if (rafSnd != null)
+                    rafSnd.close();
+            } catch (Exception e) {
+                Logger.w( "Close RandomAccessFile exception: " + e.getMessage());
+            }
+        }
+        return sndTraffic;
+    }
 }

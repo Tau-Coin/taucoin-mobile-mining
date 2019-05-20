@@ -90,6 +90,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvMemory;
     @BindView(R.id.tv_data_storage)
     TextView tvDataStorage;
+    @BindView(R.id.tv_chain_height)
+    TextView tvChainHeight;
 
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
@@ -108,6 +110,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         handleMiningRewardView();
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
         return view;
     }
 
@@ -183,7 +186,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 UserUtil.setPower(tvPower);
                 break;
             case BLOCK_HEIGHT:
-                MiningUtil.setBlockHeight(tvSynchronized);
+                MiningUtil.setBlockHeight(tvChainHeight);
                 break;
             case MINING_INIT:
                 handleMiningView();
@@ -361,6 +364,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
         TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+        TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
         handleMiningView(false);
         mPageNo = 1;
         handleMiningRewardView();

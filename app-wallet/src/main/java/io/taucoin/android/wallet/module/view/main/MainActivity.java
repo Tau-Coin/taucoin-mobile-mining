@@ -1,9 +1,7 @@
 package io.taucoin.android.wallet.module.view.main;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -28,12 +26,10 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
 import io.taucoin.android.wallet.module.view.main.iview.IMainView;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
-import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.DrawablesUtil;
-import io.taucoin.foundation.util.permission.EasyPermissions;
 
 public class MainActivity extends BaseActivity implements IMainView {
     @BindView(R.id.rb_home)
@@ -56,18 +52,6 @@ public class MainActivity extends BaseActivity implements IMainView {
         initExitApp();
         UpgradeService.startUpdateService();
 
-        handleNetworkStatsPermission();
-
-    }
-
-    private void handleNetworkStatsPermission() {
-        if(!PermissionUtils.hasPermissionToReadNetworkStats()){
-            PermissionUtils.requestReadNetworkStats();
-        }
-        String permission = Manifest.permission.READ_PHONE_STATE;
-        EasyPermissions.requestPermissions(this,
-                this.getString(R.string.permission_tip_daily_data_denied),
-                PermissionUtils.REQUEST_PERMISSIONS_NETWORK, permission);
     }
 
     @Override
@@ -200,18 +184,6 @@ public class MainActivity extends BaseActivity implements IMainView {
             if(fragment != null){
                 fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
-        }
-        switch (requestCode) {
-            case PermissionUtils.REQUEST_PERMISSIONS_NETWORK:
-                if (grantResults.length > 0) {
-                    if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                        PermissionUtils.checkUserBanPermission(this, permissions[0], R.string.permission_tip_daily_data_never_ask_again);
-                    }
-                }
-                break;
-
-            default:
-                break;
         }
     }
 }

@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 import io.taucoin.foundation.net.bean.FileLoadingBean;
+import io.taucoin.foundation.util.TrafficUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -134,5 +135,6 @@ public abstract class FileCallback implements Callback<ResponseBody> {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(FileLoadingBean load) {
         onLoading(load.getProgress(), load.getTotal());
+        TrafficUtil.saveTrafficWallet(load.getByteCount());
     }
 }
