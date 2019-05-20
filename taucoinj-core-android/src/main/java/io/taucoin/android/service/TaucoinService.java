@@ -197,8 +197,8 @@ public class TaucoinService extends Service {
 
         @Override
         public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
-            System.out.println("outcome is: "+ Hex.toHexString(outcome.getBlockhash())
-                              +" \ntxid: "+Hex.toHexString(outcome.getTxid()));
+//            System.out.println("outcome is: "+ Hex.toHexString(outcome.getBlockhash())
+//                              +" \ntxid: "+Hex.toHexString(outcome.getTxid()));
             broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(outcome));
         }
 
