@@ -293,11 +293,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     listener.onBlockConnected(newBlocks.get(i));
                 }
 
-//              if (!byTest && needFlush(block)) {
+              if (!byTest && needFlush(block)) {
                 repository.flush();
                 blockStore.flush();
                 System.gc();
-//              }
+              }
 
                 return IMPORTED_BEST;
             } else {
@@ -496,11 +496,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         storeBlock(block);
 
-        //if (!byTest && needFlush(block)) {
-        repository.flush();
-        blockStore.flush();
-        System.gc();
-        //}
+        if (!byTest && needFlush(block)) {
+            repository.flush();
+            blockStore.flush();
+            System.gc();
+        }
 
         // Remove all wallet transactions as they already approved by the net
         wallet.removeTransactions(block.getTransactionsList());
@@ -897,6 +897,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     @Override
     public void close() {
+        blockStore.flush();
         blockStore.close();
     }
 
