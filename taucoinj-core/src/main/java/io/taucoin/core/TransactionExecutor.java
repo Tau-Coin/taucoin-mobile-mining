@@ -231,8 +231,15 @@ public class TransactionExecutor {
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
-            if (freshTime > 1 && txTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp())) {
-                senderAccountState.getTranHistory().remove(txTime);
+            if (freshTime > 1) {
+                long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp());
+                while (txTime < bechTime) {
+                    senderAccountState.getTranHistory().remove(txTime);
+                    if (senderAccountState.getTranHistory().size() == 0) {
+                        break;
+                    }
+                    txTime = Collections.min(senderAccountState.getTranHistory().keySet());
+                }
             } else {
                 long txTimeTemp = ByteUtil.byteArrayToLong(tx.getTime());
                 senderAccountState.getTranHistory().put(txTimeTemp, tx.getHash());
