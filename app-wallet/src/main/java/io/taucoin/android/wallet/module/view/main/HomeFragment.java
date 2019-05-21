@@ -252,11 +252,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void showMiningView(BlockInfo blockInfo){
         int blockSync  = 0;
         int blockMined  = 0;
+        int blockHeight  = 0;
         if(blockInfo != null){
+            blockHeight = blockInfo.getBlockHeight();
             blockSync = blockInfo.getBlockSync();
             blockMined = MiningUtil.parseMinedBlocks(blockInfo);
         }
         tvSynchronized.setText(String.valueOf(blockSync));
+        tvChainHeight.setText(String.valueOf(blockHeight));
         if(MyApplication.getRemoteConnector().isCalculatingMe()){
             tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
             tvMined.setLoadingText(ResourcesUtil.getText(R.string.home_mining_mined_calculating));
