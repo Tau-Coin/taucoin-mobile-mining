@@ -34,6 +34,7 @@ import com.jaredrummler.android.processes.models.Statm;
 import com.jaredrummler.android.processes.models.Status;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -200,8 +201,10 @@ public class SysUtil {
 
     public static String formatFileSizeMb(long length) {
         float lengthM = (float) length / 1048576;
-        int sub_string = String.valueOf(lengthM).indexOf(".");
-        String result = lengthM + "000";
+        BigDecimal bigDecimal = new BigDecimal(lengthM);
+        String lengthStr = bigDecimal.toString();
+        int sub_string = lengthStr.indexOf(".");
+        String result = lengthStr + "000";
         result = result.substring(0, sub_string + 3) + "M";
         return result;
     }
