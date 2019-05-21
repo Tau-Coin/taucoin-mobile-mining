@@ -21,7 +21,7 @@
     <string name="main_home">Home</string>
     <string name="main_send_receive">Send &#38; Receive</string>
     <string name="main_manage">Manage</string>
-    <string name="main_home_title">TAUcoin.io</string>
+    <string name="main_home_title">TAUcoin.io - Mobile Mining Wallet</string>
     <string name="main_exit">Click again to exit the application!</string>
 
     <string name="tx_send">Send</string>
@@ -62,7 +62,8 @@
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
-    <string name="send_tx_range_fee">%s×%s%s&#160;(Total:%s)</string>
+    <string name="send_tx_range_fee">%s×%s%s</string>
+    <string name="send_tx_total_amount">Total: %s</string>
     <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
@@ -128,7 +129,7 @@
 
     <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
-    <string name="home_synchronized">Blocks&#160;Synchronized</string>
+    <string name="home_synchronized">Latest&#160;Block</string>
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
@@ -145,7 +146,7 @@
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
     <string name="home_mining_mined_calculating">Calculating</string>
 
-    <string name="block_list_title">Mining Details</string>
+    <string name="block_list_title">Blocks Synchronized &#38; Mined</string>
     <string name="block_list_all">ALL</string>
     <string name="block_list_me">ME</string>
     <string name="block_no">Block No.%d</string>

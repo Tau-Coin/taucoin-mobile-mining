@@ -405,4 +405,22 @@ public class MiningModel implements IMiningModel{
                 .subscribeOn(Schedulers.io())
                 .subscribe(logicObserver);
     }
+
+    @Override
+    public void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
+            if(entry == null){
+                entry = new BlockInfo();
+            }
+
+            if(entry.getBlockHeight() != blockHeight){
+                entry.setBlockHeight(blockHeight);
+                BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
+                emitter.onNext(true);
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(observer);
+    }
 }

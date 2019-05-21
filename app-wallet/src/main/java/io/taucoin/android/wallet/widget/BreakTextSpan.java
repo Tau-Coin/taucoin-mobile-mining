@@ -82,7 +82,7 @@ public class BreakTextSpan extends ReplacementSpan {
             }
             height += mY;
             Logger.d("text.height===" + height + "==y="+y);
-            canvas.drawText(txt, start, txt.length(), x + oneCharWidth / 2, height, paint);
+            canvas.drawText(txt, start, txt.length(), x + oneCharWidth / 2, height + oneCharWidth / 2, paint);
         }
         canvas.restore();
     }

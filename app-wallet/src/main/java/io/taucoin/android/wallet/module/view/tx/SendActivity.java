@@ -72,6 +72,8 @@ public class SendActivity extends BaseActivity implements ISendView {
     TextView tvFee;
     @BindView(R.id.tv_fee_calculate)
     TextView tvFeeCalculate;
+    @BindView(R.id.tv_total_amount)
+    TextView tvTotalAmount;
 
     private TxPresenter mTxPresenter;
     private ViewHolder mViewHolder ;
@@ -123,17 +125,20 @@ public class SendActivity extends BaseActivity implements ISendView {
 
     @OnTextChanged({R.id.et_amount})
     void onTextChanged(CharSequence text){
-        String feeCalculate = getText(R.string.send_tx_range_fee).toString();
+        String feeCalculate = "";
         String amount = text.toString();
         String rangeFee = "";
+        String totalAmount = "";
         if(StringUtil.isNotEmpty(amount)){
             String feeRate = "3%=";
             String fee = FmtMicrometer.fmtFormatFee(amount, "0.03");
             rangeFee = FmtMicrometer.fmtFormatRangeFee(fee);
+            feeCalculate = getText(R.string.send_tx_range_fee).toString();
+            feeCalculate = String.format(feeCalculate, amount, feeRate, fee);
+
             String total = FmtMicrometer.fmtFormatAdd(amount, rangeFee);
-            feeCalculate = String.format(feeCalculate, amount, feeRate, fee, total);
-        }else {
-            feeCalculate = "";
+            totalAmount = getText(R.string.send_tx_total_amount).toString();
+            totalAmount = String.format(totalAmount, total);
         }
         String feeStr = "";
         if(StringUtil.isNotEmpty(rangeFee)){
@@ -142,6 +147,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         }
         tvFee.setText(feeStr);
         tvFee.setTag(rangeFee);
+        tvTotalAmount.setText(totalAmount);
 
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         stringBuilder.append(feeCalculate);

@@ -78,13 +78,20 @@
 
         <TextView
             android:id="@+id/tv_fee_calculate"
-            android:layout_below="@+id/tv_fee_title"
+            android:layout_below="@+id/tv_fee"
             style="@style/style_middle_grey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:layout_marginTop="5dp"
-            android:layout_centerVertical="true"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/tv_total_amount"
+            android:layout_below="@+id/tv_fee_calculate"
+            style="@style/style_middle_grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="" />
 
         <io.taucoin.android.wallet.widget.EditInput

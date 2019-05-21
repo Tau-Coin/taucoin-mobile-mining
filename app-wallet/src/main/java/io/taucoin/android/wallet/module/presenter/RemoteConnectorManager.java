@@ -31,6 +31,7 @@ import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.BlockForgedInternalEventData;
+import io.taucoin.android.service.events.ChainInfoChangedData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.MessageEventData;
@@ -225,7 +226,11 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         int trafficSize = networkTrafficData.trafficSize;
                         TrafficUtil.saveTrafficMining(trafficSize);
                         break;
-
+                    case EVENT_CHAININFO_CHANGED:
+                        ChainInfoChangedData chainInfoData = data.getParcelable("data");
+                        long height = chainInfoData.height;
+                        updateBlockHeight(height);
+                        break;
                 }
                 break;
             case TaucoinClientMessage.MSG_POOL_TXS:
@@ -329,6 +334,16 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             @Override
             public void handleData(Boolean aBoolean) {
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+            }
+        });
+    }
+
+    private void updateBlockHeight(long height){
+        int blockHeight = (int) height;
+        getMiningModel().updateBlockHeight(blockHeight, new LogicObserver<Boolean>() {
+            @Override
+            public void handleData(Boolean keyValue) {
+                EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
             }
         });
     }

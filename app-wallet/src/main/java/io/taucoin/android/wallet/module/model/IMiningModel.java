@@ -29,4 +29,6 @@ public interface IMiningModel {
     void getMiningRewards(int pageNo, String time, LogicObserver<List<MiningReward>> logicObserver);
     /** save mining reward*/
     void saveMiningReward(TransactionExecuatedOutcome outCome);
+    /** update or save current block height */
+    void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
 }
