@@ -27,6 +27,7 @@ import io.taucoin.sync.PeersPool;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -214,6 +215,12 @@ public class TaucoinService extends Service {
             if (payload != null && payload.length() > 0) {
                 broadcastEvent(EventFlag.EVENT_NETWORK_TRAFFIC, new NetworkTrafficData(payload.length()));
             }
+        }
+
+        @Override
+        public void onChainInfoChanged(long height, byte[] previousBlockHash,
+                byte[] currentBlockHash, BigInteger totalDiff) {
+            broadcastEvent(EventFlag.EVENT_CHAININFO_CHANGED, new ChainInfoChangedData(height));
         }
     }
 }

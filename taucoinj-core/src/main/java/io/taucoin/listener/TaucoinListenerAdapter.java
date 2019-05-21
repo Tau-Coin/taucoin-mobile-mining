@@ -7,6 +7,7 @@ import io.taucoin.net.p2p.HelloMessage;
 import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.server.Channel;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -93,6 +94,12 @@ public class TaucoinListenerAdapter implements TaucoinListener {
 
     @Override
     public void onRecvHttpPayload(String payload) {
+
+    }
+
+    @Override
+    public void onChainInfoChanged(long height, byte[] previousBlockHash,
+            byte[] currentBlockHash, BigInteger totalDiff) {
 
     }
 
