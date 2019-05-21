@@ -296,6 +296,11 @@ public class InMemoryBlockStore implements BlockStore{
     }
 
     @Override
+    public long getBlockTimeByNumber(long blockNumber) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public  void close(){
 
     }

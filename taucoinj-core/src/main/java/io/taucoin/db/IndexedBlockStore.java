@@ -3,6 +3,8 @@ package io.taucoin.db;
 import io.taucoin.core.Block;
 import io.taucoin.core.BlockHeader;
 import io.taucoin.datasource.KeyValueDataSource;
+import io.taucoin.util.ByteUtil;
+
 import org.hibernate.SessionFactory;
 import org.mapdb.DB;
 import org.mapdb.DataIO;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +23,7 @@ import static java.math.BigInteger.ZERO;
 import static io.taucoin.crypto.HashUtil.shortHash;
 import static org.spongycastle.util.Arrays.areEqual;
 
-public class IndexedBlockStore implements BlockStore{
+public class IndexedBlockStore implements BlockStore {
 
     private static final Logger logger = LoggerFactory.getLogger("general");
 
@@ -29,6 +32,14 @@ public class IndexedBlockStore implements BlockStore{
     KeyValueDataSource blocks;
 
     DB indexDB;
+
+    // Block time cache: height -> block time.
+    private static final int BLOCKTIME_CACHE_CAPACITY = 288;
+
+    private static LRUCache sBlockTimeCache
+            = new LRUCache(BLOCKTIME_CACHE_CAPACITY, 0.75f);
+
+    private static Object sBlockTimeLock = new Object();
 
     public IndexedBlockStore(){
     }
@@ -39,6 +50,7 @@ public class IndexedBlockStore implements BlockStore{
         this.blocks = blocks;
         this.indexDB  = indexDB;
     }
+
     @Override
     public void close(){
         logger.info("close block store data base...");
@@ -115,6 +127,11 @@ public class IndexedBlockStore implements BlockStore{
             addInternalBlock(block, cummDifficulty, mainChain);
         else
             cache.saveBlock(block, cummDifficulty, mainChain);
+
+        // If this block is on main chain, cache its timestamp.
+        if (mainChain) {
+            addBlockTime(block);
+        }
     }
 
     private void addInternalBlock(Block block, BigInteger cummDifficulty, boolean mainChain){
@@ -493,6 +510,9 @@ public class IndexedBlockStore implements BlockStore{
                     blockInfo.setMainChain(false);
                     updateBlockInfoForLevel(block.getNumber(), blocks);
                 }
+
+                // Remove block time cache entry for undoBlocks.
+                removeBlockTime(block.getNumber());
             }
         }
 
@@ -504,6 +524,9 @@ public class IndexedBlockStore implements BlockStore{
                     blockInfo.setMainChain(true);
                     updateBlockInfoForLevel(block.getNumber(), blocks);
                 }
+
+                // Add block time cache entry for newBlocks.
+                addBlockTime(block);
             }
         }
     }
@@ -532,6 +555,25 @@ public class IndexedBlockStore implements BlockStore{
             result.addAll( cache.getListHashesStartWith(number, maxBlocks) );
 
         return result;
+    }
+
+    @Override
+    public long getBlockTimeByNumber(long blockNumber) {
+        Long blockTime = getBlockTime(blockNumber);
+
+        if (blockTime != null) {
+            return blockTime;
+        }
+
+        Block block = getChainBlockByNumber(blockNumber);
+        if (block == null) {
+            return 0;
+        }
+
+        long timeStamp = ByteUtil.byteArrayToLong(block.getTimestamp());
+        addBlockTime(block.getNumber(), timeStamp);
+
+        return timeStamp;
     }
 
     public static class BlockInfo implements Serializable {
@@ -597,6 +639,43 @@ public class IndexedBlockStore implements BlockStore{
         }
     };
 
+    private static class LRUCache extends LinkedHashMap<Long, Long> {
+        private static final long serialVersionUID = 1L;
+        private int capacity;
+
+        public LRUCache(int capacity, float loadFactor) {
+            super(capacity, loadFactor, false);
+            this.capacity = capacity;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Long> eldest) {
+            return size() > this.capacity;
+        }
+    }
+
+    private static void addBlockTime(long blockNumber, long timeStamp) {
+        synchronized(sBlockTimeLock) {
+            sBlockTimeCache.put(blockNumber, timeStamp);
+        }
+    }
+
+    private static void addBlockTime(Block block) {
+        long timeStamp = ByteUtil.byteArrayToLong(block.getTimestamp());
+        addBlockTime(block.getNumber(), timeStamp);
+    }
+
+    private static void removeBlockTime(long blockNumber) {
+        synchronized(sBlockTimeLock) {
+            sBlockTimeCache.remove(blockNumber);
+        }
+    }
+
+    private static Long getBlockTime(long blockNumber) {
+        synchronized(sBlockTimeLock) {
+            return sBlockTimeCache.get(blockNumber);
+        }
+    }
 
     public void printChain(){
 
