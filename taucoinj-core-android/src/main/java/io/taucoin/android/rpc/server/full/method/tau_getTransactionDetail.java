@@ -31,6 +31,8 @@ public class tau_getTransactionDetail extends JsonRpcServerMethod {
         ArrayList<String> result = new ArrayList<String>();
         Transaction tx = new Transaction(jsToByteArray((String)params.get(0)), false);
         result.add("Hash: " + Hex.toHexString(tx.getHash()));
+        result.add("Version: " + (int) tx.getVersion());
+        result.add("Option: " + (int) tx.getOption());
         result.add("TimeStamp: " + new BigInteger(1, tx.getTime()).toString());
         result.add("ExpireTime: " + new BigInteger(1, tx.getExpireTime()).toString());
         result.add("Sender Address: " + Hex.toHexString(tx.getSender()));

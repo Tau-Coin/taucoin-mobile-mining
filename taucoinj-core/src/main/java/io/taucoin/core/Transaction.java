@@ -175,6 +175,16 @@ public class Transaction {
         return isCompositeTx;
     }
 
+    public byte getVersion() {
+        if (!parsed) rlpParse();
+        return this.version;
+    }
+
+    public byte getOption() {
+        if (!parsed) rlpParse();
+        return this.option;
+    }
+
     public byte[] transactionCost(){
 
         if (!parsed) rlpParse();
