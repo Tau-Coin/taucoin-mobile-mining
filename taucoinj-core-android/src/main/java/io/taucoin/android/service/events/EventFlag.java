@@ -105,5 +105,10 @@ public enum EventFlag {
     /**
      * Send or receive http payload event.
      */
-    EVENT_NETWORK_TRAFFIC
+    EVENT_NETWORK_TRAFFIC,
+
+    /**
+     * Chain information changed event.
+     */
+    EVENT_CHAININFO_CHANGED
 }

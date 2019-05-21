@@ -224,6 +224,8 @@ public class RequestManager implements RequestQueue.MessageListener {
         chainInfoManager.update(msg.getHeight(), msg.getPreviousBlockHash(),
                 msg.getCurrentBlockHash(), msg.getTotalDiff());
         changeSyncState(DONE_CHAININFO_RETRIEVING);
+        listener.onChainInfoChanged(msg.getHeight(), msg.getPreviousBlockHash(),
+                msg.getCurrentBlockHash(), msg.getTotalDiff());
     }
 
     private void startPullChainInfo() {

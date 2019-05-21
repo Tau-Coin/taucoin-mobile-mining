@@ -8,6 +8,7 @@ import io.taucoin.net.rlpx.Node;
 import io.taucoin.net.server.Channel;
 import javax.inject.Singleton;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -151,6 +152,15 @@ public class CompositeTaucoinListener implements TaucoinListener {
     public void onRecvHttpPayload(String payload) {
         for (TaucoinListener listener : listeners) {
             listener.onRecvHttpPayload(payload);
+        }
+    }
+
+    @Override
+    public void onChainInfoChanged(long height, byte[] previousBlockHash,
+            byte[] currentBlockHash, BigInteger totalDiff) {
+        for (TaucoinListener listener : listeners) {
+            listener.onChainInfoChanged(height, previousBlockHash,
+                    currentBlockHash, totalDiff);
         }
     }
 }
