@@ -26,15 +26,15 @@
         android:text="@string/splash_title" />
 
     <TextView
-        android:visibility="gone"
-        style="@style/style_normal_yellow"
+        android:visibility="visible"
+        style="@style/style_tau_yellow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/app_title"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:typeface="serif"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="22dp"
         android:lineSpacingExtra="2dp"
         android:textColor="@color/color_logo"
         android:text="@string/splash_subheading" />

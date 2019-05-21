@@ -53,5 +53,7 @@ public interface BlockStore {
     void load();
     void setSessionFactory(SessionFactory sessionFactory);
 
+    long getBlockTimeByNumber(long blockNumber);
+
     void close();
 }

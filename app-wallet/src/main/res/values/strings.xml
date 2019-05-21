@@ -15,7 +15,7 @@
     <string name="common_see_more">Click to see more</string>
 
     <string name="splash_title">TAU mWallet %s</string>
-    <string name="splash_subheading">Mobile &#038; Decentral\nProof of Transaction</string>
+    <string name="splash_subheading">Mobile Mining Wallet</string>
     <string name="splash_describe">Mobile &#038; Decentral\nProof of Transaction\nMining consumes 5 MB data per day</string>
 
     <string name="main_home">Home</string>
@@ -63,7 +63,7 @@
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
     <string name="send_tx_range_fee">%s×%s%s</string>
-    <string name="send_tx_total_amount">Total: %s</string>
+    <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
     <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
@@ -127,6 +127,7 @@
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
 
+    <string name="home_balance">Balance</string>
     <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
     <string name="home_synchronized">Latest&#160;Block</string>

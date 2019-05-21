@@ -252,6 +252,12 @@ public class InMemoryBlockStore implements BlockStore {
     public BigInteger getTotalDifficultyForHash(byte[] hash) {
         return null;
     }
+
+    @Override
+    public long getBlockTimeByNumber(long blockNumber) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public void close(){
 

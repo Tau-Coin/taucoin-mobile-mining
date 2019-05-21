@@ -145,6 +145,11 @@ public class BlockStoreImpl implements BlockStore {
         return database.getAllBlocks();
     }
 
+    @Override
+    public long getBlockTimeByNumber(long blockNumber) {
+        throw new UnsupportedOperationException();
+    }
+
     public void reset() {
 
         database.reset();

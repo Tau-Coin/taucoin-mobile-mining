@@ -617,8 +617,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
 
         if (referenceHeight <= bestBlockNum) {
-            referenceTime = ByteUtil.byteArrayToLong(blockStore.
-                    getChainBlockByNumber(referenceHeight).getTimestamp());
+            referenceTime = blockStore.getBlockTimeByNumber(referenceHeight);
         } else {
             return false;
         }
