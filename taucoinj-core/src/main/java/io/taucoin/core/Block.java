@@ -130,7 +130,7 @@ public class Block {
             RLPList block = (RLPList) params.get(0);
 
             // Parse block
-            this.version = block.get(0).getRLPData()[0];
+            this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
             logger.info("signature size is {}",signature.size());
@@ -160,7 +160,7 @@ public class Block {
             this.forgerPubkey = block.get(9).getRLPData();
 
             // Parse option
-            this.option = block.get(10).getRLPData()[0];
+            this.option = block.get(10).getRLPData() == null ? (byte) 0 : block.get(10).getRLPData()[0];
 
             if(block.size() > 11) {
                 // Parse Transactions
@@ -172,7 +172,7 @@ public class Block {
             RLPList block = (RLPList) params.get(0);
 
             // Parse block
-            this.version = block.get(0).getRLPData()[0];
+            this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
             logger.info("signature size is {}",signature.size());
@@ -185,7 +185,7 @@ public class Block {
 
             this.previousHeaderHash = block.get(3).getRLPData();
             // Parse option
-            this.option = block.get(4).getRLPData()[0];
+            this.option = block.get(4).getRLPData() == null ? (byte) 0 : block.get(4).getRLPData()[0];
             // Parse Transactions
             if(block.size() > 5){
                 RLPList txTransactions = (RLPList) block.get(5);
