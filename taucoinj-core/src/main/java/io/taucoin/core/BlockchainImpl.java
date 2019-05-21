@@ -108,7 +108,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     long exitOn = Long.MAX_VALUE;
 
-    public boolean byTest = false;
     private boolean fork = false;
 
     public BlockchainImpl() {
@@ -293,7 +292,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     listener.onBlockConnected(newBlocks.get(i));
                 }
 
-              if (!byTest && needFlush(block)) {
+              if (needFlush(block)) {
                 repository.flush();
                 blockStore.flush();
                 System.gc();
@@ -496,7 +495,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         storeBlock(block);
 
-        if (!byTest && needFlush(block)) {
+        if (needFlush(block)) {
             repository.flush();
             blockStore.flush();
             System.gc();
