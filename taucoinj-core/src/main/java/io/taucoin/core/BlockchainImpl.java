@@ -437,8 +437,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         Long time = System.currentTimeMillis() / 1000;
         logger.info("create new block time {}", time);
         byte[] timeStamp = new BigInteger(time.toString()).toByteArray();
-        byte version = (byte)1;
-        byte option = (byte)1;
+        byte version = Constants.BLOCK_VERSION;
+        byte option = Constants.BLOCK_OPTION;
         Block block = new Block(version,
                 timeStamp,
                 parent.getHash(),
@@ -554,7 +554,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * @return
      */
     private boolean verifyVersion(byte version) {
-        return version == (byte) 1;
+        return version == Constants.BLOCK_VERSION;
     }
 
     /**
@@ -563,7 +563,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * @return
      */
     private boolean verifyOption(byte option) {
-        return option == (byte) 1;
+        return option == Constants.BLOCK_OPTION;
     }
 
     private boolean verifyBlockTime(Block block) {
