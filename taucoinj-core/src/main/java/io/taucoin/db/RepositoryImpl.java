@@ -48,9 +48,6 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
     private KeyValueDataSource stateDB = null;
 
-    private final ReentrantLock lock = new ReentrantLock();
-    private final AtomicInteger accessCounter = new AtomicInteger();
-
     public RepositoryImpl() {
     }
 
@@ -62,32 +59,20 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public void reset() {
-        doWithLockedAccess(new Functional.InvokeWrapper() {
-            @Override
-            public void invoke() {
-                close();
-
-                stateDB.init();
-            }
-        });
+    public synchronized void reset() {
+        close();
+        stateDB.init();
     }
 
     @Override
-    public void close() {
-        doWithLockedAccess(new Functional.InvokeWrapper() {
-            @Override
-            public void invoke() {
-
-                if (stateDB != null) {
-                    stateDB.close();
-                }
-            }
-        });
+    public synchronized void close() {
+        if (stateDB != null) {
+            stateDB.close();
+        }
     }
 
     @Override
-    public boolean isClosed() {
+    public synchronized boolean isClosed() {
         return stateDB.isAlive();
     }
 
@@ -124,32 +109,27 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public void flush() {
-        doWithLockedAccess(new Functional.InvokeWrapper() {
-            @Override
-            public void invoke() {
-                gLogger.info("flushing to disk");
-            }
-        });
+    public synchronized void flush() {
+        gLogger.info("flushing to disk");
     }
 
     @Override
-    public void rollback() {
+    public synchronized void rollback() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void commit() {
+    public synchronized void commit() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Repository startTracking() {
+    public synchronized Repository startTracking() {
         return new RepositoryTrack(this);
     }
 
     @Override
-    public BigInteger addBalance(byte[] addr, BigInteger value) {
+    public synchronized BigInteger addBalance(byte[] addr, BigInteger value) {
 
         AccountState account = getAccountStateOrCreateNew(addr);
 
@@ -159,7 +139,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         return result;
     }
 
-    public BigInteger addGenesisBalance(byte[] addr, BigInteger value) {
+    public synchronized BigInteger addGenesisBalance(byte[] addr, BigInteger value) {
 
         AccountState account = getAccountStateOrCreateNew(addr);
 
@@ -170,13 +150,13 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public BigInteger getBalance(byte[] addr) {
+    public synchronized BigInteger getBalance(byte[] addr) {
         AccountState account = getAccountState(addr);
         return (account == null) ? BigInteger.ZERO : account.getBalance();
     }
 
     @Override
-    public BigInteger getforgePower(byte[] addr) {
+    public synchronized BigInteger getforgePower(byte[] addr) {
         return getAccountStateOrCreateNew(addr).getforgePower();
     }
 
@@ -187,7 +167,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public BigInteger increaseforgePower(byte[] addr) {
+    public synchronized BigInteger increaseforgePower(byte[] addr) {
         AccountState account = getAccountStateOrCreateNew(addr);
 
         account.incrementforgePower();
@@ -197,7 +177,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public BigInteger reduceForgePower(byte[] addr) {
+    public synchronized BigInteger reduceForgePower(byte[] addr) {
         AccountState account = getAccountStateOrCreateNew(addr);
 
         account.reduceForgePower();
@@ -206,19 +186,15 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         return account.getforgePower();
     }
 
-    private void updateAccountState(final byte[] addr, final AccountState accountState) {
-        doWithAccessCounting(new Functional.InvokeWrapper() {
-            @Override
-            public void invoke() {
-                stateDB.put(addr, accountState.getEncoded());
-            }
-        });
-    }
-    private void updateGenesisAccountState(final byte[] addr, final AccountState accountState) {
-            stateDB.put(addr, accountState.getEncoded());
+    private synchronized void updateAccountState(final byte[] addr, final AccountState accountState) {
+        stateDB.put(addr, accountState.getEncoded());
     }
 
-    public BigInteger setforgePower(final byte[] addr, final BigInteger forgePower) {
+    private synchronized void updateGenesisAccountState(final byte[] addr, final AccountState accountState) {
+        stateDB.put(addr, accountState.getEncoded());
+    }
+
+    public synchronized BigInteger setforgePower(final byte[] addr, final BigInteger forgePower) {
         AccountState account = getAccountStateOrCreateNew(addr);
 
         account.setforgePower(forgePower);
@@ -228,33 +204,23 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public void delete(final byte[] addr) {
-        doWithAccessCounting(new Functional.InvokeWrapper() {
-            @Override
-            public void invoke() {
-                stateDB.delete(addr);
-            }
-        });
+    public synchronized void delete(final byte[] addr) {
+        stateDB.delete(addr);
     }
 
     @Override
-    public AccountState getAccountState(final byte[] addr) {
-        return doWithAccessCounting(new Functional.InvokeWrapperWithResult<AccountState>() {
-            @Override
-            public AccountState invoke() {
-                AccountState result = null;
-                byte[] accountData = stateDB.get(addr);
+    public synchronized AccountState getAccountState(final byte[] addr) {
+        AccountState result = null;
+        byte[] accountData = stateDB.get(addr);
 
-                if (accountData != null)
-                    result = new AccountState(accountData);
+        if (accountData != null)
+            result = new AccountState(accountData);
 
-                return result;
-            }
-        });
+        return result;
     }
 
     @Override
-    public AccountState createAccount(final byte[] addr) {
+    public synchronized AccountState createAccount(final byte[] addr) {
         AccountState accountState = new AccountState();
 
         updateAccountState(addr, accountState);
@@ -263,7 +229,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     //used for me
-    public AccountState createGenesisAccount(final byte[] addr) {
+    public synchronized AccountState createGenesisAccount(final byte[] addr) {
         AccountState accountState = new AccountState();
 
         updateGenesisAccountState(addr, accountState);
@@ -286,54 +252,4 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         ByteArrayWrapper wrappedAddress = wrap(addr);
         cacheAccounts.put(wrappedAddress, account);
     }
-
-    private void doWithLockedAccess(Functional.InvokeWrapper wrapper) {
-        lock.lock();
-        try {
-            while (accessCounter.get() > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("waiting for access ...");
-                }
-                try {
-                    sleep(100);
-                } catch (InterruptedException e) {
-                    logger.error("Error occurred during access waiting: ", e);
-                }
-            }
-
-            wrapper.invoke();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public <R> R doWithAccessCounting(Functional.InvokeWrapperWithResult<R> wrapper) {
-        while (lock.isLocked()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("waiting for lock releasing ...");
-            }
-            try {
-                sleep(100);
-            } catch (InterruptedException e) {
-                logger.error("Error occurred during locked access waiting: ", e);
-            }
-        }
-        accessCounter.incrementAndGet();
-        try {
-            return wrapper.invoke();
-        } finally {
-            accessCounter.decrementAndGet();
-        }
-    }
-
-    public void doWithAccessCounting(final Functional.InvokeWrapper wrapper) {
-        doWithAccessCounting(new Functional.InvokeWrapperWithResult<Object>() {
-            @Override
-            public Object invoke() {
-                wrapper.invoke();
-                return null;
-            }
-        });
-    }
-
 }
