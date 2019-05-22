@@ -601,7 +601,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      */
     private boolean verifyTransactionVersion(Transaction tx) {
         if (tx.getVersion() != TransactionVersion.V01.getCode()) {
-            logger.error("Tx [{}] version [] is mismatch!", Hex.toHexString(tx.getHash()),
+            logger.error("Tx [{}] version [{}] is mismatch!", Hex.toHexString(tx.getHash()),
                     tx.getVersion());
             return false;
         }
@@ -615,7 +615,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      */
     private boolean verifyTransactionOption(Transaction tx) {
         if (tx.getOption() != TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
-            logger.error("Tx [{}] option [] is mismatch!", Hex.toHexString(tx.getHash()),
+            logger.error("Tx [{}] option [{}] is mismatch!", Hex.toHexString(tx.getHash()),
                     tx.getOption());
             return false;
         }
