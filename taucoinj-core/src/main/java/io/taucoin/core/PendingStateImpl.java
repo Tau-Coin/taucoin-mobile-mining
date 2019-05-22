@@ -41,6 +41,7 @@ public class PendingStateImpl implements PendingState {
     private Repository repository;
     private BlockStore blockStore;
     private Blockchain blockchain;
+    private static final int MaxExpireTime = 144;
     private boolean isSyncdone = false;
     @Resource
     private final PriorityQueue<MemoryPoolEntry> wireTransactions = new PriorityQueue<MemoryPoolEntry>(1,new MemoryPoolPolicy());
@@ -49,6 +50,8 @@ public class PendingStateImpl implements PendingState {
     private final Map<ByteArrayWrapper, Object> receivedTxs = new LRUMap<>(500000);
 
     private final Map<String, BigInteger> expendList = new HashMap<String, BigInteger>(500000);
+
+    private final Map<String, HashSet<Long>> particleTx = new HashMap<>(50);
 
     @Resource
     private final List<Transaction> pendingStateTransactions = new ArrayList<>();
@@ -175,6 +178,12 @@ public class PendingStateImpl implements PendingState {
 			return false;
         }
         long expireTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+
+        if (expireTime > MaxExpireTime) {
+            tx.TRANSACTION_STATUS = "this transaction expire time is invalid";
+            return false;
+        }
+
         long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
         Block benchBlock = null;
         if(unlockTime >= 0) {
@@ -219,6 +228,22 @@ public class PendingStateImpl implements PendingState {
                     logger.warn("No enough balance: Require: {}, Sender's balance: {}", expendList.get(senderTmp), senderBalance);
                 tx.TRANSACTION_STATUS = "sorry,No enough balance";
                 return false;
+            }
+        }
+
+        synchronized (particleTx) {
+            String senderTmp = ByteUtil.toHexString(tx.getSender());
+            long txTime = ByteUtil.byteArrayToLong(tx.getTime());
+            if (!particleTx.containsKey(senderTmp)) {
+                HashSet<Long> hashSet = new HashSet<>();
+                particleTx.put(senderTmp,hashSet);
+            } else {
+                HashSet<Long> hashSet = particleTx.get(senderTmp);
+                if (hashSet.contains(txTime)) {
+                    return false;
+                } else {
+                    hashSet.add(txTime);
+                }
             }
         }
 
@@ -270,6 +295,7 @@ public class PendingStateImpl implements PendingState {
 
         clearOutdated();
 
+        clearParticleTx(block.getTransactionsList());
         //updateState(Block block);
     }
 
@@ -345,6 +371,21 @@ public class PendingStateImpl implements PendingState {
                 }
 
                 removeExpendList(tx);
+            }
+        }
+    }
+
+    private void clearParticleTx(List<Transaction> txs) {
+        synchronized (particleTx) {
+            for (Transaction tx : txs) {
+                String senderTmp = ByteUtil.toHexString(tx.getSender());
+                long txTime = ByteUtil.byteArrayToLong(tx.getTime());
+                if (particleTx.containsKey(senderTmp)) {
+                    HashSet<Long> hashSet = particleTx.get(senderTmp);
+                    if (hashSet.contains(txTime)) {
+                        hashSet.remove(txTime);
+                    }
+                }
             }
         }
     }
