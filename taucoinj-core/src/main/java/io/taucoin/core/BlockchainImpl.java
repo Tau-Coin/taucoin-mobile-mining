@@ -2,6 +2,8 @@ package io.taucoin.core;
 
 import io.taucoin.config.Constants;
 import io.taucoin.config.SystemProperties;
+import io.taucoin.core.transaction.TransactionOptions;
+import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.crypto.SHA3Helper;
@@ -552,7 +554,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * @param version
      * @return
      */
-    private boolean verifyVersion(byte version) {
+    private boolean verifyBlockVersion(byte version) {
         return version == Constants.BLOCK_VERSION;
     }
 
@@ -561,7 +563,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
      * @param option
      * @return
      */
-    private boolean verifyOption(byte option) {
+    private boolean verifyBlockOption(byte option) {
         return option == Constants.BLOCK_OPTION;
     }
 
@@ -589,6 +591,34 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * verify transaction version
+     * @param tx
+     * @return
+     */
+    private boolean verifyTransactionVersion(Transaction tx) {
+        if (tx.getVersion() != TransactionVersion.V01.getCode()) {
+            logger.error("Tx [{}] version [] is mismatch!", Hex.toHexString(tx.getHash()),
+                    tx.getVersion());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * verify transaction option
+     * @param tx
+     * @return
+     */
+    private boolean verifyTransactionOption(Transaction tx) {
+        if (tx.getOption() != TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
+            logger.error("Tx [{}] option [] is mismatch!", Hex.toHexString(tx.getHash()),
+                    tx.getOption());
+            return false;
+        }
         return true;
     }
 
@@ -675,13 +705,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     private boolean verifyBlockSimply(Block block) {
-        if (!verifyVersion(block.getVersion())) {
+        if (!verifyBlockVersion(block.getVersion())) {
             logger.error("Block version is invalid, block number {}, version {}",
                     block.getNumber(), block.getVersion());
             return false;
         }
 
-        if (!verifyOption(block.getOption())) {
+        if (!verifyBlockOption(block.getOption())) {
             logger.error("Block version is invalid, block number {}, version {}",
                     block.getNumber(), block.getOption());
             return false;
@@ -726,6 +756,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
             if (!txs.isEmpty()) {
                 for (Transaction tx: txs) {
+                    if (!verifyTransactionVersion(tx)) {
+                        logger.error("Block contains mismatched tx version, block number {}", block.getNumber());
+                        return false;
+                    }
+
+                    if (!verifyTransactionOption(tx)) {
+                        logger.error("Block contains mismatched tx option, block number {}", block.getNumber());
+                        return false;
+                    }
+
                     if (!verifyTransactionTime(tx, blockTime, bestBlockNum)) {
                         logger.error("Block contains expiration transaction, block number {}", block.getNumber());
                         return false;
