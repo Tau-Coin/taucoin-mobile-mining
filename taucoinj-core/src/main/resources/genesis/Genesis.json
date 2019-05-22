@@ -1,11 +1,11 @@
 {
-  "version": "0x01",
-  "timestamp": "0x5c46da3b",
+  "version": "0x00",
+  "timestamp": "0x5ce42ecd",
   "previousHeaderHash": "0x0000000000000000000000000000000000000000",
-  "generatorPublicKey": "038ccf4c15b578e734e025d381248ea54c492e3f29f9a432f84ca7e06372ab285c",
+  "generatorPublicKey": "0394c720df2a453ce470c7fbe48655f321b03432c53840d1333392c12332d61b05",
 
-  "blockSignature": "141e8cc82d3df0c1a9af8d3aa580bc8cb3b892ae2b63157fcdd248f58000553b1b6fabf96b686bd6f7807628203c4a53940fd476bb1233fd027734ed758603fe",
-  "option": "0x01",
+  "blockSignature": "fb8b62d700fa65530bccd2664874aef0e78c1657b43394af70583ac49041305516c31632043063b6aeea5703bbfc2f1391c940f5a74fdbc48eb1604e718167e9",
+  "option": "0x00",
   "coinbase": [],
 
   "alloc": {
