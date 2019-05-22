@@ -377,7 +377,7 @@ public class Transaction {
         return fee;
     }
 
-    private BigInteger getBigIntegerFee() {
+    public BigInteger getBigIntegerFee() {
         if (!parsed) rlpParse();
         return new BigInteger(fee);
     }
