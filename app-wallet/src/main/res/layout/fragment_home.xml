@@ -176,9 +176,8 @@
                 <TextView
                     style="@style/style_small_grey"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.06"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="5dp"
                     android:gravity="center_horizontal"
                     android:text="@string/home_data_storage"/>
 
@@ -216,7 +215,7 @@
                     android:id="@+id/tv_data_storage"
                     style="@style/style_power_black"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.06"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:layout_height="wrap_content"
@@ -258,7 +257,7 @@
 
                 <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.06"
                     android:layout_height="wrap_content">
 
                     <TextView
@@ -307,7 +306,7 @@
                     android:id="@+id/tv_mined"
                     style="@style/style_power_black"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.06"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:layout_height="wrap_content"
