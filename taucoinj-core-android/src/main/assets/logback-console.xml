@@ -2,7 +2,7 @@
     <!-- Create a logcat appender -->
     <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>ERROR</level>
         </filter>
         <encoder>
             <pattern>%msg</pattern>
@@ -13,15 +13,23 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="net" level="INFO">
+    <logger name="net" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="discover" level="INFO">
+     <logger name="http" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="db" level="INFO">
+    <logger name="sync2" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="discover" level="ERROR">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="db" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -53,11 +61,11 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="blockqueue" level="INFO">
+    <logger name="blockqueue" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="general" level="INFO">
+    <logger name="general" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -65,7 +73,7 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="main" level="INFO">
+    <logger name="main" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -77,7 +85,7 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="blockchain" level="INFO">
+    <logger name="blockchain" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -85,7 +93,7 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="forge" level="INFO">
+    <logger name="forge" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -93,17 +101,16 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="hsqldb.db" level="INFO">
+    <logger name="hsqldb.db" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="test" level="INFO">
+    <logger name="test" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <root level="INFO">
+    <root level="ERROR">
         <appender-ref ref="logcat" />
     </root>
 
 </configuration>
-

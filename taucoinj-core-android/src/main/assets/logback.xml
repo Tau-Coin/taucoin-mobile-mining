@@ -8,7 +8,7 @@
     <!-- Create a file appender for DEBUG-level messages -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>ERROR</level>
         </filter>
 
         <file>${LOG_DIR}/tau.log</file>
@@ -17,7 +17,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
             <maxHistory>10</maxHistory>
-            <totalSizeCap>200MB</totalSizeCap>
+            <totalSizeCap>20MB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
@@ -29,11 +29,19 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="net" level="INFO">
+    <logger name="net" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="discover" level="INFO">
+    <logger name="http" level="ERROR">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="sync2" level="ERROR">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="discover" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
@@ -69,11 +77,11 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="blockqueue" level="INFO">
+    <logger name="blockqueue" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="general" level="INFO">
+    <logger name="general" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
@@ -81,7 +89,7 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="main" level="INFO">
+    <logger name="main" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
@@ -101,7 +109,7 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="forge" level="INFO">
+    <logger name="forge" level="ERROR">
         <appender-ref ref="file" />
     </logger>
 
@@ -117,7 +125,7 @@
         <appender-ref ref="file" />
     </logger>
 
-    <root level="INFO">
+    <root level="ERROR">
         <appender-ref ref="file" />
     </root>
 
