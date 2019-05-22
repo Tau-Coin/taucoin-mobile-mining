@@ -294,11 +294,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     listener.onBlockConnected(newBlocks.get(i));
                 }
 
-              if (needFlush(block)) {
-                repository.flush();
-                blockStore.flush();
-                System.gc();
-              }
+//                if (needFlush(block)) {
+                    repository.flush();
+                    blockStore.flush();
+                    System.gc();
+//                }
 
                 return IMPORTED_BEST;
             } else {
