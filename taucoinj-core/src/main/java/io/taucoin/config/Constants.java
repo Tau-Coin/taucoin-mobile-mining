@@ -17,7 +17,7 @@ public class Constants {
     //block time drift
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
 
-    public static final String GENESIS_BLOCK_HASH = "c129752128066802431044874f7c061876950cae";
+    public static final String GENESIS_BLOCK_HASH = "ffd2f0fd959faf6a2f6cb10f5b4ed3e177bdf4e6";
 
     public static BigInteger MINIMUM_DIFFICULTY = BigInteger.valueOf(131072);
     public static BigInteger DIFFICULTY_BOUND_DIVISOR = BigInteger.valueOf(2048);
