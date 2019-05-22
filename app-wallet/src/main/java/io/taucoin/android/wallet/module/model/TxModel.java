@@ -167,6 +167,7 @@ public class TxModel implements ITxModel {
      * 0-Legitimate trading, trading pool waiting for the chain
      * 1-Legitimate transactions, not overdue on-line transactions
      * 2-Legitimate transactions are on the chain
+     * 3-Legitimate transactions, insufficient transaction fee
      *
      * 11-Verification fails, illegal transactions, transaction information is incorrect (unresolved, field length is incorrect)
      * 12-Verification fails, illegal transactions, signature verification fails
@@ -192,6 +193,11 @@ public class TxModel implements ITxModel {
                 break;
             case 2:
                 history.setResult(TransmitKey.TxResult.SUCCESSFUL);
+                isRefresh = true;
+                break;
+            case 3:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_insufficient_fee));
                 isRefresh = true;
                 break;
             case 11:

@@ -77,6 +77,7 @@
 
     <string name="send_tx_status_expired">Failed, transaction expired.</string>
     <string name="send_tx_illegal">Failed, illegal transaction.</string>
+    <string name="send_tx_insufficient_fee">Failed, insufficient transaction fee</string>
     <string name="send_tx_verify_signature">Failed, unable to verify signature</string>
     <string name="send_tx_insufficient_balance">Failed, insufficient balance</string>
     <string name="send_tx_unknown_error">Failed, network error, please try it again.</string>
