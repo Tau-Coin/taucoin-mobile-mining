@@ -6,8 +6,8 @@ import static io.taucoin.config.SystemProperties.CONFIG;
 
 public class Constants {
 
-    public static final byte BLOCK_VERSION = (byte) 1;
-    public static final byte BLOCK_OPTION = (byte) 1;
+    public static final byte BLOCK_VERSION = (byte) 0;
+    public static final byte BLOCK_OPTION = (byte) 0;
     //max block tx number
     public static final int MAX_BLOCKTXSIZE = 50;
     //transaction expiration height

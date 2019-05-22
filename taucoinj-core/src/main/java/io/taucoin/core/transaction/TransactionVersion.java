@@ -5,7 +5,7 @@ package io.taucoin.core.transaction;
  */
 public enum TransactionVersion {
 
-    V01((byte) 0x01);
+    V01((byte) 0x00);
 
     private byte code;
 
