@@ -497,11 +497,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         storeBlock(block);
 
-        if (needFlush(block)) {
+//        if (needFlush(block)) {
             repository.flush();
             blockStore.flush();
             System.gc();
-        }
+//        }
 
         // Remove all wallet transactions as they already approved by the net
         wallet.removeTransactions(block.getTransactionsList());
@@ -633,6 +633,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         long txTime = ByteUtil.byteArrayToLong(tx.getTime());
         long lockTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
+
+        if (lockTime > Constants.TX_MAXEXPIRETIME) {
+            logger.error("Tx {} expire time is in valid ",ByteUtil.toHexString(tx.getHash()));
+            return false;
+        }
 
         if (txTime - Constants.MAX_TIMEDRIFT > blockTime) {
             logger.error("Tx time {} exceeds block time {} by {} seconds", txTime, blockTime, Constants.MAX_TIMEDRIFT);

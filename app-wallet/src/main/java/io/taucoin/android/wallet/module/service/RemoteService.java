@@ -21,6 +21,9 @@ import android.content.Intent;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.wallet.base.TransmitKey;
@@ -36,6 +39,8 @@ public class RemoteService extends TaucoinRemoteService {
     public void onCreate() {
         super.onCreate();
         init();
+        // Crashlytics
+        Fabric.with(this, new Crashlytics());
     }
 
     @Override

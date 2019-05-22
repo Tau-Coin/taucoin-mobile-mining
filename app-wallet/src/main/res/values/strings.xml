@@ -80,7 +80,10 @@
     <string name="send_tx_insufficient_fee">Failed, insufficient transaction fee</string>
     <string name="send_tx_verify_signature">Failed, unable to verify signature</string>
     <string name="send_tx_insufficient_balance">Failed, insufficient balance</string>
-    <string name="send_tx_unknown_error">Failed, network error, please try it again.</string>
+    <string name="send_tx_illegal_version">Failed, illegal transaction version</string>
+    <string name="send_tx_illegal_option">Failed, illegal transaction option</string>
+    <string name="send_tx_illegal_expiry">Failed, illegal transaction expiry</string>
+    <string name="send_tx_unknown_error">Failed, network error, please try it again</string>
 
     <string name="keys_dialog_title">Please make sure your\nprivate key has been saved</string>
     <string name="keys_address">Address</string>
