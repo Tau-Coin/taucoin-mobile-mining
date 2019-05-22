@@ -576,6 +576,7 @@ public class Transaction {
     }
 
     public byte[] getExpireTime() {
+        if (!parsed) rlpParse();
         return expireTime;
     }
 }
