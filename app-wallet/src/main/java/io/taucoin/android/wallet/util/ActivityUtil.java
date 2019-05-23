@@ -18,6 +18,8 @@ package io.taucoin.android.wallet.util;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -27,6 +29,7 @@ import com.github.naturs.logger.Logger;
 import java.util.List;
 
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.module.view.SplashActivity;
 
 /**
@@ -83,8 +86,23 @@ public class ActivityUtil {
     }
 
     public static void openUri(Context context, String uriStr) {
-        Uri uri = Uri.parse(uriStr);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        context.startActivity(intent);
+        boolean isExistBrowser = true;
+        try{
+            Uri uri = Uri.parse(uriStr);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            PackageManager pm = context.getPackageManager();
+            List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
+            if(list != null && list.size() > 0){
+                context.startActivity(intent);
+            }else{
+                isExistBrowser = false;
+            }
+        }catch (Exception e){
+            Logger.e(e, "No browser installed");
+            isExistBrowser = false;
+        }
+        if(!isExistBrowser){
+            ToastUtils.showShortToast(R.string.common_install_browser);
+        }
     }
 }
