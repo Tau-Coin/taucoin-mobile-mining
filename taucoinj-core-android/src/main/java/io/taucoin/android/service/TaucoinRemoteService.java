@@ -420,7 +420,10 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     private void unregisterNetworkStateListener() {
-        this.unregisterReceiver(networkStateListener);
+        if (networkStateListener != null) {
+            this.unregisterReceiver(networkStateListener);
+            networkStateListener = null;
+        }
     }
 
     private static class NetworkStateListener extends BroadcastReceiver {
