@@ -144,13 +144,15 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     @Override
     public void onConnectorDisconnected() {
-        if (mTaucoinConnector != null) {
-            addLogEntry("Connector Disconnected");
-            mTaucoinConnector.removeListener(mHandlerIdentifier);
-            isTaucoinConnected = false;
-            isInit = false;
-            isSyncMe = -1;
-        }
+        try {
+            if (mTaucoinConnector != null) {
+                addLogEntry("Connector Disconnected");
+                mTaucoinConnector.removeListener(mHandlerIdentifier);
+                isTaucoinConnected = false;
+                isInit = false;
+                isSyncMe = -1;
+            }
+        }catch (Exception ignore){}
     }
 
     @Override

@@ -209,11 +209,13 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             boolean isMoreShow = !isLoadMore && mAdapter.getData().size() > 0;
             seeMoreView.setVisibility(isMoreShow ? View.VISIBLE : View.GONE);
             AbsListView.LayoutParams layoutParams = (AbsListView.LayoutParams) seeMoreView.getLayoutParams();
-            layoutParams.height = 0;
-            if(isMoreShow){
-                layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
+            if(layoutParams != null){
+                layoutParams.height = 0;
+                if(isMoreShow){
+                    layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
+                }
+                seeMoreView.setLayoutParams(layoutParams);
             }
-            seeMoreView.setLayoutParams(layoutParams);
         }
     }
 
