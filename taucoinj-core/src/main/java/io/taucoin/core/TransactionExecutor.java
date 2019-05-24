@@ -226,29 +226,28 @@ public class TransactionExecutor {
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
         //AccountState accountState = track.getAccountState(tx.getSender());
-        if(blockchain.getSize() > MaxHistoryCount && senderAccountState.getTranHistory().size() !=0 ){
-            long txTime = Collections.min(senderAccountState.getTranHistory().keySet());
+        if (blockchain.getSize() > MaxHistoryCount + 1
+                && senderAccountState.getTranHistory().size() != 0) {
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
-            if (freshTime > 1) {
-                long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp());
-                while (txTime < bechTime) {
-                    senderAccountState.getTranHistory().remove(txTime);
-                    if (senderAccountState.getTranHistory().size() == 0) {
-                        break;
-                    }
-                    txTime = Collections.min(senderAccountState.getTranHistory().keySet());
+            long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime - 1).getTimestamp());
+
+            Iterator<Map.Entry<Long,byte[]>> it = senderAccountState.getTranHistory().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<Long, byte[]> entry = it.next();
+                long txTime = entry.getKey();
+                if (txTime < bechTime) {
+                    it.remove();
+                } else {
+                    break;
                 }
-            } else {
-                long txTimeTemp = ByteUtil.byteArrayToLong(tx.getTime());
-                senderAccountState.getTranHistory().put(txTimeTemp, tx.getHash());
             }
-        }else{
-            long txTime = ByteUtil.byteArrayToLong(tx.getTime());
-            senderAccountState.getTranHistory().put(txTime,tx.getHash());
         }
 
+        // Store current tx time
+        senderAccountState.getTranHistory().put(ByteUtil.byteArrayToLong(tx.getTime()),
+                tx.getHash());
     }
 
     public void undoTransaction() {
