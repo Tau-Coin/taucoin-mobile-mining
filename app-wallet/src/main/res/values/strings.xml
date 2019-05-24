@@ -84,6 +84,7 @@
     <string name="send_tx_illegal_version">Failed, illegal transaction version</string>
     <string name="send_tx_illegal_option">Failed, illegal transaction option</string>
     <string name="send_tx_illegal_expiry">Failed, illegal transaction expiry</string>
+    <string name="send_tx_illegal_time">Failed, illegal transaction time</string>
     <string name="send_tx_unknown_error">Failed, network error, please try it again</string>
 
     <string name="keys_dialog_title">Please make sure your\nprivate key has been saved</string>

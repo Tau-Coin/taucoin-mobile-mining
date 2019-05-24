@@ -173,8 +173,9 @@ public class TxModel implements ITxModel {
      * 12-Verification fails, illegal transactions, signature verification fails
      * 13-Verification failed, illegal transactions, insufficient balance
      * 14-Verification failed, illegal transaction, illegal version number
-     * 15 - Validation failure, illegal transaction, illegal option number
-     * 16 - Failure of verification, illegal transaction, illegal expiration time
+     * 15-Validation failure, illegal transaction, illegal option number
+     * 16-Failure of verification, illegal transaction, illegal expiration time
+     * 17-Verification failure, illegal transaction, illegal transaction time
      *
      * 20-Chain-end backend lost transactions for unknown reasons (txId cannot be queried in the status database due to unknown errors)
      * */
@@ -232,6 +233,11 @@ public class TxModel implements ITxModel {
             case 16:
                 history.setResult(TransmitKey.TxResult.FAILED);
                 history.setMessage(ResourcesUtil.getText(R.string.send_tx_illegal_expiry));
+                isRefresh = true;
+                break;
+            case 17:
+                history.setResult(TransmitKey.TxResult.FAILED);
+                history.setMessage(ResourcesUtil.getText(R.string.send_tx_illegal_time));
                 isRefresh = true;
                 break;
             case 20:
