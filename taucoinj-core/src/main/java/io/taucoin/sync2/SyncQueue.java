@@ -176,6 +176,9 @@ public class SyncQueue {
 
                 if (importResult == IMPORTED_BEST || importResult == IMPORTED_NOT_BEST) {
                     if (logger.isDebugEnabled()) logger.debug(Hex.toHexString(wrapper.getBlock().getEncoded()));
+                } else {
+                    logger.error("Import block failed: result: {}, block.number: {}, block.hash: {}",
+                            importResult.name(), wrapper.getNumber(), wrapper.getBlock().getShortHash());
                 }
 
             } catch (Throwable e) {

@@ -467,20 +467,24 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     public synchronized boolean addBlock(Block block) {
 
         if (exitOn < block.getNumber()) {
-            System.out.print("Exiting after block.number: " + bestBlock.getNumber());
+            logger.warn("Exiting after block.number {}", bestBlock.getNumber());
             repository.flush();
             blockStore.flush();
             System.exit(-1);
         }
 
         if (!isValidBlock(block, repository)) {
-            logger.warn("Invalid block with number: {}", block.getNumber());
+            logger.error("Invalid block with number: {}", block.getNumber());
             return false;
         }
 
         // keep chain continuity
-        if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash()))
+        if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
+            logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}",
+                    Hex.toHexString(bestBlock.getHash()).substring(0, 6),
+                    Hex.toHexString(block.getPreviousHeaderHash()).substring(0, 6));
             return false;
+        }
 
         if (block.getNumber() >= config.traceStartBlock() && config.traceStartBlock() != -1) {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
