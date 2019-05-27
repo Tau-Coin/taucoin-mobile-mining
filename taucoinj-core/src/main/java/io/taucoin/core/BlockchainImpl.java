@@ -862,7 +862,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             if (!executor.init()) {
                 isValid = false;
                 cacheTrack.rollback();
-                logger.error("Transaction [{}] is invalid.", tx.getHash());
+                logger.error("Transaction {} is invalid.", Hex.toHexString(tx.getHash()));
                 break;
             }
             executor.setCoinbase(block.getForgerAddress());

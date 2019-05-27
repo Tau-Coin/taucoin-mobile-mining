@@ -117,7 +117,9 @@ public class TransactionExecutor {
         if (!isCovers(senderBalance, totalCost)) {
 
             if (logger.isWarnEnabled())
-                logger.warn("No enough balance: Require: {}, Sender's balance: {}", totalCost, senderBalance);
+                logger.warn("No enough balance: require: {}, sender's balance: {}, txid: {}, sender:{}",
+                        totalCost, senderBalance, ByteUtil.toHexString(tx.getHash()),
+                        ByteUtil.toHexString(tx.getSender()));
             tx.TRANSACTION_STATUS = "No enough balance";
             return false;
         }
