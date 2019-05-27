@@ -8,7 +8,7 @@
     <!-- Create a file appender for DEBUG-level messages -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
+            <level>INFO</level>
         </filter>
 
         <file>${LOG_DIR}/tau.log</file>
@@ -17,7 +17,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
             <maxHistory>10</maxHistory>
-            <totalSizeCap>20MB</totalSizeCap>
+            <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
@@ -25,7 +25,7 @@
         </encoder>
     </appender>
 
-    <logger name="core" level="ERROR">
+    <logger name="core" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
@@ -33,11 +33,11 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="http" level="ERROR">
+    <logger name="http" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="sync2" level="ERROR">
+    <logger name="sync2" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
@@ -45,7 +45,7 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="db" level="ERROR">
+    <logger name="db" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
@@ -73,15 +73,15 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="block" level="ERROR">
+    <logger name="block" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="blockqueue" level="ERROR">
+    <logger name="blockqueue" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="general" level="ERROR">
+    <logger name="general" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
@@ -89,31 +89,31 @@
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="main" level="ERROR">
+    <logger name="main" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="state" level="ERROR">
+    <logger name="state" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="repository" level="ERROR">
+    <logger name="repository" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="blockchain" level="ERROR">
+    <logger name="blockchain" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="txs" level="ERROR">
+    <logger name="txs" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="forge" level="ERROR">
+    <logger name="forge" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="execute" level="ERROR">
+    <logger name="execute" level="INFO">
         <appender-ref ref="file" />
     </logger>
 
@@ -125,7 +125,7 @@
         <appender-ref ref="file" />
     </logger>
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="file" />
     </root>
 
