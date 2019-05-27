@@ -273,7 +273,11 @@ public class MiningModel implements IMiningModel{
                 }
                 MiningRewardDaoUtils.getInstance().insertOrReplace(reward);
             }
-            logger.info("in executation blockHash={}, txHash={} , rewardAddress={}, rewardFee={}", blockHash, txHash, rewardAddress, rewardFee);
+            if(StringUtil.isSame(MyApplication.getKeyValue().getRawAddress().toLowerCase(), rewardAddress.toLowerCase())){
+                logger.info("in executation blockHash={}, txHash={} , rewardAddress={}, rewardFee={}, isMe", blockHash, txHash, rewardAddress, rewardFee, true);
+            }else{
+                logger.info("in executation blockHash={}, txHash={} , rewardAddress={}, rewardFee={}", blockHash, txHash, rewardAddress, rewardFee);
+            }
         }
     }
 
@@ -308,6 +312,8 @@ public class MiningModel implements IMiningModel{
                 NotifyManager.getInstance().sendBlockNotify(notifyStr);
             }
             logger.info("in executation total:" + notifyStr);
+        }else{
+            logger.info("in executation total: no reward");
         }
     }
 
