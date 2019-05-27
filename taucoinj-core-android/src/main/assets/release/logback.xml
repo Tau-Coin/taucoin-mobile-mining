@@ -1,0 +1,132 @@
+<configuration>
+    <includes>
+        <include resource="assets/logback-console.xml"/>
+    </includes>
+
+    <property name="LOG_DIR" value="/sdcard/tau-mobile/logs" />
+
+    <!-- Create a file appender for DEBUG-level messages -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+
+        <file>${LOG_DIR}/tau.log</file>
+        <append>true</append>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>20MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="core" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="net" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="http" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="sync2" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="discover" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="db" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="peerdiscovery" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="io.netty" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="wire" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="wallet" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="dump" level="OFF">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="trie" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="block" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="blockqueue" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="general" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="peermonitor" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="main" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="state" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="repository" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="blockchain" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="txs" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="forge" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="execute" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="hsqldb.db" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <logger name="test" level="WARN">
+        <appender-ref ref="file" />
+    </logger>
+
+    <root level="WARN">
+        <appender-ref ref="file" />
+    </root>
+
+</configuration>

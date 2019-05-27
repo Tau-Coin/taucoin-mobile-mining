@@ -27,6 +27,16 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    sourceSets {
+        release {
+            assets.srcDirs = ['assets', 'src/main/assets/release']
+        }
+        debug {
+            assets.srcDirs = ['assets', 'src/main/assets/debug']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
