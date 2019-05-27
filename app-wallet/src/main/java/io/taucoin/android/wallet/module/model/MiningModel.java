@@ -21,6 +21,7 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
+import io.taucoin.android.wallet.module.bean.BlockNoComparator;
 import io.taucoin.android.wallet.module.bean.RewardBean;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
@@ -29,6 +30,7 @@ import io.taucoin.core.TransactionExecuatedOutcome;
 import org.spongycastle.util.encoders.Hex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +69,7 @@ public class MiningModel implements IMiningModel{
             }
             // set mining info
             List<MiningBlock> list = MiningBlockDaoUtils.getInstance().queryByPubicKey(pubicKey);
+            Collections.sort(list, new BlockNoComparator());
             blockInfo.setMiningBlocks(list);
 
             emitter.onNext(blockInfo);
@@ -227,7 +230,7 @@ public class MiningModel implements IMiningModel{
         }
     }
 
-    private void saveMiningReward(Map<byte[], Long> addressMap, TransactionExecuatedOutcome outCome, boolean isMiner) {
+    private synchronized void saveMiningReward(Map<byte[], Long> addressMap, TransactionExecuatedOutcome outCome, boolean isMiner) {
         if(null == addressMap || addressMap.size() == 0){
             return;
         }
@@ -315,7 +318,7 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void handleSynchronizedBlock(BlockEventData blockEvent, boolean isConnect, LogicObserver<MessageEvent.EventCode> logicObserver) {
+    public synchronized void handleSynchronizedBlock(BlockEventData blockEvent, boolean isConnect, LogicObserver<MessageEvent.EventCode> logicObserver) {
         Observable.create((ObservableOnSubscribe<MessageEvent.EventCode>) emitter -> {
             MessageEvent.EventCode eventCode = MessageEvent.EventCode.MINING_INFO;
             if(blockEvent != null){
