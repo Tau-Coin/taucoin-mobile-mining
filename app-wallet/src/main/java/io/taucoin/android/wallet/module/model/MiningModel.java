@@ -15,8 +15,6 @@
  */
 package io.taucoin.android.wallet.module.model;
 
-import com.github.naturs.logger.Logger;
-
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.db.entity.MiningReward;
@@ -27,6 +25,8 @@ import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
+
+import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.util.ArrayList;
@@ -59,6 +59,7 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger("MiningModel");
     @Override
     public void getMiningInfo(LogicObserver<BlockInfo> observer) {
         Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {
@@ -272,6 +273,7 @@ public class MiningModel implements IMiningModel{
                 }
                 MiningRewardDaoUtils.getInstance().insertOrReplace(reward);
             }
+            logger.info("in executation blockHash={}, txHash={} , rewardAddress={}, rewardFee={}", blockHash, txHash, rewardAddress, rewardFee);
         }
     }
 
@@ -304,8 +306,8 @@ public class MiningModel implements IMiningModel{
             }
             if(isRollBack || reward > 0){
                 NotifyManager.getInstance().sendBlockNotify(notifyStr);
-                Logger.d(notifyStr);
             }
+            logger.info("in executation total:" + notifyStr);
         }
     }
 
