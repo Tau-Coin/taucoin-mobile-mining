@@ -333,8 +333,12 @@ public class MiningModel implements IMiningModel{
 
                     if(!isConnect){
                         String blockHash = Hex.toHexString(block.getHash());
-                        rollBackMiningReward(blockHash);
-                        logger.info("in executation rollBackMiningReward blockHash={}", blockHash);
+                        try {
+                            rollBackMiningReward(blockHash);
+                            logger.info("in executation rollBackMiningReward blockHash={}", blockHash);
+                        }catch (Exception e){
+                            logger.error("in executation rollBackMiningReward blockHash=" + blockHash + " is error", e);
+                        }
                     }
                 }
             }

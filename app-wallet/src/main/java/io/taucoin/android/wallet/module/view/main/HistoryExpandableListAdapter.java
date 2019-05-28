@@ -166,9 +166,25 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.tvMemo.setVisibility(!isHaveMemo  || isReceiver? View.GONE : View.VISIBLE);
         childViewHolder.tvMemoTitle.setVisibility(!isHaveMemo || isReceiver ? View.GONE : View.VISIBLE);
 
-        childViewHolder.tvFailMsg.setText(tx.getMessage());
-        boolean isHaveFailMsg = StringUtil.isSame(TransmitKey.TxResult.FAILED, tx.getResult()) && StringUtil.isNotEmpty(tx.getMessage());
-        childViewHolder.tvFailMsg.setVisibility(isHaveFailMsg ? View.VISIBLE : View.GONE);
+        // The user is the sender
+        String statusMsg = tx.getMessage();
+        int color = R.color.color_red;
+        if(StringUtil.isNotEmpty(tx.getResult())){
+            switch (tx.getResult()){
+                case TransmitKey.TxResult.BROADCASTING:
+                case TransmitKey.TxResult.CONFIRMING:
+                    statusMsg = ResourcesUtil.getText(R.string.send_tx_status_pending);
+                    color = R.color.color_blue;
+                    break;
+                case TransmitKey.TxResult.SUCCESSFUL:
+                    statusMsg = ResourcesUtil.getText(R.string.send_tx_status_success);
+                    color = R.color.color_black;
+                    break;
+            }
+        }
+        int textColor = ContextCompat.getColor(parent.getContext(), color);
+        childViewHolder.tvStatusMsg.setTextColor(textColor);
+        childViewHolder.tvStatusMsg.setText(statusMsg);
         return convertView;
     }
 
@@ -201,8 +217,8 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         TextView tvTransactionId;
         @BindView(R.id.tv_tx_fee)
         TextView tvTxFee;
-        @BindView(R.id.tv_fail_msg)
-        TextView tvFailMsg;
+        @BindView(R.id.tv_status_msg)
+        TextView tvStatusMsg;
         @BindView(R.id.tv_address_title)
         TextView tvAddressTitle;
         @BindView(R.id.tv_fee_title)
