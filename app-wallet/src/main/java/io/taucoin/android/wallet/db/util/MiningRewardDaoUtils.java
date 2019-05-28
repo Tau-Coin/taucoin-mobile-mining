@@ -84,9 +84,10 @@ public class MiningRewardDaoUtils {
                 .list();
     }
 
-    public MiningReward query(String txHash, String rawAddress) {
+    public MiningReward query(String blockHash, String txHash, String rawAddress) {
         List<MiningReward> list = getMiningRewardDao().queryBuilder()
-                .where(MiningRewardDao.Properties.TxHash.eq(txHash),
+                .where(MiningRewardDao.Properties.BlockHash.eq(blockHash),
+                        MiningRewardDao.Properties.TxHash.eq(txHash),
                         MiningRewardDao.Properties.Address.eq(rawAddress))
                 .orderDesc(MiningRewardDao.Properties.Id)
                 .list();

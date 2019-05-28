@@ -147,14 +147,14 @@ public class MiningModel implements IMiningModel{
                     if(transaction.getSenderWitnessAddress() != null){
                         String witnessAddress = Hex.toHexString(transaction.getSenderWitnessAddress());
                         boolean isSave = false;
-                        if(StringUtil.isSame(rawAddress, witnessAddress)){
+                        if(StringUtil.isSame(rawAddress.toLowerCase(), witnessAddress.toLowerCase())){
                             isSave = true;
                         }else{
                             List<byte[]> addresses = transaction.getSenderAssociatedAddress();
                             if(addresses != null && addresses.size() > 0){
                                 for (byte[] address : addresses) {
                                     String associatedAddress = Hex.toHexString(address);
-                                    if(StringUtil.isSame(rawAddress, associatedAddress)){
+                                    if(StringUtil.isSame(rawAddress.toLowerCase(), associatedAddress.toLowerCase())){
                                         isSave = true;
                                         break;
                                     }
@@ -212,6 +212,7 @@ public class MiningModel implements IMiningModel{
             MiningBlockDaoUtils.getInstance().insertOrReplace(entry);
             if(!isConnect){
                 MiningBlockDaoUtils.getInstance().rollbackByBlockHash(blockHash);
+                logger.info("in executation rollbackByBlockHash blockHash={}", blockHash);
             }
         }
     }
@@ -249,7 +250,7 @@ public class MiningModel implements IMiningModel{
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByRawAddress(rewardAddress);
             // Update data for all local private keys
             if (keyValue != null) {
-                MiningReward reward = MiningRewardDaoUtils.getInstance().query(txHash, keyValue.getRawAddress());
+                MiningReward reward = MiningRewardDaoUtils.getInstance().query(blockHash, txHash, keyValue.getRawAddress());
                 if (null == reward) {
                     reward = new MiningReward();
                     reward.setTxHash(txHash);
@@ -257,15 +258,9 @@ public class MiningModel implements IMiningModel{
                     reward.setTime(DateUtil.getDateTime());
                     reward.setSenderAddress(formAddress);
                     reward.setReceiverAddress(toAddress);
-                } else {
-                    if (reward.getValid() == 0) {
-                        reward.setMinerFee(0);
-                        reward.setPartFee(0);
-                        reward.setTime(DateUtil.getDateTime());
-                    }
+                    reward.setBlockHash(blockHash);
+                    reward.setValid(1);
                 }
-                reward.setBlockHash(blockHash);
-                reward.setValid(1);
                 if (isMiner) {
                     reward.setMinerFee(rewardFee);
                 } else {
@@ -339,6 +334,7 @@ public class MiningModel implements IMiningModel{
                     if(!isConnect){
                         String blockHash = Hex.toHexString(block.getHash());
                         rollBackMiningReward(blockHash);
+                        logger.info("in executation rollBackMiningReward blockHash={}", blockHash);
                     }
                 }
             }

@@ -97,26 +97,6 @@
 
                     <TextView
                         android:layout_below="@+id/tv_balance_title"
-                        android:id="@+id/tv_mining_income"
-                        style="@style/style_mining_yellow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="@color/color_black"
-                        android:gravity="center_horizontal"
-                        android:text="0.00TAU"/>
-
-                    <TextView
-                        android:id="@+id/tv_mining_income_title"
-                        android:layout_below="@+id/tv_mining_income"
-                        style="@style/style_small_grey"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text="@string/home_mining_income"/>
-
-                    <TextView
-                        android:layout_below="@+id/tv_mining_income_title"
                         android:id="@+id/tv_power"
                         style="@style/style_mining_yellow"
                         android:layout_width="wrap_content"
@@ -137,6 +117,25 @@
                         android:gravity="center_horizontal"
                         android:text="@string/home_power"/>
 
+                    <TextView
+                        android:layout_below="@+id/tv_power_title"
+                        android:id="@+id/tv_mining_income"
+                        style="@style/style_mining_yellow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/color_black"
+                        android:gravity="center_horizontal"
+                        android:text="0.00TAU"/>
+
+                    <TextView
+                        android:id="@+id/tv_mining_income_title"
+                        android:layout_below="@+id/tv_mining_income"
+                        style="@style/style_small_grey"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/home_mining_income"/>
 
                 </RelativeLayout>
 

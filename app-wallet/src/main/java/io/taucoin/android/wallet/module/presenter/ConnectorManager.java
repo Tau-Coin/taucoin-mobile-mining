@@ -22,6 +22,8 @@ import android.os.Parcelable;
 
 import com.github.naturs.logger.Logger;
 
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,15 +41,20 @@ import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
 import io.taucoin.core.Transaction;
 
 public abstract class ConnectorManager implements ConnectorHandler {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger("ConnectorManager");
 
     TaucoinConnector mTaucoinConnector = null;
 
@@ -113,7 +120,19 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public String getErrorMsg() {
-        return isError() ? mExceptionStop.getMsg() : "";
+        String msg = "";
+        if(isError()){
+            if(mExceptionStop.getCode() == 3){
+                msg = ResourcesUtil.getText(R.string.mining_power_zero);
+            }else if(mExceptionStop.getCode() == 4){
+                msg = ResourcesUtil.getText(R.string.mining_balance_low);
+                String averageFee = FmtMicrometer.fmtFeeValue(mExceptionStop.getMsg());
+                msg = String.format(msg, averageFee);
+            }else{
+                msg = ResourcesUtil.getText(R.string.mining_exception);
+            }
+        }
+        return msg;
     }
 
     public boolean isSyncMe() {
@@ -162,7 +181,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     void addLogEntry(long timestamp, String message) {
         Date date = new Date(timestamp);
-        Logger.d("consoleLog=" + message);
+        logger.info("consoleLog=" + message);
         mConsoleLog += mDateFormatter.format(date) + " -> " + (message.length() > 100 ? message.substring(0, 100) + "..." : message) + "\n";
 
         int length = mConsoleLog.length();

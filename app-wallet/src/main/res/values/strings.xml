@@ -179,6 +179,9 @@
 
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
+    <string name="mining_balance_low">Address balance shall be larger than average block transaction fee %s TAU</string>
+    <string name="mining_power_zero">Make transactions to increase power above zero for mining, and keep balance above avg block income.</string>
+    <string name="mining_exception">Exception during mining.</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
