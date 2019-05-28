@@ -70,7 +70,7 @@
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
     <string name="send_tx_invalid_fee">Invalid Transaction Fee</string>
-    <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
+    <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee >= Balance</string>
     <string name="send_amount_too_low">Transaction amount is too low</string>
     <!--<string name="send_amount_too_high">Transaction amount is too high</string>-->
     <string name="send_fee_too_low">Transaction fee is too low</string>
