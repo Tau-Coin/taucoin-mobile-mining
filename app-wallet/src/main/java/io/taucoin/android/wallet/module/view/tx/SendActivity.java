@@ -24,6 +24,7 @@ import butterknife.OnTouch;
 import io.reactivex.ObservableOnSubscribe;
 import io.taucoin.android.wallet.core.Wallet;
 
+import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -43,9 +44,7 @@ import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
-import io.taucoin.android.wallet.widget.BreakTextSpan;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.android.wallet.widget.SelectionEditText;
@@ -68,10 +67,6 @@ public class SendActivity extends BaseActivity implements ISendView {
     EditInput etFee;
     @BindView(R.id.btn_send)
     Button btnSend;
-    @BindView(R.id.tv_fee)
-    TextView tvFee;
-    @BindView(R.id.tv_fee_calculate)
-    TextView tvFeeCalculate;
     @BindView(R.id.tv_total_amount)
     TextView tvTotalAmount;
 
@@ -89,9 +84,9 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void initView() {
-        tvFee.setTag("");
+        etFee.setText(R.string.send_tx_small_fee);
         etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
-//        initTxFeeView();
+        initTxFeeView();
 
         KeyboardUtils.registerSoftInputChangedListener(this, height -> {
             if(etFee != null){
@@ -123,36 +118,21 @@ public class SendActivity extends BaseActivity implements ISendView {
         editText.setMaxLines(1);
     }
 
-    @OnTextChanged({R.id.et_amount})
+    @OnTextChanged({R.id.et_amount, R.id.et_input})
     void onTextChanged(CharSequence text){
-        String feeCalculate = "";
-        String amount = text.toString();
-        String rangeFee = "";
-        String totalAmount = "";
-        if(StringUtil.isNotEmpty(amount)){
-            String feeRate = "3%=";
-            String fee = FmtMicrometer.fmtFormatFee(amount, "0.03");
-            rangeFee = FmtMicrometer.fmtFormatRangeFee(fee);
-            feeCalculate = getText(R.string.send_tx_range_fee).toString();
-            feeCalculate = String.format(feeCalculate, amount, feeRate, fee);
+        String amount = etAmount.getText().toString().trim();
+        String fee = etFee.getText().trim();
 
-            String total = FmtMicrometer.fmtFormatAdd(amount, rangeFee);
+        if(StringUtil.isEmpty(fee)){
+            fee = BigInteger.ZERO.toString();
+        }
+        String total = FmtMicrometer.fmtFormatAdd(amount, fee);
+        String totalAmount = "";
+        if(StringUtil.isNotEmpty(amount) ){
             totalAmount = getText(R.string.send_tx_total_amount).toString();
             totalAmount = String.format(totalAmount, total);
         }
-        String feeStr = "";
-        if(StringUtil.isNotEmpty(rangeFee)){
-            feeStr = getText(R.string.send_tx_fee).toString();
-            feeStr = String.format(feeStr, rangeFee);
-        }
-        tvFee.setText(feeStr);
-        tvFee.setTag(rangeFee);
         tvTotalAmount.setText(totalAmount);
-
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-        stringBuilder.append(feeCalculate);
-        stringBuilder.setSpan(new BreakTextSpan(tvFeeCalculate, feeCalculate), 0, stringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tvFeeCalculate.setText(stringBuilder, TextView.BufferType.SPANNABLE);
     }
 
     @OnClick({R.id.iv_fee})
@@ -178,7 +158,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         String address = etAddress.getText().toString().trim();
         String amount = etAmount.getText().toString().trim();
         String memo = etMemo.getText().toString().trim();
-        String fee = tvFee.getTag().toString().trim();
+        String fee = etFee.getText().trim();
 
         TransactionHistory tx = new TransactionHistory();
         tx.setToAddress(address);
@@ -263,6 +243,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         etAddress.getText().clear();
         etAmount.getText().clear();
         etMemo.getText().clear();
+        etFee.setText(R.string.send_tx_small_fee);
     }
 
     private void showSoftInput() {

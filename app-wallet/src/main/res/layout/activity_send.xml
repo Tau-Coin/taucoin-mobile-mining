@@ -57,45 +57,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="50dp">
 
         <TextView
             android:id="@+id/tv_fee_title"
             style="@style/style_normal_grey"
             android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_height="wrap_content"
             android:text="@string/tx_transaction_fee" />
 
-        <TextView
-            android:id="@+id/tv_fee"
-            android:layout_toEndOf="@+id/tv_fee_title"
-            style="@style/style_normal_yellow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:text="" />
-
-        <TextView
-            android:id="@+id/tv_fee_calculate"
-            android:layout_below="@+id/tv_fee"
-            style="@style/style_middle_grey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="" />
-
-        <TextView
-            android:id="@+id/tv_total_amount"
-            android:layout_below="@+id/tv_fee_calculate"
-            style="@style/style_middle_grey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="" />
-
         <io.taucoin.android.wallet.widget.EditInput
-            android:visibility="gone"
             android:layout_toStartOf="@+id/iv_fee"
             android:layout_toEndOf="@+id/tv_fee_title"
             android:id="@+id/et_fee"
@@ -105,10 +78,9 @@
             android:layout_centerVertical="true" />
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/iv_fee"
             android:layout_width="24dp"
-            android:layout_height="28dp"
+            android:layout_height="24dp"
             android:paddingStart="2dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
@@ -120,13 +92,24 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/tv_total_amount"
+        style="@style/style_normal_grey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="10dp"
+        android:gravity="start"
+        android:text="" />
+
     <Button
         android:id="@+id/btn_send"
         style="@style/style_big_white_button"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="35dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/yellow_rect_round_bg"
         android:text="@string/tx_send"

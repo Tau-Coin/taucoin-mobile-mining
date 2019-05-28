@@ -64,9 +64,8 @@
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
-    <string name="send_tx_range_fee">%s×%s%s</string>
+    <string name="send_tx_small_fee">0.01</string>
     <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
-    <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
@@ -153,6 +152,9 @@
     <string name="home_mining_participant">Participant</string>
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
     <string name="home_mining_mined_calculating">Calculating</string>
+    <string name="home_mining_power_tips">
+        Successfully transactions will enhance mining power.
+    </string>
 
     <string name="block_list_title">Blocks Synchronized &#38; Mined</string>
     <string name="block_list_all">ALL</string>

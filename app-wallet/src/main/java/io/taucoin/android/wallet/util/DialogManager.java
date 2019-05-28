@@ -19,7 +19,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.view.View;
+import android.widget.TextView;
 
+import io.taucoin.android.wallet.R;
+import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.foundation.util.StringUtil;
 
 public class DialogManager {
@@ -82,5 +85,15 @@ public class DialogManager {
 
     public interface DialogOnClickListener{
         void onClick(View view);
+    }
+
+    public static void showTipDialog(FragmentActivity activity, int msgRes) {
+        TextView textView = new TextView(activity);
+        textView.setTextAppearance(activity, R.style.style_normal_grey_dark);
+        textView.setText(msgRes);
+        textView.setLineSpacing(5.0f, 1.2f);
+        new CommonDialog.Builder(activity)
+            .setContentView(textView)
+            .create().show();
     }
 }
