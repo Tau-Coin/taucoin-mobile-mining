@@ -29,7 +29,7 @@ public class IdleState extends AbstractSyncState {
             return;
         }
 
-        if (syncManager.queue.isBlocksEmpty() && syncManager.queue.isBlockNumbersEmpty()
+        if (syncManager.queue.isImportingBlocksFinished() && syncManager.queue.isBlockNumbersEmpty()
                 && syncManager.hasToPullChainInfo()) {
             syncManager.changeState(CHAININFO_RETRIEVING);
             return;

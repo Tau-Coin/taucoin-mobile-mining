@@ -931,7 +931,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     @Override
-    public void setBestBlock(Block block) {
+    public synchronized void setBestBlock(Block block) {
         bestBlock = block;
     }
 

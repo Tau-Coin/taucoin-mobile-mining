@@ -271,6 +271,13 @@ public class RequestManager implements RequestQueue.MessageListener {
             return;
         }
 
+        // Note: if now is connecting blocks, just return directly.
+        if (!queue.isImportingBlocksFinished()) {
+            logger.warn("is connecting blocks, change hash retriving done");
+            changeSyncState(DONE_HASH_RETRIEVING);
+            return;
+        }
+
         commonAncestorFound = false;
         hashesAmountArrayIndex = 0;
 
@@ -280,10 +287,11 @@ public class RequestManager implements RequestQueue.MessageListener {
         logger.debug("Start looking for common ancestor, height {}, hash {}",
                 bestNumber, Hex.toHexString(bestHash));
 
-        if (chainInfoManager.getHeight() == bestNumber
+        if (chainInfoManager.getHeight() == bestNumber + 1
                 && Utils.hashEquals(chainInfoManager.getPreviousBlockHash(), bestHash)) {
             commonAncestorFound = true;
             pushBlockNumbers(bestNumber + 1);
+            changeSyncState(DONE_HASH_RETRIEVING);
         } else {
             sendGetBlockHashes(bestNumber,
                     FORK_MAINTAIN_HASHES_AMOUNT[hashesAmountArrayIndex++], true);

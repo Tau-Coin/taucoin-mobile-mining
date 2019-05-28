@@ -11,6 +11,7 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -74,6 +75,8 @@ public class SyncQueue {
 
     private byte[] genesisBlockHash = null;
 
+    private AtomicBoolean isImportingBlocks = new AtomicBoolean(false);
+
     public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
         this.blockchain = blockchain;
         this.headerValidator = headerValidator;
@@ -130,6 +133,8 @@ public class SyncQueue {
             worker.interrupt();
             worker = null;
         }
+
+        isImportingBlocks.set(false);
     }
 
     /**
@@ -143,7 +148,9 @@ public class SyncQueue {
             try {
                 wrapper = blockQueue.take();
                 logger.debug("BlockQueue size: {}", blockQueue.size());
+                isImportingBlocks.set(true);
                 ImportResult importResult = blockchain.tryToConnect(wrapper.getBlock());
+                isImportingBlocks.set(false);
 
                 // In case we don't have a parent on the chain
                 // return the try and wait for more blocks to come.
@@ -185,9 +192,15 @@ public class SyncQueue {
                 e.printStackTrace();
                 logger.error("Error processing block {}: ", wrapper.getBlock().toString(), e);
                 //logger.error("Block dump: {}", Hex.toHexString(wrapper.getBlock().getEncoded()));
+
+                isImportingBlocks.set(false);
             }
 
         }
+    }
+
+    public boolean isImportingBlocksFinished() {
+        return isBlocksEmpty() && !isImportingBlocks.get();
     }
 
     /**
