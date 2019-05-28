@@ -124,7 +124,7 @@ public class BlockForger {
         startForging(-1);
     }
 
-    public void startForging(long amount) {
+    public synchronized void startForging(long amount) {
         if (isForging()) {
             long timeNow = System.currentTimeMillis() / 1000;
             if (nextBlockForgedTimePoint > timeNow) {
@@ -143,7 +143,7 @@ public class BlockForger {
         fireForgerStarted();
     }
 
-    public void stopForging() {
+    public synchronized void stopForging() {
         this.isForging = false;
         this.stopForge = true;
         executor.shutdownNow();
@@ -464,6 +464,7 @@ public class BlockForger {
         @Override
         public void forgingStopped(ForgeStatus status) {
             logger.info("Forging stopped status: {}",status.getMsg());
+            forger.removeListener(this);
         }
 
         @Override
@@ -485,6 +486,7 @@ public class BlockForger {
         @Override
         public void blockForgingCanceled(Block block) {
             logger.info("Block froging canceled: {}", Hex.toHexString(block.getHash()));
+            forger.removeListener(this);
         }
      }
 }
