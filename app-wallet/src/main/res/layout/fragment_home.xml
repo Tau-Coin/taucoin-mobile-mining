@@ -133,6 +133,7 @@
                         style="@style/style_small_grey"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:drawablePadding="2dp"
                         android:gravity="center_horizontal"
                         android:text="@string/home_power"/>
 
@@ -266,7 +267,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="2dp"
+                        android:drawablePadding="4dp"
                         android:gravity="center_horizontal"
                         android:text="@string/home_mined"/>
 

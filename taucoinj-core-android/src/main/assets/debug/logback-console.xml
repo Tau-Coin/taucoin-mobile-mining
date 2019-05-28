@@ -9,15 +9,23 @@
         </encoder>
     </appender>
 
-    <logger name="core" level="ERROR">
+    <logger name="core" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="net" level="INFO">
+    <logger name="net" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="discover" level="INFO">
+     <logger name="http" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="sync2" level="INFO">
+        <appender-ref ref="logcat" />
+    </logger>
+
+    <logger name="discover" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -49,7 +57,7 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="block" level="ERROR">
+    <logger name="block" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -69,11 +77,11 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="state" level="ERROR">
+    <logger name="state" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="repository" level="ERROR">
+    <logger name="repository" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -81,7 +89,7 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="txs" level="ERROR">
+    <logger name="txs" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -89,15 +97,15 @@
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="execute" level="ERROR">
+    <logger name="execute" level="INFO">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="hsqldb.db" level="INFO">
+    <logger name="hsqldb.db" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
-    <logger name="test" level="INFO">
+    <logger name="test" level="ERROR">
         <appender-ref ref="logcat" />
     </logger>
 
@@ -106,4 +114,3 @@
     </root>
 
 </configuration>
-

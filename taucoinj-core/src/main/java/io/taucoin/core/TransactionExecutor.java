@@ -117,7 +117,9 @@ public class TransactionExecutor {
         if (!isCovers(senderBalance, totalCost)) {
 
             if (logger.isWarnEnabled())
-                logger.warn("No enough balance: Require: {}, Sender's balance: {}", totalCost, senderBalance);
+                logger.warn("No enough balance: require: {}, sender's balance: {}, txid: {}, sender:{}",
+                        totalCost, senderBalance, ByteUtil.toHexString(tx.getHash()),
+                        ByteUtil.toHexString(tx.getSender()));
             tx.TRANSACTION_STATUS = "No enough balance";
             return false;
         }
@@ -132,20 +134,25 @@ public class TransactionExecutor {
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
         // Sender subtract balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
-        //logger.info("in executation sender is "+Hex.toHexString(tx.getSender()));
         track.addBalance(tx.getSender(), totalCost.negate());
 
         TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
         outcome.setBlockHash(blockhash);
+        logger.info("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
+        logger.info("in executation isTxCompleted is {}", isTxCompleted);
         outcome.setTxid(tx.getHash());
+        logger.info("in executation tx hash is {}", Hex.toHexString(tx.getHash()));
         outcome.setSenderAddress(tx.getSender());
+        logger.info("in executation sender is {}", Hex.toHexString(tx.getSender()));
 
         // Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         outcome.setReceiveAddress(tx.getReceiveAddress());
+        logger.info("in executation receiver is {}",Hex.toHexString(tx.getReceiveAddress()));
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+        logger.info("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
         //lookup sender account state.
         AccountState senderAccountState = track.getAccountState(tx.getSender());
         if (feeDistributor.distributeFee()) {
@@ -154,6 +161,8 @@ public class TransactionExecutor {
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             HashMap<byte[],Long> currentWintess = new HashMap<>();
             currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
+            logger.info("in executation current wit {} fee is {}",Hex.toHexString(coinbase),
+                    feeDistributor.getCurrentWitFee());
             outcome.setCurrentWintess(currentWintess);
 
             // Transfer fees to receiver
@@ -166,6 +175,8 @@ public class TransactionExecutor {
                 track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
                 HashMap<byte[],Long> lastWintess = new HashMap<>();
                 lastWintess.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
+                logger.info("in executation last wit {} fee is {}",Hex.toHexString(senderAccountState.getWitnessAddress()),
+                        feeDistributor.getLastWitFee());
                 outcome.setLastWintess(lastWintess);
             }
 
@@ -186,9 +197,13 @@ public class TransactionExecutor {
                             //logger.info("3-1 associated address is {} average is {}",Hex.toHexString(
                             //track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),assDistributor.getAverageShare());
                             track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getAverageShare()));
+                            logger.info("in executation Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                                    assDistributor.getAverageShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getAverageShare());
                         } else {
                             track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getLastShare()));
+                            logger.info("in executation last Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                                    assDistributor.getLastShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getLastShare());
                         }
                     }
@@ -204,6 +219,8 @@ public class TransactionExecutor {
                 //feeDistributor.getLastWitFee());
                 // Transfer fees to current witness
                 track.addBalance(coinbase, toBI(feeDistributor.getLastWitFee()));
+                logger.info("in executation special last wit {} fee is {}",Hex.toHexString(coinbase),
+                        feeDistributor.getLastWitFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastWitFee());
             }
 
@@ -213,11 +230,15 @@ public class TransactionExecutor {
                 //feeDistributor.getLastAssociFee());
                 // Transfer fees to current associate
                 track.addBalance(coinbase, toBI(feeDistributor.getLastAssociFee()));
+                logger.info("in executation special last ass {} fee is {}",Hex.toHexString(coinbase),
+                        feeDistributor.getLastAssociFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
             listener.onTransactionExecuated(outcome);
         }
-
+        if(isTxCompleted) {
+            logger.info("in executation finish =========================");
+        }
         // Increase forge power.
         //logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.increaseforgePower(tx.getSender());
@@ -226,29 +247,28 @@ public class TransactionExecutor {
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
         //AccountState accountState = track.getAccountState(tx.getSender());
-        if(blockchain.getSize() > MaxHistoryCount && senderAccountState.getTranHistory().size() !=0 ){
-            long txTime = Collections.min(senderAccountState.getTranHistory().keySet());
+        if (blockchain.getSize() > MaxHistoryCount + 1
+                && senderAccountState.getTranHistory().size() != 0) {
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
-            if (freshTime > 1) {
-                long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1 ).getTimestamp());
-                while (txTime < bechTime) {
-                    senderAccountState.getTranHistory().remove(txTime);
-                    if (senderAccountState.getTranHistory().size() == 0) {
-                        break;
-                    }
-                    txTime = Collections.min(senderAccountState.getTranHistory().keySet());
+            long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime - 1).getTimestamp());
+
+            Iterator<Map.Entry<Long,byte[]>> it = senderAccountState.getTranHistory().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<Long, byte[]> entry = it.next();
+                long txTime = entry.getKey();
+                if (txTime < bechTime) {
+                    it.remove();
+                } else {
+                    break;
                 }
-            } else {
-                long txTimeTemp = ByteUtil.byteArrayToLong(tx.getTime());
-                senderAccountState.getTranHistory().put(txTimeTemp, tx.getHash());
             }
-        }else{
-            long txTime = ByteUtil.byteArrayToLong(tx.getTime());
-            senderAccountState.getTranHistory().put(txTime,tx.getHash());
         }
 
+        // Store current tx time
+        senderAccountState.getTranHistory().put(ByteUtil.byteArrayToLong(tx.getTime()),
+                tx.getHash());
     }
 
     public void undoTransaction() {

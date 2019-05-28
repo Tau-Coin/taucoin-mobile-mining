@@ -66,6 +66,7 @@ public class MyApplication extends MultiDexApplication {
         // Logger init
         Logger.addLogAdapter(new AndroidLogAdapter("TAUCOIN", false));
         Logger.setLogConverter(new AndroidLogConverter());
+        Logger.setDebuggable(BuildConfig.DEBUG);
 
         // Crashlytics
         Fabric.with(this, new Crashlytics());

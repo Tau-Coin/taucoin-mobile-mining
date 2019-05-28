@@ -125,7 +125,7 @@ public class TxService extends Service {
 
     private void checkRawTransactionDelay() {
         mIsChecked = true;
-        Observable.timer(5 * 60, TimeUnit.SECONDS)
+        Observable.timer(2 * 60, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override

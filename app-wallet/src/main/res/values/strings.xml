@@ -13,6 +13,7 @@
     <string name="common_balance_unit">TAU</string>
     <string name="common_refresh_failed">Refresh Failed</string>
     <string name="common_see_more">Click to see more</string>
+    <string name="common_install_browser">Please install mobile browser first!</string>
 
     <string name="splash_title">TAU mWallet %s</string>
     <string name="splash_subheading">Mobile Mining Wallet</string>
@@ -49,6 +50,7 @@
     <string name="manager_address_note">Address Note</string>
     <string name="manager_setting">Settings</string>
     <string name="manager_help">Help</string>
+    <string name="manager_p2p_exchange">P2P &#38; Non&#045;KYC Exchange</string>
     <string name="manager_upcoming_feature">Upcoming feature: IPFS native integration, Serverless Wallet, Sharding as Mining.</string>
 
     <string name="send_receiver_address">Receiver\'s Address</string>
@@ -62,14 +64,13 @@
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
 
-    <string name="send_tx_range_fee">%s×%s%s</string>
+    <string name="send_tx_small_fee">0.01</string>
     <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
-    <string name="send_tx_fee">%s&#160;TAU</string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
     <string name="send_tx_invalid_fee">Invalid Transaction Fee</string>
-    <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
+    <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee >= Balance</string>
     <string name="send_amount_too_low">Transaction amount is too low</string>
     <!--<string name="send_amount_too_high">Transaction amount is too high</string>-->
     <string name="send_fee_too_low">Transaction fee is too low</string>
@@ -83,6 +84,7 @@
     <string name="send_tx_illegal_version">Failed, illegal transaction version</string>
     <string name="send_tx_illegal_option">Failed, illegal transaction option</string>
     <string name="send_tx_illegal_expiry">Failed, illegal transaction expiry</string>
+    <string name="send_tx_illegal_time">Failed, illegal transaction time</string>
     <string name="send_tx_unknown_error">Failed, network error, please try it again</string>
 
     <string name="keys_dialog_title">Please make sure your\nprivate key has been saved</string>
@@ -131,7 +133,7 @@
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
 
-    <string name="home_balance">Balance</string>
+    <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
     <string name="home_synchronized">Latest&#160;Block</string>
@@ -150,6 +152,7 @@
     <string name="home_mining_participant">Participant</string>
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
     <string name="home_mining_mined_calculating">Calculating</string>
+    <string name="home_mining_power_tips">Sender will increase one mining power with a successful transaction.</string>
 
     <string name="block_list_title">Blocks Synchronized &#38; Mined</string>
     <string name="block_list_all">ALL</string>

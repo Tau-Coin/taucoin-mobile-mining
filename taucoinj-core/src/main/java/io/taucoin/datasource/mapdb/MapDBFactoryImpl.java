@@ -22,7 +22,7 @@ public class MapDBFactoryImpl implements MapDBFactory {
 
     @Override
     public DB createDB(String name) {
-        return createDB(name, false);
+        return createDB(name, true);
     }
 
     @Override

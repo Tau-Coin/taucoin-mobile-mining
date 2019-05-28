@@ -40,6 +40,7 @@ import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.module.view.mining.BlockListActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
@@ -94,6 +95,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvChainHeight;
     @BindView(R.id.tv_balance)
     TextView tvBalance;
+    @BindView(R.id.tv_power_title)
+    TextView tvPowerTitle;
 
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
@@ -117,9 +120,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined,
-            R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right})
+            R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right, R.id.tv_power_title})
     public void onClick(View view) {
-        if (!UserUtil.isImportKey()) {
+        if (!UserUtil.isImportKey() && view.getId() != R.id.tv_power_title) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
             startActivityForResult(intent, 100);
             return;
@@ -152,6 +155,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 ProgressManager.showProgressDialog(getActivity());
                 mIsToast = true;
                 onRefresh(null);
+                break;
+            case R.id.tv_power_title:
+                DialogManager.showTipDialog(getActivity(), R.string.home_mining_power_tips);
                 break;
             default:
                 break;
@@ -232,6 +238,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         DrawablesUtil.setEndDrawable(tvMiningTransaction, R.mipmap.icon_tx_down, 14);
         DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 8);
         DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 8);
+        DrawablesUtil.setEndDrawable(tvPowerTitle, R.mipmap.icon_log_help, 12);
 
         mMiningRewardAdapter = new MiningRewardAdapter();
         listViewMiningTx.setAdapter(mMiningRewardAdapter);

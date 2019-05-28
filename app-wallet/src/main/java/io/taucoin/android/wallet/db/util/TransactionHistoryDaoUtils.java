@@ -54,7 +54,7 @@ public class TransactionHistoryDaoUtils {
     }
 
     public List<TransactionHistory> getTxPendingListDelay(String formAddress) {
-        long time = DateUtil.getTime() - 5 * 60; // delay 5min
+        long time = DateUtil.getTime() - 2 * 60; // delay 5min
         QueryBuilder<TransactionHistory> qb = getTransactionHistoryDao().queryBuilder();
         qb.where(TransactionHistoryDao.Properties.FromAddress.eq(formAddress),
                 TransactionHistoryDao.Properties.CreateTime.lt(time),
@@ -92,7 +92,8 @@ public class TransactionHistoryDaoUtils {
          QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
          db.where(TransactionHistoryDao.Properties.CreateTime.lt(time),
                 db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
-                    TransactionHistoryDao.Properties.ToAddress.eq(address))
+                    db.and(TransactionHistoryDao.Properties.ToAddress.eq(address),
+                        TransactionHistoryDao.Properties.Result.eq(TransmitKey.TxResult.SUCCESSFUL)))
                 ).orderDesc(TransactionHistoryDao.Properties.CreateTime)
                  .offset((pageNo - 1) * TransmitKey.PAGE_SIZE).limit(TransmitKey.PAGE_SIZE);
         return db.list();

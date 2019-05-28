@@ -39,12 +39,12 @@ import io.taucoin.android.wallet.module.view.tx.SendActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.CopyManager;
 import io.taucoin.android.wallet.util.DateUtil;
+import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
-import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EmptyLayout;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DimensionsUtil;
@@ -141,7 +141,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
                 startActivity(intent);
                 break;
             case R.id.iv_tx_log_tips:
-                showTxLogTipDialog();
+                DialogManager.showTipDialog(getActivity(), R.string.tx_log_tips);
                 break;
             case R.id.tv_address:
                 copyData();
@@ -163,16 +163,6 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             CopyManager.copyText(keyValue.getAddress());
             ToastUtils.showShortToast(R.string.keys_address_copy);
         }
-    }
-
-    private void showTxLogTipDialog() {
-        TextView textView = new TextView(getActivity());
-        textView.setTextAppearance(getActivity(), R.style.style_normal_grey_dark);
-        textView.setText(R.string.tx_log_tips);
-        textView.setLineSpacing(5.0f, 1.2f);
-        new CommonDialog.Builder(getActivity())
-                .setContentView(textView)
-                .create().show();
     }
 
     @Override
@@ -209,11 +199,13 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             boolean isMoreShow = !isLoadMore && mAdapter.getData().size() > 0;
             seeMoreView.setVisibility(isMoreShow ? View.VISIBLE : View.GONE);
             AbsListView.LayoutParams layoutParams = (AbsListView.LayoutParams) seeMoreView.getLayoutParams();
-            layoutParams.height = 0;
-            if(isMoreShow){
-                layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
+            if(layoutParams != null){
+                layoutParams.height = 0;
+                if(isMoreShow){
+                    layoutParams.height = DimensionsUtil.dip2px(seeMoreView.getContext(), 40);
+                }
+                seeMoreView.setLayoutParams(layoutParams);
             }
-            seeMoreView.setLayoutParams(layoutParams);
         }
     }
 
