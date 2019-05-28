@@ -133,7 +133,7 @@
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
 
-    <string name="home_balance">Balance</string>
+    <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
     <string name="home_synchronized">Latest&#160;Block</string>
@@ -152,9 +152,7 @@
     <string name="home_mining_participant">Participant</string>
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
     <string name="home_mining_mined_calculating">Calculating</string>
-    <string name="home_mining_power_tips">
-        Successfully transactions will enhance mining power.
-    </string>
+    <string name="home_mining_power_tips">Sender will increase one mining power with a successful transaction.</string>
 
     <string name="block_list_title">Blocks Synchronized &#38; Mined</string>
     <string name="block_list_all">ALL</string>
