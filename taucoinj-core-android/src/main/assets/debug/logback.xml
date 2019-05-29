@@ -16,8 +16,8 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
-            <maxHistory>10</maxHistory>
-            <totalSizeCap>50MB</totalSizeCap>
+            <maxHistory>5</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
         </rollingPolicy>
 
         <encoder>
