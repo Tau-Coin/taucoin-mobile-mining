@@ -138,53 +138,46 @@ public class TransactionExecutor {
 
         TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
         outcome.setBlockHash(blockhash);
-        logger.info("in executation block hash is {}",Hex.toHexString(blockhash));
+        logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
-        logger.info("in executation isTxCompleted is {}", isTxCompleted);
+        logger.debug("in executation isTxCompleted is {}", isTxCompleted);
         outcome.setTxid(tx.getHash());
-        logger.info("in executation tx hash is {}", Hex.toHexString(tx.getHash()));
+        logger.debug("in executation tx hash is {}", Hex.toHexString(tx.getHash()));
         outcome.setSenderAddress(tx.getSender());
-        logger.info("in executation sender is {}", Hex.toHexString(tx.getSender()));
+        logger.debug("in executation sender is {}", Hex.toHexString(tx.getSender()));
 
         // Receiver add balance
         track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         outcome.setReceiveAddress(tx.getReceiveAddress());
-        logger.info("in executation receiver is {}",Hex.toHexString(tx.getReceiveAddress()));
+        logger.debug("in executation receiver is {}",Hex.toHexString(tx.getReceiveAddress()));
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
-        logger.info("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
+        logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
         //lookup sender account state.
         AccountState senderAccountState = track.getAccountState(tx.getSender());
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
-            //logger.error("1 current witness share {}",feeDistributor.getCurrentWitFee());
             track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             HashMap<byte[],Long> currentWintess = new HashMap<>();
             currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
-            logger.info("in executation current wit {} fee is {}",Hex.toHexString(coinbase),
+            logger.debug("in executation current wit {} fee is {}",Hex.toHexString(coinbase),
                     feeDistributor.getCurrentWitFee());
             outcome.setCurrentWintess(currentWintess);
 
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (senderAccountState.getWitnessAddress() != null) {
-                //logger.error("2 last witness {} share {}",
-                //Hex.toHexString(track.getAccountState(tx.getSender()).getWitnessAddress()),
-                //feeDistributor.getLastWitFee());
                 // Transfer fees to last witness
                 track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
                 HashMap<byte[],Long> lastWintess = new HashMap<>();
                 lastWintess.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
-                logger.info("in executation last wit {} fee is {}",Hex.toHexString(senderAccountState.getWitnessAddress()),
+                logger.debug("in executation last wit {} fee is {}",Hex.toHexString(senderAccountState.getWitnessAddress()),
                         feeDistributor.getLastWitFee());
                 outcome.setLastWintess(lastWintess);
             }
 
             int senderAssSize = senderAccountState.getAssociatedAddress().size();
             if (senderAssSize != 0) {
-                //logger.error("3 associated size {} share {}",
-                //track.getAccountState(tx.getSender()).getAssociatedAddress().size(),
-                //feeDistributor.getLastAssociFee());
                 // Transfer fees to last associate
                 AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
                         senderAssSize,
@@ -194,15 +187,13 @@ public class TransactionExecutor {
                     ArrayList<byte[]> senderAssAddress = senderAccountState.getAssociatedAddress();
                     for (int i = 0; i < senderAssSize; ++i) {
                         if(i != senderAssSize -1) {
-                            //logger.info("3-1 associated address is {} average is {}",Hex.toHexString(
-                            //track.getAccountState(tx.getSender()).getAssociatedAddress().get(i)),assDistributor.getAverageShare());
                             track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getAverageShare()));
-                            logger.info("in executation Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                            logger.debug("in executation Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
                                     assDistributor.getAverageShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getAverageShare());
                         } else {
                             track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getLastShare()));
-                            logger.info("in executation last Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                            logger.debug("in executation last Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
                                     assDistributor.getLastShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getLastShare());
                         }
@@ -214,35 +205,27 @@ public class TransactionExecutor {
              * 2 special situation is dealt by distribute associated fee to current forger
              */
             if (senderAccountState.getWitnessAddress() == null) {
-                //logger.error("4 coinbase {} share {}",
-                //Hex.toHexString(coinbase),
-                //feeDistributor.getLastWitFee());
                 // Transfer fees to current witness
                 track.addBalance(coinbase, toBI(feeDistributor.getLastWitFee()));
-                logger.info("in executation special last wit {} fee is {}",Hex.toHexString(coinbase),
+                logger.debug("in executation special last wit {} fee is {}",Hex.toHexString(coinbase),
                         feeDistributor.getLastWitFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastWitFee());
             }
 
             if (senderAssSize == 0) {
-                //logger.error("5 coinbase {} share {}",
-                //Hex.toHexString(coinbase),
-                //feeDistributor.getLastAssociFee());
                 // Transfer fees to current associate
                 track.addBalance(coinbase, toBI(feeDistributor.getLastAssociFee()));
-                logger.info("in executation special last ass {} fee is {}",Hex.toHexString(coinbase),
+                logger.debug("in executation special last ass {} fee is {}",Hex.toHexString(coinbase),
                         feeDistributor.getLastAssociFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
             listener.onTransactionExecuated(outcome);
         }
         if(isTxCompleted) {
-            logger.info("in executation finish =========================");
+            logger.debug("in executation finish =========================");
         }
         // Increase forge power.
-        //logger.info("before increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
         track.increaseforgePower(tx.getSender());
-        //logger.info("after increase sender address is {} power is {}",Hex.toHexString(tx.getSender()),track.getforgePower(tx.getSender()));
 
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
