@@ -101,6 +101,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
     public static boolean mIsToast = false;
+    public static boolean mIsSynchronized = false;
     private int mPageNo = 1;
     private String mTime;
 //    private long time = -1;
@@ -303,16 +304,23 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                             waitStartOrStop();
                         }
                         MyApplication.getRemoteConnector().init();
-                        refreshOffOnView(TransmitKey.MiningState.LOADING);
+                        refreshOffOnView(TransmitKey.MiningState.LOADING, blockInfo);
                     }else if(isStart && !isInit){
-                        refreshOffOnView(TransmitKey.MiningState.LOADING);
-                    }else if(isStart && isError){
-                        refreshOffOnView(TransmitKey.MiningState.ERROR);
+                        refreshOffOnView(TransmitKey.MiningState.LOADING, blockInfo);
+                    }else if(isStart && (isError || MiningUtil.isError(blockInfo))){
+                        if(MiningUtil.isCanMining(blockInfo)){
+                            MyApplication.getRemoteConnector().startBlockForging();
+                            refreshOffOnView(TransmitKey.MiningState.Start);
+                        }else{
+                            refreshOffOnView(TransmitKey.MiningState.ERROR, blockInfo);
+                        }
                     }else if(!isStart){
                         MyApplication.getRemoteConnector().cancelRemoteConnector();
                         refreshOffOnView(TransmitKey.MiningState.Stop);
                         ivMiningSwitch.setEnabled(true);
-                    }else{
+                    } else if(!MiningUtil.isSynchronized(blockInfo) && !mIsSynchronized){
+                        refreshOffOnView(TransmitKey.MiningState.LOADING, blockInfo);
+                    } else{
                         refreshOffOnView(TransmitKey.MiningState.Start);
                     }
                 }
@@ -345,6 +353,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void refreshOffOnView(String miningState) {
+        refreshOffOnView(miningState, null);
+    }
+
+    private void refreshOffOnView(String miningState, BlockInfo blockInfo) {
+        mIsSynchronized = true;
         int state = R.string.home_mining_off;
         int color = R.color.color_grey;
         tvErrorMsg.setVisibility(View.GONE);
@@ -355,15 +368,19 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             color = R.color.color_yellow;
             tvMiningSwitch.setNormalText(state);
         }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.LOADING)){
+            mIsSynchronized = false;
             ivMiningSwitch.setConnecting();
             state = R.string.home_mining_connecting;
+            if(MyApplication.getRemoteConnector().isInit() && !MiningUtil.isSynchronized(blockInfo)){
+                state = R.string.home_mining_synchronizing;
+            }
             color = R.color.color_yellow;
             tvMiningSwitch.setLoadingText(ResourcesUtil.getText(state));
         }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.ERROR)){
             ivMiningSwitch.setError();
-            tvErrorMsg.setText(MyApplication.getRemoteConnector().getErrorMsg());
             tvErrorMsg.setVisibility(View.VISIBLE);
-            state = R.string.home_mining_on;
+            MiningUtil.setMiningErrorMsg(tvErrorMsg, blockInfo);
+            state = R.string.home_mining_pause;
             color = R.color.color_red;
             tvMiningSwitch.setNormalText(state);
         }else {

@@ -19,6 +19,8 @@ import android.text.Html;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
+
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
+import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
@@ -41,8 +44,10 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.RewardBean;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class MiningUtil {
 
@@ -179,5 +184,84 @@ public class MiningUtil {
                     }
                 }
             });
+    }
+
+    public static void initSenderTxFee(EditInput textView) {
+        if(textView == null){
+            return;
+        }
+        Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            String senderTxFee = "";
+            BlockInfo blockInfo = BlockInfoDaoUtils.getInstance().query();
+            if(blockInfo != null){
+                String medianFee = String.valueOf(blockInfo.getMedianFee());
+                senderTxFee = FmtMicrometer.fmtFormat(medianFee);
+            }
+            emitter.onNext(senderTxFee);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<String>() {
+                @Override
+                public void handleData(String senderTxFee) {
+                    Logger.d("MiningUtil.initSenderTxFee=" + senderTxFee);
+                    textView.setText(senderTxFee);
+                }
+            });
+    }
+
+    public static void setMiningErrorMsg(TextView tvErrorMsg,  BlockInfo blockInfo) {
+        if(tvErrorMsg == null || blockInfo == null){
+            return;
+        }
+        int errorCode = MyApplication.getRemoteConnector().getErrorCode();
+        String errorMsg = "";
+        if(errorCode == 3 || getErrorCode(blockInfo) == 3){
+            errorMsg = ResourcesUtil.getText(R.string.mining_power_zero);
+        }else if(errorCode == 4 || getErrorCode(blockInfo) == 4){
+            errorMsg = ResourcesUtil.getText(R.string.mining_balance_low);
+        }
+        if(StringUtil.isNotEmpty(errorMsg)){
+            String avgIncome = String.valueOf(blockInfo.getAvgIncome());
+            avgIncome = FmtMicrometer.fmtFormat(avgIncome);
+            errorMsg = String.format(errorMsg, avgIncome);
+        }
+        tvErrorMsg.setText(errorMsg);
+    }
+
+    public static boolean isError(BlockInfo blockInfo) {
+        int errorCode = getErrorCode(blockInfo);
+        return errorCode != -1 && errorCode != 0;
+    }
+
+    public static boolean isCanMining(BlockInfo blockInfo) {
+        int errorCode = getErrorCode(blockInfo);
+        return errorCode == 0;
+    }
+
+    public static boolean isSynchronized(BlockInfo blockInfo) {
+        if(blockInfo == null){
+            return false;
+        }
+        return blockInfo.getBlockHeight() == blockInfo.getBlockSync();
+    }
+
+    private static int getErrorCode(BlockInfo blockInfo) {
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(blockInfo == null || keyValue == null ||
+            blockInfo.getBlockHeight() != blockInfo.getBlockSync()){
+            return -1;
+        }
+        BigDecimal balance = new BigDecimal(keyValue.getBalance());
+        BigDecimal avgIncome = new BigDecimal(BigInteger.ZERO);
+        if(StringUtil.isNotEmpty(blockInfo.getAvgIncome())){
+            avgIncome = new BigDecimal(blockInfo.getAvgIncome());
+        }
+        if(keyValue.getPower() <= 0){
+            return 3;
+        }else if(balance.compareTo(avgIncome) < 0){
+            return 4;
+        }else{
+            return 0;
+        }
     }
 }

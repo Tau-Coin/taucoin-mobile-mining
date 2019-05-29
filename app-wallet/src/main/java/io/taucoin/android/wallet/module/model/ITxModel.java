@@ -63,4 +63,6 @@ public interface ITxModel {
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
 
+    void getIncomeInfo(LogicObserver<Boolean> observer);
+
 }

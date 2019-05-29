@@ -42,6 +42,8 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
+import io.taucoin.android.wallet.module.bean.IncomeBean;
+import io.taucoin.android.wallet.module.bean.IncomeInfoBean;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
@@ -482,5 +484,36 @@ public class TxModel implements ITxModel {
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(observer);
+    }
+
+    @Override
+    public void getIncomeInfo(LogicObserver<Boolean> observer){
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getIncomeInfo()
+            .subscribeOn(Schedulers.io())
+            .subscribe(new TxObserver<IncomeInfoBean>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    observer.onNext(false);
+                }
+
+                @Override
+                public void handleData(IncomeInfoBean incomeInfoBean) {
+                    if(incomeInfoBean != null && incomeInfoBean.getStatus() == 200 &&
+                            incomeInfoBean.getPayLoad() != null){
+                        IncomeBean incomeBean = incomeInfoBean.getPayLoad();
+                        BlockInfo blockInfo = BlockInfoDaoUtils.getInstance().query();
+                        if(blockInfo == null){
+                            blockInfo = new BlockInfo();
+                        }
+                        blockInfo.setAvgIncome(incomeBean.getAvgIncome());
+                        blockInfo.setMedianFee(incomeBean.getMedianFee());
+                        BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
+                        observer.onNext(true);
+                    }else{
+                        observer.onNext(false);
+                    }
+                }
+            });
     }
 }

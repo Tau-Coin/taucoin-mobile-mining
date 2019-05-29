@@ -27,6 +27,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property BlockHeight = new Property(1, int.class, "blockHeight", false, "BLOCK_HEIGHT");
         public final static Property BlockSync = new Property(2, int.class, "blockSync", false, "BLOCK_SYNC");
+        public final static Property AvgIncome = new Property(3, String.class, "avgIncome", false, "AVG_INCOME");
+        public final static Property MedianFee = new Property(4, String.class, "medianFee", false, "MEDIAN_FEE");
     }
 
 
@@ -44,7 +46,9 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"BLOCK_INFO\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 1: blockHeight
-                "\"BLOCK_SYNC\" INTEGER NOT NULL );"); // 2: blockSync
+                "\"BLOCK_SYNC\" INTEGER NOT NULL ," + // 2: blockSync
+                "\"AVG_INCOME\" TEXT," + // 3: avgIncome
+                "\"MEDIAN_FEE\" TEXT);"); // 4: medianFee
     }
 
     /** Drops the underlying database table. */
@@ -63,6 +67,16 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         }
         stmt.bindLong(2, entity.getBlockHeight());
         stmt.bindLong(3, entity.getBlockSync());
+ 
+        String avgIncome = entity.getAvgIncome();
+        if (avgIncome != null) {
+            stmt.bindString(4, avgIncome);
+        }
+ 
+        String medianFee = entity.getMedianFee();
+        if (medianFee != null) {
+            stmt.bindString(5, medianFee);
+        }
     }
 
     @Override
@@ -75,6 +89,16 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         }
         stmt.bindLong(2, entity.getBlockHeight());
         stmt.bindLong(3, entity.getBlockSync());
+ 
+        String avgIncome = entity.getAvgIncome();
+        if (avgIncome != null) {
+            stmt.bindString(4, avgIncome);
+        }
+ 
+        String medianFee = entity.getMedianFee();
+        if (medianFee != null) {
+            stmt.bindString(5, medianFee);
+        }
     }
 
     @Override
@@ -87,7 +111,9 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         BlockInfo entity = new BlockInfo( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // blockHeight
-            cursor.getInt(offset + 2) // blockSync
+            cursor.getInt(offset + 2), // blockSync
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // avgIncome
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // medianFee
         );
         return entity;
     }
@@ -97,6 +123,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setBlockHeight(cursor.getInt(offset + 1));
         entity.setBlockSync(cursor.getInt(offset + 2));
+        entity.setAvgIncome(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setMedianFee(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

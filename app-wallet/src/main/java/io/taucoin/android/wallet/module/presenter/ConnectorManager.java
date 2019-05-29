@@ -41,13 +41,10 @@ import io.taucoin.android.service.TaucoinServiceMessage;
 import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.wallet.MyApplication;
-import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.FmtMicrometer;
-import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
 import io.taucoin.core.Transaction;
@@ -119,20 +116,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
         return mExceptionStop != null;
     }
 
-    public String getErrorMsg() {
-        String msg = "";
+    public int getErrorCode() {
         if(isError()){
-            if(mExceptionStop.getCode() == 3){
-                msg = ResourcesUtil.getText(R.string.mining_power_zero);
-            }else if(mExceptionStop.getCode() == 4){
-                msg = ResourcesUtil.getText(R.string.mining_balance_low);
-                String averageFee = FmtMicrometer.fmtFeeValue(mExceptionStop.getMsg());
-                msg = String.format(msg, averageFee);
-            }else{
-                msg = ResourcesUtil.getText(R.string.mining_exception);
-            }
+            return mExceptionStop.getCode();
         }
-        return msg;
+        return -1;
     }
 
     public boolean isSyncMe() {
@@ -273,6 +261,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public void startBlockForging(){
+        mExceptionStop = null;
         Logger.d("startBlockForging=-1");
         startBlockForging(-1);
     }

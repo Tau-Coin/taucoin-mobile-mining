@@ -57,6 +57,7 @@
     <string name="send_amount">Amount</string>
     <string name="send_memo">Memo</string>
     <string name="send_status">Status</string>
+    <string name="send_tx_fee_tip">The higher fee, the faster trx processing.</string>
     <string name="send_transaction_expiry" formatted="false"><Data><![CDATA[Transaction expires in <font color="#0E88EF">%s</font> (≈%s minutes) blocks.]]> </Data></string>
     <string name="send_to">To</string>
     <string name="send_dialog_yes">Proceed</string>
@@ -132,9 +133,11 @@
         Please allow installation of TAUcoin.
     </string>
 
-    <string name="home_mining_on">On</string>
+    <string name="home_mining_on">Mining</string>
+    <string name="home_mining_pause">Pause</string>
     <string name="home_mining_off">Off</string>
     <string name="home_mining_connecting">Connecting</string>
+    <string name="home_mining_synchronizing">Synchronizing</string>
 
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Mining Income</string>
@@ -182,9 +185,8 @@
 
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
-    <string name="mining_balance_low">Address balance shall be larger than average block transaction fee %s TAU</string>
-    <string name="mining_power_zero">Make transactions to increase power above zero for mining, and keep balance above avg block income.</string>
-    <string name="mining_exception">Exception during mining.</string>
+    <string name="mining_balance_low">Total Balance need to be higher than "avg block income" %s TAU for mining.</string>
+    <string name="mining_power_zero">Send transactions to increase "Mining Power" above 0, and keep Total Balance higher than "Avg Block Income" %s TAU for mining.</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

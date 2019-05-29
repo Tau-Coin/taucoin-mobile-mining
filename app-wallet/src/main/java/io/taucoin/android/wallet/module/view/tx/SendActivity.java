@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +40,7 @@ import io.taucoin.android.wallet.module.view.manage.SettingActivity;
 import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.KeyboardUtils;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.UserUtil;
@@ -71,7 +70,7 @@ public class SendActivity extends BaseActivity implements ISendView {
     TextView tvTotalAmount;
 
     private TxPresenter mTxPresenter;
-    private ViewHolder mViewHolder ;
+    private ViewHolder mViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +83,7 @@ public class SendActivity extends BaseActivity implements ISendView {
     }
 
     private void initView() {
-        etFee.setText(R.string.send_tx_small_fee);
+        MiningUtil.initSenderTxFee(etFee);
         etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
         initTxFeeView();
 
@@ -127,12 +126,14 @@ public class SendActivity extends BaseActivity implements ISendView {
             fee = BigInteger.ZERO.toString();
         }
         String total = FmtMicrometer.fmtFormatAdd(amount, fee);
-        String totalAmount = "";
         if(StringUtil.isNotEmpty(amount) ){
-            totalAmount = getText(R.string.send_tx_total_amount).toString();
+            String totalAmount = getText(R.string.send_tx_total_amount).toString();
             totalAmount = String.format(totalAmount, total);
+            tvTotalAmount.setText(totalAmount);
+            tvTotalAmount.setVisibility(View.VISIBLE);
+        }else{
+            tvTotalAmount.setVisibility(View.GONE);
         }
-        tvTotalAmount.setText(totalAmount);
     }
 
     @OnClick({R.id.iv_fee})
@@ -243,7 +244,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         etAddress.getText().clear();
         etAmount.getText().clear();
         etMemo.getText().clear();
-        etFee.setText(R.string.send_tx_small_fee);
+        MiningUtil.initSenderTxFee(etFee);
     }
 
     private void showSoftInput() {

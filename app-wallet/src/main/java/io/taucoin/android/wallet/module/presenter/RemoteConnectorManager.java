@@ -172,7 +172,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         isInit = true;
                         startSyncAll();
                         if(event == EVENT_TAUCOIN_CREATED){
-                            mExceptionStop = null;
                             startBlockForging();
                         }
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
@@ -205,7 +204,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         BlockForgeExceptionStopEvent exceptionStop = data.getParcelable("data");
                         logMessage = "Block forged stop: " + exceptionStop.getMsg();
                         addLogEntry(time, logMessage);
-                        if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4 || exceptionStop.getCode() == 11){
+                        if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4){
                             mExceptionStop = exceptionStop;
                             messageEvent = new MessageEvent();
                             messageEvent.setCode(MessageEvent.EventCode.MINING_STATE);

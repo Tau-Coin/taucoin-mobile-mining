@@ -212,7 +212,18 @@ public class TxService extends Service {
         });
     }
 
+    private void getIncomeInfo() {
+        mTxModel.getIncomeInfo(new LogicObserver<Boolean>(){
+
+            @Override
+            public void handleData(Boolean aBoolean) {
+                EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+            }
+        });
+    }
+
     private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
+        getIncomeInfo();
         ProgressManager.closeProgressDialog();
         if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
                 StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){

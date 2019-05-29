@@ -103,6 +103,16 @@
         android:gravity="start"
         android:text="" />
 
+    <TextView
+        style="@style/style_normal_grey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="10dp"
+        android:gravity="start"
+        android:text="@string/send_tx_fee_tip" />
+
     <Button
         android:id="@+id/btn_send"
         style="@style/style_big_white_button"

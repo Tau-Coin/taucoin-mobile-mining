@@ -17,15 +17,20 @@ public class BlockInfo {
     private Long id;
     private int blockHeight;
     private int blockSync;
+    private String avgIncome;
+    private String medianFee;
 
     @Transient
     private List<MiningBlock> miningBlocks;
 
-    @Generated(hash = 1356593060)
-    public BlockInfo(Long id, int blockHeight, int blockSync) {
+    @Generated(hash = 1980674216)
+    public BlockInfo(Long id, int blockHeight, int blockSync, String avgIncome,
+            String medianFee) {
         this.id = id;
         this.blockHeight = blockHeight;
         this.blockSync = blockSync;
+        this.avgIncome = avgIncome;
+        this.medianFee = medianFee;
     }
 
     @Generated(hash = 1647740766)
@@ -62,5 +67,21 @@ public class BlockInfo {
 
     public void setBlockSync(int blockSync) {
         this.blockSync = blockSync;
+    }
+
+    public String getAvgIncome() {
+        return this.avgIncome;
+    }
+
+    public void setAvgIncome(String avgIncome) {
+        this.avgIncome = avgIncome;
+    }
+
+    public String getMedianFee() {
+        return this.medianFee;
+    }
+
+    public void setMedianFee(String medianFee) {
+        this.medianFee = medianFee;
     }
 }
