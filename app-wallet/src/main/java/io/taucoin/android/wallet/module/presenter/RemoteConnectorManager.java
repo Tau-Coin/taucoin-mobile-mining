@@ -171,9 +171,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Start);
                         isInit = true;
                         startSyncAll();
-                        if(event == EVENT_TAUCOIN_CREATED){
-                            startBlockForging();
-                        }
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                         break;
                     case EVENT_BLOCK_DISCONNECT:

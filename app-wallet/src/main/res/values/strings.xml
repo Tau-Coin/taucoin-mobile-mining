@@ -34,6 +34,7 @@
     <string name="tx_transaction_id">Transaction ID</string>
     <string name="tx_transaction_expiry">Transaction Expiry</string>
     <string name="tx_transaction_fee">Transaction Fee</string>
+    <string name="tx_transaction_median_fee">Transaction Median Fee</string>
     <string name="tx_log_tips">
         &#160;Red font indicates a failed transaction,\n
         Blue font indicates a pending transaction,\n
@@ -185,8 +186,8 @@
 
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
-    <string name="mining_balance_low">Total Balance need to be higher than "avg block income" %s TAU for mining.</string>
-    <string name="mining_power_zero">Send transactions to increase "Mining Power" above 0, and keep Total Balance higher than "Avg Block Income" %s TAU for mining.</string>
+    <string name="mining_balance_low">Total Balance need to be higher than \"Median Transaction Fee Of Latest 144 Blocks\" %s TAU for mining.</string>
+    <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0, and keep Total Balance higher than \"Median Transaction Fee Of Latest 144 Blocks\" %s TAU for mining.</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

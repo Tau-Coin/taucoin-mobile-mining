@@ -221,9 +221,9 @@ public class MiningUtil {
             errorMsg = ResourcesUtil.getText(R.string.mining_balance_low);
         }
         if(StringUtil.isNotEmpty(errorMsg)){
-            String avgIncome = String.valueOf(blockInfo.getAvgIncome());
-            avgIncome = FmtMicrometer.fmtFormat(avgIncome);
-            errorMsg = String.format(errorMsg, avgIncome);
+            String medianFee = String.valueOf(blockInfo.getMedianFee());
+            medianFee = FmtMicrometer.fmtFormat(medianFee);
+            errorMsg = String.format(errorMsg, medianFee);
         }
         tvErrorMsg.setText(errorMsg);
     }
@@ -252,13 +252,13 @@ public class MiningUtil {
             return -1;
         }
         BigDecimal balance = new BigDecimal(keyValue.getBalance());
-        BigDecimal avgIncome = new BigDecimal(BigInteger.ZERO);
-        if(StringUtil.isNotEmpty(blockInfo.getAvgIncome())){
-            avgIncome = new BigDecimal(blockInfo.getAvgIncome());
+        BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
+        if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
+            medianFee = new BigDecimal(blockInfo.getMedianFee());
         }
         if(keyValue.getPower() <= 0){
             return 3;
-        }else if(balance.compareTo(avgIncome) < 0){
+        }else if(balance.compareTo(medianFee) < 0){
             return 4;
         }else{
             return 0;

@@ -81,7 +81,7 @@ public class UserPresenter {
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.PUBLIC_KEY, keyValue.getPubKey());
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.ADDRESS, keyValue.getAddress());
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.RAW_ADDRESS, keyValue.getRawAddress());
-                TxService.startTxService(TransmitKey.ServiceType.GET_IMPORT_DATA);
+                TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
                 TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
                 if(isGenerateKey){
                     gotoKeysActivity();

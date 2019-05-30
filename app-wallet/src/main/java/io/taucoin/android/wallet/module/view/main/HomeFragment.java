@@ -321,6 +321,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     } else if(!MiningUtil.isSynchronized(blockInfo) && !mIsSynchronized){
                         refreshOffOnView(TransmitKey.MiningState.LOADING, blockInfo);
                     } else{
+                        MyApplication.getRemoteConnector().startBlockForging();
                         refreshOffOnView(TransmitKey.MiningState.Start);
                     }
                 }

@@ -53,6 +53,7 @@ public class TxService extends Service {
     private ITxModel mTxModel;
     private IAppModel mAppModel;
     private boolean mIsChecked;
+    private boolean mIsGetBalance;
     private boolean mIsGetBlockHeight;
 
     public TxService() {
@@ -70,6 +71,7 @@ public class TxService extends Service {
         mTxModel = new TxModel();
         mAppModel = new AppModel();
         mIsChecked = false;
+        mIsGetBalance = false;
         mIsGetBlockHeight = false;
         NotifyManager.getInstance().initNotificationManager(this);
         NotifyManager.getInstance().initNotify();
@@ -87,9 +89,10 @@ public class TxService extends Service {
                 return super.onStartCommand(intent, flags, startId);
             }
             switch (serviceType){
-                case TransmitKey.ServiceType.GET_IMPORT_DATA:
                 case TransmitKey.ServiceType.GET_HOME_DATA:
-                    getBalance(serviceType);
+                    if(!mIsGetBalance){
+                        getBalance(serviceType);
+                    }
                     if(!mIsChecked){
                         checkRawTransaction();
                     }
@@ -171,6 +174,7 @@ public class TxService extends Service {
 
     private void getBalanceDelay(String serviceType) {
         mIsChecked = true;
+        mIsGetBalance = true;
         Observable.timer(5, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
@@ -182,6 +186,7 @@ public class TxService extends Service {
     }
 
     private void getBalance(String serviceType) {
+        mIsGetBalance = true;
         mTxModel.getBalance(new TxObserver<AccountBean>() {
             @Override
             public void handleError(String msg, int msgCode) {
@@ -225,13 +230,11 @@ public class TxService extends Service {
     private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
         getIncomeInfo();
         ProgressManager.closeProgressDialog();
-        if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA) ||
-                StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_IMPORT_DATA)){
+        if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA)){
             if(isSuccess){
                 EventBusUtil.post(MessageEvent.EventCode.ALL);
-            }else{
-                getBalanceDelay(TransmitKey.ServiceType.GET_BALANCE);
             }
+            getBalanceDelay(serviceType);
         }else{
             if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_BALANCE) && !isSuccess
                     && HomeFragment.mIsToast){
