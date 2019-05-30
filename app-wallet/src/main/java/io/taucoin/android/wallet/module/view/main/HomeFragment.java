@@ -374,6 +374,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             state = R.string.home_mining_connecting;
             if(MyApplication.getRemoteConnector().isInit() && !MiningUtil.isSynchronized(blockInfo)){
                 state = R.string.home_mining_synchronizing;
+                ivMiningSwitch.setOn();
             }
             color = R.color.color_yellow;
             tvMiningSwitch.setLoadingText(ResourcesUtil.getText(state));

@@ -95,7 +95,7 @@ public class CircleProgress extends View {
         ThreadPool.getThreadPool().execute(() -> {
             while(isLoading){
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(   50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
