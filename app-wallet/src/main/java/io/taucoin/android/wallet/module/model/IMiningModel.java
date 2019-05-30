@@ -2,6 +2,7 @@ package io.taucoin.android.wallet.module.model;
 
 import java.util.List;
 
+import io.taucoin.android.interop.BlockTxReindex;
 import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
@@ -31,4 +32,8 @@ public interface IMiningModel {
     void saveMiningReward(TransactionExecuatedOutcome outCome);
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
+
+    void startUpdatingRewardData(LogicObserver<String> logicObserver);
+
+    void handleUpdatingRewardData(BlockTxReindex outCome);
 }

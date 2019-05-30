@@ -692,6 +692,25 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    public void getRewardsByBlockHash(String identifier, byte[] hash) {
+
+        if (!isBound || hash == null)
+            return;
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_BLOCK_TX_REINDEX, 0, 0);
+        msg.replyTo = clientMessenger;
+        msg.obj = getIdentifierBundle(identifier);
+
+        Bundle data = new Bundle();
+        data.putByteArray("blockhash", hash);
+        msg.setData(data);
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(getBlockByHash) to service: " + e.getMessage());
+        }
+    }
+
     /**
      * Get block list by starting number.
      * @param identifier String Caller identifier used to return the response

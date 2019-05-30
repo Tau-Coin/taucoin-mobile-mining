@@ -16,6 +16,7 @@
 package io.taucoin.android.wallet.db.util;
 
 import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.List;
 
@@ -107,5 +108,15 @@ public class MiningRewardDaoUtils {
                 insertOrReplace(reward);
             }
         }
+    }
+
+    public List<MiningReward> queryUpdatingData() {
+        WhereCondition groupBy = new WhereCondition.StringCondition(" 1 GROUP BY " +
+                MiningRewardDao.Properties.BlockHash.columnName);
+        QueryBuilder<MiningReward> qb = getMiningRewardDao().queryBuilder();
+        qb.where(MiningRewardDao.Properties.Valid.eq(1),
+                MiningRewardDao.Properties.Verified.notEq(1), groupBy);
+        qb.orderAsc(MiningRewardDao.Properties.Id);
+        return qb.list();
     }
 }

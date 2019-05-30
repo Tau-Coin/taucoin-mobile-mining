@@ -15,6 +15,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import android.util.Log;
 import android.util.Pair;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
@@ -1139,9 +1140,12 @@ public class TaucoinRemoteService extends TaucoinService {
                 ArrayList<byte[]> lastAssociatedAddress = tx.getSenderAssociatedAddress();
                 byte[] txFee = tx.getFee();
                 FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(txFee));
+                feeDistributor.distributeFee();
                 AssociatedFeeDistributor associatedFeeDistributor = new AssociatedFeeDistributor(lastAssociatedAddress.size(),feeDistributor.getLastAssociFee());
+                associatedFeeDistributor.assDistributeFee();
                 BlockTxReindex btx = new BlockTxReindex();
                 btx.setTxid(tx.getHash());
+                btx.setBlockhash(blockHash);
                 btx.getMinerFee().put(minerAddress,feeDistributor.getCurrentWitFee());
                 btx.getLastWitFee().put(lastWitAddress,feeDistributor.getLastWitFee());
                 int count=0;

@@ -25,6 +25,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.util.Date;
 
+import io.taucoin.android.interop.BlockTxReindex;
 import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
@@ -49,6 +50,7 @@ import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
+import io.taucoin.core.Utils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.TrafficUtil;
 import io.taucoin.net.p2p.HelloMessage;
@@ -172,6 +174,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         isInit = true;
                         startSyncAll();
                         EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
+                        startUpdatingRewardData();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -273,6 +276,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 cancelLocalConnector();
                 EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                 break;
+            case TaucoinClientMessage.MSG_BLOCK_TX_REINDEX:
+                replyData = message.getData();
+                replyData.setClassLoader(BlockTxReindex.class.getClassLoader());
+                BlockTxReindex tx = replyData.getParcelable("checkoutcome");
+                handleUpdatingRewardData(tx);
+                break;
             default:
                 isClaimed = false;
         }
@@ -370,5 +379,21 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 }
             }
         });
+    }
+
+    private void startUpdatingRewardData() {
+        getMiningModel().startUpdatingRewardData(new LogicObserver<String>(){
+            @Override
+            public void handleData(String blockHash) {
+                if(mTaucoinConnector != null){
+                    byte[] bytesBlockHash = Utils.parseAsHexOrBase58(blockHash);
+                    mTaucoinConnector.getRewardsByBlockHash(mHandlerIdentifier, bytesBlockHash);
+                }
+            }
+        });
+    }
+
+    private void handleUpdatingRewardData(BlockTxReindex tx) {
+        getMiningModel().handleUpdatingRewardData(tx);
     }
 }

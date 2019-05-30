@@ -34,6 +34,7 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         public final static Property Valid = new Property(7, int.class, "valid", false, "VALID");
         public final static Property SenderAddress = new Property(8, String.class, "senderAddress", false, "SENDER_ADDRESS");
         public final static Property ReceiverAddress = new Property(9, String.class, "receiverAddress", false, "RECEIVER_ADDRESS");
+        public final static Property Verified = new Property(10, int.class, "verified", false, "VERIFIED");
     }
 
 
@@ -58,7 +59,8 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
                 "\"BLOCK_HASH\" TEXT," + // 6: blockHash
                 "\"VALID\" INTEGER NOT NULL ," + // 7: valid
                 "\"SENDER_ADDRESS\" TEXT," + // 8: senderAddress
-                "\"RECEIVER_ADDRESS\" TEXT);"); // 9: receiverAddress
+                "\"RECEIVER_ADDRESS\" TEXT," + // 9: receiverAddress
+                "\"VERIFIED\" INTEGER NOT NULL );"); // 10: verified
     }
 
     /** Drops the underlying database table. */
@@ -108,6 +110,7 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         if (receiverAddress != null) {
             stmt.bindString(10, receiverAddress);
         }
+        stmt.bindLong(11, entity.getVerified());
     }
 
     @Override
@@ -151,6 +154,7 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         if (receiverAddress != null) {
             stmt.bindString(10, receiverAddress);
         }
+        stmt.bindLong(11, entity.getVerified());
     }
 
     @Override
@@ -170,7 +174,8 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // blockHash
             cursor.getInt(offset + 7), // valid
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // senderAddress
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // receiverAddress
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // receiverAddress
+            cursor.getInt(offset + 10) // verified
         );
         return entity;
     }
@@ -187,6 +192,7 @@ public class MiningRewardDao extends AbstractDao<MiningReward, Long> {
         entity.setValid(cursor.getInt(offset + 7));
         entity.setSenderAddress(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setReceiverAddress(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setVerified(cursor.getInt(offset + 10));
      }
     
     @Override

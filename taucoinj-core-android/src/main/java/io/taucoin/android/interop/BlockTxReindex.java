@@ -9,6 +9,7 @@ public class BlockTxReindex implements Parcelable {
     boolean isCompleted = false;
     boolean isFind = true;
     private byte[] txid;
+    private byte[] blockhash;
     private HashMap<byte[],Long> minerFee = new HashMap<>();
     private HashMap<byte[],Long> lastWitFee = new HashMap<>();
     private HashMap<byte[],Long> lastAssociateFee = new HashMap<>();
@@ -24,6 +25,9 @@ public class BlockTxReindex implements Parcelable {
         byte[] txhash = new byte[32];
         in.readByteArray(txhash);
         this.txid = txhash;
+        byte[] blockHash = new byte[20];
+        in.readByteArray(blockHash);
+        this.blockhash = blockHash;
         this.minerFee = in.readHashMap(this.getClass().getClassLoader());
         this.lastWitFee = in.readHashMap(this.getClass().getClassLoader());
         this.lastAssociateFee = in.readHashMap(this.getClass().getClassLoader());
@@ -82,6 +86,7 @@ public class BlockTxReindex implements Parcelable {
         parcel.writeBooleanArray(semaphoreFlag);
 
         parcel.writeByteArray(txid);
+        parcel.writeByteArray(blockhash);
         parcel.writeMap(minerFee);
         parcel.writeMap(lastWitFee);
         parcel.writeMap(lastAssociateFee);
@@ -98,4 +103,16 @@ public class BlockTxReindex implements Parcelable {
             return new BlockTxReindex[i];
         }
     };
+
+    public byte[] getTxid() {
+        return txid;
+    }
+
+    public byte[] getBlockhash() {
+        return blockhash;
+    }
+
+    public void setBlockhash(byte[] blockhash) {
+        this.blockhash = blockhash;
+    }
 }

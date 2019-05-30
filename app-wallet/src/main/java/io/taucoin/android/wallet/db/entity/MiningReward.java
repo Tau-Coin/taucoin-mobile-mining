@@ -22,10 +22,11 @@ public class MiningReward {
     private int valid;
     private String senderAddress;
     private String receiverAddress;
-    @Generated(hash = 647148558)
+    private int verified;
+    @Generated(hash = 2001879048)
     public MiningReward(Long id, String address, String txHash, long minerFee,
             long partFee, String time, String blockHash, int valid,
-            String senderAddress, String receiverAddress) {
+            String senderAddress, String receiverAddress, int verified) {
         this.id = id;
         this.address = address;
         this.txHash = txHash;
@@ -36,6 +37,7 @@ public class MiningReward {
         this.valid = valid;
         this.senderAddress = senderAddress;
         this.receiverAddress = receiverAddress;
+        this.verified = verified;
     }
     @Generated(hash = 364800917)
     public MiningReward() {
@@ -100,5 +102,10 @@ public class MiningReward {
     public void setReceiverAddress(String receiverAddress) {
         this.receiverAddress = receiverAddress;
     }
-
+    public int getVerified() {
+        return this.verified;
+    }
+    public void setVerified(int verified) {
+        this.verified = verified;
+    }
 }
