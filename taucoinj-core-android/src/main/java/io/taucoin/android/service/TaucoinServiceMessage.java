@@ -159,4 +159,8 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_GET_ACCOUNT_STATE = 31;
 
+    /**
+     * Command to the service to get block tx reindex
+     */
+    public static final int MSG_GET_BLOCK_TX_REINDEX = 32;
 }

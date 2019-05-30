@@ -91,4 +91,9 @@ public class TaucoinClientMessage {
      * Send account state event to client
      */
     public static final int MSG_ACCOUNT_STATE = 18;
+
+    /**
+     * Send block tx reindex Msg to client
+     */
+    public static final int MSG_BLOCK_TX_REINDEX = 19;
 }

@@ -18,14 +18,11 @@ import android.text.TextUtils;
 import android.util.Pair;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
+import io.taucoin.android.interop.BlockTxReindex;
 import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.android.service.events.*;
 import io.taucoin.config.MainNetParams;
-import io.taucoin.core.Block;
-import io.taucoin.core.DumpedPrivateKey;
-import io.taucoin.core.Genesis;
-import io.taucoin.core.Transaction;
-import io.taucoin.core.VersionedChecksummedBytes;
+import io.taucoin.core.*;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
@@ -289,7 +286,9 @@ public class TaucoinRemoteService extends TaucoinService {
             case TaucoinServiceMessage.MSG_GET_ACCOUNT_STATE:
                 getAccountState(message);
                 break;
-
+            case TaucoinServiceMessage.MSG_GET_BLOCK_TX_REINDEX:
+                getBlockTxReindex(message);
+                break;
             default:
                 return false;
         }
@@ -1107,6 +1106,67 @@ public class TaucoinRemoteService extends TaucoinService {
             message.replyTo.send(replyMessage);
         } catch (RemoteException e) {
             logger.error("Exception sending pending txs to client: " + e.getMessage());
+        }
+    }
+
+    protected void getBlockTxReindex(Message message) {
+        Message replyMessage = Message.obtain(null,TaucoinClientMessage.MSG_BLOCK_TX_REINDEX,0,0);
+        Bundle replyData = new Bundle();
+        Bundle data = message.getData();
+        byte[] blockHash = data.getByteArray("blockhash");
+        if (taucoin != null) {
+            Blockchain blockchain = taucoin.getBlockchain();
+            Block reBlock = blockchain.getBlockByHash(blockHash);
+            if (reBlock == null) {
+                BlockTxReindex btx = new BlockTxReindex();
+                //if false means that this block can not find
+                btx.setFind(false);
+                replyData.putParcelable("checkoutcome",btx);
+                replyMessage.setData(replyData);
+                try {
+                    message.replyTo.send(replyMessage);
+                } catch (RemoteException e) {
+                    logger.error("Exception sending block tx reindex to client: " + e.getMessage());
+                }
+                return;
+            }
+            List<Transaction> txList = reBlock.getTransactionsList();
+            byte[] minerAddress = reBlock.getForgerAddress();
+            int txCount = 0;
+            for (Transaction tx : txList) {
+                txCount++;
+                byte[] lastWitAddress = tx.getSenderWitnessAddress();
+                ArrayList<byte[]> lastAssociatedAddress = tx.getSenderAssociatedAddress();
+                byte[] txFee = tx.getFee();
+                FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(txFee));
+                AssociatedFeeDistributor associatedFeeDistributor = new AssociatedFeeDistributor(lastAssociatedAddress.size(),feeDistributor.getLastAssociFee());
+                BlockTxReindex btx = new BlockTxReindex();
+                btx.setTxid(tx.getHash());
+                btx.getMinerFee().put(minerAddress,feeDistributor.getCurrentWitFee());
+                btx.getLastWitFee().put(lastWitAddress,feeDistributor.getLastWitFee());
+                int count=0;
+                for (byte[] assAddr: lastAssociatedAddress) {
+                    count++;
+                    if(count != lastAssociatedAddress.size()) {
+                        btx.updateAssociatedFee(assAddr,associatedFeeDistributor.getAverageShare());
+                    } else {
+                        btx.updateAssociatedFee(assAddr,associatedFeeDistributor.getLastShare());
+                    }
+                }
+
+                if (txCount == txList.size()) {
+                    //if true means that this is last transaction in this block wanted.
+                    btx.setCompleted(true);
+                }
+
+                replyData.putParcelable("checkoutcome",btx);
+                replyMessage.setData(replyData);
+                try {
+                    message.replyTo.send(replyMessage);
+                } catch (RemoteException e) {
+                    logger.error("Exception sending block tx reindex to client: " + e.getMessage());
+                }
+            }
         }
     }
 
