@@ -157,10 +157,10 @@ public class CompositeTaucoinListener implements TaucoinListener {
 
     @Override
     public void onChainInfoChanged(long height, byte[] previousBlockHash,
-            byte[] currentBlockHash, BigInteger totalDiff) {
+            byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
         for (TaucoinListener listener : listeners) {
             listener.onChainInfoChanged(height, previousBlockHash,
-                    currentBlockHash, totalDiff);
+                    currentBlockHash, totalDiff, medianFee);
         }
     }
 }

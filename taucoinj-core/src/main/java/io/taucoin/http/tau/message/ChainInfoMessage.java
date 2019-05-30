@@ -32,16 +32,20 @@ public class ChainInfoMessage extends Message {
     // Total difficulity
     private BigInteger totalDiff;
 
+    // Media fee of latest 144 blocks.
+    long medianFee;
+
     public ChainInfoMessage() {
     }
 
     public ChainInfoMessage(byte[] genesisHash, long height, byte[] currentBlockHash,
-            BigInteger totalDiff, byte[] previousBlockHash) {
+            BigInteger totalDiff, byte[] previousBlockHash, long medianFee) {
         this.genesisHash = genesisHash;
         this.height = height;
         this.currentBlockHash = currentBlockHash;
         this.totalDiff = totalDiff;
         this.previousBlockHash = previousBlockHash;
+        this.medianFee = medianFee;
     }
 
     public byte[] getGenesisHash() {
@@ -84,6 +88,14 @@ public class ChainInfoMessage extends Message {
         this.totalDiff = totalDiff;
     }
 
+    public long getMedianFee() {
+        return medianFee;
+    }
+
+    public void setMedianFee(long medianFee) {
+        this.medianFee = medianFee;
+    }
+
     @Override
     public Class<?> getAnswerMessage() {
         return null;
@@ -103,7 +115,8 @@ public class ChainInfoMessage extends Message {
         payload.append("\tpreviousBlockHash:" +
                 (previousBlockHash == null ? "null" : Hex.toHexString(previousBlockHash)) + ",\n");
         payload.append("\tcurrentBlockHash:" + Hex.toHexString(currentBlockHash) + ",\n");
-        payload.append("\ttotalDiff:" + totalDiff.toString(16) + "\n");
+        payload.append("\ttotalDiff:" + totalDiff.toString(16) + ",\n");
+        payload.append("\tmedianFee:" + medianFee + "\n");
         payload.append("]\n");
         return payload.toString();
     }
@@ -132,6 +145,7 @@ public class ChainInfoMessage extends Message {
                         Hex.toHexString(message.getCurrentBlockHash()));
                 jsonGenerator.writeStringField("totaldifficulty",
                         message.getTotalDiff().toString(16));
+                jsonGenerator.writeNumberField("medianfee", message.getMedianFee());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -184,6 +198,8 @@ public class ChainInfoMessage extends Message {
             JsonNode totalDiffNode = node.get("totaldifficulty");
             String totalDiff = totalDiffNode.asText();
             message.setTotalDiff(new BigInteger(totalDiff, 16).abs());
+            JsonNode medianFeeNode = node.get("medianfee");
+            message.setMedianFee(medianFeeNode.asLong());
 
             return message;
         }

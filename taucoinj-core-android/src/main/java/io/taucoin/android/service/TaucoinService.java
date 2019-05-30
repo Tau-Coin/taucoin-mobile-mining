@@ -219,8 +219,8 @@ public class TaucoinService extends Service {
 
         @Override
         public void onChainInfoChanged(long height, byte[] previousBlockHash,
-                byte[] currentBlockHash, BigInteger totalDiff) {
-            broadcastEvent(EventFlag.EVENT_CHAININFO_CHANGED, new ChainInfoChangedData(height));
+                byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
+            broadcastEvent(EventFlag.EVENT_CHAININFO_CHANGED, new ChainInfoChangedData(height, medianFee));
         }
     }
 }

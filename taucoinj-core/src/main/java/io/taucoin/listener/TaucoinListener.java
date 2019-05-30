@@ -54,6 +54,6 @@ public interface TaucoinListener {
     void onRecvHttpPayload(String payload);
 
     void onChainInfoChanged(long height, byte[] previousBlockHash,
-            byte[] currentBlockHash, BigInteger totalDiff);
+            byte[] currentBlockHash, BigInteger totalDiff, long medianFee);
 
 }

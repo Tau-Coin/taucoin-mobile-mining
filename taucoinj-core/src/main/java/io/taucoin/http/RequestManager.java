@@ -222,10 +222,10 @@ public class RequestManager implements RequestQueue.MessageListener {
 
     private void processChainInfoMessage(ChainInfoMessage msg) {
         chainInfoManager.update(msg.getHeight(), msg.getPreviousBlockHash(),
-                msg.getCurrentBlockHash(), msg.getTotalDiff());
+                msg.getCurrentBlockHash(), msg.getTotalDiff(), msg.getMedianFee());
         changeSyncState(DONE_CHAININFO_RETRIEVING);
         listener.onChainInfoChanged(msg.getHeight(), msg.getPreviousBlockHash(),
-                msg.getCurrentBlockHash(), msg.getTotalDiff());
+                msg.getCurrentBlockHash(), msg.getTotalDiff(), msg.getMedianFee());
     }
 
     private void startPullChainInfo() {

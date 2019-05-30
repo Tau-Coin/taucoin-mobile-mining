@@ -76,7 +76,7 @@ public class BlockForger {
             = new ChainInfoManager.ChainInfoListener() {
         @Override
         public void onChainInfoChanged(long height, byte[] previousBlockHash,
-                byte[] currentBlockHash, BigInteger totalDiff) {
+                byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
             BlockForger.this.onChainInfoChanged(height, currentBlockHash);
         }
     };
@@ -238,12 +238,25 @@ public class BlockForger {
             logger.error("Forging Power < 0!!!");
             return ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
         }
-        long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
-        logger.info("balance: {} history average fee: {}",balance,hisAverageFee);
-        if (balance.longValue() < hisAverageFee){
-            logger.info("balance less than history average fee");
+
+        //long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
+        long medianFee = chainInfoManager.getMedianFee();
+        // If medianFee hasn't been pulled from network, wait for a while.
+        while (medianFee <= 0) {
+            logger.warn("Forging task will sleep 2s for getting chaininfo");
+            try {
+                Thread.sleep(2000);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                logger.error("Waiting for chaininfo interrupted");
+                return ForgeStatus.FORGE_NORMAL_EXIT;
+            }
+        }
+        logger.info("balance: {}, median fee: {}", balance, medianFee);
+        if (balance.longValue() < medianFee){
+            logger.info("balance less than median fee");
             return new ForgeStatus(4,
-                    String.valueOf(hisAverageFee));
+                    String.valueOf(medianFee));
         }
 
         logger.info("base target {}, forging power {}", baseTarget, forgingPower);

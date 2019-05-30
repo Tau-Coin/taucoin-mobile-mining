@@ -7,10 +7,13 @@ public class ChainInfoChangedData extends EventData {
 
     public long height;
 
-    public ChainInfoChangedData(long height) {
+    public long medianFee;
+
+    public ChainInfoChangedData(long height, long medianFee) {
 
         super();
         this.height = height;
+        this.medianFee = medianFee;
     }
 
     @Override
@@ -24,6 +27,7 @@ public class ChainInfoChangedData extends EventData {
 
         super.writeToParcel(parcel, i);
         parcel.writeLong(height);
+        parcel.writeLong(medianFee);
     }
 
     public static final Parcelable.Creator<ChainInfoChangedData> CREATOR = new Parcelable.Creator<ChainInfoChangedData>() {
@@ -43,5 +47,6 @@ public class ChainInfoChangedData extends EventData {
 
         super(in);
         height = in.readLong();
+        medianFee = in.readLong();
     }
 }

@@ -24,6 +24,7 @@ public class ChainInfoManager {
     private byte[] previousBlockHash;
     private byte[] currentBlockHash;
     private BigInteger totalDiff;
+    private long medianFee;
 
     private List<ChainInfoListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -33,14 +34,16 @@ public class ChainInfoManager {
         this.previousBlockHash = null;
         this.currentBlockHash = Genesis.getInstance().getHash();
         this.totalDiff = BigInteger.ZERO;
+        this.medianFee = 0;
     }
 
     public synchronized void update(long height, byte[] previousBlockHash,
-            byte[] currentBlockHash, BigInteger totalDiff) {
+            byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
         this.height = height;
         this.previousBlockHash = previousBlockHash;
         this.currentBlockHash = currentBlockHash;
         this.totalDiff = totalDiff;
+        this.medianFee = medianFee;
 
         fireChainInfoChanged();
     }
@@ -61,9 +64,13 @@ public class ChainInfoManager {
         return totalDiff;
     }
 
+    public synchronized long getMedianFee() {
+        return medianFee;
+    }
+
     public interface ChainInfoListener {
         void onChainInfoChanged(long height, byte[] previousBlockHash,
-                byte[] currentBlockHash, BigInteger totalDiff);
+                byte[] currentBlockHash, BigInteger totalDiff, long medianFee);
     }
 
     public void addListener(ChainInfoListener l) {
@@ -76,7 +83,8 @@ public class ChainInfoManager {
 
     private void fireChainInfoChanged() {
         for (ChainInfoListener l : listeners) {
-            l.onChainInfoChanged(height, previousBlockHash, currentBlockHash, totalDiff);
+            l.onChainInfoChanged(height, previousBlockHash, currentBlockHash,
+                    totalDiff, medianFee);
         }
     }
 }
