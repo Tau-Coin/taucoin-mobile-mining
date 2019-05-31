@@ -455,7 +455,7 @@ public class MiningModel implements IMiningModel{
                     MiningReward reward = lists.get(i);
                     if(reward != null && StringUtil.isNotEmpty(reward.getBlockHash())){
                         Thread.sleep(300);
-                        logicObserver.handleData(reward.getBlockHash());
+                        emitter.onNext(reward.getBlockHash());
                     }
                 }
             }
