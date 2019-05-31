@@ -58,7 +58,7 @@ public class ProofOfTransaction {
                 min = MAXRATIO;
             }
 
-            newRequiredBaseTarget = previousBlockBaseTarget.multiply(BigInteger.valueOf(min).divide(BigInteger.valueOf(AVERTIME)));
+            newRequiredBaseTarget = previousBlockBaseTarget.multiply(BigInteger.valueOf(min)).divide(BigInteger.valueOf(AVERTIME));
         }else{
             long max = 0;
 
