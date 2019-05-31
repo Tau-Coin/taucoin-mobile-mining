@@ -468,7 +468,7 @@ public class MiningModel implements IMiningModel{
     @Override
     public void handleUpdatingRewardData(BlockTxReindex outCome) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            if(outCome == null){
+            if(outCome == null || !outCome.isFind()){
                 return;
             }
             Map<String, MiningReward> miningRewards = new HashMap<>();
