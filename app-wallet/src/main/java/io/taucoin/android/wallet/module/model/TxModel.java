@@ -506,10 +506,15 @@ public class TxModel implements ITxModel {
                         if(blockInfo == null){
                             blockInfo = new BlockInfo();
                         }
-                        blockInfo.setAvgIncome(incomeBean.getAvgIncome());
-                        blockInfo.setMedianFee(incomeBean.getMedianFee());
-                        BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
-                        observer.onNext(true);
+                        if(StringUtil.isNotSame(blockInfo.getAvgIncome(), incomeBean.getAvgIncome()) ||
+                                StringUtil.isNotSame(blockInfo.getMedianFee(), incomeBean.getMedianFee())){
+                            blockInfo.setAvgIncome(incomeBean.getAvgIncome());
+                            blockInfo.setMedianFee(incomeBean.getMedianFee());
+                            BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
+                            observer.onNext(true);
+                        }else{
+                            observer.onNext(false);
+                        }
                     }else{
                         observer.onNext(false);
                     }

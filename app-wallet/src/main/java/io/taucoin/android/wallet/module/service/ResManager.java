@@ -114,7 +114,7 @@ class ResManager implements BaseHandler.HandleCallBack{
                      Message message = mHandler.obtainMessage(2);
                      message.setData(bundle);
                      mHandler.sendMessage(message);
-                     Thread.sleep(1500);
+                     Thread.sleep(3500);
                      startResThreadDelay();
                  }
              } catch (InterruptedException e) {

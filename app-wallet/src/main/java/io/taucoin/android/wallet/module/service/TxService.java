@@ -222,7 +222,9 @@ public class TxService extends Service {
 
             @Override
             public void handleData(Boolean aBoolean) {
-                EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                if(aBoolean){
+                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                }
             }
         });
     }
