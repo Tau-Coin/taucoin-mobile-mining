@@ -221,7 +221,10 @@ public class MiningUtil {
             errorMsg = ResourcesUtil.getText(R.string.mining_balance_low);
         }
         if(StringUtil.isNotEmpty(errorMsg)){
-            String medianFee = String.valueOf(blockInfo.getMedianFee());
+            String medianFee = BigInteger.ZERO.toString();
+            if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
+                medianFee = String.valueOf(blockInfo.getMedianFee());
+            }
             medianFee = FmtMicrometer.fmtFormat(medianFee);
             errorMsg = String.format(errorMsg, medianFee);
         }
