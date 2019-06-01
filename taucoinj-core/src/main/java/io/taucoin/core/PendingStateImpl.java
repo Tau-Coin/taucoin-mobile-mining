@@ -50,7 +50,7 @@ public class PendingStateImpl implements PendingState {
     // transactions could be sent by peers even if they were already included into blocks
     private final Map<ByteArrayWrapper, Object> receivedTxs = new LRUMap<>(500000);
 
-    private final Map<String, BigInteger> expendList = new HashMap<String, BigInteger>(500000);
+    private final Map<String, BigInteger> expendList = new LRUMap<String, BigInteger>(500000);
 
     private final Map<String, HashSet<Long>> particleTx = new HashMap<>(50);
 
