@@ -24,6 +24,7 @@ import static org.apache.commons.lang3.ArrayUtils.getLength;
 import static io.taucoin.util.ByteUtil.*;
 import static io.taucoin.util.BIUtil.toBI;
 import static io.taucoin.util.TimeUtils.timeNows;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
  * A transaction (formally, T) is a single cryptographically
@@ -319,7 +320,6 @@ public class Transaction {
             }
         }
         this.parsed = true;
-        this.hash = getHash();
     }
 
     public boolean validate() {
@@ -344,9 +344,11 @@ public class Transaction {
     
     //entire transaction hash code
     public byte[] getHash() {
+        if (!isEmpty(hash)) return hash;
         if (!parsed) rlpParse();
         byte[] plainMsg = this.getEncoded();
-        return HashUtil.sha3(plainMsg);
+        hash = HashUtil.sha3(plainMsg);
+        return hash;
     }
 
     //get txid for wallet
@@ -494,8 +496,6 @@ public class Transaction {
         this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
                 toAddress, amount, fee, expireTime, v, r, s);
 
-        this.hash = this.getHash();
-
         return rlpEncoded;
     }
 
@@ -539,7 +539,6 @@ public class Transaction {
 
         this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
                 toAddress, amount, fee,expireTime, senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,v, r, s);
-        this.hash = this.getHash();
 
         return rlpEncodedComposite;
     }
