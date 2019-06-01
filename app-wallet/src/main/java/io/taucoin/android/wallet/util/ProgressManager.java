@@ -52,23 +52,27 @@ public class ProgressManager {
     }
 
     private static synchronized Dialog showProgressDialog(BaseActivity activity, boolean isCanCancel){
-        closeProgressDialog();
-        Logger.d("showProgressDialog");
-        mWeakReference = new WeakReference<>(activity);
-        if(mWeakReference.get() != null && mWeakReference.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE) != null){
+        try {
+            closeProgressDialog();
+            Logger.d("showProgressDialog");
+            mWeakReference = new WeakReference<>(activity);
+            if(mWeakReference.get() != null && mWeakReference.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE) != null){
 
-            Dialog progress = new Dialog(mWeakReference.get(), R.style.dialog_translucent);
-            progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            progress.setContentView(R.layout.dialog_waiting);
-            progress.setCanceledOnTouchOutside(isCanCancel);
-            progress.setCancelable(isCanCancel);
-            mProgress = progress;
-            if(!mWeakReference.get().isFinishing()){
-                progress.show();
-            }else{
-                closeProgressDialog();
+                Dialog progress = new Dialog(mWeakReference.get(), R.style.dialog_translucent);
+                progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                progress.setContentView(R.layout.dialog_waiting);
+                progress.setCanceledOnTouchOutside(isCanCancel);
+                progress.setCancelable(isCanCancel);
+                mProgress = progress;
+                if(!mWeakReference.get().isFinishing()){
+                    progress.show();
+                }else{
+                    closeProgressDialog();
+                }
+                mProgress.setOnCancelListener(ProgressManager::closeProgressDialog);
             }
-            mProgress.setOnCancelListener(ProgressManager::closeProgressDialog);
+        }catch (Exception ex){
+            Logger.e(ex, "showProgressDialog is error");
         }
         return mProgress;
     }

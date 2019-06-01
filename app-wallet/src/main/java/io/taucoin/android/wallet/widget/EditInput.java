@@ -138,7 +138,11 @@ public class EditInput extends LinearLayout {
             if (Build.VERSION.SDK_INT >= ANDROID_SDK_NUM) {
                 text = text + emptyStr;
                 mEtInput.setText(text);
-                mEtInput.setSelection(text.length() - 1);
+                if(text.length() > 0){
+                    mEtInput.setSelection(text.length() - 1);
+                }else {
+                    mEtInput.setSelection(text.length());
+                }
             } else {
                 mEtInput.setText(text);
                 mEtInput.setSelection(text.length());
