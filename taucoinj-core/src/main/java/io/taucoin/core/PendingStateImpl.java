@@ -125,14 +125,13 @@ public class PendingStateImpl implements PendingState {
 
         if (transactions.isEmpty()) return newTxs;
 
+        logger.info("From network coming TXs: {} " + transactions.size());
+
         for (Transaction tx : transactions) {
-            logger.info("from network coming TX: {}" + tx.getHash());
             if (addNewTxIfNotExist(tx)) {
                 unknownTx++;
                 if (isValid(tx)) {
                     newTxs.add(tx);
-                } else {
-                    logger.info("Non valid TX: {} " + tx.getHash());
                 }
             }
         }
@@ -180,11 +179,10 @@ public class PendingStateImpl implements PendingState {
         }
 
         // Verification of transaction time 
-        long lockTimeStart= System.currentTimeMillis() / 1000- Constants.MAX_TIMEDRIFT;
-        long lockTimeEND= System.currentTimeMillis() / 1000+ Constants.MAX_TIMEDRIFT;
-        long txTime= ByteUtil.byteArrayToLong(tx.getTime());
-        if((txTime < lockTimeStart) ||(txTime> lockTimeEND)){
-            logger.warn("Invalid transaction time: {}, contrast with system time: {}", txTime, System.currentTimeMillis() / 1000);
+        long lockTimeEND = System.currentTimeMillis() / 1000+ Constants.MAX_TIMEDRIFT;
+        long txTime = ByteUtil.byteArrayToLong(tx.getTime());
+        if(txTime > lockTimeEND){
+            logger.error("Invalid transaction time: {}, contrast with system time: {}", txTime, System.currentTimeMillis() / 1000);
 		    return false;		  
         }
 
