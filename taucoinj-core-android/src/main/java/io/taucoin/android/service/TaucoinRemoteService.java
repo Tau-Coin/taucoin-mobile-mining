@@ -1211,6 +1211,8 @@ public class TaucoinRemoteService extends TaucoinService {
                 BlockTxReindex btx = new BlockTxReindex();
                 //if false means that this block can not find
                 btx.setFind(false);
+                btx.setTxid(new byte[32]);
+                btx.setBlockhash(new byte[20]);
                 replyData.putParcelable("checkoutcome",btx);
                 replyMessage.setData(replyData);
                 try {
