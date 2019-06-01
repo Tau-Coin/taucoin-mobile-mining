@@ -480,18 +480,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        // keep chain continuity
-        if (!java.util.Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
-            logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}, raw array {}, {}",
-                    Hex.toHexString(bestBlock.getHash()),
-                    Hex.toHexString(block.getPreviousHeaderHash()),
-                    bestBlock.getHash(), block.getPreviousHeaderHash());
-
-            boolean result = org.spongycastle.util.Arrays.areEqual(bestBlock.getHash(), block.getPreviousHeaderHash());
-            logger.error("spongycastle Arrays.areEqual result {}", result);
-            return false;
-        }
-
         if (block.getNumber() >= config.traceStartBlock() && config.traceStartBlock() != -1) {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
         }
