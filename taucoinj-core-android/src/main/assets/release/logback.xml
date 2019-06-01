@@ -18,6 +18,7 @@
             <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
             <maxHistory>5</maxHistory>
             <totalSizeCap>100MB</totalSizeCap>
+             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
 
         <encoder>
