@@ -115,8 +115,8 @@ public class TaucoinService extends Service {
 
         @Override
         public void trace(String output) {
-
-            broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData(output));
+            // app don't care trace event.
+            // broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData(output));
         }
 
         @Override
@@ -138,24 +138,24 @@ public class TaucoinService extends Service {
         @Override
         public void onRecvMessage(Channel channel, Message message) {
 
-            broadcastEvent(EventFlag.EVENT_RECEIVE_MESSAGE, new MessageEventData(message.getClass(), message.getEncoded()));
+            //broadcastEvent(EventFlag.EVENT_RECEIVE_MESSAGE, new MessageEventData(message.getClass(), message.getEncoded()));
         }
 
         @Override
         public void onSendMessage(Channel channel, Message message) {
-            broadcastEvent(EventFlag.EVENT_SEND_MESSAGE, new MessageEventData(message.getClass(), message.getEncoded()));
+            //broadcastEvent(EventFlag.EVENT_SEND_MESSAGE, new MessageEventData(message.getClass(), message.getEncoded()));
         }
 
         @Override
         public void onPeerDisconnect(String host, long port) {
 
-            broadcastEvent(EventFlag.EVENT_PEER_DISCONNECT, new PeerDisconnectEventData(host, port));
+            //broadcastEvent(EventFlag.EVENT_PEER_DISCONNECT, new PeerDisconnectEventData(host, port));
         }
 
         @Override
         public void onPendingTransactionsReceived(List<Transaction> transactions) {
 
-            broadcastEvent(EventFlag.EVENT_PENDING_TRANSACTIONS_RECEIVED, new PendingTransactionsEventData(transactions));
+            //broadcastEvent(EventFlag.EVENT_PENDING_TRANSACTIONS_RECEIVED, new PendingTransactionsEventData(transactions));
         }
 
         @Override
@@ -165,25 +165,25 @@ public class TaucoinService extends Service {
         @Override
         public void onSyncDone() {
 
-            broadcastEvent(EventFlag.EVENT_SYNC_DONE, new EventData());
+            //broadcastEvent(EventFlag.EVENT_SYNC_DONE, new EventData());
         }
 
         @Override
         public void onNoConnections() {
 
-            broadcastEvent(EventFlag.EVENT_NO_CONNECTIONS, new EventData());
+            //broadcastEvent(EventFlag.EVENT_NO_CONNECTIONS, new EventData());
         }
 
         @Override
         public void onHandShakePeer(Channel channel, HelloMessage helloMessage) {
 
-            broadcastEvent(EventFlag.EVENT_HANDSHAKE_PEER, new MessageEventData(helloMessage.getClass(), helloMessage.getEncoded()));
+            //broadcastEvent(EventFlag.EVENT_HANDSHAKE_PEER, new MessageEventData(helloMessage.getClass(), helloMessage.getEncoded()));
         }
 
         @Override
         public void onEthStatusUpdated(Channel channel, StatusMessage status) {
 
-            broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData("Eth status update: " + status.toString()));
+            //broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData("Eth status update: " + status.toString()));
         }
 
         @Override
