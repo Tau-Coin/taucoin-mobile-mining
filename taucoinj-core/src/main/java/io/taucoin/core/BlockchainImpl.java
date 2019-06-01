@@ -933,6 +933,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Override
     public synchronized void setBestBlock(Block block) {
         bestBlock = block;
+        logger.info("Set best block with number {}, hash {}", bestBlock.getNumber(),
+                 Hex.toHexString(bestBlock.getHash()));
     }
 
     @Override

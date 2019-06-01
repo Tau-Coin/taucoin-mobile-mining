@@ -11,6 +11,7 @@ import org.mapdb.DataIO;
 import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -170,6 +171,8 @@ public class IndexedBlockStore implements BlockStore {
         index.put(block.getNumber(), blockInfos);
 
         blocks.put(block.getHash(), block.getEncoded());
+        logger.info("Save block with number {}, hash {}", block.getNumber(),
+                Hex.toHexString(block.getHash()));
     }
 
 
