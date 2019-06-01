@@ -481,8 +481,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         // keep chain continuity
         if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
             logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}",
-                    Hex.toHexString(bestBlock.getHash()).substring(0, 6),
-                    Hex.toHexString(block.getPreviousHeaderHash()).substring(0, 6));
+                    Hex.toHexString(bestBlock.getHash()),
+                    Hex.toHexString(block.getPreviousHeaderHash()));
             return false;
         }
 
