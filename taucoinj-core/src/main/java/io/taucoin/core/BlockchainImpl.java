@@ -19,6 +19,7 @@ import io.taucoin.validator.ParentBlockHeaderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
+import org.spongycastle.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -480,11 +481,14 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
 
         // keep chain continuity
-        if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
+        if (!java.util.Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
             logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}, raw array {}, {}",
                     Hex.toHexString(bestBlock.getHash()),
                     Hex.toHexString(block.getPreviousHeaderHash()),
                     bestBlock.getHash(), block.getPreviousHeaderHash());
+
+            boolean result = org.spongycastle.util.Arrays.areEqual(bestBlock.getHash(), block.getPreviousHeaderHash());
+            logger.error("spongycastle Arrays.areEqual result {}", result);
             return false;
         }
 
@@ -679,7 +683,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     private boolean verifyProofOfTransaction(Block block, Repository repo) {
         if (block.getNumber() == 0 ) {
             byte[] genesisHash = Hex.decode(Constants.GENESIS_BLOCK_HASH);
-            if (Arrays.equals(block.getHash(), genesisHash)) {
+            if (java.util.Arrays.equals(block.getHash(), genesisHash)) {
                 return true;
             } else {
                 logger.error("Genesis block hash is not right!!! ({})", block.getGenerationSignature());
@@ -935,8 +939,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Override
     public synchronized void setBestBlock(Block block) {
         bestBlock = block;
-        logger.info("Set best block with number {}, hash {}", bestBlock.getNumber(),
-                 Hex.toHexString(bestBlock.getHash()));
+        logger.info("Set best block with number {}, hash {}, raw {}", bestBlock.getNumber(),
+                 Hex.toHexString(bestBlock.getHash()), bestBlock.getHash());
     }
 
     @Override

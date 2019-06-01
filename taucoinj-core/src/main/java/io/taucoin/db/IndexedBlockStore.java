@@ -171,8 +171,8 @@ public class IndexedBlockStore implements BlockStore {
         index.put(block.getNumber(), blockInfos);
 
         blocks.put(block.getHash(), block.getEncoded());
-        logger.info("Save block with number {}, hash {}", block.getNumber(),
-                Hex.toHexString(block.getHash()));
+        logger.info("Save block with number {}, hash {}, raw {}", block.getNumber(),
+                Hex.toHexString(block.getHash()), block.getHash());
     }
 
 
