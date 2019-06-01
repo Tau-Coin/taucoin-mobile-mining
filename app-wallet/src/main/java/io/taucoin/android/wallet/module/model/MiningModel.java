@@ -64,7 +64,7 @@ import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("MiningModel");
-    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(10));
+    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(30));
     @Override
     public void getMiningInfo(LogicObserver<BlockInfo> observer) {
         Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {

@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.module.model;
 
 import com.github.naturs.logger.Logger;
 
+import io.reactivex.Scheduler;
 import io.taucoin.android.wallet.R;
 
 import org.spongycastle.util.encoders.Hex;
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -74,6 +76,8 @@ import io.taucoin.util.ByteUtil;
 
 public class TxModel implements ITxModel {
 
+    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(20));
+
     @Override
     public void getBalance(TxObserver<AccountBean> observer) {
         String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
@@ -82,7 +86,8 @@ public class TxModel implements ITxModel {
         NetWorkManager.createMainApiService(TransactionService.class)
             .getBalance(map)
             .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
             .subscribe(observer);
     }
 
@@ -101,7 +106,8 @@ public class TxModel implements ITxModel {
             }catch (Exception ignore){}
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -126,8 +132,9 @@ public class TxModel implements ITxModel {
                 }
             }
             emitter.onNext(lists);
-        }).subscribeOn(Schedulers.io())
-                .subscribe(observer);
+        }) .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
     }
 
     @Override
@@ -136,7 +143,8 @@ public class TxModel implements ITxModel {
         map.put("txids", txIds);
         NetWorkManager.createMainApiService(TransactionService.class)
             .getRawTransaction(map)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
             .subscribe(new TxObserver<TxDataBean>() {
                 @Override
                 public void handleData(TxDataBean resResult) {
@@ -297,7 +305,8 @@ public class TxModel implements ITxModel {
             transactionBean.setRawData(transaction);
             emitter.onNext(transactionBean);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -312,7 +321,8 @@ public class TxModel implements ITxModel {
         map.put("transaction", txHash);
         NetWorkManager.createMainApiService(TransactionService.class)
             .sendRawTransaction(map)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new TxObserver<NewTxBean>() {
                 @Override
@@ -368,7 +378,8 @@ public class TxModel implements ITxModel {
             TransactionHistoryDaoUtils.getInstance().insertOrReplace(transactionHistory);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -377,7 +388,8 @@ public class TxModel implements ITxModel {
             TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(logicObserver);
     }
 
@@ -391,7 +403,8 @@ public class TxModel implements ITxModel {
             List<TransactionHistory> result = TransactionHistoryDaoUtils.getInstance().queryData(pageNo, time, keyValue.getAddress());
             emitter.onNext(result);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(logicObserver);
     }
 
@@ -422,7 +435,8 @@ public class TxModel implements ITxModel {
                     NetWorkManager.createMainApiService(TransactionService.class)
                         .getTxRecords(map)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
+                        .subscribeOn(scheduler)
+                        .unsubscribeOn(scheduler)
                         .subscribe(observer);
                 }
             });
@@ -458,7 +472,8 @@ public class TxModel implements ITxModel {
             }
             emitter.onNext(true);
         }).observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -466,7 +481,8 @@ public class TxModel implements ITxModel {
     public void getBlockHeight(TxObserver<ChainBean> observer) {
         NetWorkManager.createMainApiService(TransactionService.class)
                 .getBlockHeight()
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
@@ -482,7 +498,8 @@ public class TxModel implements ITxModel {
             BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -490,7 +507,8 @@ public class TxModel implements ITxModel {
     public void getIncomeInfo(LogicObserver<Boolean> observer){
         NetWorkManager.createMainApiService(TransactionService.class)
             .getIncomeInfo()
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
             .subscribe(new TxObserver<IncomeInfoBean>() {
                 @Override
                 public void handleError(String msg, int msgCode) {

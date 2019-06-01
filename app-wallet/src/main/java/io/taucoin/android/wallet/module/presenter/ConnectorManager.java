@@ -18,6 +18,7 @@ package io.taucoin.android.wallet.module.presenter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Parcelable;
 
 import com.github.naturs.logger.Logger;
@@ -52,7 +53,7 @@ import io.taucoin.core.Transaction;
 public abstract class ConnectorManager implements ConnectorHandler {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("ConnectorManager");
-
+    private ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
     TaucoinConnector mTaucoinConnector = null;
 
     @SuppressLint("SimpleDateFormat")
@@ -93,7 +94,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
         Context context = MyApplication.getInstance();
         Intent intent = new Intent(context, RemoteService.class);
         intent.putExtra(TransmitKey.SERVICE_TYPE, TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS);
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 
     void cancelLocalConnector(){
@@ -188,7 +193,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void importPrivkeyAndInit(String privateKey){
         Logger.d("importPrivkeyAndInit");
-        ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
         initializer.schedule(new InitTask(mTaucoinConnector, mHandlerIdentifier, privateKey),
                 BOOT_UP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
     }
@@ -268,7 +272,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     public void startBlockForging(int targetAmount){
         Logger.d("startBlockForging=" + targetAmount);
-        ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
         initializer.schedule(new ForgingTask(mTaucoinConnector, targetAmount),
                 BOOT_UP_DELAY_FORGE_SECONDS, TimeUnit.SECONDS);
     }
