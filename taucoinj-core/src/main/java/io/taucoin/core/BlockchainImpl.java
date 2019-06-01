@@ -325,8 +325,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         Block preBlock = blockStore.getBlockByHash(block.getPreviousHeaderHash());
         if (preBlock == null) {
-            logger.error("Cannot find parent block! Block hash [{}], previous block hash [{}].",
-                    Hex.toHexString(block.getHash()), Hex.toHexString(block.getPreviousHeaderHash()));
+            logger.error("Cannot find parent block! Block hash [{}], previous block hash [{}], raw byte array {} {}.",
+                    Hex.toHexString(block.getHash()), Hex.toHexString(block.getPreviousHeaderHash()),
+                    block.getHash(), block.getPreviousHeaderHash());
             return NO_PARENT;
         }
 
@@ -480,9 +481,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         // keep chain continuity
         if (!Arrays.equals(bestBlock.getHash(), block.getPreviousHeaderHash())) {
-            logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}",
+            logger.error("Previous block hash isn't consistent with best block, best: {}, previous: {}, raw array {}, {}",
                     Hex.toHexString(bestBlock.getHash()),
-                    Hex.toHexString(block.getPreviousHeaderHash()));
+                    Hex.toHexString(block.getPreviousHeaderHash()),
+                    bestBlock.getHash(), block.getPreviousHeaderHash());
             return false;
         }
 
