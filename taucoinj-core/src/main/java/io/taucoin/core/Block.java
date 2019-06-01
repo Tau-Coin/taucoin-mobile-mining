@@ -40,6 +40,7 @@ public class Block {
 
     //160 bits, The SHA256 previous block header and RIPEMD 160 second 160 bits
     private byte[] previousHeaderHash;
+    private byte[] blockhash = null;
 
     /* Transactions */
     private List<Transaction> transactionsList = new CopyOnWriteArrayList<>();
@@ -216,9 +217,10 @@ public class Block {
 
     public byte[] getHash() {
         if (!parsed) parseRLP();
-        //current block hash (sha256 ripemd160)
-        //return HashUtil.ripemd160(HashUtil.sha256(this.getEncoded()));
-        return HashUtil.ripemd160(HashUtil.sha256(this.getHashEncoded()));
+        if (this.blockhash == null) {
+            this.blockhash = HashUtil.ripemd160(HashUtil.sha256(this.getHashEncoded()));
+        }
+        return this.blockhash;
     }
 
     public byte[] getPreviousHeaderHash() {
