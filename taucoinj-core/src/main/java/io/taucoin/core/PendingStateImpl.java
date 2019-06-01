@@ -1,5 +1,6 @@
 package io.taucoin.core;
 
+import io.taucoin.config.Constants;
 import io.taucoin.db.BlockStore;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
@@ -177,6 +178,16 @@ public class PendingStateImpl implements PendingState {
             tx.TRANSACTION_STATUS = "Invalid transaction in structure";
 			return false;
         }
+
+        // Verification of transaction time 
+        long lockTimeStart= System.currentTimeMillis() / 1000- Constants.MAX_TIMEDRIFT;
+        long lockTimeEND= System.currentTimeMillis() / 1000+ Constants.MAX_TIMEDRIFT;
+        long txTime= ByteUtil.byteArrayToLong(tx.getTime());
+        if((txTime < lockTimeStart) ||(txTime> lockTimeEND)){
+            logger.warn("Invalid transaction time: {}, contrast with system time: {}", txTime, System.currentTimeMillis() / 1000);
+		    return false;		  
+        }
+
         long expireTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
 
         if (expireTime > MaxExpireTime) {
@@ -204,7 +215,7 @@ public class PendingStateImpl implements PendingState {
             tx.TRANSACTION_STATUS = "Invalid transaction in time";
 			return false;
         }
-        
+
         TransactionExecutor executor = new TransactionExecutor(tx, getRepository(),blockchain,listener);
 
         return executor.init();
