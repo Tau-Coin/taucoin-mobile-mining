@@ -67,4 +67,12 @@ public class BlockInfoDaoUtils {
     public synchronized void insertOrReplace(BlockInfo blockInfo) {
         getBlockInfoDao().insertOrReplace(blockInfo);
     }
+
+    public void reloadBlocks() {
+        BlockInfo blockInfo = query();
+        if(blockInfo != null){
+            blockInfo.setBlockSync(0);
+            insertOrReplace(blockInfo);
+        }
+    }
 }

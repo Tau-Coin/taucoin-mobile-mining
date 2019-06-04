@@ -92,7 +92,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
         closeTaucoin();
 
         Context context = MyApplication.getInstance();
+        Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
         Intent intent = new Intent(context, RemoteService.class);
+        intent.putExtra("bean", parcelable);
         intent.putExtra(TransmitKey.SERVICE_TYPE, TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);

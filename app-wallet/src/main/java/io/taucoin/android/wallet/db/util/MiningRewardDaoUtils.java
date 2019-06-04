@@ -119,4 +119,8 @@ public class MiningRewardDaoUtils {
         qb.orderAsc(MiningRewardDao.Properties.Id);
         return qb.list();
     }
+
+    public void clear() {
+        getMiningRewardDao().deleteAll();
+    }
 }

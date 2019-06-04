@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.db.util;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.GreenDaoManager;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
@@ -104,5 +105,17 @@ public class KeyValueDaoUtils {
     public boolean updateMiningState(KeyValue keyValue) {
         long result = getKeyValueDao().insertOrReplace(keyValue);
         return result > -1;
+    }
+
+    public void reloadBlocks() {
+        List<KeyValue> list = getKeyValueDao().queryBuilder()
+                .list();
+        if(list.size() > 0){
+            for(KeyValue keyValue : list){
+                keyValue.setSyncBlockNum(0);
+                keyValue.setMiningState(TransmitKey.MiningState.Stop);
+                update(keyValue);
+            }
+        }
     }
 }

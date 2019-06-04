@@ -46,13 +46,13 @@ public class RemoteService extends TaucoinRemoteService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null){
+            NotifyManager.NotifyData mData = intent.getParcelableExtra("bean");
+            NotifyManager.getInstance().sendNotify(this, builder, mData);
+
             int type = intent.getIntExtra(TransmitKey.SERVICE_TYPE, -1);
             if(type == TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS){
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(0);
-            }else{
-                NotifyManager.NotifyData mData = intent.getParcelableExtra("bean");
-                NotifyManager.getInstance().sendNotify(this, builder, mData);
             }
         }
         return super.onStartCommand(intent, flags, startId);

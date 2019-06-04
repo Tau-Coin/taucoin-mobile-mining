@@ -164,7 +164,7 @@ public class NotifyManager {
 
     }
 
-    private synchronized void sendNotify(){
+    public synchronized void sendNotify(){
         if(mService == null){
             return;
         }

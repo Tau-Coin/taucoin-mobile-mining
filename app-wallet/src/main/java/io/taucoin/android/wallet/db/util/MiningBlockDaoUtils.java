@@ -84,4 +84,8 @@ public class MiningBlockDaoUtils {
             }
         }
     }
+
+    public void clear() {
+        getMiningBlockDao().deleteAll();
+    }
 }

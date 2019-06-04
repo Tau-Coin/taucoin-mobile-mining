@@ -223,7 +223,7 @@ public class TxService extends Service {
 
             @Override
             public void handleData(Boolean aBoolean) {
-                if(aBoolean){
+                if(MyApplication.getRemoteConnector().isInit()){
                     EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 }
             }
@@ -315,6 +315,7 @@ public class TxService extends Service {
         intent.setClass(context, TxService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
+            NotifyManager.getInstance().sendNotify();
         } else {
             context.startService(intent);
         }

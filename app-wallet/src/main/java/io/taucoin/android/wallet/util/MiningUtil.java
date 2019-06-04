@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.util;
 
+import android.content.Context;
 import android.text.Html;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.github.naturs.logger.Logger;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -38,6 +40,8 @@ import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
+import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
+import io.taucoin.android.wallet.db.util.MiningBlockDaoUtils;
 import io.taucoin.android.wallet.db.util.MiningRewardDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
@@ -48,6 +52,7 @@ import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
+import io.taucoin.foundation.util.ThreadPool;
 
 public class MiningUtil {
 
@@ -266,5 +271,32 @@ public class MiningUtil {
         }else{
             return 0;
         }
+    }
+
+    public static void clearAndReloadBlocks() {
+        MyApplication.getRemoteConnector().cancelRemoteConnector();
+        ThreadPool.getThreadPool().execute(() -> {
+            try {
+                Thread.sleep(5000);
+                Context context = MyApplication.getInstance();
+                String dataDir =  context.getApplicationInfo().dataDir;
+                Logger.d(dataDir);
+                String blocksDir = dataDir + File.separator + "blocks";
+                String stateDir = dataDir + File.separator + "state";
+                File blocksFile = new File(blocksDir);
+                FileUtil.deleteFile(blocksFile);
+                File stateFile = new File(stateDir);
+                FileUtil.deleteFile(stateFile);
+
+                MiningBlockDaoUtils.getInstance().clear();
+                MiningRewardDaoUtils.getInstance().clear();
+                BlockInfoDaoUtils.getInstance().reloadBlocks();
+                KeyValueDaoUtils.getInstance().reloadBlocks();
+                EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
+            }catch (Exception ex){
+                Logger.e(ex, "clearAndReloadBlocks is error");
+            }
+        });
     }
 }
