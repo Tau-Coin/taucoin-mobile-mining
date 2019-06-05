@@ -80,14 +80,6 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
-    public void waitingCancel(){
-        if(isInit == 0){
-            isInit = 2;
-        }else{
-            cancelRemoteConnector();
-        }
-    }
-
     public void cancelRemoteConnector(){
         if (mTaucoinConnector != null) {
             addLogEntry("Cancel Remote Connector...");

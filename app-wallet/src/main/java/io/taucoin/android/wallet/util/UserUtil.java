@@ -17,6 +17,7 @@ package io.taucoin.android.wallet.util;
 
 import android.text.Html;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
@@ -97,17 +98,21 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
-    public static void setPower(TextView tvPower, ProgressView ivMiningPower) {
-        if(tvPower == null || ivMiningPower == null){
+    public static void setPower(TextView tvPower, ProgressView ivMiningPower, Switch ivMiningSwitch) {
+        if(tvPower == null || ivMiningPower == null || ivMiningSwitch == null){
             return;
         }
         String power = "0";
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
             power = String.valueOf(keyValue.getPower());
-            if(keyValue.getPower() <= 0 || MyApplication.getRemoteConnector().getErrorCode() == 3){
+            if(keyValue.getPower() <= 0 || MyApplication.getRemoteConnector().getErrorCode() == 3 || !ivMiningSwitch.isChecked()){
                 ivMiningPower.setOff();
-                ivMiningPower.setEnabled(true);
+                if(!ivMiningSwitch.isChecked()){
+                    ivMiningPower.setEnabled(false);
+                }else{
+                    ivMiningPower.setEnabled(true);
+                }
             }else {
                 ivMiningPower.setOn();
                 ivMiningPower.setEnabled(false);
@@ -183,7 +188,7 @@ public class UserUtil {
         }
     }
 
-    public static void setBalanceAndSync(ProgressView ivMiningBalance, ProgressView ivMiningSync, Object data) {
+    public static void setBalanceAndSync(ProgressView ivMiningBalance, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data) {
         try{
             if(data != null){
                 BlockInfo blockInfo = (BlockInfo)data;
@@ -193,19 +198,27 @@ public class UserUtil {
                 if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
                     medianFee = new BigDecimal(blockInfo.getMedianFee());
                 }
-                if(balance.compareTo(medianFee) < 0 || MyApplication.getRemoteConnector().getErrorCode() == 4){
+                if(balance.compareTo(medianFee) < 0 || MyApplication.getRemoteConnector().getErrorCode() == 4 || !ivMiningSwitch.isChecked()){
                     ivMiningBalance.setOff();
-                    ivMiningBalance.setEnabled(true);
+                    if(!ivMiningSwitch.isChecked()){
+                        ivMiningBalance.setEnabled(false);
+                    }else {
+                        ivMiningBalance.setEnabled(true);
+                    }
                 }else {
                     ivMiningBalance.setOn();
                     ivMiningBalance.setEnabled(false);
                 }
-                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() == blockInfo.getBlockSync() ){
+                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() == blockInfo.getBlockSync() && ivMiningSwitch.isChecked()){
                     ivMiningSync.setOn();
                     ivMiningSync.setEnabled(false);
                 }else {
                     ivMiningSync.setOff();
-                    ivMiningSync.setEnabled(true);
+                    if(!ivMiningSwitch.isChecked()){
+                        ivMiningSync.setEnabled(false);
+                    }else{
+                        ivMiningSync.setEnabled(true);
+                    }
                 }
             }
         }catch (Exception ignore){

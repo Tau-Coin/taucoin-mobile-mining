@@ -167,13 +167,10 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     // import key and init return
                     case EVENT_TAUCOIN_CREATED:
                     case EVENT_TAUCOIN_EXIST:
-                        if(isInit == 2){
-                            cancelRemoteConnector();
-                        }else{
-                            isInit = 1;
-                            startSyncAll();
-                            startUpdatingRewardData();
-                        }
+                        isInit = 1;
+                        EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
+                        startSyncAll();
+                        startUpdatingRewardData();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");

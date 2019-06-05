@@ -47,6 +47,9 @@ public class RemoteService extends TaucoinRemoteService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null){
             NotifyManager.NotifyData mData = intent.getParcelableExtra("bean");
+            if(mData != null){
+                mData.miningState = TransmitKey.MiningState.Start;
+            }
             NotifyManager.getInstance().sendNotify(this, builder, mData);
 
             int type = intent.getIntExtra(TransmitKey.SERVICE_TYPE, -1);

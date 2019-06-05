@@ -106,6 +106,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ProgressView ivMiningPower;
     @BindView(R.id.iv_mining_sync)
     ProgressView ivMiningSync;
+    @BindView(R.id.tv_booting)
+    LoadingTextView tvBooting;
 
     private MiningPresenter miningPresenter;
     private MiningRewardAdapter mMiningRewardAdapter;
@@ -200,6 +202,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             return;
         }
         boolean isOn = ivMiningSwitch.isChecked();
+        // switch state
+        UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
+        handleMiningView();
+
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
         if(!isNotice){
             requestWriteLOgPermissions();
@@ -220,13 +226,17 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 if (refreshLayout != null && refreshLayout.isRefreshing()) {
                     refreshLayout.finishRefresh();
                 }
-                UserUtil.setPower(tvPower, ivMiningPower);
+                UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
                 UserUtil.setBalance(tvBalance);
                 break;
             case BLOCK_HEIGHT:
                 MiningUtil.setBlockHeight(tvChainHeight);
                 break;
             case MINING_INIT:
+                if(ivMiningSwitch != null){
+                    ivMiningSwitch.setEnabled(true);
+                    tvBooting.setVisibility(View.INVISIBLE);
+                }
                 handleMiningView();
             case MINING_INFO:
                 handleMiningView();
@@ -241,7 +251,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 UserUtil.setApplicationInfo(tvCPU, tvMemory, tvDataStorage, object.getData());
                 break;
             case MINING_INCOME:
-                UserUtil.setBalanceAndSync(ivMiningBalance, ivMiningSync, object.getData());
+                BlockInfo blockInfo = (BlockInfo) object.getData();
+                showMiningView(blockInfo);
                 break;
             default:
                 break;
@@ -298,7 +309,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             blockMined = MiningUtil.parseMinedBlocks(blockInfo);
             miners = StringUtil.getIntString(blockInfo.getMinerNo());
             medianFee = StringUtil.getIntString(blockInfo.getMedianFee());
-            UserUtil.setBalanceAndSync(ivMiningBalance, ivMiningSync, blockInfo);
+            UserUtil.setBalanceAndSync(ivMiningBalance, ivMiningSync, ivMiningSwitch, blockInfo);
         }
         tvSynchronized.setText(String.valueOf(blockSync));
         tvChainHeight.setText(String.valueOf(blockHeight));
@@ -330,8 +341,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                         if(isCanInit){
                             MyApplication.getRemoteConnector().init();
                         }
+                        if(!MyApplication.getRemoteConnector().isInit()){
+                            ivMiningSwitch.setEnabled(false);
+                            String booting = ResourcesUtil.getText(R.string.home_mining_booting);
+                            tvBooting.setLoadingText(booting);
+                            tvBooting.setVisibility(View.VISIBLE);
+                        }
                     }else{
-                        MyApplication.getRemoteConnector().waitingCancel();
+                        MyApplication.getRemoteConnector().cancelRemoteConnector();
                     }
                 }
             });
@@ -391,6 +408,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void onDestroy() {
         if(tvMiningSwitch != null){
             tvMined.closeLoading();
+            tvBooting.closeLoading();
         }
         super.onDestroy();
     }
