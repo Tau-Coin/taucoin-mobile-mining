@@ -202,8 +202,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             return;
         }
         boolean isOn = ivMiningSwitch.isChecked();
-        // switch state
-        UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
         handleMiningView();
 
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
@@ -252,7 +250,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case MINING_INCOME:
                 BlockInfo blockInfo = (BlockInfo) object.getData();
-                showMiningView(blockInfo);
+                showMiningView(blockInfo, false);
                 break;
             default:
                 break;
@@ -299,21 +297,38 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public void showMiningView(BlockInfo blockInfo){
+        showMiningView(blockInfo, true);
+    }
+
+    public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
         int blockSync  = 0;
         int blockMined  = 0;
         int blockHeight  = 0;
         int miners  = 0;
+
         if(blockInfo != null){
             blockHeight = blockInfo.getBlockHeight();
             blockSync = blockInfo.getBlockSync();
             blockMined = MiningUtil.parseMinedBlocks(blockInfo);
             miners = StringUtil.getIntString(blockInfo.getMinerNo());
             medianFee = StringUtil.getIntString(blockInfo.getMedianFee());
+
+            boolean isStopped = ivMiningBalance.isEnabled() || ivMiningPower.isEnabled() || ivMiningSync.isEnabled();
+            UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
             UserUtil.setBalanceAndSync(ivMiningBalance, ivMiningSync, ivMiningSwitch, blockInfo);
+            boolean isNeedRestart = !ivMiningBalance.isEnabled() && !ivMiningPower.isEnabled() && !ivMiningSync.isEnabled();
+            if(MyApplication.getRemoteConnector().isInit() && isStopped && isNeedRestart){
+                MyApplication.getRemoteConnector().startBlockForging();
+            }
         }
         tvSynchronized.setText(String.valueOf(blockSync));
         tvChainHeight.setText(String.valueOf(blockHeight));
         tvMiners.setText(String.valueOf(miners));
+
+        if(!isRefreshMined){
+            return;
+        }
+
         if(MyApplication.getRemoteConnector().isCalculatingMe()){
             tvMined.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
             tvMined.setLoadingText(ResourcesUtil.getText(R.string.home_mining_mined_calculating));

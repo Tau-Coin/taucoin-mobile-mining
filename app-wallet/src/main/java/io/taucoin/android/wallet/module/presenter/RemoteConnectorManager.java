@@ -170,6 +170,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         isInit = 1;
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
                         startSyncAll();
+                        startBlockForging();
                         startUpdatingRewardData();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
