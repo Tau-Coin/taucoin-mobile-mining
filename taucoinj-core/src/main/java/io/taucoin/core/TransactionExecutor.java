@@ -1,5 +1,6 @@
 package io.taucoin.core;
 
+import io.taucoin.config.Constants;
 import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.ByteUtil;
@@ -147,9 +148,12 @@ public class TransactionExecutor {
         logger.debug("in executation sender is {}", Hex.toHexString(tx.getSender()));
 
         // Receiver add balance
-        track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
+        String receiverHexAddress = Hex.toHexString(tx.getReceiveAddress());
+        if (!receiverHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+            track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
+        }
         outcome.setReceiveAddress(tx.getReceiveAddress());
-        logger.debug("in executation receiver is {}",Hex.toHexString(tx.getReceiveAddress()));
+        logger.debug("in executation receiver is {}", receiverHexAddress);
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
         logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
@@ -157,10 +161,13 @@ public class TransactionExecutor {
         AccountState senderAccountState = track.getAccountState(tx.getSender());
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
-            track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
+            String coinbaseHexAddress = Hex.toHexString(coinbase);
+            if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
+            }
             HashMap<byte[],Long> currentWintess = new HashMap<>();
             currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
-            logger.debug("in executation current wit {} fee is {}",Hex.toHexString(coinbase),
+            logger.debug("in executation current wit {} fee is {}", coinbaseHexAddress,
                     feeDistributor.getCurrentWitFee());
             outcome.setCurrentWintess(currentWintess);
 
@@ -168,10 +175,13 @@ public class TransactionExecutor {
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
             if (senderAccountState.getWitnessAddress() != null) {
                 // Transfer fees to last witness
-                track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
+                String witnessHexAddress = Hex.toHexString(senderAccountState.getWitnessAddress());
+                if (!witnessHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
+                }
                 HashMap<byte[],Long> lastWintess = new HashMap<>();
                 lastWintess.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
-                logger.debug("in executation last wit {} fee is {}",Hex.toHexString(senderAccountState.getWitnessAddress()),
+                logger.debug("in executation last wit {} fee is {}", witnessHexAddress,
                         feeDistributor.getLastWitFee());
                 outcome.setLastWintess(lastWintess);
             }
@@ -186,14 +196,19 @@ public class TransactionExecutor {
                 if (assDistributor.assDistributeFee()) {
                     ArrayList<byte[]> senderAssAddress = senderAccountState.getAssociatedAddress();
                     for (int i = 0; i < senderAssSize; ++i) {
+                        String senderHexAssAddress = Hex.toHexString(senderAssAddress.get(i));
                         if(i != senderAssSize -1) {
-                            track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getAverageShare()));
-                            logger.debug("in executation Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                            if (!senderHexAssAddress.equals(Constants.BURN_COIN_ADDR)) {
+                                track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getAverageShare()));
+                            }
+                            logger.debug("in executation Ass {} fee is {}", senderHexAssAddress,
                                     assDistributor.getAverageShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getAverageShare());
                         } else {
-                            track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getLastShare()));
-                            logger.debug("in executation last Ass {} fee is {}",Hex.toHexString(senderAssAddress.get(i)),
+                            if (!senderHexAssAddress.equals(Constants.BURN_COIN_ADDR)) {
+                                track.addBalance(senderAssAddress.get(i), toBI(assDistributor.getLastShare()));
+                            }
+                            logger.debug("in executation last Ass {} fee is {}", senderHexAssAddress,
                                     assDistributor.getLastShare());
                             outcome.updateSenderAssociated(senderAssAddress.get(i), assDistributor.getLastShare());
                         }
@@ -206,16 +221,20 @@ public class TransactionExecutor {
              */
             if (senderAccountState.getWitnessAddress() == null) {
                 // Transfer fees to current witness
-                track.addBalance(coinbase, toBI(feeDistributor.getLastWitFee()));
-                logger.debug("in executation special last wit {} fee is {}",Hex.toHexString(coinbase),
+                if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(coinbase, toBI(feeDistributor.getLastWitFee()));
+                }
+                logger.debug("in executation special last wit {} fee is {}", coinbaseHexAddress,
                         feeDistributor.getLastWitFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastWitFee());
             }
 
             if (senderAssSize == 0) {
                 // Transfer fees to current associate
-                track.addBalance(coinbase, toBI(feeDistributor.getLastAssociFee()));
-                logger.debug("in executation special last ass {} fee is {}",Hex.toHexString(coinbase),
+                if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(coinbase, toBI(feeDistributor.getLastAssociFee()));
+                }
+                logger.debug("in executation special last ass {} fee is {}", coinbaseHexAddress,
                         feeDistributor.getLastAssociFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
@@ -260,19 +279,29 @@ public class TransactionExecutor {
         track.addBalance(tx.getSender(), totalCost);
 
         // Subtract receiver balance
-        track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
+        String receiverHexAddress = Hex.toHexString(tx.getReceiveAddress());
+        if (!receiverHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+            track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
+        }
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
 
         AccountState senderAccountState = track.getAccountState(tx.getSender());
 
+        String coinbaseHexAddress = Hex.toHexString(coinbase);
+
         if (feeDistributor.distributeFee()) {
             // Transfer fees to forger
-            track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()).negate());
+            if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()).negate());
+            }
             if (senderAccountState.getWitnessAddress() != null) {
                 // Transfer fees to last witness
-                track.addBalance(senderAccountState.getWitnessAddress(),
-                        toBI(feeDistributor.getLastWitFee()).negate());
+                String witnessHexAddress = Hex.toHexString(senderAccountState.getWitnessAddress());
+                if (!witnessHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(senderAccountState.getWitnessAddress(),
+                            toBI(feeDistributor.getLastWitFee()).negate());
+                }
             }
 
             int size = senderAccountState.getAssociatedAddress().size();
@@ -283,12 +312,17 @@ public class TransactionExecutor {
 
                 if (assDistributor.assDistributeFee()) {
                     for (int i = 0; i < size; ++i) {
+                        String associateHexAddress = Hex.toHexString(senderAccountState.getAssociatedAddress().get(i));
                         if(i != size -1) {
-                            track.addBalance(senderAccountState.getAssociatedAddress().get(i),
-                                    toBI(assDistributor.getAverageShare()).negate());
+                            if (!associateHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                                track.addBalance(senderAccountState.getAssociatedAddress().get(i),
+                                        toBI(assDistributor.getAverageShare()).negate());
+                            }
                         } else {
-                            track.addBalance(senderAccountState.getAssociatedAddress().get(i),
-                                    toBI(assDistributor.getLastShare()).negate());
+                            if (!associateHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                                track.addBalance(senderAccountState.getAssociatedAddress().get(i),
+                                        toBI(assDistributor.getLastShare()).negate());
+                            }
                         }
                     }
                 }
@@ -299,14 +333,18 @@ public class TransactionExecutor {
              */
             if (senderAccountState.getWitnessAddress() == null) {
                 // Transfer fees to last witness
-                track.addBalance(coinbase,
-                        toBI(feeDistributor.getLastWitFee()).negate());
+                if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(coinbase,
+                            toBI(feeDistributor.getLastWitFee()).negate());
+                }
             }
 
             if (size == 0) {
                 // Transfer fees to last associate
-                track.addBalance(coinbase,
-                        toBI(feeDistributor.getLastAssociFee()).negate());
+                if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
+                    track.addBalance(coinbase,
+                            toBI(feeDistributor.getLastAssociFee()).negate());
+                }
             }
         }
 
