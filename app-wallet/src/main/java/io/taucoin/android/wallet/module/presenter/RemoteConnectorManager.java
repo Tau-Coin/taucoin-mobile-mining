@@ -46,7 +46,6 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
-import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.core.TransactionExecuatedOutcome;
@@ -54,8 +53,6 @@ import io.taucoin.core.Utils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.TrafficUtil;
 import io.taucoin.net.p2p.HelloMessage;
-
-import static io.taucoin.android.service.events.EventFlag.EVENT_TAUCOIN_CREATED;
 
 public class RemoteConnectorManager extends ConnectorManager implements ConnectorHandler {
 
@@ -170,11 +167,13 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     // import key and init return
                     case EVENT_TAUCOIN_CREATED:
                     case EVENT_TAUCOIN_EXIST:
-                        NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Start);
-                        isInit = true;
-                        startSyncAll();
-                        EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
-                        startUpdatingRewardData();
+                        if(isInit == 2){
+                            cancelRemoteConnector();
+                        }else{
+                            isInit = 1;
+                            startSyncAll();
+                            startUpdatingRewardData();
+                        }
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -272,7 +271,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 submitTransactionResult(transaction);
                 break;
             case TaucoinClientMessage.MSG_CLOSE_DONE:
-                NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Stop);
                 cancelLocalConnector();
                 EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
                 break;

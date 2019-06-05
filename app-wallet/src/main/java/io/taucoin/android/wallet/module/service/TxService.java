@@ -30,6 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
@@ -219,13 +220,14 @@ public class TxService extends Service {
     }
 
     private void getIncomeInfo() {
-        mTxModel.getIncomeInfo(new LogicObserver<Boolean>(){
+        mTxModel.getIncomeInfo(new LogicObserver<BlockInfo>(){
 
             @Override
-            public void handleData(Boolean aBoolean) {
-                if(MyApplication.getRemoteConnector().isInit()){
-                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                }
+            public void handleData(BlockInfo blockInfo) {
+                MessageEvent messageEvent = new MessageEvent();
+                messageEvent.setData(blockInfo);
+                messageEvent.setCode(MessageEvent.EventCode.MINING_INCOME);
+                EventBusUtil.post(messageEvent);
             }
         });
     }

@@ -269,8 +269,7 @@ public class NotifyManager {
                 break;
             case ACTION_NOTIFICATION_MINING:
                 if(StringUtil.isNotSame(serviceType, TransmitKey.MiningState.LOADING)){
-                    sendNotify(TransmitKey.MiningState.LOADING);
-                    updateMiningState();
+                    updateMiningState(serviceType);
                     Logger.d("NotificationReceiver immediate enter MainActivity");
                 }
                 break;
@@ -306,9 +305,12 @@ public class NotifyManager {
         }
     }
 
-    private void updateMiningState() {
-        EventBusUtil.post(MessageEvent.EventCode.NOTIFY_MINING);
-        new MiningModel().updateMiningState(new LogicObserver<Boolean>() {
+    private void updateMiningState(String serviceType) {
+        boolean isOn = StringUtil.isSame(serviceType, TransmitKey.MiningState.Start);
+        isOn = !isOn;
+        String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
+        sendNotify(miningState);
+        new MiningModel().updateMiningState(miningState, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean aBoolean) {
                 boolean isStart = false;
@@ -317,9 +319,12 @@ public class NotifyManager {
                     isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                 }
                 if(isStart){
-                    MyApplication.getRemoteConnector().init();
+                    boolean isCanInit = MyApplication.getRemoteConnector().isCanInit();
+                    if(isCanInit){
+                        MyApplication.getRemoteConnector().init();
+                    }
                 }else{
-                    MyApplication.getRemoteConnector().cancelRemoteConnector();
+                    MyApplication.getRemoteConnector().waitingCancel();
                 }
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
             }

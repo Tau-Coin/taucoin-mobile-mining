@@ -86,17 +86,13 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void updateMiningState(LogicObserver<Boolean> observer) {
+    public void updateMiningState(String miningState, LogicObserver<Boolean> observer) {
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
             boolean isSuccess = false;
             if(entry != null){
-                String state = TransmitKey.MiningState.Start;
-                if(StringUtil.isSame(entry.getMiningState(), state)){
-                    state = TransmitKey.MiningState.Stop;
-                }
-                entry.setMiningState(state);
+                entry.setMiningState(miningState);
                 isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
             }
             emitter.onNext(isSuccess);

@@ -66,7 +66,7 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_generate_key)
     public void onBtnGenerateClicked() {
-        if(MyApplication.getRemoteConnector().isInit()){
+        if(!MyApplication.getRemoteConnector().isCanInit()){
             ToastUtils.showShortToast(R.string.mining_generate_private_key);
             return;
         }

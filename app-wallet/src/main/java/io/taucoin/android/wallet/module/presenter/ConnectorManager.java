@@ -61,7 +61,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     String mHandlerIdentifier = UUID.randomUUID().toString();
     private String mConsoleLog = "";
     private boolean isTaucoinConnected = false;
-    boolean isInit = false;
+    int isInit = -1;
     int isSyncMe = -1;
     BlockForgeExceptionStopEvent mExceptionStop;
 
@@ -80,10 +80,19 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
+    public void waitingCancel(){
+        if(isInit == 0){
+            isInit = 2;
+        }else{
+            cancelRemoteConnector();
+        }
+    }
+
     public void cancelRemoteConnector(){
         if (mTaucoinConnector != null) {
             addLogEntry("Cancel Remote Connector...");
             closeTaucoin();
+            cancelLocalConnector();
         }
     }
 
@@ -109,14 +118,18 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.unbindService();
             mTaucoinConnector = null;
         }
-        isInit = false;
+        isInit = -1;
         isSyncMe = -1;
         isTaucoinConnected = false;
         mExceptionStop = null;
     }
 
     public boolean isInit() {
-        return isInit;
+        return isInit == 1;
+    }
+
+    public boolean isCanInit() {
+        return isInit == -1;
     }
 
     public boolean isError() {
@@ -145,9 +158,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
             isTaucoinConnected = true;
             mTaucoinConnector.addListener(mHandlerIdentifier, EnumSet.allOf(EventFlag.class));
 
-            if(!isInit){
-                init();
-            }
+            isInit = -1;
+            init();
         }
     }
 
@@ -163,7 +175,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
                 addLogEntry("Connector Disconnected");
                 mTaucoinConnector.removeListener(mHandlerIdentifier);
                 isTaucoinConnected = false;
-                isInit = false;
+                isInit = -1;
                 isSyncMe = -1;
             }
         }catch (Exception ignore){}
@@ -361,11 +373,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
             String privateKey = MyApplication.getKeyValue().getPriKey();
             // import privateKey and init
             if(isTaucoinConnected){
-                if(isInit){
+                if(isInit()){
                     importForgerPrivkey(privateKey);
                     startSyncAll();
                 }else{
-                    importPrivkeyAndInit(privateKey);
+                    if(isCanInit()){
+                        isInit = 0;
+                        importPrivkeyAndInit(privateKey);
+                    }
                 }
             }else{
                 createRemoteConnector();

@@ -17,11 +17,16 @@ import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.InputDialog;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
+
+import static android.os.Build.VERSION_CODES.M;
 
 public class SettingActivity extends BaseActivity {
 
@@ -46,14 +51,29 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.tv_trans_expiry})
+    @OnClick({R.id.tv_trans_expiry,  R.id.tv_reset_data})
     void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_trans_expiry:
                 showInputDialog();
                 break;
+            case R.id.tv_reset_data:
+                resetData();
+                break;
             default:
                 break;
+        }
+    }
+
+    private void resetData() {
+        if(UserUtil.isImportKey()){
+            KeyValue KeyValue = MyApplication.getKeyValue();
+            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
+                ToastUtils.showShortToast(R.string.mining_import_private_key);
+                return;
+            }
+            ProgressManager.showProgressDialog(this);
+            MiningUtil.clearAndReloadBlocks();
         }
     }
 

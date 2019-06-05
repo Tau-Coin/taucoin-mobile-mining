@@ -47,4 +47,9 @@
         <attr name="empty_textSize" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="ProgressView">
+        <attr name="center_text" format="string" />
+        <attr name="center_image" format="string" />
+    </declare-styleable>
+
 </resources>

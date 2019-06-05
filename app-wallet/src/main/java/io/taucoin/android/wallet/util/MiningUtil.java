@@ -35,7 +35,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
-import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.MiningBlock;
 import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
@@ -51,8 +50,6 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.StringUtil;
-import io.taucoin.foundation.util.ThreadPool;
 
 public class MiningUtil {
 
@@ -214,70 +211,9 @@ public class MiningUtil {
             });
     }
 
-    public static void setMiningErrorMsg(TextView tvErrorMsg,  BlockInfo blockInfo) {
-        if(tvErrorMsg == null || blockInfo == null){
-            return;
-        }
-        int errorCode = MyApplication.getRemoteConnector().getErrorCode();
-        String errorMsg = "";
-        if(errorCode == 3 || getErrorCode(blockInfo) == 3){
-            errorMsg = ResourcesUtil.getText(R.string.mining_power_zero);
-        }else if(errorCode == 4 || getErrorCode(blockInfo) == 4){
-            errorMsg = ResourcesUtil.getText(R.string.mining_balance_low);
-        }
-        if(StringUtil.isNotEmpty(errorMsg)){
-            String medianFee = BigInteger.ZERO.toString();
-            if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
-                medianFee = String.valueOf(blockInfo.getMedianFee());
-            }
-            medianFee = FmtMicrometer.fmtFormat(medianFee);
-            errorMsg = String.format(errorMsg, medianFee);
-        }
-        tvErrorMsg.setText(errorMsg);
-    }
-
-    public static boolean isError(BlockInfo blockInfo) {
-        int errorCode = getErrorCode(blockInfo);
-        return errorCode != -1 && errorCode != 0;
-    }
-
-    public static boolean isCanMining(BlockInfo blockInfo) {
-        int errorCode = getErrorCode(blockInfo);
-        return errorCode == 0;
-    }
-
-    public static boolean isSynchronized(BlockInfo blockInfo) {
-        if(blockInfo == null){
-            return false;
-        }
-        return blockInfo.getBlockHeight() == blockInfo.getBlockSync();
-    }
-
-    private static int getErrorCode(BlockInfo blockInfo) {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(blockInfo == null || keyValue == null ||
-            blockInfo.getBlockHeight() != blockInfo.getBlockSync()){
-            return -1;
-        }
-        BigDecimal balance = new BigDecimal(keyValue.getBalance());
-        BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
-        if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
-            medianFee = new BigDecimal(blockInfo.getMedianFee());
-        }
-        if(keyValue.getPower() <= 0){
-            return 3;
-        }else if(balance.compareTo(medianFee) < 0){
-            return 4;
-        }else{
-            return 0;
-        }
-    }
-
     public static void clearAndReloadBlocks() {
-        MyApplication.getRemoteConnector().cancelRemoteConnector();
-        ThreadPool.getThreadPool().execute(() -> {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
-                Thread.sleep(5000);
                 Context context = MyApplication.getInstance();
                 String dataDir =  context.getApplicationInfo().dataDir;
                 Logger.d(dataDir);
@@ -294,9 +230,24 @@ public class MiningUtil {
                 KeyValueDaoUtils.getInstance().reloadBlocks();
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
+                emitter.onNext(true);
             }catch (Exception ex){
+                emitter.onNext(false);
                 Logger.e(ex, "clearAndReloadBlocks is error");
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<Boolean>() {
+                @Override
+                public void handleData(Boolean isSuccess) {
+                    Logger.d("MiningUtil.clearAndReloadBlocks=" + isSuccess);
+                    ProgressManager.closeProgressDialog();
+                    if(isSuccess){
+                        ToastUtils.showShortToast(R.string.setting_reset_data_success);
+                    }else {
+                        ToastUtils.showShortToast(R.string.setting_reset_data_fail);
+                    }
+                }
+            });
     }
 }

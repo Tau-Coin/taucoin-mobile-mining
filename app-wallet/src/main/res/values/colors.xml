@@ -26,5 +26,8 @@
     <color name="color_grey_dark">#3a3a3a</color>
     <color name="color_grey_light">#808080</color>
     <color name="color_grey_normal">#696969</color>
+    <color name="color_home_grey_light">#eaeaea</color>
+    <color name="color_home_grey_dark">#8a8a8a</color>
+    <color name="color_home_green">#7cba59</color>
 
 </resources>

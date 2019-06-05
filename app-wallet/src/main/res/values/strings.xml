@@ -135,15 +135,17 @@
         Please allow installation of TAUcoin.
     </string>
 
-    <string name="home_mining_on">Mining</string>
-    <string name="home_mining_pause">Pause</string>
-    <string name="home_mining_off">Off</string>
-    <string name="home_mining_connecting">Connecting</string>
-    <string name="home_mining_synchronizing">Synchronizing</string>
+    <string name="home_mining_balance">Balance</string>
+    <string name="home_mining_power">Power</string>
+    <string name="home_mining_sync">Synced</string>
+    <string name="home_mining_on">Mining&#160;\nOn</string>
+    <string name="home_mining_off">Mining&#160;\nOff</string>
+    <string name="home_mining_booting">Booting</string>
 
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
+    <string name="home_miners">Miners&#160;Online</string>
     <string name="home_synchronized">Latest&#160;Block</string>
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
@@ -173,12 +175,6 @@
     <string name="block_transaction_id">Transaction&#160;ID&#160;&#160;</string>
     <string name="bloc_transaction_fee">Transaction&#160;Fee&#160;&#160;%sTAU</string>
 
-    <!--<string name="bloc_in_synchronization">Synchronizing Block Data</string>-->
-    <!--<string name="mining_init_data">Initializing Database</string>-->
-    <!--<string name="mining_sync_block">Synchronizing Block Data</string>-->
-    <!--<string name="mining_in_progress">Mining in progress</string>-->
-    <!--<string name="mining_generation_rate">Current block generation rate: 5 min/block.</string>-->
-    <!--<string name="mining_mining_internal">Expected block time</string>-->
     <string name="income_miner">New block reward %s TAU.</string>
     <string name="income_miner_participant">New block and transaction participation reward %s TAU.</string>
     <string name="income_participant">Transaction participation reward %s TAU.</string>
@@ -188,11 +184,15 @@
     <string name="mining_import_private_key">Please stop mining first</string>
     <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_balance_low">Total Balance need to be higher than \"Median Transaction Fee Of Latest 144 Blocks\" %s TAU for mining.</string>
-    <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0, and keep Total Balance higher than \"Median Transaction Fee Of Latest 144 Blocks\" %s TAU for mining.</string>
+    <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
+    <string name="mining_sync_complete">\"Latest Block\" need to be equal to \"Total Balance\" for mining.</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
     <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
+    <string name="setting_reset_data">Reset Blockchain Data</string>
+    <string name="setting_reset_data_success">Successful</string>
+    <string name="setting_reset_data_fail">Failed</string>
 
 </resources>

@@ -41,8 +41,8 @@ public class MiningPresenter {
         mMiningModel.getMiningInfo(logicObserver);
     }
 
-    public void updateMiningState() {
-        mMiningModel.updateMiningState(new LogicObserver<Boolean>() {
+    public void updateMiningState(String miningState) {
+        mMiningModel.updateMiningState(miningState, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 mHomeView.handleMiningView();

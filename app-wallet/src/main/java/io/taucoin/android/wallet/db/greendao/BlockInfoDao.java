@@ -29,6 +29,7 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         public final static Property BlockSync = new Property(2, int.class, "blockSync", false, "BLOCK_SYNC");
         public final static Property AvgIncome = new Property(3, String.class, "avgIncome", false, "AVG_INCOME");
         public final static Property MedianFee = new Property(4, String.class, "medianFee", false, "MEDIAN_FEE");
+        public final static Property MinerNo = new Property(5, String.class, "minerNo", false, "MINER_NO");
     }
 
 
@@ -48,7 +49,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
                 "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 1: blockHeight
                 "\"BLOCK_SYNC\" INTEGER NOT NULL ," + // 2: blockSync
                 "\"AVG_INCOME\" TEXT," + // 3: avgIncome
-                "\"MEDIAN_FEE\" TEXT);"); // 4: medianFee
+                "\"MEDIAN_FEE\" TEXT," + // 4: medianFee
+                "\"MINER_NO\" TEXT);"); // 5: minerNo
     }
 
     /** Drops the underlying database table. */
@@ -77,6 +79,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         if (medianFee != null) {
             stmt.bindString(5, medianFee);
         }
+ 
+        String minerNo = entity.getMinerNo();
+        if (minerNo != null) {
+            stmt.bindString(6, minerNo);
+        }
     }
 
     @Override
@@ -99,6 +106,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         if (medianFee != null) {
             stmt.bindString(5, medianFee);
         }
+ 
+        String minerNo = entity.getMinerNo();
+        if (minerNo != null) {
+            stmt.bindString(6, minerNo);
+        }
     }
 
     @Override
@@ -113,7 +125,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
             cursor.getInt(offset + 1), // blockHeight
             cursor.getInt(offset + 2), // blockSync
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // avgIncome
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // medianFee
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // medianFee
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // minerNo
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         entity.setBlockSync(cursor.getInt(offset + 2));
         entity.setAvgIncome(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setMedianFee(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setMinerNo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

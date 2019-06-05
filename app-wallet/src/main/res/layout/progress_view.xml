@@ -27,4 +27,14 @@
         android:contentDescription="@null"
         android:src="@mipmap/icon_connecting"
         android:layout_centerInParent="true" />
+
+    <TextView
+        style="@style/style_middle_white"
+        android:id="@+id/center_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="1dp"
+        android:gravity="center_horizontal|center"
+        android:contentDescription="@null"
+        android:layout_centerInParent="true" />
 </RelativeLayout>

@@ -15,7 +15,7 @@ public interface IMiningModel {
     /** Get mining information */
     void getMiningInfo(LogicObserver<BlockInfo> observer);
     /** update or save mining state */
-    void updateMiningState(LogicObserver<Boolean> observer);
+    void updateMiningState(String miningState, LogicObserver<Boolean> observer);
     /** update or save current synchronized block */
     void updateSynchronizedBlockNum(int blockSynchronized, LogicObserver<Boolean> observer);
     /** update my mining block */

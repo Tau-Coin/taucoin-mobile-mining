@@ -20,12 +20,19 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import io.taucoin.android.wallet.R;
 
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.service.NotifyManager;
+import io.taucoin.android.wallet.widget.LoadingTextView;
+import io.taucoin.android.wallet.widget.ProgressView;
 import io.taucoin.foundation.util.StringUtil;
 
 public class UserUtil {
@@ -90,14 +97,21 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
-    public static void setPower(TextView tvPower) {
-        if(tvPower == null){
+    public static void setPower(TextView tvPower, ProgressView ivMiningPower) {
+        if(tvPower == null || ivMiningPower == null){
             return;
         }
         String power = "0";
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
             power = String.valueOf(keyValue.getPower());
+            if(keyValue.getPower() <= 0 || MyApplication.getRemoteConnector().getErrorCode() == 3){
+                ivMiningPower.setOff();
+                ivMiningPower.setEnabled(true);
+            }else {
+                ivMiningPower.setOn();
+                ivMiningPower.setEnabled(false);
+            }
         }
         tvPower.setText(power);
         Logger.d("UserUtil.setPower=" + power);
@@ -162,6 +176,36 @@ public class UserUtil {
                 if(StringUtil.isNotEmpty(notifyData.netDataSize)){
                     String dataSize = notifyData.netDataSize.substring(0, notifyData.netDataSize.length() - 1);
                     tvDataStorage.setText(dataSize);
+                }
+            }
+        }catch (Exception ignore){
+
+        }
+    }
+
+    public static void setBalanceAndSync(ProgressView ivMiningBalance, ProgressView ivMiningSync, Object data) {
+        try{
+            if(data != null){
+                BlockInfo blockInfo = (BlockInfo)data;
+                KeyValue keyValue = MyApplication.getKeyValue();
+                BigDecimal balance = new BigDecimal(keyValue.getBalance());
+                BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
+                if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
+                    medianFee = new BigDecimal(blockInfo.getMedianFee());
+                }
+                if(balance.compareTo(medianFee) < 0 || MyApplication.getRemoteConnector().getErrorCode() == 4){
+                    ivMiningBalance.setOff();
+                    ivMiningBalance.setEnabled(true);
+                }else {
+                    ivMiningBalance.setOn();
+                    ivMiningBalance.setEnabled(false);
+                }
+                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() == blockInfo.getBlockSync() ){
+                    ivMiningSync.setOn();
+                    ivMiningSync.setEnabled(false);
+                }else {
+                    ivMiningSync.setOff();
+                    ivMiningSync.setEnabled(true);
                 }
             }
         }catch (Exception ignore){

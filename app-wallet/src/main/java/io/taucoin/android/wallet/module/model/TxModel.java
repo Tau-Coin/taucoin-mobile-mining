@@ -510,17 +510,12 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getIncomeInfo(LogicObserver<Boolean> observer){
+    public void getIncomeInfo(LogicObserver<BlockInfo> observer){
         NetWorkManager.createMainApiService(TransactionService.class)
             .getIncomeInfo()
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
             .subscribe(new TxObserver<IncomeInfoBean>() {
-                @Override
-                public void handleError(String msg, int msgCode) {
-                    observer.onNext(false);
-                }
-
                 @Override
                 public void handleData(IncomeInfoBean incomeInfoBean) {
                     if(incomeInfoBean != null && incomeInfoBean.getStatus() == 200 &&
@@ -531,16 +526,14 @@ public class TxModel implements ITxModel {
                             blockInfo = new BlockInfo();
                         }
                         if(StringUtil.isNotSame(blockInfo.getAvgIncome(), incomeBean.getAvgIncome()) ||
-                                StringUtil.isNotSame(blockInfo.getMedianFee(), incomeBean.getMedianFee())){
+                                StringUtil.isNotSame(blockInfo.getMedianFee(), incomeBean.getMedianFee()) ||
+                                StringUtil.isNotSame(blockInfo.getMinerNo(), incomeBean.getMinerNo())){
                             blockInfo.setAvgIncome(incomeBean.getAvgIncome());
                             blockInfo.setMedianFee(incomeBean.getMedianFee());
+                            blockInfo.setMinerNo(incomeBean.getMinerNo());
                             BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
-                            observer.onNext(true);
-                        }else{
-                            observer.onNext(false);
                         }
-                    }else{
-                        observer.onNext(false);
+                        observer.onNext(blockInfo);
                     }
                 }
             });

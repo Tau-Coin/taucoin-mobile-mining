@@ -87,13 +87,17 @@ public class DialogManager {
         void onClick(View view);
     }
 
-    public static void showTipDialog(FragmentActivity activity, int msgRes) {
+    public static void showTipDialog(FragmentActivity activity, String msg) {
         TextView textView = new TextView(activity);
         textView.setTextAppearance(activity, R.style.style_normal_grey_dark);
-        textView.setText(msgRes);
+        textView.setText(msg);
         textView.setLineSpacing(5.0f, 1.2f);
         new CommonDialog.Builder(activity)
-            .setContentView(textView)
-            .create().show();
+                .setContentView(textView)
+                .create().show();
+    }
+
+    public static void showTipDialog(FragmentActivity activity, int msgRes) {
+        showTipDialog(activity, ResourcesUtil.getText(msgRes));
     }
 }
