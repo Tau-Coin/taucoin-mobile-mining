@@ -214,7 +214,7 @@ public class UserUtil {
                     ivMiningBalance.setOn();
                     ivMiningBalance.setEnabled(false);
                 }
-                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() == blockInfo.getBlockSync() && ivMiningSwitch.isChecked()){
+                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync() && ivMiningSwitch.isChecked()){
                     ivMiningSync.setOn();
                     ivMiningSync.setEnabled(false);
                 }else {
