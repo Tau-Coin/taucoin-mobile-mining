@@ -120,6 +120,7 @@ public class TaucoinRemoteService extends TaucoinService {
         // super.onDestroy will call taucoin.close()
         super.onDestroy();
         unregisterNetworkStateListener();
+        clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
     }
@@ -131,6 +132,7 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.close();
             taucoin = null;
         }
+        clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
     }
@@ -782,6 +784,11 @@ public class TaucoinRemoteService extends TaucoinService {
                 listeners = new ArrayList<>();
                 shouldAdd = true;
             }
+
+            // If exists, remove the older one.
+            if (listeners.contains(identifier)) {
+                listeners.remove(identifier);
+            }
             if (shouldAdd || !listeners.contains(identifier)) {
                 listeners.add(identifier);
                 listenersByType.put(flag, listeners);
@@ -809,6 +816,11 @@ public class TaucoinRemoteService extends TaucoinService {
         logger.info("Client listener unregistered!");
     }
 
+    private static void clearListeners() {
+        clientListeners.clear();
+        listenersByType.clear();
+    }
+
     /**
      * Closes taucoin
      *
@@ -821,6 +833,8 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.close();
             taucoin = null;
         }
+
+        clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
 
