@@ -38,7 +38,10 @@ public class HashUtil {
      * @return - sha256 hash of the data
      */
     public static byte[] sha256(byte[] input) {
-        return sha256digest.digest(input);
+        synchronized (sha256digest) {
+            sha256digest.reset();
+            return sha256digest.digest(input);
+        }
     }
 
     public static byte[] sha3(byte[] input) {
