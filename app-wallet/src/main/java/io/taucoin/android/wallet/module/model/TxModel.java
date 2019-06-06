@@ -79,7 +79,7 @@ public class TxModel implements ITxModel {
     private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(20));
 
     @Override
-    public void getBalance(TxObserver<AccountBean> observer) {
+    public void getBalance(LogicObserver<KeyValue> observer) {
         String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  rawAddress);
@@ -88,19 +88,39 @@ public class TxModel implements ITxModel {
             .subscribeOn(Schedulers.io())
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
-            .subscribe(observer);
+            .subscribe(new TxObserver<AccountBean>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    observer.handleError(msgCode, msg);
+                }
+
+                @Override
+                public void handleData(AccountBean accountBean) {
+                    super.handleData(accountBean);
+                    if(accountBean != null && accountBean.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
+                        updateBalance(rawAddress, accountBean, observer);
+                    }else{
+                        observer.onError();
+                    }
+                }
+            });
     }
 
-    @Override
-    public void updateBalance(AccountBean accountInfo, LogicObserver<KeyValue> observer) {
+    private void updateBalance(String rawAddress, AccountBean accountInfo, LogicObserver<KeyValue> observer) {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-
+        String currentAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
             try {
-                if(accountInfo != null && StringUtil.isNotEmpty(accountInfo.getAccountInfo())){
-                    keyValue.setBalance(accountInfo.getBalance().longValue());
-                    keyValue.setPower(accountInfo.getPower().longValue());
+                if(accountInfo != null && StringUtil.isSame(rawAddress, currentAddress)){
+                    long balance = 0;
+                    long power = 0;
+                    if(StringUtil.isNotEmpty(accountInfo.getAccountInfo())){
+                        balance = accountInfo.getBalance().longValue();
+                        power = accountInfo.getPower().longValue();
+                    }
+                    keyValue.setBalance(balance);
+                    keyValue.setPower(power);
                     KeyValueDaoUtils.getInstance().update(keyValue);
                 }
             }catch (Exception ignore){}

@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="10dp"
                 android:baselineAligned="true"
-                android:paddingEnd="10dp"
+                android:paddingEnd="2dp"
                 android:paddingTop="25dp"
                 android:orientation="horizontal">
 
@@ -88,49 +88,54 @@
 
                 </FrameLayout>
 
-                <RelativeLayout
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_weight="1.8"
-                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1.85"
                     android:layout_height="wrap_content">
 
-                    <Switch
-                        android:layout_toStartOf="@+id/tv_mining_switch"
-                        android:id="@+id/iv_mining_switch"
+                    <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:switchMinWidth="80dp"
-                        android:track="@drawable/grey_switch_rect_round_bg"
-                        android:thumb="@drawable/shape_switch_white"
-                        android:textOn="    "
-                        android:textOff="    "
-                        android:checked="false"
-                        android:layout_height="40dp" />
+                        android:layout_gravity="center_horizontal|center"
+                        android:paddingTop="10dp"
+                        android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/tv_mining_switch"
-                        style="@style/style_middle_grey_dark"
-                        android:layout_width="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal|center"
-                        android:layout_marginStart="2dp"
-                        android:layout_alignParentEnd="true"
-                        android:text="@string/home_mining_off"
-                        tools:ignore="RelativeOverlap" />
+                        <Switch
+                            android:id="@+id/iv_mining_switch"
+                            android:layout_width="wrap_content"
+                            android:switchMinWidth="70dp"
+                            android:track="@drawable/grey_switch_rect_round_bg"
+                            android:thumb="@drawable/shape_switch_white"
+                            android:textOn="    "
+                            android:textOff="    "
+                            android:checked="false"
+                            android:layout_height="40dp" />
 
-                    <io.taucoin.android.wallet.widget.LoadingTextView
-                        style="@style/style_middle_yellow"
-                        android:id="@+id/tv_booting"
-                        android:visibility="invisible"
-                        android:layout_toStartOf="@+id/tv_mining_switch"
-                        android:layout_below="@+id/iv_mining_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:minWidth="80dp"
-                        android:gravity="center_horizontal|center"
-                        android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_toEndOf="@+id/iv_mining_switch"
+                            android:id="@+id/tv_mining_switch"
+                            style="@style/style_middle_grey_dark"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal|center"
+                            android:layout_marginStart="2dp"
+                            android:text="@string/home_mining_off"
+                            tools:ignore="RelativeOverlap" />
 
-                </RelativeLayout>
+                        <io.taucoin.android.wallet.widget.LoadingTextView
+                            style="@style/style_middle_yellow"
+                            android:id="@+id/tv_booting"
+                            android:visibility="invisible"
+                            android:layout_toStartOf="@+id/tv_mining_switch"
+                            android:layout_below="@+id/iv_mining_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:minWidth="70dp"
+                            android:gravity="center_horizontal|center"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
+
+                </FrameLayout>
 
             </LinearLayout>
 

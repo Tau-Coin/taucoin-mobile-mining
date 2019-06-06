@@ -185,7 +185,7 @@
     <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_balance_low">Total Balance need to be higher than \"Median Transaction Fee Of Latest 144 Blocks\" %s TAU for mining.</string>
     <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
-    <string name="mining_sync_complete">\"Latest Block\" need to be equal to \"Total Balance\" for mining.</string>
+    <string name="mining_sync_complete">Latest block need to be synced.</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

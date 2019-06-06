@@ -31,7 +31,7 @@ public class FmtMicrometer {
 
     static String fmtBalance(Long balance) {
         DecimalFormat df = getDecimalFormatInstance();
-        df.applyPattern("###,##0.##");
+        df.applyPattern("###,##0.00");
         df.setRoundingMode(RoundingMode.FLOOR);
         BigDecimal bigDecimal = new BigDecimal(balance);
         bigDecimal = bigDecimal.divide(new BigDecimal(mDecimal), mScale, RoundingMode.HALF_UP);

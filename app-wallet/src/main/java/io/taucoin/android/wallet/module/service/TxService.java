@@ -189,29 +189,19 @@ public class TxService extends Service {
 
     private void getBalance(String serviceType) {
         mIsGetBalance = true;
-        mTxModel.getBalance(new TxObserver<AccountBean>() {
+        mTxModel.getBalance(new LogicObserver<KeyValue>() {
+
             @Override
-            public void handleError(String msg, int msgCode) {
+            public void handleError(int msgCode, String msg) {
                 handleBalanceDisplay(serviceType, false);
             }
 
             @Override
-            public void handleData(AccountBean account) {
-                super.handleData(account);
-                Logger.i("getBalance success");
-                if(account != null && account.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
-                    mTxModel.updateBalance(account, new LogicObserver<KeyValue>() {
-                        @Override
-                        public void handleData(KeyValue entry) {
-                            MyApplication.setKeyValue(entry);
-                            handleBalanceDisplay(serviceType, true);
-                        }
-
-                        @Override
-                        public void handleError(int code, String msg) {
-                            handleBalanceDisplay(serviceType, false);
-                        }
-                    });
+            public void handleData(KeyValue entry) {
+                if(entry != null){
+                    Logger.i("getBalance success");
+                    MyApplication.setKeyValue(entry);
+                    handleBalanceDisplay(serviceType, true);
                 }else{
                     handleBalanceDisplay(serviceType, false);
                 }

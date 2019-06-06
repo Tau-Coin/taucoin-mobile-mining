@@ -29,7 +29,7 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 
 public interface ITxModel {
     /** Get balance from the server */
-    void getBalance(TxObserver<AccountBean> observer);
+    void getBalance(LogicObserver<KeyValue> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
     void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer);
@@ -58,8 +58,8 @@ public interface ITxModel {
     /** get block height from the server */
     void getBlockHeight(TxObserver<ChainBean> observer);
 
-    /** Update balance from the server */
-    void updateBalance(AccountBean accountInfo, LogicObserver<KeyValue> observer);
+//    /** Update balance from the server */
+//    void updateBalance(AccountBean accountInfo, LogicObserver<KeyValue> observer);
 
     /** update or save current block height */
     void updateBlockHeight(int blockHeight, LogicObserver<Boolean> observer);
