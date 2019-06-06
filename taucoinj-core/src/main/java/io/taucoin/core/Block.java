@@ -134,7 +134,7 @@ public class Block {
             this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
-            logger.info("signature size is {}",signature.size());
+            logger.debug("signature size is {}",signature.size());
             // Parse blockSignature
             byte[] r = signature.get(0).getRLPData();
             byte[] s = signature.get(1).getRLPData();
@@ -176,7 +176,7 @@ public class Block {
             this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
-            logger.info("signature size is {}",signature.size());
+            logger.debug("signature size is {}",signature.size());
 
             // Parse blockSignature
             byte[] r = signature.get(0).getRLPData();
