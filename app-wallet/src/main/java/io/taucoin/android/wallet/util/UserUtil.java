@@ -32,7 +32,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.service.NotifyManager;
-import io.taucoin.android.wallet.widget.LoadingTextView;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.ProgressView;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -73,6 +73,11 @@ public class UserUtil {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null){
             setBalance(tvBalance, 0L);
+            return;
+        }
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        if(StringUtil.isNotSame(address, keyValue.getAddress())){
+            TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
             return;
         }
         setBalance(tvBalance, keyValue.getBalance());
