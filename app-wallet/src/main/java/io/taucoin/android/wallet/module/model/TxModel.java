@@ -537,6 +537,10 @@ public class TxModel implements ITxModel {
             .unsubscribeOn(scheduler)
             .subscribe(new TxObserver<IncomeInfoBean>() {
                 @Override
+                public void handleError(String msg, int msgCode) {
+                }
+
+                @Override
                 public void handleData(IncomeInfoBean incomeInfoBean) {
                     if(incomeInfoBean != null && incomeInfoBean.getStatus() == 200 &&
                             incomeInfoBean.getPayLoad() != null){

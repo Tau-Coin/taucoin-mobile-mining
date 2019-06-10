@@ -142,7 +142,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         switch (view.getId()) {
             case R.id.iv_mining_switch:
                 if(UserUtil.isImportKey()){
-                    starOrStopMining(false);
+                    starOrStopMining();
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
@@ -197,7 +197,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
-    private void starOrStopMining(boolean isNotice) {
+    private void starOrStopMining() {
         if(ivMiningSwitch == null){
             return;
         }
@@ -205,7 +205,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         handleMiningView();
 
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
-        if(!isNotice){
+        if(BuildConfig.DEBUG){
             requestWriteLOgPermissions();
         }
         miningPresenter.updateMiningState(miningState);
@@ -224,7 +224,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 if (refreshLayout != null && refreshLayout.isRefreshing()) {
                     refreshLayout.finishRefresh();
                 }
-                UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
+                UserUtil.setPower(tvPower);
                 UserUtil.setBalance(tvBalance);
                 break;
             case BLOCK_HEIGHT:
@@ -314,8 +314,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             medianFee = StringUtil.getIntString(blockInfo.getMedianFee());
 
             boolean isStopped = ivMiningBalance.isEnabled() || ivMiningPower.isEnabled() || ivMiningSync.isEnabled();
-            UserUtil.setPower(tvPower, ivMiningPower, ivMiningSwitch);
-            UserUtil.setBalanceAndSync(ivMiningBalance, ivMiningSync, ivMiningSwitch, blockInfo);
+            UserUtil.setMiningConditions(ivMiningBalance, ivMiningPower, ivMiningSync, ivMiningSwitch, blockInfo, !isRefreshMined);
             boolean isNeedRestart = !ivMiningBalance.isEnabled() && !ivMiningPower.isEnabled() && !ivMiningSync.isEnabled();
             if(MyApplication.getRemoteConnector().isInit() && isStopped && isNeedRestart){
                 MyApplication.getRemoteConnector().startBlockForging();

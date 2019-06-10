@@ -135,6 +135,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
         return -1;
     }
 
+    public void clearErrorCode() {
+        mExceptionStop = null;
+    }
+
     public boolean isSyncMe() {
         return isSyncMe == 1;
     }

@@ -103,25 +103,14 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
-    public static void setPower(TextView tvPower, ProgressView ivMiningPower, Switch ivMiningSwitch) {
-        if(tvPower == null || ivMiningPower == null || ivMiningSwitch == null){
+    public static void setPower(TextView tvPower) {
+        if(tvPower == null){
             return;
         }
         String power = "0";
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue != null){
             power = String.valueOf(keyValue.getPower());
-            if(keyValue.getPower() <= 0 || MyApplication.getRemoteConnector().getErrorCode() == 3 || !ivMiningSwitch.isChecked()){
-                ivMiningPower.setOff();
-                if(!ivMiningSwitch.isChecked()){
-                    ivMiningPower.setEnabled(false);
-                }else{
-                    ivMiningPower.setEnabled(true);
-                }
-            }else {
-                ivMiningPower.setOn();
-                ivMiningPower.setEnabled(false);
-            }
         }
         tvPower.setText(power);
         Logger.d("UserUtil.setPower=" + power);
@@ -193,17 +182,25 @@ public class UserUtil {
         }
     }
 
-    public static void setBalanceAndSync(ProgressView ivMiningBalance, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data) {
+    /**
+     * set state of mining conditions
+     * */
+    public static void setMiningConditions(ProgressView ivMiningBalance, ProgressView ivMiningPower, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data, boolean isClearError) {
         try{
             if(data != null){
                 BlockInfo blockInfo = (BlockInfo)data;
                 KeyValue keyValue = MyApplication.getKeyValue();
+                boolean isSynced = blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync();
                 BigDecimal balance = new BigDecimal(keyValue.getBalance());
                 BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
                 if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
                     medianFee = new BigDecimal(blockInfo.getMedianFee());
                 }
-                if(balance.compareTo(medianFee) < 0 || MyApplication.getRemoteConnector().getErrorCode() == 4 || !ivMiningSwitch.isChecked()){
+                boolean isBalanceError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 4;
+                if(balance.compareTo(medianFee) >= 0 && isBalanceError && isClearError){
+                    MyApplication.getRemoteConnector().clearErrorCode();
+                }
+                if(balance.compareTo(medianFee) < 0 || isBalanceError || !ivMiningSwitch.isChecked()){
                     ivMiningBalance.setOff();
                     if(!ivMiningSwitch.isChecked()){
                         ivMiningBalance.setEnabled(false);
@@ -214,7 +211,25 @@ public class UserUtil {
                     ivMiningBalance.setOn();
                     ivMiningBalance.setEnabled(false);
                 }
-                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync() && ivMiningSwitch.isChecked()){
+
+                long power = keyValue.getPower();
+                boolean isPowerError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 3;
+                if(power > 0 && isPowerError && isClearError){
+                    MyApplication.getRemoteConnector().clearErrorCode();
+                }
+                if(keyValue.getPower() <= 0 || isPowerError || !ivMiningSwitch.isChecked()){
+                    ivMiningPower.setOff();
+                    if(!ivMiningSwitch.isChecked()){
+                        ivMiningPower.setEnabled(false);
+                    }else{
+                        ivMiningPower.setEnabled(true);
+                    }
+                }else {
+                    ivMiningPower.setOn();
+                    ivMiningPower.setEnabled(false);
+                }
+
+                if(isSynced && ivMiningSwitch.isChecked()){
                     ivMiningSync.setOn();
                     ivMiningSync.setEnabled(false);
                 }else {
