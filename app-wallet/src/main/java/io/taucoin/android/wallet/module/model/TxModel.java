@@ -423,6 +423,7 @@ public class TxModel implements ITxModel {
     public void queryTransactionHistory(int pageNo, String time, LogicObserver<List<TransactionHistory>> logicObserver) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null || StringUtil.isEmpty(keyValue.getAddress())){
+            logicObserver.onNext(null);
             return;
         }
         Observable.create((ObservableOnSubscribe<List<TransactionHistory>>) emitter -> {

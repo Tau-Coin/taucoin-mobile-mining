@@ -47,6 +47,10 @@ public class TxPresenter {
         mTxModel.queryTransactionHistory(pageNo, time, new LogicObserver<List<TransactionHistory>>(){
 
             @Override
+            public void handleError(int code, String msg) {
+                handleData(null);
+            }
+            @Override
             public void handleData(List<TransactionHistory> transactionHistories) {
                 mSendReceiveView.loadTransactionHistory(transactionHistories);
                 mSendReceiveView.finishRefresh();

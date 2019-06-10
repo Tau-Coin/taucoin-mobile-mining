@@ -121,6 +121,7 @@ public class TxService extends Service {
             }
             Logger.i("TxService onStartCommand, ServiceType=" + serviceType);
         }
+        NotifyManager.getInstance().sendNotify();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -307,7 +308,6 @@ public class TxService extends Service {
         intent.setClass(context, TxService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
-            NotifyManager.getInstance().sendNotify();
         } else {
             context.startService(intent);
         }
