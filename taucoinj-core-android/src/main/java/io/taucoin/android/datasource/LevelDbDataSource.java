@@ -6,6 +6,7 @@ import io.taucoin.datasource.KeyValueDataSource;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
+import org.iq80.leveldb.DBException;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.WriteBatch;
 
@@ -91,7 +92,6 @@ public class LevelDbDataSource implements KeyValueDataSource {
         }
     }
 
-
     @Override
     public void setName(String name) {
         this.name = name;
@@ -104,7 +104,11 @@ public class LevelDbDataSource implements KeyValueDataSource {
 
     @Override
     public byte[] get(byte[] key) {
-        return db.get(key);
+        try {
+            return db.get(key);
+        } catch (DBException e) {
+            return db.get(key);
+        }
     }
 
     @Override
@@ -120,26 +124,38 @@ public class LevelDbDataSource implements KeyValueDataSource {
 
     @Override
     public Set<byte[]> keys() {
-
-        DBIterator dbIterator = db.iterator();
-        Set<byte[]> keys = new HashSet<>();
-        while (dbIterator.hasNext()) {
-
-            Map.Entry<byte[], byte[]> entry = dbIterator.next();
-            keys.add(entry.getKey());
+        try (DBIterator iterator = db.iterator()) {
+            Set<byte[]> result = new HashSet<>();
+            for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+                result.add(iterator.peekNext().getKey());
+            }
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return keys;
+    }
+
+    private void updateBatchInternal(Map<byte[], byte[]> rows) throws IOException {
+        try (WriteBatch batch = db.createWriteBatch()) {
+            for (Map.Entry<byte[], byte[]> entry : rows.entrySet()) {
+                batch.put(entry.getKey(), entry.getValue());
+            }
+            db.write(batch);
+        }
     }
 
     @Override
     public void updateBatch(Map<byte[], byte[]> rows) {
-
-        WriteBatch batch = db.createWriteBatch();
-
-        for (Map.Entry<byte[], byte[]> row : rows.entrySet())
-            batch.put(row.getKey(), row.getValue());
-
-        db.write(batch);
+        try  {
+            updateBatchInternal(rows);
+        } catch (Exception e) {
+            // try one more time
+            try {
+                updateBatchInternal(rows);
+            } catch (Exception e1) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
