@@ -77,6 +77,9 @@ public class SyncQueue {
 
     private AtomicBoolean isImportingBlocks = new AtomicBoolean(false);
 
+    // As soon as possbile stop connecting worker.
+    private AtomicBoolean isRequestStopped = new AtomicBoolean(false);
+
     public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
         this.blockchain = blockchain;
         this.headerValidator = headerValidator;
@@ -124,6 +127,7 @@ public class SyncQueue {
             }
         };
 
+        isRequestStopped.set(false);
         this.worker = new Thread (queueProducer);
         worker.start();
     }
@@ -134,7 +138,26 @@ public class SyncQueue {
             worker = null;
         }
 
+        isRequestStopped.set(true);
         isImportingBlocks.set(false);
+
+        // Clear cache
+        if (hashStore != null) {
+            hashStore.clear();
+            hashStore.close();
+        }
+        if (headerStore != null) {
+            headerStore.clear();
+            headerStore.close();
+        }
+        if (blockNumbersStore != null) {
+            blockNumbersStore.clear();
+            blockNumbersStore.close();
+        }
+        if (blockQueue != null) {
+            //blockQueue.clear();
+            blockQueue.close();
+        }
     }
 
     /**
@@ -142,7 +165,7 @@ public class SyncQueue {
      */
     private void produceQueue() {
 
-        while (!Thread.interrupted()){
+        while (!Thread.interrupted() && !isRequestStopped.get()){
 
             BlockWrapper wrapper = null;
             try {
@@ -196,6 +219,10 @@ public class SyncQueue {
                 isImportingBlocks.set(false);
             }
 
+        }
+
+        if (isRequestStopped.get()) {
+            logger.warn("Quit sync worker");
         }
     }
 
