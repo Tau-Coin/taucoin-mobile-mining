@@ -15,8 +15,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import android.util.Log;
-import android.util.Pair;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.interop.BlockTxReindex;
@@ -29,10 +27,7 @@ import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
 import io.taucoin.forge.ForgeStatus;
 import io.taucoin.http.ConnectionManager;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.net.peerdiscovery.PeerInfo;
-import io.taucoin.net.server.ChannelManager;
-import io.taucoin.sync.PeersPool;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.Utils;
 
@@ -42,11 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.http.ConnectionState.*;
@@ -252,10 +245,6 @@ public class TaucoinRemoteService extends TaucoinService {
 
             case TaucoinServiceMessage.MSG_SUBMIT_TRANSACTION:
                 submitTransaction(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_GET_ADMIN_INFO:
-                getAdminInfo(message);
                 break;
 
             case TaucoinServiceMessage.MSG_GET_PENDING_TRANSACTIONS:
@@ -947,30 +936,6 @@ public class TaucoinRemoteService extends TaucoinService {
             } catch (RemoteException e) {
                 logger.error("Exception sending submitted transaction to client: " + e.getMessage());
             }
-        }
-    }
-
-    /**
-     * Get admin info
-     *
-     * Incoming message parameters: none
-     * Sends message ( "key": type [description] ):
-     * {
-     *     "adminInfo": Parcelable(AdminInfo) [taucoin admin info]
-     * }
-     */
-    protected void getAdminInfo(Message message) {
-
-        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_ADMIN_INFO, 0, 0, message.obj);
-        Bundle replyData = new Bundle();
-        AdminInfo info = taucoin.getAdminInfo();
-        replyData.putParcelable("adminInfo", new io.taucoin.android.interop.AdminInfo(info));
-        replyMessage.setData(replyData);
-        try {
-            message.replyTo.send(replyMessage);
-            logger.info("Sent admin info: " + info.toString());
-        } catch (RemoteException e) {
-            logger.error("Exception sending admin info to client: " + e.getMessage());
         }
     }
 

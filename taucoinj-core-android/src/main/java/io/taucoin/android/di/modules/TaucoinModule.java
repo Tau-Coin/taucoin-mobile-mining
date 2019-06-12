@@ -3,8 +3,6 @@ package io.taucoin.android.di.modules;
 import android.content.Context;
 
 import io.taucoin.android.datasource.LevelDbDataSource;
-import io.taucoin.android.db.InMemoryBlockStore;
-import io.taucoin.android.db.OrmLiteBlockStoreDatabase;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Account;
@@ -35,7 +33,6 @@ import io.taucoin.http.tau.codec.TauMessageCodec;
 import io.taucoin.http.tau.handler.TauHandler;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.sync2.SyncManager;
@@ -62,7 +59,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
 
 import static io.taucoin.db.IndexedBlockStore.BLOCK_INFO_SERIALIZER;
@@ -98,27 +94,27 @@ public class TaucoinModule {
     @Provides
     @Singleton
     WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet,
-            BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager, PendingState pendingState,
+            BlockStore blockStore, SyncManager syncManager, PendingState pendingState,
             RequestManager requestManager, PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
 
-        return new WorldManager(listener, blockchain, repository, wallet, blockStore, adminInfo, syncManager,
+        return new WorldManager(listener, blockchain, repository, wallet, blockStore, syncManager,
                 pendingState, requestManager, poolSynchronizer, refWatcher);
     }
 
     @Provides
     @Singleton
-    Taucoin provideTaucoin(WorldManager worldManager, AdminInfo adminInfo,
+    Taucoin provideTaucoin(WorldManager worldManager,
                              io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
                              BlockForger blockForger, RequestManager requestManager, RefWatcher refWatcher) {
-        return new io.taucoin.android.Taucoin(worldManager, adminInfo, blockLoader, pendingState, blockForger, requestManager, refWatcher);
+        return new io.taucoin.android.Taucoin(worldManager, blockLoader, pendingState, blockForger, requestManager, refWatcher);
     }
 
     @Provides
     @Singleton
     io.taucoin.core.Blockchain provideBlockchain(BlockStore blockStore, io.taucoin.core.Repository repository,
-                                                   Wallet wallet, AdminInfo adminInfo,
+                                                   Wallet wallet,
                                                    ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
-        return new BlockchainImpl(blockStore, repository, wallet, adminInfo, parentHeaderValidator, pendingState, listener);
+        return new BlockchainImpl(blockStore, repository, wallet, parentHeaderValidator, pendingState, listener);
     }
 
     @Provides
@@ -191,12 +187,6 @@ public class TaucoinModule {
         rules.add(new ProofOfTransactionRule());
 
         return new BlockHeaderValidator(rules);
-    }
-
-    @Provides
-    @Singleton
-    AdminInfo provideAdminInfo() {
-        return new AdminInfo();
     }
 
     @Provides

@@ -2,7 +2,6 @@ package io.taucoin.android.manager;
 
 
 import io.taucoin.core.Block;
-import io.taucoin.core.ImportResult;
 import io.taucoin.core.Blockchain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

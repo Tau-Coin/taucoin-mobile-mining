@@ -589,27 +589,6 @@ public class TaucoinConnector extends ServiceConnector {
     }
 
     /**
-     * Get admin info
-     * @param identifier String Caller identifier used to return the response
-     *
-     * Sends message parameters: none
-     */
-    public void getAdminInfo(String identifier) {
-
-        if (!isBound)
-            return;
-
-        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_GET_ADMIN_INFO, 0, 0);
-        msg.replyTo = clientMessenger;
-        msg.obj = getIdentifierBundle(identifier);
-        try {
-            serviceMessenger.send(msg);
-        } catch (RemoteException e) {
-            logger.error("Exception sending message(getAdminInfo) to service: " + e.getMessage());
-        }
-    }
-
-    /**
      * Get pending transactions
      * @param identifier String Caller identifier used to return the response
      *

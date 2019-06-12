@@ -6,8 +6,6 @@ import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.Taucoin;
 import io.taucoin.http.ConnectionManager;
 import io.taucoin.manager.WorldManager;
-import io.taucoin.net.server.ChannelManager;
-import io.taucoin.sync.PeersPool;
 import io.taucoin.validator.ParentBlockHeaderValidator;
 
 import javax.inject.Singleton;
