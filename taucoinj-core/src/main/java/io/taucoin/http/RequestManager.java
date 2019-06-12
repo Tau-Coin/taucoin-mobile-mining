@@ -154,6 +154,12 @@ public class RequestManager implements RequestQueue.MessageListener {
         }
     }
 
+    public void close() {
+        if (clientsPool != null) {
+            clientsPool.close();
+        }
+    }
+
     public void changeSyncState(SyncStateEnum state) {
         logger.info("sync state changed from {} to {}", getSyncState(), state);
 

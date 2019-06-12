@@ -85,10 +85,14 @@ public class PoolSynchronizer implements ForgerListener {
         this.requestManager = requestManager;
     }
 
-    public void close() {
+    public void stop() {
         if (timerTask != null) {
             timerTask.cancel(true);
         }
+    }
+
+    public void close() {
+        stop();
     }
 
     @Override

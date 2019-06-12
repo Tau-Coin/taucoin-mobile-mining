@@ -201,4 +201,16 @@ public class HttpClient {
             }
         });
     }
+
+    public void close() {
+        if (isConnected.get() && channel != null) {
+            try {
+                channel.close().sync();
+            } catch (Exception e) {
+                logger.error("Close exception {}", e);
+            }
+        }
+
+        workerGroup.shutdownGracefully();
+    }
 }

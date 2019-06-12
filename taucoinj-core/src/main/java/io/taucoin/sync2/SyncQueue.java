@@ -75,6 +75,17 @@ public class SyncQueue {
 
     private byte[] genesisBlockHash = null;
 
+    private AtomicBoolean inited = new AtomicBoolean(false);
+
+    // The task of connecting blocks.
+    private Runnable queueProducer = new Runnable(){
+
+        @Override
+        public void run() {
+            produceQueue();
+        }
+   };
+
     private AtomicBoolean isImportingBlocks = new AtomicBoolean(false);
 
     // As soon as possbile stop connecting worker.
@@ -94,6 +105,9 @@ public class SyncQueue {
      * starts {@link #produceQueue()} thread
      */
     public void init() {
+        if (inited.get()) {
+            return;
+        }
 
         logger.info("Start loading sync queue");
 
@@ -115,24 +129,20 @@ public class SyncQueue {
         blockNumbersStore.open();
         blockQueue.open();
 
-        if (!config.isSyncEnabled()) {
+        inited.set(true);
+    }
+
+    public synchronized void start() {
+        if (!config.isSyncEnabled() || !inited.get()) {
             return;
         }
-
-        Runnable queueProducer = new Runnable(){
-
-            @Override
-            public void run() {
-                produceQueue();
-            }
-        };
 
         isRequestStopped.set(false);
         this.worker = new Thread (queueProducer);
         worker.start();
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (worker != null) {
             worker.interrupt();
             worker = null;
@@ -144,20 +154,40 @@ public class SyncQueue {
         // Clear cache
         if (hashStore != null) {
             hashStore.clear();
-            hashStore.close();
         }
         if (headerStore != null) {
             headerStore.clear();
-            headerStore.close();
         }
         if (blockNumbersStore != null) {
             blockNumbersStore.clear();
-            blockNumbersStore.close();
         }
         if (blockQueue != null) {
             //blockQueue.clear();
+        }
+    }
+
+    public synchronized void close() {
+        isImportingBlocks.set(false);
+
+        if (!inited.get()) {
+            return;
+        }
+
+        // Close db.
+        if (hashStore != null) {
+            hashStore.close();
+        }
+        if (headerStore != null) {
+            headerStore.close();
+        }
+        if (blockNumbersStore != null) {
+            blockNumbersStore.close();
+        }
+        if (blockQueue != null) {
             blockQueue.close();
         }
+
+        inited.set(true);
     }
 
     /**
