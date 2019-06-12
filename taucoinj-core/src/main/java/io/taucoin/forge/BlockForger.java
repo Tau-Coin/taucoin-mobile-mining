@@ -229,31 +229,31 @@ public class BlockForger {
 
         baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
-        BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
+//        BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
         if (forgingPower.longValue() <= 0) {
             logger.error("Forging Power < 0!!!");
             return ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
         }
 
-        //long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
-        long medianFee = chainInfoManager.getMedianFee();
-        // If medianFee hasn't been pulled from network, wait for a while.
-        while (medianFee <= 0) {
-            logger.warn("Forging task will sleep 2s for getting chaininfo");
-            try {
-                Thread.sleep(2000);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                logger.error("Waiting for chaininfo interrupted");
-                return ForgeStatus.FORGE_NORMAL_EXIT;
-            }
-        }
-        logger.info("balance: {}, median fee: {}", balance, medianFee);
-        if (balance.longValue() < medianFee){
-            logger.info("balance less than median fee");
-            return new ForgeStatus(4,
-                    String.valueOf(medianFee));
-        }
+//        long hisAverageFee = bestBlock.getCumulativeFee().longValue()/(bestBlock.getNumber()+1);
+//        long medianFee = chainInfoManager.getMedianFee();
+//        If medianFee hasn't been pulled from network, wait for a while.
+//        while (medianFee <= 0) {
+//            logger.warn("Forging task will sleep 2s for getting chaininfo");
+//            try {
+//                Thread.sleep(2000);
+//            } catch (Throwable e) {
+//                e.printStackTrace();
+//                logger.error("Waiting for chaininfo interrupted");
+//                return ForgeStatus.FORGE_NORMAL_EXIT;
+//            }
+//        }
+//        logger.info("balance: {}, median fee: {}", balance, medianFee);
+//        if (balance.longValue() < medianFee){
+//            logger.info("balance less than median fee");
+//            return new ForgeStatus(4,
+//                    String.valueOf(medianFee));
+//        }
 
         logger.info("base target {}, forging power {}", baseTarget, forgingPower);
 
