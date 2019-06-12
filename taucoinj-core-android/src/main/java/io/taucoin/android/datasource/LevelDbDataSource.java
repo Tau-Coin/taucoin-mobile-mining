@@ -107,6 +107,14 @@ public class LevelDbDataSource implements KeyValueDataSource {
         try {
             return db.get(key);
         } catch (DBException e) {
+            // Try to recover database.
+            try {
+                tryToRecoverDb();
+            } catch (Exception re) {
+                re.printStackTrace();
+                logger.error(re.getMessage(), re);
+                throw new RuntimeException("Can't recover database");
+            }
             return db.get(key);
         }
     }
@@ -149,6 +157,15 @@ public class LevelDbDataSource implements KeyValueDataSource {
         try  {
             updateBatchInternal(rows);
         } catch (Exception e) {
+            // Try to recover database.
+            try {
+                tryToRecoverDb();
+            } catch (Exception re) {
+                re.printStackTrace();
+                logger.error(re.getMessage(), re);
+                throw new RuntimeException("Can't recover database");
+            }
+
             // try one more time
             try {
                 updateBatchInternal(rows);
@@ -170,5 +187,30 @@ public class LevelDbDataSource implements KeyValueDataSource {
         } catch (IOException e) {
             logger.error("Failed to find the db file on the close: {} ", name);
         }
+    }
+
+    // Temp test solution. It often happens that level db gets error.
+    private void tryToRecoverDb() throws Exception {
+        close();
+
+        if (name == null) throw new NullPointerException("no name set to the db when recovery");
+
+        Options options = new Options();
+        options.createIfMissing(true);
+        options.compressionType(CompressionType.NONE);
+        options.blockSize(10 * 1024 * 1024);
+        options.writeBufferSize(10 * 1024 * 1024);
+        options.cacheSize(0);
+        options.paranoidChecks(false);
+        options.verifyChecksums(false);
+
+        File dbLocation = new File(SystemProperties.CONFIG.databaseDir());
+        File fileLocation = new File(dbLocation, name);
+        if (!dbLocation.exists()) dbLocation.mkdirs();
+
+        logger.warn("Recovering database: '{}'", name);
+
+        db = factory.open(fileLocation, options);
+        alive = true;
     }
 }
