@@ -3,14 +3,13 @@ package io.taucoin.core;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.util.Utils;
 
-import javax.inject.Inject;
-
 import java.math.BigInteger;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 
 /**

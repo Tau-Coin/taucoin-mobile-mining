@@ -3,9 +3,7 @@ package io.taucoin.core;
 import io.taucoin.db.ByteArrayWrapper;
 
 import java.math.BigInteger;
-
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * @author Roman Mandeleil

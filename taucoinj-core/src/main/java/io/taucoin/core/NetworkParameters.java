@@ -18,23 +18,12 @@
 
 package io.taucoin.core;
 
-import com.google.common.base.Objects;
-//import io.taucoin.core.Block;
-//import io.taucoin.core.StoredBlock;
-//import io.taucoin.core.VerificationException;
-//import io.taucoin.net.peerdiscovery.*;
 import io.taucoin.config.*;
-//import io.taucoin.db.BlockStore;
 
-//import io.taucoin.util.MonetaryFormat;
-
-import javax.annotation.*;
-import java.io.*;
 import java.math.*;
-import java.util.*;
+import javax.annotation.*;
 
-//import static io.taucoin.core.Coin.*;
-//import org.taucoin.util.VersionTally;
+import com.google.common.base.Objects;
 
 /**
  * <p>NetworkParameters contains the data needed for working with an instantiation of a Bitcoin chain.</p>

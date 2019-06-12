@@ -4,37 +4,28 @@ import io.taucoin.config.Constants;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
-import io.taucoin.crypto.ECKey;
-import io.taucoin.crypto.HashUtil;
-import io.taucoin.crypto.SHA3Helper;
 import io.taucoin.db.BlockStore;
-import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.util.AdvancedDeviceUtils;
 import io.taucoin.util.ByteUtil;
-import io.taucoin.util.RLP;
 import io.taucoin.validator.DependentBlockHeaderRule;
 import io.taucoin.validator.ParentBlockHeaderValidator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-import org.spongycastle.util.Arrays;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.SignatureException;
 import java.util.*;
 
-import static java.lang.Math.max;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static java.lang.Runtime.getRuntime;
-import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Collections.emptyList;
 import static io.taucoin.core.ImportResult.*;
@@ -92,12 +83,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private TaucoinListener listener;
 
-
-    private AdminInfo adminInfo;
-
-
     private DependentBlockHeaderRule parentHeaderValidator;
-
 
     private PendingState pendingState;
 
@@ -119,12 +105,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     //todo: autowire over constructor
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
-                          Wallet wallet, AdminInfo adminInfo,
+                          Wallet wallet,
                           ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.wallet = wallet;
-        this.adminInfo = adminInfo;
         this.parentHeaderValidator = parentHeaderValidator;
         this.pendingState = pendingState;
         this.listener = listener;
@@ -883,7 +868,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         updateTotalDifficulty(block);
 
         long totalTime = System.nanoTime() - saveTime;
-        adminInfo.addBlockExecTime(totalTime);
         logger.info("block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
 
         return true;

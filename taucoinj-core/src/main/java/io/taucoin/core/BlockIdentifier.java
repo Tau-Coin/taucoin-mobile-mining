@@ -1,12 +1,11 @@
 package io.taucoin.core;
 
-import io.taucoin.util.ByteUtil;
 import io.taucoin.util.RLP;
 import io.taucoin.util.RLPList;
+
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import static io.taucoin.util.ByteUtil.byteArrayToLong;
 

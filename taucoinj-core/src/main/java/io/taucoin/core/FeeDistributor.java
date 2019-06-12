@@ -1,7 +1,5 @@
 package io.taucoin.core;
 
-import java.math.BigInteger;
-
 public class FeeDistributor {
     public static int integrityShare = 3;
     //public static int receiveShare = 1;

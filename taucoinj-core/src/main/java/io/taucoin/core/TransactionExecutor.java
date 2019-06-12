@@ -1,9 +1,9 @@
 package io.taucoin.core;
 
 import io.taucoin.config.Constants;
-import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.ByteUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -11,12 +11,8 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.apache.commons.lang3.ArrayUtils.getLength;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.util.BIUtil.*;
-import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static io.taucoin.util.ByteUtil.toHexString;
 
 /**
  * @author Roman Mandeleil

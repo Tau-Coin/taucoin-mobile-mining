@@ -1,6 +1,5 @@
 package io.taucoin.core;
 
-
 import java.math.BigInteger;
 import java.util.List;
 
