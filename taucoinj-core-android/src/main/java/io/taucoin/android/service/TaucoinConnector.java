@@ -140,6 +140,26 @@ public class TaucoinConnector extends ServiceConnector {
     }
 
     /**
+     * Stop block syncing.
+     * Please handle TaucoinClientMessage.MSG_STOP_SYNC_RESULT for result
+     * of stopping syncing.
+     */
+    public void stopSync() {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_STOP_SYNC, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(init) to service: " + e.getMessage());
+        }
+    }
+
+    /**
      * Get block hash list.
      *
      * @param start start height

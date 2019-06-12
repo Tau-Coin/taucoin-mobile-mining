@@ -278,6 +278,10 @@ public class TaucoinRemoteService extends TaucoinService {
                 startSync(message);
                 break;
 
+            case TaucoinServiceMessage.MSG_STOP_SYNC:
+                stopSync(message);
+                break;
+
             case TaucoinServiceMessage.MSG_GET_BLOCK_HASH_LIST:
                 getBlockHashList(message);
                 break;
@@ -1083,7 +1087,24 @@ public class TaucoinRemoteService extends TaucoinService {
         try {
             message.replyTo.send(replyMessage);
         } catch (RemoteException e) {
-            logger.error("Exception sending importing privkey result to client: " + e.getMessage());
+            logger.error("Exception sending starting sync result to client: " + e.getMessage());
+        }
+    }
+
+    protected void stopSync(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_STOP_SYNC_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        if (taucoin != null) {
+            replyData.putSerializable("event", EventFlag.EVENT_STOP_SYNC);
+            taucoin.stopSync();
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending stopping sync result to client: " + e.getMessage());
         }
     }
 

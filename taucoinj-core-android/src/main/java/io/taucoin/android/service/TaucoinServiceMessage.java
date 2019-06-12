@@ -163,4 +163,10 @@ public class TaucoinServiceMessage {
      * Command to the service to get block tx reindex
      */
     public static final int MSG_GET_BLOCK_TX_REINDEX = 32;
+
+    /**
+     * Command to the service to stop sync
+     */
+    public static final int MSG_STOP_SYNC = 33;
+
 }
