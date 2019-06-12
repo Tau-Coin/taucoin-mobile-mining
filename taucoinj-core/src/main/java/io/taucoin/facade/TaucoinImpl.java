@@ -6,7 +6,6 @@ import io.taucoin.core.PendingState;
 import io.taucoin.debug.RefWatcher;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.forge.BlockForger;
@@ -50,8 +49,6 @@ public class TaucoinImpl implements Taucoin {
     public static final String TRANSACTION_SUBMITFAIL = "submission failure, please relay to rpc";
     protected WorldManager worldManager;
 
-    protected AdminInfo adminInfo;
-
     protected BlockLoader blockLoader;
 
     protected PendingState pendingState;
@@ -63,11 +60,10 @@ public class TaucoinImpl implements Taucoin {
     protected RefWatcher refWatcher;
 
     @Inject
-    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo,
+    public TaucoinImpl(WorldManager worldManager,
             BlockLoader blockLoader, PendingState pendingState, BlockForger blockForger,
             RequestManager requestManager, RefWatcher refWatcher) {
         this.worldManager = worldManager;
-        this.adminInfo = adminInfo;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
         this.blockForger = blockForger;
@@ -261,11 +257,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public io.taucoin.core.PendingState getPendingState() {
         return worldManager.getPendingState();
-    }
-
-    @Override
-    public AdminInfo getAdminInfo() {
-        return adminInfo;
     }
 
     @Override

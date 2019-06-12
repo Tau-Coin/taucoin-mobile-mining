@@ -50,8 +50,6 @@ public class WorldManager {
 
     private BlockStore blockStore;
 
-    private AdminInfo adminInfo;
-
     private SyncManager syncManager;
 
     private PendingState pendingState;
@@ -68,7 +66,7 @@ public class WorldManager {
 
     @Inject
     public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
-                        , BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager
+                        , BlockStore blockStore, SyncManager syncManager
                         , PendingState pendingState, RequestManager requestManager
                         ,PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
         logger.info("World manager instantiated");
@@ -77,7 +75,6 @@ public class WorldManager {
         this.repository = repository;
         this.wallet = wallet;
         this.blockStore = blockStore;
-        this.adminInfo = adminInfo;
         this.syncManager = syncManager;
         this.pendingState = pendingState;
         this.requestManager = requestManager;
@@ -243,7 +240,6 @@ public class WorldManager {
         refWatcher.watch(wallet);
         refWatcher.watch(activePeer);
         refWatcher.watch(blockStore);
-        refWatcher.watch(adminInfo);
         refWatcher.watch(syncManager);
         refWatcher.watch(pendingState);
         refWatcher.watch(requestManager);

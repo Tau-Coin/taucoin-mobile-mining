@@ -8,7 +8,6 @@ import io.taucoin.core.Wallet;
 import io.taucoin.db.BlockStore;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.net.client.PeerClient;
@@ -151,8 +150,6 @@ public interface Taucoin {
     io.taucoin.core.PendingState getPendingState();
 
     public void init();
-
-    AdminInfo getAdminInfo();
 
     /**
      * @return - currently pending transactions received from the net
