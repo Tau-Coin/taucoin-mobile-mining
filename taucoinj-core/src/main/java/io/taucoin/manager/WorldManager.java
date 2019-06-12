@@ -128,7 +128,7 @@ public class WorldManager {
 
         syncManager.stop();
         requestManager.stop();
-        poolSynchronizer.close();
+        poolSynchronizer.stop();
     }
 
     public TaucoinListener getListener() {
@@ -231,6 +231,10 @@ public class WorldManager {
     public void close() {
         stopPeerDiscovery();
         stopSync();
+
+        poolSynchronizer.close();
+        syncManager.close();
+        requestManager.close();
         repository.close();
         blockchain.close();
 

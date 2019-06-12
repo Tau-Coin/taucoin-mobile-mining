@@ -120,6 +120,8 @@ public class SyncManager {
                     logger.info("Sync Manager: OFF");
                     return;
                 }
+
+                queue.start();
                 logger.info("Sync Manager: ON");
                 //set IDLE state at the beginning
                 state = syncStates.get(IDLE);
@@ -158,7 +160,12 @@ public class SyncManager {
 
         if (queue != null) {
             queue.stop();
-            queue = null;
+        }
+    }
+
+    public void close() {
+        if (queue != null) {
+            queue.close();
         }
     }
 

@@ -58,4 +58,12 @@ public class ClientsPool {
     public synchronized void sendMessage(Message message) {
         mainHttpClient.sendRequest(message);
     }
+
+    public synchronized void close() {
+        if (mainHttpClient != null) {
+            mainHttpClient.close();
+        }
+
+        pool.clear();
+    }
 }
