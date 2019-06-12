@@ -35,6 +35,9 @@ import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.PeersPool;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.Utils;
+
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -65,6 +68,8 @@ public class TaucoinRemoteService extends TaucoinService {
     private ConnectionManager connectionManager = null;
     private IntentFilter intentFilter = null;
     private NetworkStateListener networkStateListener = null;
+
+    private RefWatcher refWatcher;
 
     public TaucoinRemoteService() {
 
@@ -113,7 +118,14 @@ public class TaucoinRemoteService extends TaucoinService {
     public void onCreate() {
 
         super.onCreate();
-    }
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        refWatcher = LeakCanary.install(this.getApplication());
+   }
 
     @Override
     public void onDestroy() {
@@ -831,12 +843,15 @@ public class TaucoinRemoteService extends TaucoinService {
 
         if (taucoin != null) {
             taucoin.close();
-            taucoin = null;
+            //taucoin = null;
         }
 
         clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
+
+        refWatcher.watch(component);
+        refWatcher.watch(taucoin);
 
         Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_DONE, 0, 0);
         try {

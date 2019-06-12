@@ -5,6 +5,7 @@ import io.taucoin.core.*;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
@@ -59,6 +60,8 @@ public class WorldManager {
 
     private PoolSynchronizer poolSynchronizer;
 
+    private RefWatcher refWatcher;
+
     private volatile boolean isSyncRunning = false;
 
     SystemProperties config = SystemProperties.CONFIG;
@@ -66,7 +69,8 @@ public class WorldManager {
     @Inject
     public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
                         , BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager
-                        , PendingState pendingState, RequestManager requestManager, PoolSynchronizer poolSynchronizer) {
+                        , PendingState pendingState, RequestManager requestManager
+                        ,PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
         logger.info("World manager instantiated");
         this.listener = listener;
         this.blockchain = blockchain;
@@ -78,6 +82,7 @@ public class WorldManager {
         this.pendingState = pendingState;
         this.requestManager = requestManager;
         this.poolSynchronizer = poolSynchronizer;
+        this.refWatcher = refWatcher;
         this.syncManager.setRequestManager(requestManager);
         this.poolSynchronizer.setRequestManager(requestManager);
     }
@@ -231,5 +236,17 @@ public class WorldManager {
         stopSync();
         repository.close();
         blockchain.close();
+
+        refWatcher.watch(listener);
+        refWatcher.watch(blockchain);
+        refWatcher.watch(repository);
+        refWatcher.watch(wallet);
+        refWatcher.watch(activePeer);
+        refWatcher.watch(blockStore);
+        refWatcher.watch(adminInfo);
+        refWatcher.watch(syncManager);
+        refWatcher.watch(pendingState);
+        refWatcher.watch(requestManager);
+        refWatcher.watch(poolSynchronizer);
     }
 }

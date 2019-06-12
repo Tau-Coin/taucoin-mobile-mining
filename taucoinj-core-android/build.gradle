@@ -55,6 +55,8 @@ tasks.withType(JavaCompile){
 dependencies {
     implementation 'com.google.dagger:dagger:2.17'
     implementation 'com.google.dagger:dagger-android-support:2.17'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.17'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.17'
 

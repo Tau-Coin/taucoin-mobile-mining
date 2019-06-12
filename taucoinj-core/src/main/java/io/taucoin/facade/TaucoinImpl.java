@@ -3,6 +3,7 @@ package io.taucoin.facade;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.core.PendingState;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.AdminInfo;
@@ -59,16 +60,19 @@ public class TaucoinImpl implements Taucoin {
 
     protected RequestManager requestManager;
 
+    protected RefWatcher refWatcher;
+
     @Inject
     public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo,
             BlockLoader blockLoader, PendingState pendingState, BlockForger blockForger,
-            RequestManager requestManager) {
+            RequestManager requestManager, RefWatcher refWatcher) {
         this.worldManager = worldManager;
         this.adminInfo = adminInfo;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
         this.blockForger = blockForger;
         this.requestManager = requestManager;
+        this.refWatcher = refWatcher;
         this.blockForger.setTaucoin(this);
         this.blockForger.init();
     }
@@ -201,6 +205,11 @@ public class TaucoinImpl implements Taucoin {
             blockForger.stopForging();
         }
         worldManager.close();
+
+        refWatcher.watch(worldManager);
+        refWatcher.watch(blockLoader);
+        refWatcher.watch(blockForger);
+        refWatcher.watch(this);
     }
 
     @Override

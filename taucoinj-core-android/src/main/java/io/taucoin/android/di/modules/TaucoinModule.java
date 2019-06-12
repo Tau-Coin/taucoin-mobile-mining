@@ -5,6 +5,7 @@ import android.content.Context;
 import io.taucoin.android.datasource.LevelDbDataSource;
 import io.taucoin.android.db.InMemoryBlockStore;
 import io.taucoin.android.db.OrmLiteBlockStoreDatabase;
+import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Account;
 import io.taucoin.core.Blockchain;
@@ -20,6 +21,7 @@ import io.taucoin.datasource.mapdb.MapDBFactoryImpl;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.db.RepositoryImpl;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.http.client.ClientsPool;
@@ -97,18 +99,18 @@ public class TaucoinModule {
     @Singleton
     WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet,
             BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager, PendingState pendingState,
-            RequestManager requestManager, PoolSynchronizer poolSynchronizer) {
+            RequestManager requestManager, PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
 
         return new WorldManager(listener, blockchain, repository, wallet, blockStore, adminInfo, syncManager,
-                pendingState, requestManager, poolSynchronizer);
+                pendingState, requestManager, poolSynchronizer, refWatcher);
     }
 
     @Provides
     @Singleton
     Taucoin provideTaucoin(WorldManager worldManager, AdminInfo adminInfo,
                              io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
-                             BlockForger blockForger, RequestManager requestManager) {
-        return new io.taucoin.android.Taucoin(worldManager, adminInfo, blockLoader, pendingState, blockForger, requestManager);
+                             BlockForger blockForger, RequestManager requestManager, RefWatcher refWatcher) {
+        return new io.taucoin.android.Taucoin(worldManager, adminInfo, blockLoader, pendingState, blockForger, requestManager, refWatcher);
     }
 
     @Provides
@@ -330,6 +332,12 @@ public class TaucoinModule {
     PoolSynchronizer providePoolSynchronizer(TaucoinListener listener,
             BlockForger blockForger, PendingState pendingState) {
         return new PoolSynchronizer(listener, blockForger, pendingState);
+    }
+
+    @Provides
+    @Singleton
+    RefWatcher provideRefWatcher() {
+        return new TauMobileRefWatcher();
     }
 
     public static void close() {
