@@ -3,7 +3,6 @@ package io.taucoin.facade;
 import io.taucoin.core.*;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Mikhail Kalinin

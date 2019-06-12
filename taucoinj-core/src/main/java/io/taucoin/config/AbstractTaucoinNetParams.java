@@ -18,22 +18,9 @@
 
 package io.taucoin.config;
 
-import java.math.BigInteger;
-import java.util.concurrent.TimeUnit;
-
-//import io.taucoin.core.Block;
 import io.taucoin.core.NetworkParameters;
-//import io.taucoin.core.StoredBlock;
-//import io.taucoin.core.Transaction;
-//import io.taucoin.core.Util;
-//import io.taucoin.util.MonetaryFormat;
-//import io.taucoin.core.VerificationException;
-//import io.taucoin.store.BlockStore;
-//import io.taucoin.store.BlockStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Stopwatch;
 
 /**
  * Parameters for taucoin-like networks.
@@ -49,31 +36,4 @@ public abstract class AbstractTaucoinNetParams extends NetworkParameters {
     public AbstractTaucoinNetParams() {
         super();
     }
-
-    /*
-    @Override
-    public Coin getMaxMoney() {
-        return MAX_MONEY;
-    }
-
-    @Override
-    public Coin getMinNonDustOutput() {
-        return Transaction.MIN_NONDUST_OUTPUT;
-    }
-
-    @Override
-    public MonetaryFormat getMonetaryFormat() {
-        return new MonetaryFormat();
-    }
-
-    @Override
-    public String getUriScheme() {
-        return TAUCOIN_SCHEME;
-    }
-
-    @Override
-    public boolean hasMaxMoney() {
-        return true;
-    }
-    */
 }

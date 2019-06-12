@@ -1,7 +1,6 @@
 package io.taucoin.facade;
 
 import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
 import io.taucoin.core.ImportResult;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.Wallet;
@@ -13,13 +12,10 @@ import io.taucoin.forge.BlockForger;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
-import io.taucoin.net.server.ChannelManager;
 
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 /**
  * @author Roman Mandeleil

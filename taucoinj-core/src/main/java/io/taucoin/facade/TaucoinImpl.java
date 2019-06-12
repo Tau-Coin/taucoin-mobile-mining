@@ -1,39 +1,27 @@
 package io.taucoin.facade;
 
-import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.core.PendingState;
 import io.taucoin.debug.RefWatcher;
-import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.http.RequestManager;
-import io.taucoin.http.submit.TransactionExecutor;
-import io.taucoin.http.submit.TransactionTask;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
-import io.taucoin.net.rlpx.NodeType;
-import io.taucoin.util.ByteUtil;
-import org.apache.commons.collections4.list.TransformedList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import java.math.BigInteger;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
 
-import static io.taucoin.config.SystemProperties.CONFIG;
+import javax.inject.Inject;
 
 /**
  * @author Roman Mandeleil

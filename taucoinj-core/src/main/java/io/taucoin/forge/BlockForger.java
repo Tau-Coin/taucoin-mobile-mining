@@ -1,7 +1,6 @@
 package io.taucoin.forge;
 
 
-import io.taucoin.util.ByteUtil;
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
 import io.taucoin.facade.Taucoin;
@@ -18,11 +17,11 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
-
 
 /**
  * Created by Anton Nashatyrev on 10.12.2015.

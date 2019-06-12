@@ -1,11 +1,8 @@
 package io.taucoin.facade;
 
 import io.taucoin.core.Block;
-import io.taucoin.core.Transaction;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
 
 public interface Blockchain extends io.taucoin.core.Blockchain {
 
