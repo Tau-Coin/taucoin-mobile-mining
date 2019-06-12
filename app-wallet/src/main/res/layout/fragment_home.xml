@@ -50,21 +50,6 @@
                     android:layout_height="wrap_content">
 
                     <io.taucoin.android.wallet.widget.ProgressView
-                        android:id="@+id/iv_mining_balance"
-                        android:layout_width="60dp"
-                        app:center_text="@string/home_mining_balance"
-                        android:layout_gravity="center_horizontal|center"
-                        android:layout_height="60dp" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:paddingBottom="20dp"
-                    android:layout_height="wrap_content">
-
-                    <io.taucoin.android.wallet.widget.ProgressView
                         android:id="@+id/iv_mining_power"
                         android:layout_width="60dp"
                         app:center_text="@string/home_mining_power"
@@ -90,7 +75,7 @@
 
                 <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_weight="1.85"
+                    android:layout_weight="1.6"
                     android:layout_height="wrap_content">
 
                     <RelativeLayout

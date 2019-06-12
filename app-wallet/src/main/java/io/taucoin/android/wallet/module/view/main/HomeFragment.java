@@ -100,8 +100,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvPowerTitle;
     @BindView(R.id.tv_miners)
     TextView tvMiners;
-    @BindView(R.id.iv_mining_balance)
-    ProgressView ivMiningBalance;
     @BindView(R.id.iv_mining_power)
     ProgressView ivMiningPower;
     @BindView(R.id.iv_mining_sync)
@@ -132,7 +130,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
     @OnClick({R.id.iv_mining_switch, R.id.tv_mining_transaction, R.id.tv_synchronized, R.id.tv_mined,
             R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right, R.id.tv_power_title,
-            R.id.iv_mining_balance, R.id.iv_mining_power, R.id.iv_mining_sync, })
+            R.id.iv_mining_power, R.id.iv_mining_sync, })
     public void onClick(View view) {
         if (!UserUtil.isImportKey() && view.getId() != R.id.tv_power_title) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -170,12 +168,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case R.id.tv_power_title:
                 DialogManager.showTipDialog(getActivity(), R.string.home_mining_power_tips);
-                break;
-            case R.id.iv_mining_balance:
-                String balanceLow = ResourcesUtil.getText(R.string.mining_balance_low);
-                String medianFeeStr = FmtMicrometer.fmtFormat(String.valueOf(medianFee));
-                balanceLow = StringUtil.formatString(balanceLow, medianFeeStr);
-                DialogManager.showTipDialog(getActivity(), balanceLow);
                 break;
             case R.id.iv_mining_power:
                 DialogManager.showTipDialog(getActivity(), R.string.mining_power_zero);
@@ -313,9 +305,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             miners = StringUtil.getIntString(blockInfo.getMinerNo());
             medianFee = StringUtil.getIntString(blockInfo.getMedianFee());
 
-            boolean isStopped = ivMiningBalance.isEnabled() || ivMiningPower.isEnabled() || ivMiningSync.isEnabled();
-            UserUtil.setMiningConditions(ivMiningBalance, ivMiningPower, ivMiningSync, ivMiningSwitch, blockInfo, !isRefreshMined);
-            boolean isNeedRestart = !ivMiningBalance.isEnabled() && !ivMiningPower.isEnabled() && !ivMiningSync.isEnabled();
+            boolean isStopped = ivMiningPower.isEnabled() || ivMiningSync.isEnabled();
+            UserUtil.setMiningConditions(ivMiningPower, ivMiningSync, ivMiningSwitch, blockInfo, !isRefreshMined);
+            boolean isNeedRestart = !ivMiningPower.isEnabled() && !ivMiningSync.isEnabled();
             if(MyApplication.getRemoteConnector().isInit() && isStopped && isNeedRestart){
                 MyApplication.getRemoteConnector().startBlockForging();
             }

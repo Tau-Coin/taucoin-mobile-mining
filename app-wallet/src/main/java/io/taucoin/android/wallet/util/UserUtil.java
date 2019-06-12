@@ -22,9 +22,6 @@ import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import io.taucoin.android.wallet.R;
 
 import io.taucoin.android.wallet.MyApplication;
@@ -185,32 +182,12 @@ public class UserUtil {
     /**
      * set state of mining conditions
      * */
-    public static void setMiningConditions(ProgressView ivMiningBalance, ProgressView ivMiningPower, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data, boolean isClearError) {
+    public static void setMiningConditions(ProgressView ivMiningPower, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data, boolean isClearError) {
         try{
             if(data != null){
                 BlockInfo blockInfo = (BlockInfo)data;
                 KeyValue keyValue = MyApplication.getKeyValue();
                 boolean isSynced = blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync();
-                BigDecimal balance = new BigDecimal(keyValue.getBalance());
-                BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
-                if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
-                    medianFee = new BigDecimal(blockInfo.getMedianFee());
-                }
-                boolean isBalanceError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 4;
-                if(balance.compareTo(medianFee) >= 0 && isBalanceError && isClearError){
-                    MyApplication.getRemoteConnector().clearErrorCode();
-                }
-                if(balance.compareTo(medianFee) < 0 || isBalanceError || !ivMiningSwitch.isChecked()){
-                    ivMiningBalance.setOff();
-                    if(!ivMiningSwitch.isChecked()){
-                        ivMiningBalance.setEnabled(false);
-                    }else {
-                        ivMiningBalance.setEnabled(true);
-                    }
-                }else {
-                    ivMiningBalance.setOn();
-                    ivMiningBalance.setEnabled(false);
-                }
 
                 long power = keyValue.getPower();
                 boolean isPowerError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 3;

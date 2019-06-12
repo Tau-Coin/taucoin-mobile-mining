@@ -82,6 +82,7 @@ public class TxService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        NotifyManager.getInstance().sendNotify();
         KeyValue keyValue = MyApplication.getKeyValue();
         if(intent != null){
             String action = intent.getAction();
@@ -121,7 +122,6 @@ public class TxService extends Service {
             }
             Logger.i("TxService onStartCommand, ServiceType=" + serviceType);
         }
-        NotifyManager.getInstance().sendNotify();
         return super.onStartCommand(intent, flags, startId);
     }
 
