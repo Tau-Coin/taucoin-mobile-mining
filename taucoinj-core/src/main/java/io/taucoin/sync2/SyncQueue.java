@@ -158,7 +158,9 @@ public class SyncQueue {
             blockNumbersStore.clear();
         }
         if (blockQueue != null) {
-            //blockQueue.clear();
+            if (blockQueue instanceof BlockQueueMem) {
+                blockQueue.clear();
+            }
         }
     }
 
