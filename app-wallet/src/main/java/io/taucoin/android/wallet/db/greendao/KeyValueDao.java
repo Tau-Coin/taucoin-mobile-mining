@@ -31,10 +31,13 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property RawAddress = new Property(4, String.class, "rawAddress", false, "RAW_ADDRESS");
         public final static Property Balance = new Property(5, long.class, "balance", false, "BALANCE");
         public final static Property Power = new Property(6, long.class, "power", false, "POWER");
-        public final static Property NickName = new Property(7, String.class, "nickName", false, "NICK_NAME");
-        public final static Property MiningState = new Property(8, String.class, "miningState", false, "MINING_STATE");
-        public final static Property TransExpiry = new Property(9, long.class, "transExpiry", false, "TRANS_EXPIRY");
-        public final static Property SyncBlockNum = new Property(10, long.class, "syncBlockNum", false, "SYNC_BLOCK_NUM");
+        public final static Property MiningIncome = new Property(7, long.class, "miningIncome", false, "MINING_INCOME");
+        public final static Property MinedBlocks = new Property(8, long.class, "minedBlocks", false, "MINED_BLOCKS");
+        public final static Property NickName = new Property(9, String.class, "nickName", false, "NICK_NAME");
+        public final static Property MiningState = new Property(10, String.class, "miningState", false, "MINING_STATE");
+        public final static Property SyncState = new Property(11, String.class, "syncState", false, "SYNC_STATE");
+        public final static Property TransExpiry = new Property(12, long.class, "transExpiry", false, "TRANS_EXPIRY");
+        public final static Property SyncBlockNum = new Property(13, long.class, "syncBlockNum", false, "SYNC_BLOCK_NUM");
     }
 
 
@@ -57,10 +60,13 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"RAW_ADDRESS\" TEXT," + // 4: rawAddress
                 "\"BALANCE\" INTEGER NOT NULL ," + // 5: balance
                 "\"POWER\" INTEGER NOT NULL ," + // 6: power
-                "\"NICK_NAME\" TEXT," + // 7: nickName
-                "\"MINING_STATE\" TEXT," + // 8: miningState
-                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 9: transExpiry
-                "\"SYNC_BLOCK_NUM\" INTEGER NOT NULL );"); // 10: syncBlockNum
+                "\"MINING_INCOME\" INTEGER NOT NULL ," + // 7: miningIncome
+                "\"MINED_BLOCKS\" INTEGER NOT NULL ," + // 8: minedBlocks
+                "\"NICK_NAME\" TEXT," + // 9: nickName
+                "\"MINING_STATE\" TEXT," + // 10: miningState
+                "\"SYNC_STATE\" TEXT," + // 11: syncState
+                "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 12: transExpiry
+                "\"SYNC_BLOCK_NUM\" INTEGER NOT NULL );"); // 13: syncBlockNum
     }
 
     /** Drops the underlying database table. */
@@ -99,18 +105,25 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         }
         stmt.bindLong(6, entity.getBalance());
         stmt.bindLong(7, entity.getPower());
+        stmt.bindLong(8, entity.getMiningIncome());
+        stmt.bindLong(9, entity.getMinedBlocks());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(8, nickName);
+            stmt.bindString(10, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(9, miningState);
+            stmt.bindString(11, miningState);
         }
-        stmt.bindLong(10, entity.getTransExpiry());
-        stmt.bindLong(11, entity.getSyncBlockNum());
+ 
+        String syncState = entity.getSyncState();
+        if (syncState != null) {
+            stmt.bindString(12, syncState);
+        }
+        stmt.bindLong(13, entity.getTransExpiry());
+        stmt.bindLong(14, entity.getSyncBlockNum());
     }
 
     @Override
@@ -143,18 +156,25 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         }
         stmt.bindLong(6, entity.getBalance());
         stmt.bindLong(7, entity.getPower());
+        stmt.bindLong(8, entity.getMiningIncome());
+        stmt.bindLong(9, entity.getMinedBlocks());
  
         String nickName = entity.getNickName();
         if (nickName != null) {
-            stmt.bindString(8, nickName);
+            stmt.bindString(10, nickName);
         }
  
         String miningState = entity.getMiningState();
         if (miningState != null) {
-            stmt.bindString(9, miningState);
+            stmt.bindString(11, miningState);
         }
-        stmt.bindLong(10, entity.getTransExpiry());
-        stmt.bindLong(11, entity.getSyncBlockNum());
+ 
+        String syncState = entity.getSyncState();
+        if (syncState != null) {
+            stmt.bindString(12, syncState);
+        }
+        stmt.bindLong(13, entity.getTransExpiry());
+        stmt.bindLong(14, entity.getSyncBlockNum());
     }
 
     @Override
@@ -172,10 +192,13 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // rawAddress
             cursor.getLong(offset + 5), // balance
             cursor.getLong(offset + 6), // power
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // nickName
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // miningState
-            cursor.getLong(offset + 9), // transExpiry
-            cursor.getLong(offset + 10) // syncBlockNum
+            cursor.getLong(offset + 7), // miningIncome
+            cursor.getLong(offset + 8), // minedBlocks
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // nickName
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // miningState
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // syncState
+            cursor.getLong(offset + 12), // transExpiry
+            cursor.getLong(offset + 13) // syncBlockNum
         );
         return entity;
     }
@@ -189,10 +212,13 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setRawAddress(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setBalance(cursor.getLong(offset + 5));
         entity.setPower(cursor.getLong(offset + 6));
-        entity.setNickName(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setMiningState(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setTransExpiry(cursor.getLong(offset + 9));
-        entity.setSyncBlockNum(cursor.getLong(offset + 10));
+        entity.setMiningIncome(cursor.getLong(offset + 7));
+        entity.setMinedBlocks(cursor.getLong(offset + 8));
+        entity.setNickName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setMiningState(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setSyncState(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setTransExpiry(cursor.getLong(offset + 12));
+        entity.setSyncBlockNum(cursor.getLong(offset + 13));
      }
     
     @Override

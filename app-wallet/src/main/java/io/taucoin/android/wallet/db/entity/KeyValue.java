@@ -20,14 +20,18 @@ public class KeyValue {
     private String rawAddress;
     private long balance;
     private long power;
+    private long miningIncome;
+    private long minedBlocks;
     private String nickName;
     private String miningState;
+    private String syncState;
     private long transExpiry;
     private long syncBlockNum;
-    @Generated(hash = 982514948)
+    @Generated(hash = 720700569)
     public KeyValue(Long id, String pubKey, String priKey, String address,
-            String rawAddress, long balance, long power, String nickName,
-            String miningState, long transExpiry, long syncBlockNum) {
+            String rawAddress, long balance, long power, long miningIncome,
+            long minedBlocks, String nickName, String miningState, String syncState,
+            long transExpiry, long syncBlockNum) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -35,8 +39,11 @@ public class KeyValue {
         this.rawAddress = rawAddress;
         this.balance = balance;
         this.power = power;
+        this.miningIncome = miningIncome;
+        this.minedBlocks = minedBlocks;
         this.nickName = nickName;
         this.miningState = miningState;
+        this.syncState = syncState;
         this.transExpiry = transExpiry;
         this.syncBlockNum = syncBlockNum;
     }
@@ -85,6 +92,18 @@ public class KeyValue {
     public void setPower(long power) {
         this.power = power;
     }
+    public long getMiningIncome() {
+        return this.miningIncome;
+    }
+    public void setMiningIncome(long miningIncome) {
+        this.miningIncome = miningIncome;
+    }
+    public long getMinedBlocks() {
+        return this.minedBlocks;
+    }
+    public void setMinedBlocks(long minedBlocks) {
+        this.minedBlocks = minedBlocks;
+    }
     public String getNickName() {
         return this.nickName;
     }
@@ -96,6 +115,12 @@ public class KeyValue {
     }
     public void setMiningState(String miningState) {
         this.miningState = miningState;
+    }
+    public String getSyncState() {
+        return this.syncState;
+    }
+    public void setSyncState(String syncState) {
+        this.syncState = syncState;
     }
     public long getTransExpiry() {
         return this.transExpiry;

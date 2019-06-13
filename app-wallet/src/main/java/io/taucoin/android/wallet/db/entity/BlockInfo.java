@@ -21,8 +21,8 @@ public class BlockInfo {
     private String medianFee;
     private String minerNo;
 
-    @Transient
-    private List<MiningBlock> miningBlocks;
+//    @Transient
+//    private List<MiningBlock> miningBlocks;
 
     @Generated(hash = 206698040)
     public BlockInfo(Long id, int blockHeight, int blockSync, String avgIncome,
@@ -39,13 +39,13 @@ public class BlockInfo {
     public BlockInfo() {
     }
 
-    public List<MiningBlock> getMiningInfo() {
-        return miningBlocks;
-    }
-
-    public void setMiningBlocks(List<MiningBlock> miningBlocks) {
-        this.miningBlocks = miningBlocks;
-    }
+//    public List<MiningBlock> getMiningInfo() {
+//        return miningBlocks;
+//    }
+//
+//    public void setMiningBlocks(List<MiningBlock> miningBlocks) {
+//        this.miningBlocks = miningBlocks;
+//    }
 
     public Long getId() {
         return this.id;

@@ -30,6 +30,7 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -100,17 +101,27 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
-    public static void setPower(TextView tvPower) {
-        if(tvPower == null){
+    public static void setUserInfo(TextView tvPower, TextView tvMiningIncome, LoadingTextView tvMined) {
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue == null || tvPower == null || tvMiningIncome == null || tvMined == null){
             return;
         }
-        String power = "0";
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue != null){
-            power = String.valueOf(keyValue.getPower());
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        if(StringUtil.isNotSame(address, keyValue.getAddress())){
+            TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+            return;
         }
+        String power = String.valueOf(keyValue.getPower());
         tvPower.setText(power);
         Logger.d("UserUtil.setPower=" + power);
+
+        String minedBlocks = String.valueOf(keyValue.getMinedBlocks());
+        tvMined.setNormalText(minedBlocks);
+
+        String miningIncome = FmtMicrometer.fmtMiningIncome(keyValue.getMiningIncome());
+        String incomeStr = MyApplication.getInstance().getResources().getString(R.string.common_balance);
+        incomeStr = String.format(incomeStr, miningIncome);
+        tvMiningIncome.setText(Html.fromHtml(incomeStr));
     }
 
     public static boolean isImportKey() {

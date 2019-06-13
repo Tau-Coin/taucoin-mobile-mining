@@ -32,7 +32,6 @@ import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.ChainDetail;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
@@ -312,7 +311,6 @@ public class TxService extends Service {
             context.startService(intent);
         }
     }
-
 
     public static void stopService() {
         Context context = MyApplication.getInstance();
