@@ -8,8 +8,6 @@ import io.taucoin.db.BlockStore;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.AdvancedDeviceUtils;
 import io.taucoin.util.ByteUtil;
-import io.taucoin.validator.DependentBlockHeaderRule;
-import io.taucoin.validator.ParentBlockHeaderValidator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +81,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private TaucoinListener listener;
 
-    private DependentBlockHeaderRule parentHeaderValidator;
-
     private PendingState pendingState;
 
 
@@ -106,11 +102,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
                           Wallet wallet,
-                          ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
+                          PendingState pendingState, TaucoinListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.wallet = wallet;
-        this.parentHeaderValidator = parentHeaderValidator;
         this.pendingState = pendingState;
         this.listener = listener;
     }
@@ -517,21 +512,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
 
-    public boolean isValid(BlockHeader header) {
-
-        Block parentBlock = getParent(header);
-
-        if (!parentHeaderValidator.validate(header, parentBlock.getHeader())) {
-
-            if (logger.isErrorEnabled())
-                parentHeaderValidator.logErrors(logger);
-
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * verify block version
      * @param version
@@ -709,12 +689,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             logger.error("Verify Block time fail, block number {}", block.getNumber());
             return false;
         }
-
-        /*
-		if (!isValid(block.getHeader())) {
-            return false;
-        }
-		*/
 
         List<Transaction> txs = block.getTransactionsList();
         if (txs.size() > Constants.MAX_BLOCKTXSIZE) {
@@ -1001,10 +975,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     public boolean isBlockExist(byte[] hash) {
         return blockStore.isBlockExist(hash);
-    }
-
-    public void setParentHeaderValidator(DependentBlockHeaderRule parentHeaderValidator) {
-        this.parentHeaderValidator = parentHeaderValidator;
     }
 
     public void setPendingState(PendingState pendingState) {

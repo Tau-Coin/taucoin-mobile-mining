@@ -4,6 +4,7 @@ import android.content.Context;
 
 import io.taucoin.android.datasource.LevelDbDataSource;
 import io.taucoin.android.debug.TauMobileRefWatcher;
+import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Account;
 import io.taucoin.core.Blockchain;
@@ -33,22 +34,13 @@ import io.taucoin.http.tau.codec.TauMessageCodec;
 import io.taucoin.http.tau.handler.TauHandler;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.sync2.SyncManager;
 import io.taucoin.sync2.SyncQueue;
 import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.sync2.PoolSynchronizer;
-import io.taucoin.validator.BlockHeaderRule;
-import io.taucoin.validator.BlockHeaderValidator;
-import io.taucoin.validator.DependentBlockHeaderRule;
-import io.taucoin.validator.DifficultyRule;
-import io.taucoin.validator.ParentBlockHeaderValidator;
-import io.taucoin.validator.ParentNumberRule;
-import io.taucoin.validator.ProofOfTransactionRule;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +54,6 @@ import org.mapdb.DB;
 import org.mapdb.Serializer;
 
 import static io.taucoin.db.IndexedBlockStore.BLOCK_INFO_SERIALIZER;
-import static java.util.Arrays.asList;
 import static io.taucoin.config.SystemProperties.CONFIG;
 
 @Module
@@ -113,8 +104,8 @@ public class TaucoinModule {
     @Singleton
     io.taucoin.core.Blockchain provideBlockchain(BlockStore blockStore, io.taucoin.core.Repository repository,
                                                    Wallet wallet,
-                                                   ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
-        return new BlockchainImpl(blockStore, repository, wallet, parentHeaderValidator, pendingState, listener);
+                                                   PendingState pendingState, TaucoinListener listener) {
+        return new BlockchainImpl(blockStore, repository, wallet, pendingState, listener);
     }
 
     @Provides
@@ -177,16 +168,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    SyncQueue provideSyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
-        return new SyncQueue(blockchain, headerValidator);
-    }
-
-    @Provides
-    BlockHeaderValidator provideBlockHeaderValidator() {
-        List<BlockHeaderRule> rules = new ArrayList<BlockHeaderRule>();
-        rules.add(new ProofOfTransactionRule());
-
-        return new BlockHeaderValidator(rules);
+    SyncQueue provideSyncQueue(Blockchain blockchain) {
+        return new SyncQueue(blockchain);
     }
 
     @Provides
@@ -226,21 +209,7 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    Context provideContext() {
-        return context;
-    }
-
-    @Provides
-    @Singleton
-    ParentBlockHeaderValidator provideParentBlockHeaderValidator() {
-
-        List<DependentBlockHeaderRule> rules = new ArrayList<>(asList(
-                new ParentNumberRule(),
-                new DifficultyRule()
-        ));
-
-        return new ParentBlockHeaderValidator(rules);
-    }
+    Context provideContext() { return context; }
 
     @Provides
     @Singleton

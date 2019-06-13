@@ -4,7 +4,6 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Block;
 import io.taucoin.core.BlockHeader;
 import io.taucoin.core.Blockchain;
-import io.taucoin.validator.BlockHeaderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -20,9 +19,8 @@ import static io.taucoin.config.SystemProperties.CONFIG;
 
 @Singleton
 public class BlockLoader {
-    private static final Logger logger = LoggerFactory.getLogger("blockqueue");
 
-    private BlockHeaderValidator headerValidator;
+    private static final Logger logger = LoggerFactory.getLogger("blockqueue");
 
     SystemProperties config = SystemProperties.CONFIG;
 
@@ -53,7 +51,8 @@ public class BlockLoader {
                 long t1 = System.nanoTime();
                 if (block.getNumber() >= blockchain.getBestBlock().getNumber()){
 
-                    if (block.getNumber() > 0 && !isValid(block.getHeader())) {
+                    //if (block.getNumber() > 0 && !isValid(block.getHeader())) {
+                    if (block.getNumber() > 0) {
                         break;
                     };
 
@@ -79,18 +78,5 @@ public class BlockLoader {
         }
 
         System.out.println(" * Done * ");
-    }
-
-    private boolean isValid(BlockHeader header) {
-
-        if (!headerValidator.validate(header)) {
-
-            if (logger.isErrorEnabled())
-                headerValidator.logErrors(logger);
-
-            return false;
-        }
-
-        return true;
     }
 }
