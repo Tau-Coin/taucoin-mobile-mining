@@ -24,8 +24,6 @@ public interface BlockStore {
 
     List<byte[]> getListHashesEndWith(byte[] hash, long qty);
 
-    List<BlockHeader> getListHeadersEndWith(byte[] hash, long qty);
-
     List<Block> getListBlocksEndWith(byte[] hash, long qty);
 
     void saveBlock(Block block, BigInteger cummDifficulty, boolean mainChain);

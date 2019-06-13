@@ -90,18 +90,6 @@ public class InMemoryBlockStore implements BlockStore{
     }
 
     @Override
-    public List<BlockHeader> getListHeadersEndWith(byte[] hash, long qty) {
-        List<Block> blocks = getListBlocksEndWith(hash, qty);
-        List<BlockHeader> headers = new ArrayList<>(blocks.size());
-
-        for (Block b : blocks) {
-            headers.add(b.getHeader());
-        }
-
-        return headers;
-    }
-
-    @Override
     public List<Block> getListBlocksEndWith(byte[] hash, long qty) {
 
         Block startBlock = hashIndex.get(wrap(hash));
@@ -141,7 +129,6 @@ public class InMemoryBlockStore implements BlockStore{
     }
 
     // FIXME: wrap from here in to db class
-
     public byte[] dbGetBlockHashByNumber(long blockNumber) {
 
         Session s = sessionFactory.openSession();

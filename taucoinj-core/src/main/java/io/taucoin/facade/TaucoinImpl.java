@@ -217,7 +217,6 @@ public class TaucoinImpl implements Taucoin {
         return new Transaction(version, option, timeStamp, toAddress, amount, fee);
     }
 
-
     @Override
     public Transaction submitTransaction(Transaction transaction) {
          boolean submitResult = pendingState.addPendingTransaction(transaction);
@@ -230,12 +229,6 @@ public class TaucoinImpl implements Taucoin {
 
          return null;
     }
-
-    @Override
-    public Wallet getWallet() {
-        return worldManager.getWallet();
-    }
-
 
     @Override
     public io.taucoin.facade.Repository getRepository() {

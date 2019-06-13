@@ -4,11 +4,9 @@ import io.taucoin.net.tau.TauVersion;
 
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
-import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.net.server.ChannelManager;
 import io.taucoin.sync.SyncManager;
 import io.taucoin.sync.SyncQueue;
-import io.taucoin.net.MessageQueue;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -35,8 +33,6 @@ public class TauHandlerFactoryImpl implements TauHandlerFactory {
 
     protected SyncQueue queue;
 
-    protected Wallet wallet;
-
     protected PendingState pendingState;
 
     protected ChannelManager channelManager;
@@ -45,7 +41,7 @@ public class TauHandlerFactoryImpl implements TauHandlerFactory {
     public TauHandlerFactoryImpl(Provider<Tau60> tau60Provider, Provider<Tau61> tau61Provider, Provider<Tau62> tau62Provider,
             Blockchain blockchain, BlockStore blockstore, SyncManager syncManager,
             SyncQueue queue,
-            Wallet wallet, PendingState pendingState, ChannelManager channelManager) {
+            PendingState pendingState, ChannelManager channelManager) {
         this.tau60Provider = tau60Provider;
         this.tau61Provider = tau61Provider;
         this.tau62Provider = tau62Provider;
@@ -54,7 +50,6 @@ public class TauHandlerFactoryImpl implements TauHandlerFactory {
         this.blockstore = blockstore;
         this.syncManager = syncManager;
         this.queue = queue;
-        this.wallet = wallet;
         this.pendingState = pendingState;
         this.channelManager = channelManager;
     }
@@ -75,7 +70,7 @@ public class TauHandlerFactoryImpl implements TauHandlerFactory {
             default:    throw new IllegalArgumentException("Eth " + version + " is not supported");
         }
 
-        handler.init(blockchain, blockstore, syncManager, queue, wallet, pendingState, channelManager);
+        handler.init(blockchain, blockstore, syncManager, queue, pendingState, channelManager);
         return handler;
     }
 }

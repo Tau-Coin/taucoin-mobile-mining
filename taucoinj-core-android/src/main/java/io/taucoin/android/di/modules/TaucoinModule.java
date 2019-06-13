@@ -12,7 +12,6 @@ import io.taucoin.core.BlockchainImpl;
 import io.taucoin.core.PendingState;
 import io.taucoin.core.PendingStateImpl;
 import io.taucoin.core.Repository;
-import io.taucoin.core.Wallet;
 import io.taucoin.datasource.HashMapDB;
 import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.datasource.mapdb.MapDBFactory;
@@ -84,11 +83,11 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet,
+    WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository,
             BlockStore blockStore, SyncManager syncManager, PendingState pendingState,
             RequestManager requestManager, PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
 
-        return new WorldManager(listener, blockchain, repository, wallet, blockStore, syncManager,
+        return new WorldManager(listener, blockchain, repository, blockStore, syncManager,
                 pendingState, requestManager, poolSynchronizer, refWatcher);
     }
 
@@ -103,15 +102,8 @@ public class TaucoinModule {
     @Provides
     @Singleton
     io.taucoin.core.Blockchain provideBlockchain(BlockStore blockStore, io.taucoin.core.Repository repository,
-                                                   Wallet wallet,
                                                    PendingState pendingState, TaucoinListener listener) {
-        return new BlockchainImpl(blockStore, repository, wallet, pendingState, listener);
-    }
-
-    @Provides
-    @Singleton
-    Wallet provideWallet(Repository repository, Provider<Account> accountProvider, TaucoinListener listener) {
-        return new Wallet(repository, accountProvider, listener);
+        return new BlockchainImpl(blockStore, repository, pendingState, listener);
     }
 
     @Provides

@@ -68,16 +68,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     private Repository repository;
     private Repository track;
 
-
     private BlockStore blockStore;
 
     private Block bestBlock;
 
     private BigInteger totalDifficulty = ZERO;
-
-
-    Wallet wallet;
-
 
     private TaucoinListener listener;
 
@@ -101,11 +96,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     //todo: autowire over constructor
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
-                          Wallet wallet,
                           PendingState pendingState, TaucoinListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
-        this.wallet = wallet;
         this.pendingState = pendingState;
         this.listener = listener;
     }
@@ -481,9 +474,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             System.gc();
 //        }
 
-        // Remove all wallet transactions as they already approved by the net
-        wallet.removeTransactions(block.getTransactionsList());
-
         listener.trace(String.format("Block chain size: [ %d ]", this.getSize()));
 
         listener.onBlock(block);
@@ -789,9 +779,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             wrapBlockTransactions(block, repo);
 
             if (!config.blockChainOnly()) {
-//                wallet.addTransactions(block.getTransactionsList());
                 return applyBlock(block, repo);
-//                wallet.processBlock(block);
             }
         }
         return true;
@@ -983,44 +971,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     public PendingState getPendingState() {
         return pendingState;
-    }
-
-    @Override
-    public synchronized List<BlockHeader> getListOfHeadersStartFrom(BlockIdentifier identifier, int skip, int limit, boolean reverse) {
-        long blockNumber = identifier.getNumber();
-
-        if (identifier.getHash() != null) {
-            Block block = getBlockByHash(identifier.getHash());
-
-            if (block == null) {
-                return emptyList();
-            }
-
-            blockNumber = block.getNumber();
-        }
-
-        long bestNumber = bestBlock.getNumber();
-
-        if (bestNumber < blockNumber) {
-            return emptyList();
-        }
-
-        int qty = getQty(blockNumber, bestNumber, limit, reverse);
-
-        byte[] startHash = getStartHash(blockNumber, skip, qty, reverse);
-
-        if (startHash == null) {
-            return emptyList();
-        }
-
-        List<BlockHeader> headers = blockStore.getListHeadersEndWith(startHash, qty);
-
-        // blocks come with falling numbers
-        if (!reverse) {
-            Collections.reverse(headers);
-        }
-
-        return headers;
     }
 
     private int getQty(long blockNumber, long bestNumber, int limit, boolean reverse) {

@@ -1,8 +1,6 @@
 package io.taucoin.net.submit;
 
 import io.taucoin.core.Transaction;
-import io.taucoin.core.Wallet;
-import io.taucoin.manager.WorldManager;
 import io.taucoin.net.server.Channel;
 import io.taucoin.net.server.ChannelManager;
 
@@ -12,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import static java.lang.Thread.sleep;
 
 /**
  * @author Roman Mandeleil

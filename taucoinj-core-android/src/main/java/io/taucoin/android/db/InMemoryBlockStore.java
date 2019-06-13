@@ -2,7 +2,6 @@ package io.taucoin.android.db;
 
 
 import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
 import org.hibernate.SessionFactory;
@@ -94,19 +93,6 @@ public class InMemoryBlockStore implements BlockStore {
         }
 
         return hashes;
-    }
-
-
-    @Override
-    public List<BlockHeader> getListHeadersEndWith(byte[] hash, long qty) {
-        List<Block> blocks = getListBlocksEndWith(hash, qty);
-        List<BlockHeader> headers = new ArrayList<>(blocks.size());
-
-        for (Block b : blocks) {
-            headers.add(b.getHeader());
-        }
-
-        return headers;
     }
 
     @Override

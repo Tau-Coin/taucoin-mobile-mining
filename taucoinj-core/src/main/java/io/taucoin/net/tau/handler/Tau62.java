@@ -59,9 +59,6 @@ public class Tau62 extends TauHandler {
             case NEW_BLOCK_HASHES:
                 processNewBlockHashes((NewBlockHashes62Message) msg);
                 break;
-            case GET_BLOCK_HEADERS:
-                processGetBlockHeaders((GetBlockHeadersMessage) msg);
-                break;
             case BLOCK_HEADERS:
                 processBlockHeaders((BlockHeadersMessage) msg);
                 break;
@@ -128,18 +125,6 @@ public class Tau62 extends TauHandler {
             int maxBlocksAsk = (int) (lastBlockNumber - firstBlockNumber + 1);
             sendGetBlockHeaders(firstBlockNumber, maxBlocksAsk);
         }
-    }
-
-    protected void processGetBlockHeaders(GetBlockHeadersMessage msg) {
-        List<BlockHeader> headers = blockchain.getListOfHeadersStartFrom(
-                msg.getBlockIdentifier(),
-                msg.getSkipBlocks(),
-                min(msg.getMaxHeaders(), MAX_HASHES_TO_SEND),
-                msg.isReverse()
-        );
-
-        BlockHeadersMessage response = new BlockHeadersMessage(headers);
-        sendMessage(response);
     }
 
     protected void processBlockHeaders(BlockHeadersMessage msg) {

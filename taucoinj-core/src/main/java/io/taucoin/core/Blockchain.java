@@ -47,8 +47,6 @@ public interface Blockchain {
 
     boolean isBlockExist(byte[] hash);
 
-    List<BlockHeader> getListOfHeadersStartFrom(BlockIdentifier identifier, int skip, int limit, boolean reverse);
-
     List<byte[]> getListOfBodiesByHashes(List<byte[]> hashes);
 
     Transaction getTransactionByHash(byte[] hash);
