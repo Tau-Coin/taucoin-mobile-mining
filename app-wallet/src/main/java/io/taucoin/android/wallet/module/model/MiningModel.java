@@ -32,6 +32,7 @@ import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.core.Block;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
     private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(30));
@@ -58,6 +59,26 @@ public class MiningModel implements IMiningModel{
             boolean isSuccess = false;
             if(entry != null){
                 entry.setMiningState(miningState);
+                isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
+            }
+            emitter.onNext(isSuccess);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(observer);
+    }
+
+    @Override
+    public void updateSyncState(String syncState, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+            KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
+            boolean isSuccess = false;
+            if(entry != null){
+                entry.setSyncState(syncState);
+                if(StringUtil.isSame(syncState, TransmitKey.MiningState.Stop)){
+                    entry.setMiningState(syncState);
+                }
                 isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
             }
             emitter.onNext(isSuccess);

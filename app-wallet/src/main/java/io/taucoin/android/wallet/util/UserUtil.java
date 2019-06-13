@@ -17,7 +17,6 @@ package io.taucoin.android.wallet.util;
 
 import android.text.Html;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
@@ -193,7 +192,7 @@ public class UserUtil {
     /**
      * set state of mining conditions
      * */
-    public static void setMiningConditions(ProgressView ivMiningPower, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data, boolean isClearError) {
+    public static void setMiningConditions(ProgressView ivMiningPower, ProgressView ivMiningSync, Object data, boolean isClearError) {
         try{
             if(data != null){
                 BlockInfo blockInfo = (BlockInfo)data;
@@ -204,29 +203,23 @@ public class UserUtil {
                 boolean isPowerError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 3;
                 if(power > 0 && isPowerError && isClearError){
                     MyApplication.getRemoteConnector().clearErrorCode();
+                    isPowerError = false;
+                    MyApplication.getRemoteConnector().startBlockForging();
                 }
-                if(keyValue.getPower() <= 0 || isPowerError || !ivMiningSwitch.isChecked()){
+                if(keyValue.getPower() <= 0 || isPowerError){
                     ivMiningPower.setOff();
-                    if(!ivMiningSwitch.isChecked()){
-                        ivMiningPower.setEnabled(false);
-                    }else{
-                        ivMiningPower.setEnabled(true);
-                    }
+                    ivMiningPower.setEnabled(true);
                 }else {
                     ivMiningPower.setOn();
                     ivMiningPower.setEnabled(false);
                 }
 
-                if(isSynced && ivMiningSwitch.isChecked()){
+                if(isSynced){
                     ivMiningSync.setOn();
                     ivMiningSync.setEnabled(false);
                 }else {
                     ivMiningSync.setOff();
-                    if(!ivMiningSwitch.isChecked()){
-                        ivMiningSync.setEnabled(false);
-                    }else{
-                        ivMiningSync.setEnabled(true);
-                    }
+                    ivMiningSync.setEnabled(true);
                 }
             }
         }catch (Exception ignore){

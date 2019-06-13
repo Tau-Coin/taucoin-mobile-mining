@@ -37,13 +37,16 @@ import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.foundation.util.TrafficUtil;
 import io.taucoin.net.p2p.HelloMessage;
 
@@ -71,7 +74,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     @SuppressWarnings("ConstantConditions")
     @Override
     public boolean handleMessage(Message message) {
-        Logger.d("message.what=\t" + message.what);
         boolean isClaimed = true;
         long time = new Date().getTime();
         switch (message.what) {
@@ -161,9 +163,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_TAUCOIN_CREATED:
                     case EVENT_TAUCOIN_EXIST:
                         isInit = 1;
-                        EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
-                        startSyncAll();
-                        startBlockForging();
+                        startSyncAndMining();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -268,6 +268,26 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 isClaimed = false;
         }
         return isClaimed;
+    }
+
+    private void startSyncAndMining() {
+        logger.info("startSyncAndMining");
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if (keyValue != null) {
+            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
+            boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
+            if(isSyncStart){
+                if(isMiningStart){
+                    MyApplication.getRemoteConnector().startBlockForging();
+                }else{
+                    MyApplication.getRemoteConnector().stopBlockForging();
+                }
+                MyApplication.getRemoteConnector().startSyncAll();
+            }else{
+                MyApplication.getRemoteConnector().stopSyncAll();
+                MyApplication.getRemoteConnector().stopBlockForging();
+            }
+        }
     }
 
     private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {

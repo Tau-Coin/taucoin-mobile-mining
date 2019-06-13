@@ -45,6 +45,7 @@ import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
@@ -276,11 +277,8 @@ public class NotifyManager {
                 gotoMainActivity();
                 break;
             case ACTION_NOTIFICATION_MINING:
-                if(StringUtil.isNotSame(serviceType, TransmitKey.MiningState.Start) ||
-                        MyApplication.getRemoteConnector().isInit()){
-                    updateMiningState(serviceType);
-                    Logger.d("NotificationReceiver immediate enter MainActivity");
-                }
+                updateMiningState(serviceType);
+                Logger.d("NotificationReceiver immediate enter MainActivity");
                 break;
             default:
                 break;
@@ -315,6 +313,14 @@ public class NotifyManager {
     }
 
     private void updateMiningState(String serviceType) {
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if (keyValue != null) {
+            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
+            if(!isSyncStart){
+                ToastUtils.showShortToast(R.string.mining_need_sync_open);
+                return;
+            }
+        }
         boolean isOn = StringUtil.isSame(serviceType, TransmitKey.MiningState.Start);
         isOn = !isOn;
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
@@ -328,14 +334,14 @@ public class NotifyManager {
                     isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                 }
                 if(isStart){
-                    boolean isCanInit = MyApplication.getRemoteConnector().isCanInit();
-                    if(isCanInit){
-                        MyApplication.getRemoteConnector().init();
-                    }
+                    MyApplication.getRemoteConnector().startBlockForging();
                 }else{
-                    MyApplication.getRemoteConnector().cancelRemoteConnector();
+                    MyApplication.getRemoteConnector().stopBlockForging();
                 }
-                EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                MessageEvent messageEvent = new MessageEvent();
+                messageEvent.setCode(MessageEvent.EventCode.MINING_NOTIFY);
+                messageEvent.setData(isStart);
+                EventBusUtil.post(messageEvent);
             }
         });
     }

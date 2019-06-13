@@ -19,8 +19,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
@@ -40,7 +40,6 @@ import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
-import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.LoadingTextView;
@@ -56,6 +55,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.iv_mining_switch)
     Switch ivMiningSwitch;
+    @BindView(R.id.iv_sync_switch)
+    Switch ivSyncSwitch;
     @BindView(R.id.tv_mining_switch)
     TextView tvMiningSwitch;
     @BindView(R.id.tv_mining_income)
@@ -88,8 +89,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ProgressView ivMiningPower;
     @BindView(R.id.iv_mining_sync)
     ProgressView ivMiningSync;
-    @BindView(R.id.tv_booting)
-    LoadingTextView tvBooting;
 
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
@@ -100,6 +99,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         ButterKnife.bind(this, view);
         miningPresenter = new MiningPresenter(this);
         initView();
+        MyApplication.getRemoteConnector().init();
         handleMiningView();
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
@@ -107,7 +107,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         return view;
     }
 
-    @OnClick({R.id.iv_mining_switch, R.id.tv_synchronized, R.id.tv_mined,
+    @OnClick({R.id.iv_mining_switch, R.id.iv_sync_switch, R.id.tv_synchronized, R.id.tv_mined,
             R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right, R.id.tv_power_title,
             R.id.iv_mining_power, R.id.iv_mining_sync, })
     public void onClick(View view) {
@@ -120,6 +120,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case R.id.iv_mining_switch:
                 if(UserUtil.isImportKey()){
                     starOrStopMining();
+                }else{
+                    ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+                }
+                break;
+            case R.id.iv_sync_switch:
+                if(UserUtil.isImportKey()){
+                    starOrStopSync();
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
@@ -153,13 +160,46 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
-    @OnCheckedChanged({R.id.iv_mining_switch})
-    void onMiningSwitchChanged(boolean isChecked){
-        if(tvMiningSwitch != null){
-            tvMiningSwitch.setText(isChecked ? R.string.home_mining_on : R.string.home_mining_off);
-            int colorRes = isChecked ? R.color.color_yellow : R.color.color_grey;
-            tvMiningSwitch.setTextColor(ResourcesUtil.getColor(colorRes));
+    @OnTouch({R.id.iv_mining_switch})
+    boolean onMiningSwitchTouch(){
+        if(ivSyncSwitch != null && !ivSyncSwitch.isChecked()){
+            ToastUtils.showShortToast(R.string.mining_need_sync_open);
+            return true;
         }
+        return false;
+    }
+
+//    @OnCheckedChanged({R.id.iv_mining_switch})
+//    void onMiningSwitchChanged(boolean isChecked){
+//        if(tvMiningSwitch != null){
+//            tvMiningSwitch.setText(isChecked ? R.string.home_mining_on : R.string.home_mining_off);
+//            int colorRes = isChecked ? R.color.color_yellow : R.color.color_grey;
+//            tvMiningSwitch.setTextColor(ResourcesUtil.getColor(colorRes));
+//        }
+//    }
+
+    private void starOrStopSync() {
+        if(ivSyncSwitch == null){
+            return;
+        }
+        boolean isOn = ivSyncSwitch.isChecked();
+
+        if(isOn){
+            MyApplication.getRemoteConnector().init();
+            MyApplication.getRemoteConnector().startSyncAll();
+        }else{
+            MyApplication.getRemoteConnector().stopSyncAll();
+            if(ivMiningSwitch.isChecked()){
+                MyApplication.getRemoteConnector().stopBlockForging();
+                ivMiningSwitch.setChecked(false);
+                NotifyManager.getInstance().sendNotify(TransmitKey.MiningState.Stop);
+            }
+        }
+        String syncState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
+        if(BuildConfig.DEBUG){
+            requestWriteLOgPermissions();
+        }
+        miningPresenter.updateSyncState(syncState);
     }
 
     private void starOrStopMining() {
@@ -167,8 +207,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             return;
         }
         boolean isOn = ivMiningSwitch.isChecked();
-        handleMiningView();
-
+        if(isOn){
+            MyApplication.getRemoteConnector().init();
+            MyApplication.getRemoteConnector().startBlockForging();
+        }else{
+            MyApplication.getRemoteConnector().stopBlockForging();
+        }
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
         if(BuildConfig.DEBUG){
             requestWriteLOgPermissions();
@@ -195,17 +239,14 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             case BLOCK_HEIGHT:
                 MiningUtil.setBlockHeight(tvChainHeight);
                 break;
-            case MINING_INIT:
-                if(ivMiningSwitch != null){
-                    ivMiningSwitch.setEnabled(true);
-                    tvBooting.setVisibility(View.INVISIBLE);
-                }
-                handleMiningView();
             case MINING_INFO:
-                handleMiningView();
-                break;
             case MINING_STATE:
                 handleMiningView();
+                break;
+            case MINING_NOTIFY:
+                if(ivMiningSwitch != null && object.getData() != null){
+                    ivMiningSwitch.setChecked((Boolean) object.getData());
+                }
                 break;
             case MINING_REWARD:
                 onRefresh(null);
@@ -231,12 +272,34 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 8);
         DrawablesUtil.setEndDrawable(tvPowerTitle, R.mipmap.icon_log_help, 12);
 
+        initTopSwitch();
+    }
+
+    public synchronized void handleMiningView() {
+        if (UserUtil.isImportKey()) {
+            miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
+                @Override
+                public void handleData(BlockInfo blockInfo) {
+                    showMiningView(blockInfo);
+                }
+            });
+        }else{
+            showMiningView(null);
+        }
+    }
+
+    private void initTopSwitch() {
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue != null) {
-            boolean isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
-            if(isStart){
-                ivMiningSwitch.setChecked(true);
-                MyApplication.getRemoteConnector().init();
+            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
+            boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
+            ivSyncSwitch.setChecked(isSyncStart);
+            ivMiningSwitch.setChecked(isMiningStart);
+            if(isSyncStart){
+                if(isMiningStart){
+                    MyApplication.getRemoteConnector().startSyncAll();
+                }
+                MyApplication.getRemoteConnector().startBlockForging();
             }
         }
     }
@@ -255,50 +318,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             blockSync = blockInfo.getBlockSync();
             miners = StringUtil.getIntString(blockInfo.getMinerNo());
 
-            boolean isStopped = ivMiningPower.isEnabled() || ivMiningSync.isEnabled();
-            UserUtil.setMiningConditions(ivMiningPower, ivMiningSync, ivMiningSwitch, blockInfo, !isRefreshMined);
-            boolean isNeedRestart = !ivMiningPower.isEnabled() && !ivMiningSync.isEnabled();
-            if(MyApplication.getRemoteConnector().isInit() && isStopped && isNeedRestart){
-                MyApplication.getRemoteConnector().startBlockForging();
-            }
+            UserUtil.setMiningConditions(ivMiningPower, ivMiningSync, blockInfo, !isRefreshMined);
         }
         tvSynchronized.setText(String.valueOf(blockSync));
         tvChainHeight.setText(String.valueOf(blockHeight));
         tvMiners.setText(String.valueOf(miners));
-    }
-
-    public synchronized void handleMiningView() {
-        if (UserUtil.isImportKey()) {
-            miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
-                @Override
-                public void handleData(BlockInfo blockInfo) {
-                    showMiningView(blockInfo);
-
-                    boolean isStart = false;
-                    KeyValue keyValue = MyApplication.getKeyValue();
-                    if (keyValue != null) {
-                        isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
-                    }
-                    ivMiningSwitch.setChecked(isStart);
-                    if(isStart){
-                        boolean isCanInit = MyApplication.getRemoteConnector().isCanInit();
-                        if(isCanInit){
-                            MyApplication.getRemoteConnector().init();
-                        }
-                        if(!MyApplication.getRemoteConnector().isInit()){
-                            ivMiningSwitch.setEnabled(false);
-                            String booting = ResourcesUtil.getText(R.string.home_mining_booting);
-                            tvBooting.setLoadingText(booting);
-                            tvBooting.setVisibility(View.VISIBLE);
-                        }
-                    }else{
-                        MyApplication.getRemoteConnector().cancelRemoteConnector();
-                    }
-                }
-            });
-        }else{
-            showMiningView(null);
-        }
     }
 
     @Override
@@ -322,7 +346,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void onDestroy() {
         if(tvMiningSwitch != null){
             tvMined.closeLoading();
-            tvBooting.closeLoading();
         }
         super.onDestroy();
     }

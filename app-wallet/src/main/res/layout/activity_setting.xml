@@ -33,7 +33,6 @@
             android:id="@+id/tv_reset_data"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="1dp"
             android:layout_marginBottom="1dp"
             app:itemRightTextColor="@color/color_grey_dark"
             app:itemLeftText="@string/setting_reset_data" />

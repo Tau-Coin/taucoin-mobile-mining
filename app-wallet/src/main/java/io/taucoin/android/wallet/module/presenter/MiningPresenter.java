@@ -42,7 +42,16 @@ public class MiningPresenter {
         mMiningModel.updateMiningState(miningState, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
-                mHomeView.handleMiningView();
+//                mHomeView.handleMiningView();
+            }
+        });
+    }
+
+    public void updateSyncState(String syncState) {
+        mMiningModel.updateSyncState(syncState, new LogicObserver<Boolean>() {
+            @Override
+            public void handleData(Boolean isSuccess) {
+//                mHomeView.handleMiningView();
             }
         });
     }

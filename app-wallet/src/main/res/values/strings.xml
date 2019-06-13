@@ -138,12 +138,13 @@
     <string name="home_mining_balance">Balance</string>
     <string name="home_mining_power">Power</string>
     <string name="home_mining_sync">Synced</string>
-    <string name="home_mining_on">Mining\nOn</string>
-    <string name="home_mining_off">Mining\nOff</string>
-    <string name="home_mining_booting">Booting</string>
+    <string name="home_mining_tip">Mining</string>
+    <string name="home_sync_tip">Sync</string>
+    <string name="home_on">On</string>
+    <string name="home_off">Off</string>
 
     <string name="home_balance">Total Balance</string>
-    <string name="home_mining_income">Mining Income</string>
+    <string name="home_mining_income">Historical Mining Income</string>
     <string name="home_power">Mining&#160;Power</string>
     <string name="home_miners">Miners&#160;Online</string>
     <string name="home_synchronized">Latest&#160;Block</string>
@@ -185,6 +186,7 @@
     <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
     <string name="mining_sync_complete">Latest block need to be synced.</string>
+    <string name="mining_need_sync_open">Please turn on the synchronization switch first!</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

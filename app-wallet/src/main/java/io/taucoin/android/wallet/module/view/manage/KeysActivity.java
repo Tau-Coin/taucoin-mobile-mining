@@ -50,8 +50,8 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
         }
     }
 
-    @OnClick(R.id.btn_import_key)
-    void onImportKeyClick() {
+    @OnClick({R.id.btn_import_key, R.id.btn_generate_key})
+    void onImportKeyClick(View view) {
         if(UserUtil.isImportKey()){
             KeyValue KeyValue = MyApplication.getKeyValue();
             if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
@@ -59,18 +59,13 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
                 return;
             }
         }
-        Intent intent = new Intent(this, ImportKeyActivity.class);
-        startActivity(intent);
-        this.finish();
-    }
-
-    @OnClick(R.id.btn_generate_key)
-    public void onBtnGenerateClicked() {
-        if(!MyApplication.getRemoteConnector().isCanInit()){
-            ToastUtils.showShortToast(R.string.mining_generate_private_key);
-            return;
+        if(view.getId() == R.id.btn_import_key){
+            Intent intent = new Intent(this, ImportKeyActivity.class);
+            startActivity(intent);
+            this.finish();
+        }else{
+            mUserPresenter.showSureDialog(this);
         }
-        mUserPresenter.showSureDialog(this);
     }
 
     @Override
