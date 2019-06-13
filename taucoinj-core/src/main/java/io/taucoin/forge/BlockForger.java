@@ -143,6 +143,10 @@ public class BlockForger {
     }
 
     public synchronized void stopForging() {
+        if (!isForging() || stopForge) {
+            return;
+        }
+
         this.isForging = false;
         this.stopForge = true;
         executor.shutdownNow();
