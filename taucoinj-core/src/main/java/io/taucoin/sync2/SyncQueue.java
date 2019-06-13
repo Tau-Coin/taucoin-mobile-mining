@@ -187,7 +187,7 @@ public class SyncQueue {
             blockQueue.close();
         }
 
-        inited.set(true);
+        inited.set(false);
     }
 
     /**
