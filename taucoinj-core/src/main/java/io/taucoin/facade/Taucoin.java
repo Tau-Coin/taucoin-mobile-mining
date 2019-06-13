@@ -3,7 +3,6 @@ package io.taucoin.facade;
 import io.taucoin.core.Block;
 import io.taucoin.core.ImportResult;
 import io.taucoin.core.Transaction;
-import io.taucoin.core.Wallet;
 import io.taucoin.db.BlockStore;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.listener.TaucoinListener;
@@ -126,14 +125,6 @@ public interface Taucoin {
      *                    return this transaction as approved
      */
     Transaction submitTransaction(Transaction transaction);
-
-
-    /**
-     * @return wallet object which is the manager
-     *         of internal accounts
-     */
-    Wallet getWallet();
-
 
     /**
      * @return - repository for all state data.

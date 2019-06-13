@@ -995,7 +995,6 @@ public class TaucoinRemoteService extends TaucoinService {
         }
 
         if (taucoin != null && !TextUtils.isEmpty(privateKey)) {
-            taucoin.getWorldManager().getWallet().importKey(key.getPrivKeyBytes());
             CONFIG.importForgerPrikey(key.getPrivKeyBytes());
             replyData.putString("result", "OK");
         } else {

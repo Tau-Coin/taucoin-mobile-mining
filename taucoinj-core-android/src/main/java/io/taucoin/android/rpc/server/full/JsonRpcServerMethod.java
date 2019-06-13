@@ -6,19 +6,13 @@ import com.thetransactioncompany.jsonrpc2.server.*;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-//import io.taucoin.android.db.BlockTransactionVO;
-//import io.taucoin.android.db.OrmLiteBlockStoreDatabase;
-import io.taucoin.android.rpc.server.full.JsonRpcServer;
 import io.taucoin.core.Account;
-import io.taucoin.core.AccountState;
 import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
-import io.taucoin.core.Blockchain;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.crypto.ECKey;
-import io.taucoin.crypto.HashUtil;
+
 import io.taucoin.facade.Taucoin;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.RLP;
@@ -27,10 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-
-import static io.taucoin.core.Denomination.SZABO;
 
 public abstract class JsonRpcServerMethod implements RequestHandler {
 
@@ -237,9 +227,5 @@ public abstract class JsonRpcServerMethod implements RequestHandler {
         */
 
         return res;
-    }
-
-    protected byte[] getCoinBase() {
-        return ((Account) taucoin.getWallet().getAccountCollection().toArray()[0]).getEcKey().getAddress();
     }
 }

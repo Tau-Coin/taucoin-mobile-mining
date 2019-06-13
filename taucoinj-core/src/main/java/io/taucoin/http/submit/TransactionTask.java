@@ -1,9 +1,7 @@
 package io.taucoin.http.submit;
 
 import io.taucoin.core.Transaction;
-import io.taucoin.core.Wallet;
 import io.taucoin.http.RequestManager;
-import io.taucoin.manager.WorldManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import static java.lang.Thread.sleep;
 
 /**
  * @author Roman Mandeleil

@@ -49,11 +49,6 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
             ecprivateKey.add(key);
         }
 
-        for (ECKey key: ecprivateKey) {
-           //worldManager.getWallet().importKey(Hex.decode(privateKey));
-           worldManager.getWallet().importKey(key.getPrivKeyBytes());
-        }
-
         // By default, import first privkey as block forger private key.
         if (!ecprivateKey.isEmpty()) {
             //CONFIG.importForgerPrikey(Hex.decode(privateKeys.get(0)));
@@ -68,10 +63,4 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
         worldManager.initSync();
     }
 
-    public byte[] createRandomAccount() {
-
-        byte[] randomPrivateKey = HashUtil.sha3(HashUtil.randomPeerId());
-        worldManager.getWallet().importKey(randomPrivateKey);
-        return randomPrivateKey;
-    }
 }

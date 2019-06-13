@@ -44,8 +44,6 @@ public class WorldManager {
 
     private Repository repository;
 
-    private Wallet wallet;
-
     private PeerClient activePeer;
 
     private BlockStore blockStore;
@@ -65,7 +63,7 @@ public class WorldManager {
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
-    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
+    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository
                         , BlockStore blockStore, SyncManager syncManager
                         , PendingState pendingState, RequestManager requestManager
                         ,PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
@@ -73,7 +71,6 @@ public class WorldManager {
         this.listener = listener;
         this.blockchain = blockchain;
         this.repository = repository;
-        this.wallet = wallet;
         this.blockStore = blockStore;
         this.syncManager = syncManager;
         this.pendingState = pendingState;
@@ -135,20 +132,12 @@ public class WorldManager {
         return listener;
     }
 
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
     public io.taucoin.facade.Repository getRepository() {
         return (io.taucoin.facade.Repository)repository;
     }
 
     public Blockchain getBlockchain() {
         return blockchain;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
     }
 
     public void setActivePeer(PeerClient peer) {
@@ -241,7 +230,6 @@ public class WorldManager {
         refWatcher.watch(listener);
         refWatcher.watch(blockchain);
         refWatcher.watch(repository);
-        refWatcher.watch(wallet);
         refWatcher.watch(activePeer);
         refWatcher.watch(blockStore);
         refWatcher.watch(syncManager);
