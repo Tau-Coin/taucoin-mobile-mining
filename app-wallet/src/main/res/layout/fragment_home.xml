@@ -83,6 +83,7 @@
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_weight="1.6"
+                        android:layout_gravity="center_vertical"
                         android:layout_height="wrap_content">
 
                         <LinearLayout
@@ -104,12 +105,12 @@
                                     android:switchMinWidth="70dp"
                                     android:track="@drawable/grey_switch_rect_round_bg"
                                     android:thumb="@drawable/shape_switch_white"
-                                    android:switchTextAppearance="@style/style_small_grey_dark"
+                                    android:switchTextAppearance="@style/style_switch_grey_dark"
                                     android:textOn="@string/home_on"
                                     android:showText="true"
                                     android:textOff="@string/home_off"
                                     android:checked="false"
-                                    android:layout_height="40dp"
+                                    android:layout_height="wrap_content"
                                     tools:ignore="UnusedAttribute" />
 
                                 <TextView
@@ -127,7 +128,7 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_gravity="start"
-                                android:paddingTop="5dp"
+                                android:paddingTop="10dp"
                                 android:orientation="horizontal"
                                 android:layout_height="wrap_content">
 
@@ -137,12 +138,12 @@
                                     android:switchMinWidth="70dp"
                                     android:track="@drawable/grey_switch_rect_round_bg"
                                     android:thumb="@drawable/shape_switch_white"
-                                    android:switchTextAppearance="@style/style_small_grey_dark"
+                                    android:switchTextAppearance="@style/style_switch_grey_dark"
                                     android:textOn="@string/home_on"
                                     android:showText="true"
                                     android:textOff="@string/home_off"
                                     android:checked="false"
-                                    android:layout_height="40dp"
+                                    android:layout_height="wrap_content"
                                     tools:ignore="UnusedAttribute" />
 
                                 <TextView
