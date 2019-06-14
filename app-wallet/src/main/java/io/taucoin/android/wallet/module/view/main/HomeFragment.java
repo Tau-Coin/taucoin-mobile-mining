@@ -263,9 +263,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     ivMiningSwitch.setChecked((Boolean) object.getData());
                 }
                 break;
-            case MINING_REWARD:
-                onRefresh(null);
-                break;
             case APPLICATION_INFO:
                 UserUtil.setApplicationInfo(tvCPU, tvMemory, tvDataStorage, object.getData());
                 break;
