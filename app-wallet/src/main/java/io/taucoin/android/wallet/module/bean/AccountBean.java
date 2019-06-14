@@ -41,6 +41,7 @@ public class AccountBean {
 
     private BigInteger balance;
     private BigInteger power;
+    private BigInteger income;
     private boolean parsed = false;
 
     private void parseRLP() {
@@ -57,6 +58,11 @@ public class AccountBean {
         } else {
             this.power = BigInteger.ZERO;
         }
+        if(account.get(2) != null && account.get(2).getRLPData() != null){
+            this.income = new BigInteger(1, account.get(2).getRLPData());
+        } else {
+            this.income = BigInteger.ZERO;
+        }
         this.parsed = true;
     }
 
@@ -72,5 +78,12 @@ public class AccountBean {
             parseRLP();
         }
         return power;
+    }
+
+    public BigInteger getIncome() {
+        if (!parsed) {
+            parseRLP();
+        }
+        return income;
     }
 }
