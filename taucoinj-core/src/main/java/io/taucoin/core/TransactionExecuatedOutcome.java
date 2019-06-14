@@ -97,12 +97,31 @@ public class TransactionExecuatedOutcome {
         }
     }
 
+    /**
+     * current miner may share the fee resident because of distribution policy
+     * @param address
+     * @param deltafee
+     */
     public void updateCurrentWintessBalance(byte[] address,long deltafee){
         if (this.currentWintess.containsKey(address)) {
             long temp = currentWintess.get(address) + deltafee;
             this.currentWintess.put(address, temp);
         } else {
             this.currentWintess.put(address, deltafee);
+        }
+    }
+
+    /**
+     * different tx from a block may be witnessed a same last witness.
+     * @param address
+     * @param fee
+     */
+    public void updateLastWintessBalance(byte[] address,long fee) {
+        if (this.lastWintess.containsKey(address)) {
+            long temp = lastWintess.get(address) + fee;
+            this.lastWintess.put(address, temp);
+        } else {
+            this.lastWintess.put(address, fee);
         }
     }
 }

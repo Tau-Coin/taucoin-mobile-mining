@@ -793,11 +793,18 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         Repository cacheTrack;
         boolean isValid = true;
         int txCount = 0;
+
+        boolean isForgedSelf = false;
+        if (block.getForgerAddress().equals(config.getForgerCoinbase())) {
+            isForgedSelf = true;
+        }
+
         for (Transaction tx : block.getTransactionsList()) {
             //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
+            executor.setForgedByself(isForgedSelf);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
             if (!executor.init()) {

@@ -27,6 +27,9 @@ public class TransactionExecutor {
     private byte[] coinbase;
     private Blockchain blockchain;
     private TaucoinListener listener;
+
+    // indicate that this is witness by self to show mining income asap.
+    private boolean isForgedByself = false;
     /**
      * this is a temporary strategy.
      * a transaction per second.
@@ -37,6 +40,10 @@ public class TransactionExecutor {
 
     long basicTxAmount = 0;
     long basicTxFee = 0;
+
+    public void setForgedByself(boolean forgedByself) {
+        isForgedByself = forgedByself;
+    }
 
     //constructor
     public TransactionExecutor(Transaction tx, Repository track,Blockchain blockchain,TaucoinListener listener) {
@@ -234,7 +241,9 @@ public class TransactionExecutor {
                         feeDistributor.getLastAssociFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
-            listener.onTransactionExecuated(outcome);
+            if (isForgedByself) {
+                listener.onTransactionExecuated(outcome);
+            }
         }
         if(isTxCompleted) {
             logger.debug("in executation finish =========================");
