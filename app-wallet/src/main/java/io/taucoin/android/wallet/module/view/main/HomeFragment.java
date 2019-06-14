@@ -17,10 +17,14 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.concurrent.TimeUnit;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
@@ -34,6 +38,7 @@ import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.IHomeView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
+import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
@@ -119,6 +124,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         switch (view.getId()) {
             case R.id.iv_mining_switch:
                 if(UserUtil.isImportKey()){
+                    throttleFirst(view, 2);
                     starOrStopMining();
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
@@ -126,6 +132,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case R.id.iv_sync_switch:
                 if(UserUtil.isImportKey()){
+                    throttleFirst(view, 2);
                     starOrStopSync();
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
@@ -357,6 +364,18 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     this.getString(R.string.permission_tip_upgrade_denied),
                     PermissionUtils.REQUEST_PERMISSIONS_STORAGE, permission);
         }
+    }
+
+    public void throttleFirst(View view, long delaySeconds){
+        view.setEnabled(false);
+        Observable.timer(delaySeconds, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new CommonObserver<Long>() {
+                @Override
+                public void onComplete() {
+                    view.setEnabled(true);
+                }
+            });
     }
 
     @Override
