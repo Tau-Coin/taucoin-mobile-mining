@@ -47,6 +47,7 @@ import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.IncomeBean;
 import io.taucoin.android.wallet.module.bean.IncomeInfoBean;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.bean.MinerInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
@@ -106,6 +107,35 @@ public class TxModel implements ITxModel {
             });
     }
 
+    @Override
+    public void getMinerInfo(LogicObserver<KeyValue> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  address);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getMinerInfo(map)
+            .subscribeOn(Schedulers.io())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(new TxObserver<MinerInfoBean>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    observer.handleError(msgCode, msg);
+                }
+
+                @Override
+                public void handleData(MinerInfoBean minerInfoBean) {
+                    super.handleData(minerInfoBean);
+                    if(minerInfoBean != null && minerInfoBean.getStatus() == NetResultCode.MAIN_SUCCESS_CODE){
+                        updateMinerInfo(address, minerInfoBean, observer);
+                    }else{
+                        observer.onError();
+                    }
+                }
+            });
+    }
+
+
     private void updateBalance(String rawAddress, AccountBean accountInfo, LogicObserver<KeyValue> observer) {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
         String currentAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
@@ -115,12 +145,33 @@ public class TxModel implements ITxModel {
                 if(accountInfo != null && StringUtil.isSame(rawAddress, currentAddress)){
                     long balance = 0;
                     long power = 0;
+                    long miningIncome = 0;
                     if(StringUtil.isNotEmpty(accountInfo.getAccountInfo())){
                         balance = accountInfo.getBalance().longValue();
                         power = accountInfo.getPower().longValue();
+                        miningIncome = accountInfo.getIncome().longValue();
                     }
                     keyValue.setBalance(balance);
                     keyValue.setPower(power);
+                    keyValue.setMiningIncome(miningIncome);
+                    KeyValueDaoUtils.getInstance().update(keyValue);
+                }
+            }catch (Exception ignore){}
+            emitter.onNext(keyValue);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(observer);
+    }
+
+    private void updateMinerInfo(String address, MinerInfoBean minerInfoBean, LogicObserver<KeyValue> observer) {
+        String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        String currentAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
+            try {
+                if(minerInfoBean != null && StringUtil.isSame(address, currentAddress)){
+                    keyValue.setMinedBlocks(minerInfoBean.getMinerPartNo());
                     KeyValueDaoUtils.getInstance().update(keyValue);
                 }
             }catch (Exception ignore){}

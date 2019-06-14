@@ -54,6 +54,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
+                android:singleLine="true"
                 android:text="@string/main_send_receive"
                 android:textColor="@drawable/bottom_tab_color" />
 

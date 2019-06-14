@@ -19,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -227,24 +228,24 @@ public class NotifyManager {
         service.startForeground(NOTIFICATION_ID, mNotification);
     }
 
-    public void sendBlockNotify(String rewardMsg) {
-        if(mService == null || !PermissionUtils.isNotificationEnabled()){
+    void sendBlockNotify(Service service, NotificationManager notificationManager, NotificationCompat.Builder builder, String rewardMsg) {
+        if(service == null || !PermissionUtils.isNotificationEnabled()){
             return;
         }
 
         int notifyId = (int) (System.currentTimeMillis() / 1000);
-        RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_mining);
-        remoteViews.setImageViewResource(R.id.iv_logo, mService.getApplicationInfo().icon);
-        remoteViews.setTextViewText(R.id.tv_msg, mService.getString(R.string.app_name));
+        RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.notification_mining);
+        remoteViews.setImageViewResource(R.id.iv_logo, service.getApplicationInfo().icon);
+        remoteViews.setTextViewText(R.id.tv_msg, service.getString(R.string.app_name));
         remoteViews.setTextViewText(R.id.tv_tip, rewardMsg);
 
         long time = new Date().getTime();
         remoteViews.setTextViewText(R.id.tv_time, DateUtil.format(time, DateUtil.pattern0));
-        mBuilder.setCustomContentView(remoteViews);
-        mBuilder.setSound(null);
-        Notification notification = mBuilder.build();
+        builder.setCustomContentView(remoteViews);
+        builder.setSound(null);
+        Notification notification = builder.build();
         notification.flags = Notification.FLAG_AUTO_CANCEL;
-        mNotificationManager.notify(notifyId, notification);
+        notificationManager.notify(notifyId, notification);
     }
 
     void cancelNotify(){

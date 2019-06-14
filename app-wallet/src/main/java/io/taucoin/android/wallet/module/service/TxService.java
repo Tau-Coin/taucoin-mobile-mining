@@ -189,6 +189,8 @@ public class TxService extends Service {
 
     private void getBalance(String serviceType) {
         mIsGetBalance = true;
+        getIncomeInfo();
+        getMinerInfo();
         mTxModel.getBalance(new LogicObserver<KeyValue>() {
 
             @Override
@@ -222,8 +224,18 @@ public class TxService extends Service {
         });
     }
 
+    private void getMinerInfo() {
+        mTxModel.getMinerInfo(new LogicObserver<KeyValue>(){
+
+            @Override
+            public void handleData(KeyValue keyValue) {
+                MyApplication.setKeyValue(keyValue);
+                EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+            }
+        });
+    }
+
     private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
-        getIncomeInfo();
         ProgressManager.closeProgressDialog();
         if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA)){
             if(isSuccess){

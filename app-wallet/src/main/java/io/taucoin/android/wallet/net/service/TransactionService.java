@@ -23,6 +23,7 @@ import io.reactivex.Observable;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.IncomeInfoBean;
+import io.taucoin.android.wallet.module.bean.MinerInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
@@ -52,4 +53,6 @@ public interface TransactionService {
     @GET("getincomeinfo")
     Observable<IncomeInfoBean> getIncomeInfo();
 
+    @POST("getminerinfo")
+    Observable<MinerInfoBean> getMinerInfo(@Body Map<String,String> address);
 }

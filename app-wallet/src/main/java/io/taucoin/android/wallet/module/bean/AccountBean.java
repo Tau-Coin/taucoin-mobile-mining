@@ -58,7 +58,7 @@ public class AccountBean {
         } else {
             this.power = BigInteger.ZERO;
         }
-        if(account.get(2) != null && account.get(2).getRLPData() != null){
+        if(account.size() > 2 && account.get(2) != null && account.get(2).getRLPData() != null){
             this.income = new BigInteger(1, account.get(2).getRLPData());
         } else {
             this.income = BigInteger.ZERO;

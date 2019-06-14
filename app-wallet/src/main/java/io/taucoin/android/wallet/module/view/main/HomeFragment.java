@@ -70,8 +70,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvPower;
     @BindView(R.id.tv_synchronized)
     TextView tvSynchronized;
-    @BindView(R.id.tv_synchronized_title)
-    TextView tvSynchronizedTitle;
+    @BindView(R.id.tv_chain_height_title)
+    TextView tvChainHeightTitle;
     @BindView(R.id.tv_mined)
     LoadingTextView tvMined;
     @BindView(R.id.tv_mined_title)
@@ -112,9 +112,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         return view;
     }
 
-    @OnClick({R.id.iv_mining_switch, R.id.iv_sync_switch, R.id.tv_synchronized, R.id.tv_mined,
-            R.id.tv_synchronized_title, R.id.tv_mined_title, R.id.iv_right, R.id.tv_power_title,
-            R.id.iv_mining_power, R.id.iv_mining_sync, })
+    @OnClick({R.id.iv_mining_switch, R.id.iv_sync_switch, R.id.tv_chain_height, R.id.tv_mined,
+            R.id.tv_chain_height_title, R.id.tv_mined_title, R.id.iv_right, R.id.tv_power_title,
+            R.id.iv_mining_power, R.id.iv_mining_sync})
     public void onClick(View view) {
         if (!UserUtil.isImportKey() && view.getId() != R.id.tv_power_title) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -138,12 +138,20 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
                 break;
-            case R.id.tv_synchronized_title:
-            case R.id.tv_synchronized:
+            case R.id.tv_chain_height_title:
+            case R.id.tv_chain_height:
+                if(UserUtil.isImportKey()){
+                    ActivityUtil.openUri(getActivity(), TransmitKey.ExternalUrl.BLOCKS_INFO);
+                }else{
+                    ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+                }
+                break;
             case R.id.tv_mined_title:
             case R.id.tv_mined:
                 if(UserUtil.isImportKey()){
-                    ActivityUtil.openUri(getActivity(), TransmitKey.ExternalUrl.BLOCKS_INFO);
+                    String address = MyApplication.getKeyValue().getAddress();
+                    String uriStr = TransmitKey.ExternalUrl.MINING_INFO + address;
+                    ActivityUtil.openUri(getActivity(), uriStr);
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
@@ -275,7 +283,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setOnRefreshListener(this);
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
-        DrawablesUtil.setEndDrawable(tvSynchronizedTitle, R.mipmap.icon_right_grey, 8);
+        DrawablesUtil.setEndDrawable(tvChainHeightTitle, R.mipmap.icon_right_grey, 8);
         DrawablesUtil.setEndDrawable(tvMinedTitle, R.mipmap.icon_right_grey, 8);
         DrawablesUtil.setEndDrawable(tvPowerTitle, R.mipmap.icon_log_help, 12);
 

@@ -23,13 +23,22 @@ import android.support.v4.app.NotificationCompat;
 
 import com.crashlytics.android.Crashlytics;
 
+import java.util.Map;
+
 import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.service.TaucoinRemoteService;
 import io.taucoin.android.service.TaucoinServiceMessage;
+import io.taucoin.android.service.events.EventData;
+import io.taucoin.android.service.events.EventFlag;
+import io.taucoin.android.service.events.TransactionExecuatedEvent;
+import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.core.TransactionExecuatedOutcome;
 
 public class RemoteService extends TaucoinRemoteService {
     private NotificationCompat.Builder builder;
+    private NotificationManager mNotificationManager;
 
     public RemoteService() {
         super();
@@ -80,13 +89,59 @@ public class RemoteService extends TaucoinRemoteService {
         return true;
     }
 
+    @Override
+    protected void broadcastEvent(EventFlag event, EventData data) {
+        super.broadcastEvent(event, data);
+        if(event != null && event == EventFlag.EVENT_TRANSACTION_EXECUATED){
+            TransactionExecuatedEvent txRewards = (TransactionExecuatedEvent) data;
+            if(txRewards != null && txRewards.outcome != null){
+                TransactionExecuatedOutcome outcome = txRewards.outcome;
+                long rewards = 0L;
+                rewards += parseRewards(outcome.getLastWintess());
+                rewards += parseRewards(outcome.getSenderAssociated());
+
+                long minerRewards = parseRewards(outcome.getCurrentWintess());
+                int notifyRes = -1;
+                if(rewards > 0){
+                    if(minerRewards > 0){
+                        notifyRes = R.string.income_miner_participant;
+                    }else{
+                        notifyRes = R.string.income_participant;
+                    }
+                }else if(minerRewards > 0){
+                    notifyRes = R.string.income_miner;
+                }
+                rewards += minerRewards;
+                if(rewards > 0 && notifyRes > 0){
+                    String notifyStr = getText(notifyRes).toString();
+                    String rewardStr = FmtMicrometer.fmtFormat(String.valueOf(rewards));
+                    notifyStr = String.format(notifyStr, rewardStr);
+                    NotifyManager.getInstance().sendBlockNotify(this, mNotificationManager, builder, notifyStr);
+                }
+            }
+        }else if(event != null && event == EventFlag.EVENT_BLOCK_DISCONNECT){
+            String rollback = getText(R.string.income_miner_rollback).toString();
+            NotifyManager.getInstance().sendBlockNotify(this, mNotificationManager, builder, rollback);
+        }
+    }
+
+    private long parseRewards(Map<byte[],Long> map) {
+        long rewards = 0;
+        if(map != null && map.size() > 0){
+            for (Map.Entry<byte[], Long> entry : map.entrySet()) {
+                rewards += entry.getValue();
+            }
+        }
+        return rewards;
+    }
+
     private void init() {
         initNotificationManager();
     }
 
     private void initNotificationManager() {
         // notification manager
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         builder = NotifyManager.getInstance().createNotificationBuilder(this, mNotificationManager);
     }
 }

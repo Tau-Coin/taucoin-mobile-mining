@@ -30,6 +30,8 @@ import io.taucoin.foundation.net.callback.LogicObserver;
 public interface ITxModel {
     /** Get balance from the server */
     void getBalance(LogicObserver<KeyValue> observer);
+    /** Get balance from the server */
+    void getMinerInfo(LogicObserver<KeyValue> observer);
 
     /** Detecting whether a transaction enters the trading pool and block chain */
     void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer);
