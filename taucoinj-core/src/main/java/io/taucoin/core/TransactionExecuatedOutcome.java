@@ -6,8 +6,8 @@ import java.util.Map;
 public class TransactionExecuatedOutcome {
     private byte[] blockhash = null;
     private HashMap<byte[],Long> senderAssociated = new HashMap<>();
-    private Map<byte[],Long> lastWintess;
-    private Map<byte[],Long> currentWintess;
+    private Map<byte[],Long> lastWintess = new HashMap<>();
+    private Map<byte[],Long> currentWintess = new HashMap<>();
 
     private byte[] senderAddress;
     private byte[] receiveAddress;
