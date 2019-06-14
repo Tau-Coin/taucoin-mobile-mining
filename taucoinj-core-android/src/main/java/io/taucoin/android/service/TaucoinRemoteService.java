@@ -18,7 +18,6 @@ import android.text.TextUtils;
 import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.interop.BlockTxReindex;
-import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.android.service.events.*;
 import io.taucoin.config.MainNetParams;
 import io.taucoin.core.*;
@@ -27,7 +26,6 @@ import io.taucoin.crypto.HashUtil;
 import io.taucoin.android.Taucoin;
 import io.taucoin.forge.ForgeStatus;
 import io.taucoin.http.ConnectionManager;
-import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.Utils;
 
@@ -191,38 +189,6 @@ public class TaucoinRemoteService extends TaucoinService {
                 init(message);
                 break;
 
-            case TaucoinServiceMessage.MSG_CONNECT:
-                connect(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_LOAD_BLOCKS:
-                loadBlocks(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_START_JSON_RPC_SERVER:
-                startJsonRpc(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_CHANGE_JSON_RPC_SERVER:
-                changeJsonRpc(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_FIND_ONLINE_PEER:
-                findOnlinePeer(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_GET_PEERS:
-                getPeers(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_START_PEER_DISCOVERY:
-                startPeerDiscovery(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_STOP_PEER_DISCOVERY:
-                stopPeerDiscovery(message);
-                break;
-
             case TaucoinServiceMessage.MSG_GET_BLOCKCHAIN_STATUS:
                 getBlockchainStatus(message);
                 break;
@@ -233,10 +199,6 @@ public class TaucoinRemoteService extends TaucoinService {
 
             case TaucoinServiceMessage.MSG_REMOVE_LISTENER:
                 removeListener(message);
-                break;
-
-            case TaucoinServiceMessage.MSG_GET_CONNECTION_STATUS:
-                getConnectionStatus(message);
                 break;
 
             case TaucoinServiceMessage.MSG_CLOSE:
@@ -331,12 +293,6 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.initSync();
             isTaucoinStarted = true;
             isInitialized = true;
-
-            // Start rpc server
-            if (CONFIG.isRpcEnabled()) {
-                logger.info("Starting json rpc...");
-                startJsonRpc(null);
-            }
 
             // Init network status and register listener.
             initNetwork();
@@ -462,7 +418,6 @@ public class TaucoinRemoteService extends TaucoinService {
     protected void init(Message message) {
 
         if (isTaucoinStarted) {
-            stopJsonRpcServer();
             closeTaucoin(null);
             taucoin = null;
             component = null;
@@ -474,269 +429,7 @@ public class TaucoinRemoteService extends TaucoinService {
         List<String> privateKeys = data.getStringArrayList("privateKeys");
         onTaucoinCreated(privateKeys);
     }
-*/
-    /**
-     * Connect to peer
-     *
-     * Incoming message parameters ( "key": type [description] ):
-     * {
-     *     "ip": String  [peer ip address]
-     *     "port": int  [peer port]
-     *     "remoteId": String  [peer remoteId]
-     * }
-     * Sends message: none
-     */
-    protected void connect(Message message) {
-
-        if (!isConnected && taucoin != null) {
-            isConnected = true;
-            Bundle data = message.getData();
-            String ip = data.getString("ip");
-            if (ip == null && this.ipBootstrap != null) {
-                ip = this.ipBootstrap;
-            }
-            int port = data.getInt("port");
-            if (port == -1) {
-                port = this.portBootstrap;
-            }
-            String remoteId = data.getString("remoteId");
-            if (remoteId == null && this.remoteIdBootstrap != null) {
-                remoteId = this.remoteIdBootstrap;
-            }
-            System.out.println("Trying to connect to: " + ip + ":" + port + "@" + remoteId);
-            new ConnectTask(ip, port, remoteId).execute(taucoin);
-        }
-    }
-
-    protected class ConnectTask extends AsyncTask<Taucoin, Message, Void> {
-
-        String ip;
-        int port;
-        String remoteId;
-
-        public ConnectTask(String ip, int port, String remoteId) {
-
-            this.ip = ip;
-            this.port = port;
-            this.remoteId = remoteId;
-        }
-
-        protected Void doInBackground(Taucoin... args) {
-
-            Taucoin taucoin = args[0];
-            System.out.println("Connecting to: " + ip + ":" + port + "@" + remoteId);
-            taucoin.initSync();
-            //taucoin.connect(ip, port, remoteId);
-            logger.info("Taucoin connecting to : " + ip + ":" + port);
-            return null;
-        }
-
-        protected void onPostExecute(Void results) {
-
-
-        }
-    }
-
-    /**
-     * Load blocks from dump file
-     *
-     * Incoming message parameters ( "key": type [description] ):
-     * {
-     *     "dumpFile": String  [blocks dump file path]
-     * }
-     * Sends message: none
-     */
-    protected void loadBlocks(Message message) {
-
-        if (!isConnected) {
-            isConnected = true;
-            new LoadBlocksTask(message).execute(taucoin);
-        }
-    }
-
-    protected class LoadBlocksTask extends AsyncTask<Taucoin, Message, Void> {
-
-        String dumpFile;
-
-        public LoadBlocksTask(Message message) {
-
-            Bundle data = message.getData();
-            dumpFile = data.getString("dumpFile");
-        }
-
-        protected Void doInBackground(Taucoin... args) {
-
-            Taucoin taucoin = args[0];
-            logger.info("Loading blocks from: " + dumpFile);
-            BlockLoader blockLoader = (BlockLoader)taucoin.getBlockLoader();
-            blockLoader.loadBlocks(dumpFile);
-            logger.info("Finished loading blocks from: " + dumpFile);
-            return null;
-        }
-
-        protected void onPostExecute(Void results) {
-
-
-        }
-    }
-
-    protected void stopJsonRpcServer() {
-        if (jsonRpcServerThread != null) {
-            jsonRpcServerThread.interrupt();
-            jsonRpcServerThread = null;
-        }
-        if (jsonRpcServer != null) {
-            jsonRpcServer.stop();
-            jsonRpcServer = null;
-        }
-    }
-
-    /**
-     * Start the json rpc server
-     *
-     * Incoming message parameters: none
-     * Sends message: none
-     */
-    protected void startJsonRpc(Message message) {
-
-        if (jsonRpcServer == null) {
-            //TODO: add here switch between full and light version
-            jsonRpcServer = new io.taucoin.android.rpc.server.full.JsonRpcServer(taucoin);
-        }
-        if (jsonRpcServerThread == null) {
-            jsonRpcServerThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        jsonRpcServer.start(CONFIG.rpcListenPort());
-                        logger.info("Started json rpc server!");
-                    } catch (Exception e) {
-                        logger.error("Exception starting json rpc server: " + e.getMessage());
-                    }
-                }
-            });
-            jsonRpcServerThread.start();
-        }
-    }
-
-    /**
-     * Start the json rpc server
-     *
-     * Incoming message parameters: none
-     * Sends message: none
-     */
-    protected void changeJsonRpc(Message message) {
-
-        String server = null;
-        if (message == null) {
-            if (currentJsonRpcServer != null) {
-                server = currentJsonRpcServer;
-            }
-        } else {
-            Bundle data = message.getData();
-            server = data.getString("rpc_server");
-            currentJsonRpcServer = server;
-        }
-        if (jsonRpcServer != null && server != null) {
-            //((io.taucoin.android.rpc.server.light.JsonRpcServer)jsonRpcServer).addRemoteServer(server, true);
-        } else {
-            System.out.println("jsonRpcServer or server is null on changeJsonRpc");
-        }
-    }
-
-
-
-    /**
-     * Find an online peer
-     *
-     * Incoming message parameters ( "key": type [description] ):
-     * {
-     *      "excludePeer": Parcelable(PeerInfo) [peer to exclude from search]
-     * }
-     * Sends message parameters ( "key": type [description] ):
-     * {
-     *     "peerInfo": Parcelable(PeerInfo) [found online peer, or null if error / online peer not found]
-     * }
-     */
-    protected void findOnlinePeer(Message message) {
-
-        Bundle data = message.getData();
-        PeerInfo foundPeerInfo;
-        PeerInfo peerInfo = data.getParcelable("excludePeer");
-        if (peerInfo != null) {
-            foundPeerInfo = taucoin.findOnlinePeer(peerInfo);
-        } else {
-            PeerInfo[] excludePeerSet = (PeerInfo[])data.getParcelableArray("excludePeerSet");
-            if (excludePeerSet != null) {
-                foundPeerInfo = taucoin.findOnlinePeer(new HashSet<>(Arrays.asList(excludePeerSet)));
-            } else {
-                foundPeerInfo = taucoin.findOnlinePeer();
-            }
-        }
-        // Send reply
-        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_ONLINE_PEER, 0, 0, message.obj);
-        Bundle replyData = new Bundle();
-        replyData.putParcelable("peerInfo", new io.taucoin.android.interop.PeerInfo(foundPeerInfo));
-        replyMessage.setData(replyData);
-        try {
-            message.replyTo.send(replyMessage);
-            logger.info("Sent online peer to client: " + foundPeerInfo.toString());
-        } catch (RemoteException e) {
-            logger.error("Exception sending online peer to client: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Get etherum peers
-     *
-     * Incoming message parameters: none
-     * Sends message ( "key": type [description] ):
-     * {
-     *     "peers": Parcelable[](PeerInfo[]) [taucoin peers]
-     * }
-     */
-    protected void getPeers(Message message) {
-
-        Set<PeerInfo> peers = taucoin.getPeers();
-        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_PEERS, 0, 0, message.obj);
-        Bundle replyData = new Bundle();
-        io.taucoin.android.interop.PeerInfo[] convertedPeers = new io.taucoin.android.interop.PeerInfo[peers.size()];
-        int index = 0;
-        for (PeerInfo peerInfo: peers) {
-            convertedPeers[index] = new io.taucoin.android.interop.PeerInfo(peerInfo);
-            index++;
-        }
-        replyData.putParcelableArray("peers", convertedPeers);
-        replyMessage.setData(replyData);
-        try {
-            message.replyTo.send(replyMessage);
-            logger.info("Sent peers to client: " + peers.size());
-        } catch (RemoteException e) {
-            logger.error("Exception sending peers to client: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Starts taucoin peer discovery
-     * Incoming message parameters: none
-     * Sends message: none
-     */
-    protected void startPeerDiscovery(Message message) {
-
-        taucoin.startPeerDiscovery();
-        logger.info("Started peer discovery.");
-    }
-
-    /**
-     * Stops taucoin peer discovery
-     * Incoming message parameters: none
-     * Sends message: none
-     */
-    protected void stopPeerDiscovery(Message message) {
-
-        taucoin.stopPeerDiscovery();
-        logger.info("Stopped peer discovery.");
-    }
+   */
 
     /**
      * Gets the blockchain status
@@ -857,30 +550,6 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     /**
-     * Get connection status
-     *
-     * Incoming message parameters: none
-     * Sends message ( "key": type [description] ):
-     * {
-     *     "status": String [taucoin connection status: Connected/Not Connected]
-     * }
-     */
-    protected void getConnectionStatus(Message message) {
-
-        String status = taucoin.isConnected() ? "Connected" : "Not Connected";
-        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CONNECTION_STATUS, 0, 0, message.obj);
-        Bundle replyData = new Bundle();
-        replyData.putString("status", status);
-        replyMessage.setData(replyData);
-        try {
-            message.replyTo.send(replyMessage);
-            logger.info("Sent taucoin connection status: " + status);
-        } catch (RemoteException e) {
-            logger.error("Exception sending taucoin connection status to client: " + e.getMessage());
-        }
-    }
-
-    /**
      * Submit taucoin transaction
      *
      * Incoming message parameters ( "key": type [description] ):
@@ -995,6 +664,7 @@ public class TaucoinRemoteService extends TaucoinService {
         }
 
         if (taucoin != null && !TextUtils.isEmpty(privateKey)) {
+            //taucoin.getWorldManager().getWallet().importKey(key.getPrivKeyBytes());
             CONFIG.importForgerPrikey(key.getPrivKeyBytes());
             replyData.putString("result", "OK");
         } else {
