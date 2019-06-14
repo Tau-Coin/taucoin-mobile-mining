@@ -83,6 +83,7 @@ public class UserPresenter {
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.RAW_ADDRESS, keyValue.getRawAddress());
                 TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
                 TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
+                MyApplication.getRemoteConnector().init();
                 if(isGenerateKey){
                     gotoKeysActivity();
                 }else{
@@ -103,7 +104,6 @@ public class UserPresenter {
         mIImportKeyView.gotoKeysActivity();
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
         EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
-        EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
     }
 
     private void getAddOuts() {
