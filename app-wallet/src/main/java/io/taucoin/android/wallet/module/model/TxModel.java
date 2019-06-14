@@ -423,6 +423,7 @@ public class TxModel implements ITxModel {
     public void queryTransactionHistory(int pageNo, String time, LogicObserver<List<TransactionHistory>> logicObserver) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if(keyValue == null || StringUtil.isEmpty(keyValue.getAddress())){
+            logicObserver.onNext(null);
             return;
         }
         Observable.create((ObservableOnSubscribe<List<TransactionHistory>>) emitter -> {
@@ -536,6 +537,10 @@ public class TxModel implements ITxModel {
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
             .subscribe(new TxObserver<IncomeInfoBean>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                }
+
                 @Override
                 public void handleData(IncomeInfoBean incomeInfoBean) {
                     if(incomeInfoBean != null && incomeInfoBean.getStatus() == 200 &&

@@ -6,6 +6,7 @@ import io.taucoin.datasource.KeyValueDataSource;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
+import org.iq80.leveldb.DBException;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.WriteBatch;
 
@@ -52,8 +53,8 @@ public class LevelDbDataSource implements KeyValueDataSource {
         options.blockSize(10 * 1024 * 1024);
         options.writeBufferSize(10 * 1024 * 1024);
         options.cacheSize(0);
-        options.paranoidChecks(true);
-        options.verifyChecksums(true);
+        options.paranoidChecks(false);
+        options.verifyChecksums(false);
 
         try {
             logger.debug("Opening database");
@@ -91,7 +92,6 @@ public class LevelDbDataSource implements KeyValueDataSource {
         }
     }
 
-
     @Override
     public void setName(String name) {
         this.name = name;
@@ -104,7 +104,19 @@ public class LevelDbDataSource implements KeyValueDataSource {
 
     @Override
     public byte[] get(byte[] key) {
-        return db.get(key);
+        try {
+            return db.get(key);
+        } catch (DBException e) {
+            // Try to recover database.
+            try {
+                tryToRecoverDb();
+            } catch (Exception re) {
+                re.printStackTrace();
+                logger.error(re.getMessage(), re);
+                throw new RuntimeException("Can't recover database");
+            }
+            return db.get(key);
+        }
     }
 
     @Override
@@ -120,26 +132,47 @@ public class LevelDbDataSource implements KeyValueDataSource {
 
     @Override
     public Set<byte[]> keys() {
-
-        DBIterator dbIterator = db.iterator();
-        Set<byte[]> keys = new HashSet<>();
-        while (dbIterator.hasNext()) {
-
-            Map.Entry<byte[], byte[]> entry = dbIterator.next();
-            keys.add(entry.getKey());
+        try (DBIterator iterator = db.iterator()) {
+            Set<byte[]> result = new HashSet<>();
+            for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+                result.add(iterator.peekNext().getKey());
+            }
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return keys;
+    }
+
+    private void updateBatchInternal(Map<byte[], byte[]> rows) throws IOException {
+        try (WriteBatch batch = db.createWriteBatch()) {
+            for (Map.Entry<byte[], byte[]> entry : rows.entrySet()) {
+                batch.put(entry.getKey(), entry.getValue());
+            }
+            db.write(batch);
+        }
     }
 
     @Override
     public void updateBatch(Map<byte[], byte[]> rows) {
+        try  {
+            updateBatchInternal(rows);
+        } catch (Exception e) {
+            // Try to recover database.
+            try {
+                tryToRecoverDb();
+            } catch (Exception re) {
+                re.printStackTrace();
+                logger.error(re.getMessage(), re);
+                throw new RuntimeException("Can't recover database");
+            }
 
-        WriteBatch batch = db.createWriteBatch();
-
-        for (Map.Entry<byte[], byte[]> row : rows.entrySet())
-            batch.put(row.getKey(), row.getValue());
-
-        db.write(batch);
+            // try one more time
+            try {
+                updateBatchInternal(rows);
+            } catch (Exception e1) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -154,5 +187,30 @@ public class LevelDbDataSource implements KeyValueDataSource {
         } catch (IOException e) {
             logger.error("Failed to find the db file on the close: {} ", name);
         }
+    }
+
+    // Temp test solution. It often happens that level db gets error.
+    private void tryToRecoverDb() throws Exception {
+        close();
+
+        if (name == null) throw new NullPointerException("no name set to the db when recovery");
+
+        Options options = new Options();
+        options.createIfMissing(true);
+        options.compressionType(CompressionType.NONE);
+        options.blockSize(10 * 1024 * 1024);
+        options.writeBufferSize(10 * 1024 * 1024);
+        options.cacheSize(0);
+        options.paranoidChecks(false);
+        options.verifyChecksums(false);
+
+        File dbLocation = new File(SystemProperties.CONFIG.databaseDir());
+        File fileLocation = new File(dbLocation, name);
+        if (!dbLocation.exists()) dbLocation.mkdirs();
+
+        logger.warn("Recovering database: '{}'", name);
+
+        db = factory.open(fileLocation, options);
+        alive = true;
     }
 }

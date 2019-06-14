@@ -4,7 +4,6 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.datasource.mapdb.MapDBFactory;
 import io.taucoin.db.*;
-import io.taucoin.validator.BlockHeaderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -60,17 +59,14 @@ public class SyncQueue {
 
     private SyncManager syncManager;
 
-    private BlockHeaderValidator headerValidator;
-
     private MapDBFactory mapDBFactory;
 
     private Thread worker = null;
 
     private byte[] genesisBlockHash = null;
 
-    public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
+    public SyncQueue(Blockchain blockchain) {
         this.blockchain = blockchain;
-        this.headerValidator = headerValidator;
     }
 
     public void setSyncManager(SyncManager syncManager) {
@@ -189,6 +185,7 @@ public class SyncQueue {
     public void addAndValidate(List<Block> blocks, byte[] nodeId) {
 
         // run basic checks
+		/*
         for (Block b : blocks) {
             if (!isValid(b.getHeader())) {
 
@@ -200,7 +197,7 @@ public class SyncQueue {
                 return;
             }
         }
-
+        */
         addList(blocks, nodeId);
     }
 
@@ -239,19 +236,17 @@ public class SyncQueue {
     public void addNew(Block block, byte[] nodeId) {
 
         // run basic checks
+		/*
         if (!isValid(block.getHeader())) {
             syncManager.reportBadAction(nodeId);
             return;
         }
-
+        */
         BlockWrapper wrapper = new BlockWrapper(block, true, nodeId);
         wrapper.setReceivedAt(System.currentTimeMillis());
 
         blockQueue.addOrReplace(wrapper);
 
-//        logger.debug("Blocks waiting to be proceed:  queue.size: [{}] lastBlock.number: [{}]",
-//                blockQueue.size(),
-//                wrapper.getNumber());
     }
 
     /**
@@ -358,7 +353,7 @@ public class SyncQueue {
     public List<BlockHeader> addAndValidateHeaders(List<BlockHeader> headers, byte[] nodeId) {
         List<BlockHeader> newHeaders = new ArrayList<BlockHeader>();
         List<BlockHeader> filtered = blockQueue.filterExistingHeaders(headers);
-
+        /*
         for (BlockHeader header : filtered) {
 
             if (!isValid(header)) {
@@ -373,7 +368,7 @@ public class SyncQueue {
                 newHeaders.add(header);
             }
         }
-
+        */
         headerStore.addBatch(newHeaders);
 
         if (logger.isDebugEnabled())
@@ -491,6 +486,7 @@ public class SyncQueue {
      * @param header block header
      * @return true if block is valid, false otherwise
      */
+	/*
     private boolean isValid(BlockHeader header) {
 
         if (!headerValidator.validate(header)) {
@@ -503,6 +499,7 @@ public class SyncQueue {
 
         return true;
     }
+     */
 
     public static void fillupHeadersNumber(List<BlockHeader> headers,
             long startNumber, long lastNumber) {

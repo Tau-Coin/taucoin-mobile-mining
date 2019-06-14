@@ -15,10 +15,7 @@
  */
 package io.taucoin.android.wallet.module.presenter;
 
-import java.util.List;
-
 import io.taucoin.android.wallet.db.entity.BlockInfo;
-import io.taucoin.android.wallet.db.entity.MiningReward;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.view.main.iview.IHomeView;
@@ -45,16 +42,16 @@ public class MiningPresenter {
         mMiningModel.updateMiningState(miningState, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
-                mHomeView.handleMiningView();
+//                mHomeView.handleMiningView();
             }
         });
     }
 
-    public void getMiningRewards(int pageNo, String time) {
-        mMiningModel.getMiningRewards(pageNo, time, new LogicObserver<List<MiningReward>>() {
+    public void updateSyncState(String syncState) {
+        mMiningModel.updateSyncState(syncState, new LogicObserver<Boolean>() {
             @Override
-            public void handleData(List<MiningReward> miningRewards) {
-                mHomeView.handleMiningRewardView(miningRewards);
+            public void handleData(Boolean isSuccess) {
+//                mHomeView.handleMiningView();
             }
         });
     }

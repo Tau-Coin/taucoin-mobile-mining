@@ -28,9 +28,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 
@@ -45,7 +43,7 @@ public class TaucoinService extends Service {
 
     protected static JsonRpcServer jsonRpcServer;
     protected static Thread jsonRpcServerThread;
-
+    protected  TransactionExecuatedOutcome appWanted = new TransactionExecuatedOutcome();
     public TaucoinService() {
     }
 
@@ -200,7 +198,47 @@ public class TaucoinService extends Service {
         public void onTransactionExecuated(TransactionExecuatedOutcome outcome) {
 //            System.out.println("outcome is: "+ Hex.toHexString(outcome.getBlockhash())
 //                              +" \ntxid: "+Hex.toHexString(outcome.getTxid()));
-            broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(outcome));
+            if (!outcome.isTxComplete()) {
+                Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
+                if (iterc.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iterc.next();
+                    appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                }
+
+                Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
+                if (iterl.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iterl.next();
+                    appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                }
+
+                Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
+                while (iters.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iters.next();
+                    appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                }
+            } else {
+                Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
+                if (iterc.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iterc.next();
+                    appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                }
+
+                Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
+                if (iterl.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iterl.next();
+                    appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                }
+
+                Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
+                while (iters.hasNext()) {
+                    Map.Entry<byte[], Long> entry = iters.next();
+                    appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                }
+                broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(appWanted));
+                appWanted.getSenderAssociated().clear();
+                appWanted.getLastWintess().clear();
+                appWanted.getCurrentWintess().clear();
+            }
         }
 
         @Override

@@ -18,12 +18,8 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.security.SignatureException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import static org.apache.commons.lang3.ArrayUtils.getLength;
 import static io.taucoin.util.ByteUtil.*;
-import static io.taucoin.util.BIUtil.toBI;
-import static io.taucoin.util.TimeUtils.timeNows;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**

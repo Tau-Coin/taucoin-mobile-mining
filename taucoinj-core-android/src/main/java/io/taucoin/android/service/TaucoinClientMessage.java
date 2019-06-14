@@ -96,4 +96,9 @@ public class TaucoinClientMessage {
      * Send block tx reindex Msg to client
      */
     public static final int MSG_BLOCK_TX_REINDEX = 19;
+
+    /**
+     * Send stopping sync result to client
+     */
+    public static final int MSG_STOP_SYNC_RESULT = 20;
 }

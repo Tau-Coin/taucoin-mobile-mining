@@ -1,7 +1,6 @@
 package io.taucoin.android.db;
 
 import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
 import io.taucoin.db.BlockStore;
 import io.taucoin.util.ByteUtil;
 import org.hibernate.SessionFactory;
@@ -28,11 +27,6 @@ public class BlockStoreImpl implements BlockStore {
 
     @Override
     public List<Block> getListBlocksEndWith(byte[] hash, long qty) {
-        return null;
-    }
-
-    @Override
-    public List<BlockHeader> getListHeadersEndWith(byte[] hash, long qty) {
         return null;
     }
 

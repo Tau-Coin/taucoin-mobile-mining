@@ -4,37 +4,26 @@ import io.taucoin.config.Constants;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
-import io.taucoin.crypto.ECKey;
-import io.taucoin.crypto.HashUtil;
-import io.taucoin.crypto.SHA3Helper;
 import io.taucoin.db.BlockStore;
-import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.util.AdvancedDeviceUtils;
 import io.taucoin.util.ByteUtil;
-import io.taucoin.util.RLP;
-import io.taucoin.validator.DependentBlockHeaderRule;
-import io.taucoin.validator.ParentBlockHeaderValidator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-import org.spongycastle.util.Arrays;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.SignatureException;
 import java.util.*;
 
-import static java.lang.Math.max;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static java.lang.Runtime.getRuntime;
-import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Collections.emptyList;
 import static io.taucoin.core.ImportResult.*;
@@ -79,25 +68,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     private Repository repository;
     private Repository track;
 
-
     private BlockStore blockStore;
 
     private Block bestBlock;
 
     private BigInteger totalDifficulty = ZERO;
 
-
-    Wallet wallet;
-
-
     private TaucoinListener listener;
-
-
-    private AdminInfo adminInfo;
-
-
-    private DependentBlockHeaderRule parentHeaderValidator;
-
 
     private PendingState pendingState;
 
@@ -119,13 +96,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     //todo: autowire over constructor
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
-                          Wallet wallet, AdminInfo adminInfo,
-                          ParentBlockHeaderValidator parentHeaderValidator, PendingState pendingState, TaucoinListener listener) {
+                          PendingState pendingState, TaucoinListener listener) {
         this.blockStore = blockStore;
         this.repository = repository;
-        this.wallet = wallet;
-        this.adminInfo = adminInfo;
-        this.parentHeaderValidator = parentHeaderValidator;
         this.pendingState = pendingState;
         this.listener = listener;
     }
@@ -501,9 +474,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             System.gc();
 //        }
 
-        // Remove all wallet transactions as they already approved by the net
-        wallet.removeTransactions(block.getTransactionsList());
-
         listener.trace(String.format("Block chain size: [ %d ]", this.getSize()));
 
         listener.onBlock(block);
@@ -531,21 +501,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return blockStore.getBlockByHash(header.getPreviousHeaderHash());
     }
 
-
-    public boolean isValid(BlockHeader header) {
-
-        Block parentBlock = getParent(header);
-
-        if (!parentHeaderValidator.validate(header, parentBlock.getHeader())) {
-
-            if (logger.isErrorEnabled())
-                parentHeaderValidator.logErrors(logger);
-
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * verify block version
@@ -725,12 +680,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        /*
-		if (!isValid(block.getHeader())) {
-            return false;
-        }
-		*/
-
         List<Transaction> txs = block.getTransactionsList();
         if (txs.size() > Constants.MAX_BLOCKTXSIZE) {
             logger.error("Too many transactions, block number {}", block.getNumber());
@@ -830,9 +779,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             wrapBlockTransactions(block, repo);
 
             if (!config.blockChainOnly()) {
-//                wallet.addTransactions(block.getTransactionsList());
                 return applyBlock(block, repo);
-//                wallet.processBlock(block);
             }
         }
         return true;
@@ -846,11 +793,18 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         Repository cacheTrack;
         boolean isValid = true;
         int txCount = 0;
+
+        boolean isForgedSelf = false;
+        if (block.getForgerAddress().equals(config.getForgerCoinbase())) {
+            isForgedSelf = true;
+        }
+
         for (Transaction tx : block.getTransactionsList()) {
             //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
+            executor.setForgedByself(isForgedSelf);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
             if (!executor.init()) {
@@ -883,7 +837,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         updateTotalDifficulty(block);
 
         long totalTime = System.nanoTime() - saveTime;
-        adminInfo.addBlockExecTime(totalTime);
         logger.info("block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
 
         return true;
@@ -1019,54 +972,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return blockStore.isBlockExist(hash);
     }
 
-    public void setParentHeaderValidator(DependentBlockHeaderRule parentHeaderValidator) {
-        this.parentHeaderValidator = parentHeaderValidator;
-    }
-
     public void setPendingState(PendingState pendingState) {
         this.pendingState = pendingState;
     }
 
     public PendingState getPendingState() {
         return pendingState;
-    }
-
-    @Override
-    public synchronized List<BlockHeader> getListOfHeadersStartFrom(BlockIdentifier identifier, int skip, int limit, boolean reverse) {
-        long blockNumber = identifier.getNumber();
-
-        if (identifier.getHash() != null) {
-            Block block = getBlockByHash(identifier.getHash());
-
-            if (block == null) {
-                return emptyList();
-            }
-
-            blockNumber = block.getNumber();
-        }
-
-        long bestNumber = bestBlock.getNumber();
-
-        if (bestNumber < blockNumber) {
-            return emptyList();
-        }
-
-        int qty = getQty(blockNumber, bestNumber, limit, reverse);
-
-        byte[] startHash = getStartHash(blockNumber, skip, qty, reverse);
-
-        if (startHash == null) {
-            return emptyList();
-        }
-
-        List<BlockHeader> headers = blockStore.getListHeadersEndWith(startHash, qty);
-
-        // blocks come with falling numbers
-        if (!reverse) {
-            Collections.reverse(headers);
-        }
-
-        return headers;
     }
 
     private int getQty(long blockNumber, long bestNumber, int limit, boolean reverse) {

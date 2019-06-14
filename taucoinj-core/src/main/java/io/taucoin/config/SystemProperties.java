@@ -22,7 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
@@ -92,6 +91,8 @@ public class SystemProperties {
     private byte[] forgerPrivateKey = null;
     private byte[] forgerPublicKey = null;
     private byte[] forgerCoinbase = null;
+
+    private Object forgerKeyLock = new Object();
 
     public SystemProperties() {
         this(ConfigFactory.empty());
@@ -699,51 +700,59 @@ public class SystemProperties {
     }
 
     public void importForgerPrikey(byte[] prikey) {
-        if (prikey == null) {
-            forgerPrivateKey = null;
-            forgerPublicKey = null;
-            forgerCoinbase = null;
-        } else {
-            forgerPrivateKey = prikey;
-            forgerPublicKey = ECKey.fromPrivate(prikey).getPubKey();
-            forgerCoinbase = ECKey.fromPrivate(prikey).getAddress();
+        synchronized(forgerKeyLock) {
+            if (prikey == null) {
+                forgerPrivateKey = null;
+                forgerPublicKey = null;
+                forgerCoinbase = null;
+            } else {
+                forgerPrivateKey = prikey;
+                forgerPublicKey = ECKey.fromPrivate(prikey).getPubKey();
+                forgerCoinbase = ECKey.fromPrivate(prikey).getAddress();
+            }
         }
     }
 
     @ValidateMe
     public byte[] getForgerPrikey() {
-        if (forgerPrivateKey != null) {
+        synchronized(forgerKeyLock) {
+            if (forgerPrivateKey != null) {
+                return forgerPrivateKey;
+            }
+
+            String privkeyStr = config.getString("forge.prikey");
+            forgerPrivateKey = Utils.getRawPrivateKeyString(privkeyStr);
+            forgerPublicKey = ECKey.fromPrivate(forgerPrivateKey).getPubKey();
+            forgerCoinbase = ECKey.fromPrivate(forgerPrivateKey).getAddress();
+
+            //logger.info("forger privkey {}", Hex.toHexString(forgerPrivateKey));
+            logger.info("forger pubkey {}", Hex.toHexString(forgerPublicKey));
+            logger.info("forger coinbase {}", Hex.toHexString(forgerCoinbase));
+
             return forgerPrivateKey;
         }
-
-        String privkeyStr = config.getString("forge.prikey");
-        forgerPrivateKey = Utils.getRawPrivateKeyString(privkeyStr);
-        forgerPublicKey = ECKey.fromPrivate(forgerPrivateKey).getPubKey();
-        forgerCoinbase = ECKey.fromPrivate(forgerPrivateKey).getAddress();
-
-        //logger.info("forger privkey {}", Hex.toHexString(forgerPrivateKey));
-        logger.info("forger pubkey {}", Hex.toHexString(forgerPublicKey));
-        logger.info("forger coinbase {}", Hex.toHexString(forgerCoinbase));
-
-        return forgerPrivateKey;
     }
 
     public byte[] getForgerPubkey() {
-        if (forgerPublicKey != null) {
+        synchronized(forgerKeyLock) {
+            if (forgerPublicKey != null) {
+                return forgerPublicKey;
+            }
+
+            getForgerPrikey();
             return forgerPublicKey;
         }
-
-        getForgerPrikey();
-        return forgerPublicKey;
     }
 
     public byte[] getForgerCoinbase() {
-        if (forgerCoinbase != null) {
+        synchronized(forgerKeyLock) {
+            if (forgerCoinbase != null) {
+                return forgerCoinbase;
+            }
+
+            getForgerPrikey();
             return forgerCoinbase;
         }
-
-        getForgerPrikey();
-        return forgerCoinbase;
     }
 
     public Genesis getGenesis() {

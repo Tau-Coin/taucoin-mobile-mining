@@ -1,39 +1,27 @@
 package io.taucoin.facade;
 
-import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.core.PendingState;
-import io.taucoin.listener.CompositeTaucoinListener;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.listener.TaucoinListener;
-import io.taucoin.manager.AdminInfo;
 import io.taucoin.manager.BlockLoader;
 import io.taucoin.manager.WorldManager;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.http.RequestManager;
-import io.taucoin.http.submit.TransactionExecutor;
-import io.taucoin.http.submit.TransactionTask;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.net.peerdiscovery.PeerInfo;
 import io.taucoin.net.rlpx.Node;
-import io.taucoin.net.rlpx.NodeType;
-import io.taucoin.util.ByteUtil;
-import org.apache.commons.collections4.list.TransformedList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import java.math.BigInteger;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
 
-import static io.taucoin.config.SystemProperties.CONFIG;
+import javax.inject.Inject;
 
 /**
  * @author Roman Mandeleil
@@ -49,8 +37,6 @@ public class TaucoinImpl implements Taucoin {
     public static final String TRANSACTION_SUBMITFAIL = "submission failure, please relay to rpc";
     protected WorldManager worldManager;
 
-    protected AdminInfo adminInfo;
-
     protected BlockLoader blockLoader;
 
     protected PendingState pendingState;
@@ -59,16 +45,18 @@ public class TaucoinImpl implements Taucoin {
 
     protected RequestManager requestManager;
 
+    protected RefWatcher refWatcher;
+
     @Inject
-    public TaucoinImpl(WorldManager worldManager, AdminInfo adminInfo,
+    public TaucoinImpl(WorldManager worldManager,
             BlockLoader blockLoader, PendingState pendingState, BlockForger blockForger,
-            RequestManager requestManager) {
+            RequestManager requestManager, RefWatcher refWatcher) {
         this.worldManager = worldManager;
-        this.adminInfo = adminInfo;
         this.blockLoader = blockLoader;
         this.pendingState = pendingState;
         this.blockForger = blockForger;
         this.requestManager = requestManager;
+        this.refWatcher = refWatcher;
         this.blockForger.setTaucoin(this);
         this.blockForger.init();
     }
@@ -201,6 +189,11 @@ public class TaucoinImpl implements Taucoin {
             blockForger.stopForging();
         }
         worldManager.close();
+
+        refWatcher.watch(worldManager);
+        refWatcher.watch(blockLoader);
+        refWatcher.watch(blockForger);
+        refWatcher.watch(this);
     }
 
     @Override
@@ -224,7 +217,6 @@ public class TaucoinImpl implements Taucoin {
         return new Transaction(version, option, timeStamp, toAddress, amount, fee);
     }
 
-
     @Override
     public Transaction submitTransaction(Transaction transaction) {
          boolean submitResult = pendingState.addPendingTransaction(transaction);
@@ -239,12 +231,6 @@ public class TaucoinImpl implements Taucoin {
     }
 
     @Override
-    public Wallet getWallet() {
-        return worldManager.getWallet();
-    }
-
-
-    @Override
     public io.taucoin.facade.Repository getRepository() {
         return worldManager.getRepository();
     }
@@ -252,11 +238,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public io.taucoin.core.PendingState getPendingState() {
         return worldManager.getPendingState();
-    }
-
-    @Override
-    public AdminInfo getAdminInfo() {
-        return adminInfo;
     }
 
     @Override

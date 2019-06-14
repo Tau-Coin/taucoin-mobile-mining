@@ -1,9 +1,9 @@
 package io.taucoin.core;
 
 import io.taucoin.config.Constants;
-import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.util.ByteUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -11,12 +11,8 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.apache.commons.lang3.ArrayUtils.getLength;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.util.BIUtil.*;
-import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static io.taucoin.util.ByteUtil.toHexString;
 
 /**
  * @author Roman Mandeleil
@@ -31,6 +27,9 @@ public class TransactionExecutor {
     private byte[] coinbase;
     private Blockchain blockchain;
     private TaucoinListener listener;
+
+    // indicate that this is witness by self to show mining income asap.
+    private boolean isForgedByself = false;
     /**
      * this is a temporary strategy.
      * a transaction per second.
@@ -41,6 +40,10 @@ public class TransactionExecutor {
 
     long basicTxAmount = 0;
     long basicTxFee = 0;
+
+    public void setForgedByself(boolean forgedByself) {
+        isForgedByself = forgedByself;
+    }
 
     //constructor
     public TransactionExecutor(Transaction tx, Repository track,Blockchain blockchain,TaucoinListener listener) {
@@ -238,7 +241,9 @@ public class TransactionExecutor {
                         feeDistributor.getLastAssociFee());
                 outcome.updateCurrentWintessBalance(coinbase,feeDistributor.getLastAssociFee());
             }
-            listener.onTransactionExecuated(outcome);
+            if (isForgedByself) {
+                listener.onTransactionExecuated(outcome);
+            }
         }
         if(isTxCompleted) {
             logger.debug("in executation finish =========================");

@@ -17,13 +17,9 @@ package io.taucoin.android.wallet.util;
 
 import android.text.Html;
 import android.view.View;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import io.taucoin.android.wallet.R;
 
@@ -33,6 +29,7 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -103,28 +100,27 @@ public class UserUtil {
         Logger.d("UserUtil.setBalance=" + balanceStr);
     }
 
-    public static void setPower(TextView tvPower, ProgressView ivMiningPower, Switch ivMiningSwitch) {
-        if(tvPower == null || ivMiningPower == null || ivMiningSwitch == null){
+    public static void setUserInfo(TextView tvPower, TextView tvMiningIncome, LoadingTextView tvMined) {
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue == null || tvPower == null || tvMiningIncome == null || tvMined == null){
             return;
         }
-        String power = "0";
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue != null){
-            power = String.valueOf(keyValue.getPower());
-            if(keyValue.getPower() <= 0 || MyApplication.getRemoteConnector().getErrorCode() == 3 || !ivMiningSwitch.isChecked()){
-                ivMiningPower.setOff();
-                if(!ivMiningSwitch.isChecked()){
-                    ivMiningPower.setEnabled(false);
-                }else{
-                    ivMiningPower.setEnabled(true);
-                }
-            }else {
-                ivMiningPower.setOn();
-                ivMiningPower.setEnabled(false);
-            }
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        if(StringUtil.isNotSame(address, keyValue.getAddress())){
+            TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+            return;
         }
+        String power = String.valueOf(keyValue.getPower());
         tvPower.setText(power);
         Logger.d("UserUtil.setPower=" + power);
+
+        String minedBlocks = String.valueOf(keyValue.getMinedBlocks());
+        tvMined.setNormalText(minedBlocks);
+
+        String miningIncome = FmtMicrometer.fmtMiningIncome(keyValue.getMiningIncome());
+        String incomeStr = MyApplication.getInstance().getResources().getString(R.string.common_balance);
+        incomeStr = String.format(incomeStr, miningIncome);
+        tvMiningIncome.setText(Html.fromHtml(incomeStr));
     }
 
     public static boolean isImportKey() {
@@ -193,37 +189,37 @@ public class UserUtil {
         }
     }
 
-    public static void setBalanceAndSync(ProgressView ivMiningBalance, ProgressView ivMiningSync, Switch ivMiningSwitch, Object data) {
+    /**
+     * set state of mining conditions
+     * */
+    public static void setMiningConditions(ProgressView ivMiningPower, ProgressView ivMiningSync, Object data, boolean isClearError) {
         try{
             if(data != null){
                 BlockInfo blockInfo = (BlockInfo)data;
                 KeyValue keyValue = MyApplication.getKeyValue();
-                BigDecimal balance = new BigDecimal(keyValue.getBalance());
-                BigDecimal medianFee = new BigDecimal(BigInteger.ZERO);
-                if(StringUtil.isNotEmpty(blockInfo.getMedianFee())){
-                    medianFee = new BigDecimal(blockInfo.getMedianFee());
+                boolean isSynced = blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync();
+
+                long power = keyValue.getPower();
+                boolean isPowerError = isSynced && MyApplication.getRemoteConnector().getErrorCode() == 3;
+                if(power > 0 && isPowerError && isClearError){
+                    MyApplication.getRemoteConnector().clearErrorCode();
+                    isPowerError = false;
+                    MyApplication.getRemoteConnector().startBlockForging();
                 }
-                if(balance.compareTo(medianFee) < 0 || MyApplication.getRemoteConnector().getErrorCode() == 4 || !ivMiningSwitch.isChecked()){
-                    ivMiningBalance.setOff();
-                    if(!ivMiningSwitch.isChecked()){
-                        ivMiningBalance.setEnabled(false);
-                    }else {
-                        ivMiningBalance.setEnabled(true);
-                    }
+                if(keyValue.getPower() <= 0 || isPowerError){
+                    ivMiningPower.setOff();
+                    ivMiningPower.setEnabled(true);
                 }else {
-                    ivMiningBalance.setOn();
-                    ivMiningBalance.setEnabled(false);
+                    ivMiningPower.setOn();
+                    ivMiningPower.setEnabled(false);
                 }
-                if(blockInfo.getBlockHeight() != 0 && blockInfo.getBlockHeight() <= blockInfo.getBlockSync() && ivMiningSwitch.isChecked()){
+
+                if(isSynced){
                     ivMiningSync.setOn();
                     ivMiningSync.setEnabled(false);
                 }else {
                     ivMiningSync.setOff();
-                    if(!ivMiningSwitch.isChecked()){
-                        ivMiningSync.setEnabled(false);
-                    }else{
-                        ivMiningSync.setEnabled(true);
-                    }
+                    ivMiningSync.setEnabled(true);
                 }
             }
         }catch (Exception ignore){

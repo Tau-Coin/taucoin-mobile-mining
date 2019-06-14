@@ -5,6 +5,7 @@ import io.taucoin.core.*;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
@@ -43,13 +44,9 @@ public class WorldManager {
 
     private Repository repository;
 
-    private Wallet wallet;
-
     private PeerClient activePeer;
 
     private BlockStore blockStore;
-
-    private AdminInfo adminInfo;
 
     private SyncManager syncManager;
 
@@ -59,25 +56,27 @@ public class WorldManager {
 
     private PoolSynchronizer poolSynchronizer;
 
+    private RefWatcher refWatcher;
+
     private volatile boolean isSyncRunning = false;
 
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
-    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository, Wallet wallet
-                        , BlockStore blockStore, AdminInfo adminInfo, SyncManager syncManager
-                        , PendingState pendingState, RequestManager requestManager, PoolSynchronizer poolSynchronizer) {
+    public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository
+                        , BlockStore blockStore, SyncManager syncManager
+                        , PendingState pendingState, RequestManager requestManager
+                        ,PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
         logger.info("World manager instantiated");
         this.listener = listener;
         this.blockchain = blockchain;
         this.repository = repository;
-        this.wallet = wallet;
         this.blockStore = blockStore;
-        this.adminInfo = adminInfo;
         this.syncManager = syncManager;
         this.pendingState = pendingState;
         this.requestManager = requestManager;
         this.poolSynchronizer = poolSynchronizer;
+        this.refWatcher = refWatcher;
         this.syncManager.setRequestManager(requestManager);
         this.poolSynchronizer.setRequestManager(requestManager);
     }
@@ -126,15 +125,11 @@ public class WorldManager {
 
         syncManager.stop();
         requestManager.stop();
-        poolSynchronizer.close();
+        poolSynchronizer.stop();
     }
 
     public TaucoinListener getListener() {
         return listener;
-    }
-
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
     }
 
     public io.taucoin.facade.Repository getRepository() {
@@ -143,10 +138,6 @@ public class WorldManager {
 
     public Blockchain getBlockchain() {
         return blockchain;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
     }
 
     public void setActivePeer(PeerClient peer) {
@@ -229,7 +220,21 @@ public class WorldManager {
     public void close() {
         stopPeerDiscovery();
         stopSync();
+
+        poolSynchronizer.close();
+        syncManager.close();
+        requestManager.close();
         repository.close();
         blockchain.close();
+
+        refWatcher.watch(listener);
+        refWatcher.watch(blockchain);
+        refWatcher.watch(repository);
+        refWatcher.watch(activePeer);
+        refWatcher.watch(blockStore);
+        refWatcher.watch(syncManager);
+        refWatcher.watch(pendingState);
+        refWatcher.watch(requestManager);
+        refWatcher.watch(poolSynchronizer);
     }
 }

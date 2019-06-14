@@ -3,17 +3,13 @@ package io.taucoin.core;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.RLP;
 import io.taucoin.util.RLPList;
-import io.taucoin.util.RLPElement;
-import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-
-import static io.taucoin.crypto.HashUtil.*;
+import java.util.*;
 
 public class AccountState implements Serializable {
     private static final Logger log = LoggerFactory.getLogger("accountState");

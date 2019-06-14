@@ -1,11 +1,7 @@
 package io.taucoin.core;
 
-import io.taucoin.crypto.ECKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-
-import java.util.List;
 
 
 public class StakeHolderIdentityUpdate {

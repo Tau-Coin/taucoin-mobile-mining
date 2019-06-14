@@ -5,27 +5,23 @@ import io.taucoin.db.BlockStore;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.listener.TaucoinListenerAdapter;
-import io.taucoin.manager.WorldManager;
-import io.taucoin.util.FastByteComparisons;
 import io.taucoin.util.ByteUtil;
+import io.taucoin.db.ByteArrayWrapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-
-import javax.annotation.Resource;
-
-import javax.inject.Singleton;
-import javax.inject.Inject;
 
 import java.math.BigInteger;
 import java.util.*;
 
-import static java.math.BigInteger.ZERO;
+import javax.annotation.Resource;
+import javax.inject.Singleton;
+import javax.inject.Inject;
+
 import org.apache.commons.collections4.map.LRUMap;
-import static io.taucoin.config.SystemProperties.CONFIG;
-import static io.taucoin.util.BIUtil.toBI;
+
 import static io.taucoin.util.BIUtil.*;
-import io.taucoin.db.ByteArrayWrapper;
+
 
 /**
  * Keeps logic providing pending state management

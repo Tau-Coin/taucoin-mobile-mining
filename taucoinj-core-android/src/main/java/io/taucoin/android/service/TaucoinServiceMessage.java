@@ -34,11 +34,6 @@ public class TaucoinServiceMessage {
     public static final int MSG_START_PEER_DISCOVERY = 6;
 
     /**
-     * Command to the service to stop peer discovery
-     */
-    public static final int MSG_STOP_PEER_DISCOVERY = 7;
-
-    /**
      * Command to the service to get blockchain status (Loading/Loaded)
      */
     public static final int MSG_GET_BLOCKCHAIN_STATUS = 8;
@@ -163,4 +158,10 @@ public class TaucoinServiceMessage {
      * Command to the service to get block tx reindex
      */
     public static final int MSG_GET_BLOCK_TX_REINDEX = 32;
+
+    /**
+     * Command to the service to stop sync
+     */
+    public static final int MSG_STOP_SYNC = 33;
+
 }

@@ -16,24 +16,19 @@ import io.taucoin.sync.SyncQueue;
 import io.taucoin.net.MessageQueue;
 import io.taucoin.net.submit.NewBlockHeaderBroadcaster;
 import io.taucoin.net.submit.NewBlockHeaderTask;
-import io.taucoin.net.submit.TransactionExecutor;
-import io.taucoin.net.submit.TransactionTask;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.net.tau.message.*;
 import io.taucoin.sync.SyncStateName;
 import io.taucoin.sync.SyncStatistics;
 import io.taucoin.net.message.ReasonCode;
 import io.taucoin.net.server.Channel;
-import io.taucoin.util.BIUtil;
 import io.taucoin.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.inject.Inject;
 
 import java.math.BigInteger;
 import java.util.*;
 
-import static io.taucoin.config.SystemProperties.CONFIG;
 import static io.taucoin.sync.SyncStateName.*;
 import static io.taucoin.util.BIUtil.isLessThan;
 
@@ -72,8 +67,6 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
     protected SyncQueue queue;
 
     protected CompositeTaucoinListener ethereumListener;
-
-    protected Wallet wallet;
 
     protected PendingState pendingState;
 
@@ -130,12 +123,11 @@ public abstract class TauHandler extends SimpleChannelInboundHandler<TauMessage>
 
     public void init(Blockchain blockchain, BlockStore blockstore, SyncManager syncManager,
             SyncQueue queue,
-            Wallet wallet, PendingState pendingState, ChannelManager channelManager) {
+            PendingState pendingState, ChannelManager channelManager) {
         this.blockchain = blockchain;
         this.blockstore = blockstore;
         this.syncManager = syncManager;
         this.queue = queue;
-        this.wallet = wallet;
         this.pendingState = pendingState;
         this.channelManager = channelManager;
         this.ethereumListener = (CompositeTaucoinListener)channelManager.getListener();

@@ -3,6 +3,8 @@ package io.taucoin.android.wallet.module.view.manage;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
 import io.taucoin.android.wallet.R;
@@ -21,9 +23,11 @@ import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
+import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.InputDialog;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
 
 import static android.os.Build.VERSION_CODES.M;
@@ -72,8 +76,18 @@ public class SettingActivity extends BaseActivity {
                 ToastUtils.showShortToast(R.string.mining_import_private_key);
                 return;
             }
-            ProgressManager.showProgressDialog(this);
-            MiningUtil.clearAndReloadBlocks();
+            View view = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);
+            TextView tvMsg = view.findViewById(R.id.tv_msg);
+            tvMsg.setText(R.string.setting_reset_data_tips);
+            new CommonDialog.Builder(this)
+                .setContentView(view)
+                .setButtonWidth(240)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.cancel();
+                    ProgressManager.showProgressDialog(this);
+                    MiningUtil.clearAndReloadBlocks();
+                }).setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
+                .create().show();
         }
     }
 

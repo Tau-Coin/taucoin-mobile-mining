@@ -1,12 +1,7 @@
 package io.taucoin.http;
 
-import io.taucoin.listener.TaucoinListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import static io.taucoin.http.ConnectionState.*;
 
@@ -16,20 +11,12 @@ import static io.taucoin.http.ConnectionState.*;
  * Main Functions:
  *     Maintain network state.
  */
-@Singleton
 public class ConnectionManager {
 
     protected static final Logger logger = LoggerFactory.getLogger("http");
 
     private Object stateLock = new Object();
     private ConnectionState state = CONNECTED;
-
-    private TaucoinListener listener;
-
-    @Inject
-    public ConnectionManager(TaucoinListener listener) {
-        this.listener = listener;
-    }
 
     public ConnectionState getConnectionState() {
         synchronized(stateLock) {

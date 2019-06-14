@@ -21,12 +21,8 @@ import android.os.Message;
 
 import com.github.naturs.logger.Logger;
 
-import org.spongycastle.util.encoders.Hex;
-
 import java.util.Date;
 
-import io.taucoin.android.interop.BlockTxReindex;
-import io.taucoin.android.interop.Transaction;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
@@ -40,17 +36,17 @@ import io.taucoin.android.service.events.NetworkTrafficData;
 import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
-import io.taucoin.android.service.events.TransactionExecuatedEvent;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.core.TransactionExecuatedOutcome;
-import io.taucoin.core.Utils;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.foundation.util.TrafficUtil;
 import io.taucoin.net.p2p.HelloMessage;
 
@@ -78,7 +74,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
     @SuppressWarnings("ConstantConditions")
     @Override
     public boolean handleMessage(Message message) {
-        Logger.d("message.what=\t" + message.what);
         boolean isClaimed = true;
         long time = new Date().getTime();
         switch (message.what) {
@@ -168,10 +163,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_TAUCOIN_CREATED:
                     case EVENT_TAUCOIN_EXIST:
                         isInit = 1;
-                        EventBusUtil.post(MessageEvent.EventCode.MINING_INIT);
-                        startSyncAll();
-                        startBlockForging();
-                        startUpdatingRewardData();
+                        startSyncAndMining();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");
@@ -201,7 +193,7 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         BlockForgeExceptionStopEvent exceptionStop = data.getParcelable("data");
                         logMessage = "Block forged stop: " + exceptionStop.getMsg();
                         addLogEntry(time, logMessage);
-                        if(exceptionStop.getCode() == 3 || exceptionStop.getCode() == 4){
+                        if(exceptionStop.getCode() == 3){
                             mExceptionStop = exceptionStop;
                             messageEvent = new MessageEvent();
                             messageEvent.setCode(MessageEvent.EventCode.MINING_STATE);
@@ -209,13 +201,13 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         }
                         break;
                     case EVENT_TRANSACTION_EXECUATED:
-                        TransactionExecuatedEvent txExe = data.getParcelable("data");
-                        if(txExe != null && txExe.outcome != null){
-                            String txId = Hex.toHexString(txExe.outcome.getTxid());
-                            logMessage = "transaction executed id=" + txId;
-                            addLogEntry(time, logMessage);
-                            saveMiningReward(txExe.outcome);
-                        }
+//                        TransactionExecuatedEvent txExe = data.getParcelable("data");
+//                        if(txExe != null && txExe.outcome != null){
+//                            String txId = Hex.toHexString(txExe.outcome.getTxid());
+//                            logMessage = "transaction executed id=" + txId;
+//                            addLogEntry(time, logMessage);
+//                            saveMiningReward(txExe.outcome);
+//                        }
                         break;
                     case EVENT_NETWORK_TRAFFIC:
                         NetworkTrafficData networkTrafficData = data.getParcelable("data");
@@ -249,34 +241,28 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 break;
             // get block list return
             case TaucoinClientMessage.MSG_BLOCKS:
-                replyData = message.getData();
-                replyData.setClassLoader(BlockEventData.class.getClassLoader());
-                BlockEventData blocks = replyData.getParcelable(TransmitKey.RemoteResult.BLOCK);
-                boolean isFinish = replyData.getBoolean(TransmitKey.RemoteResult.IS_FINISH, false);
-                updateMyMiningBlock(blocks, isFinish);
+//                replyData = message.getData();
+//                replyData.setClassLoader(BlockEventData.class.getClassLoader());
+//                BlockEventData blocks = replyData.getParcelable(TransmitKey.RemoteResult.BLOCK);
+//                boolean isFinish = replyData.getBoolean(TransmitKey.RemoteResult.IS_FINISH, false);
+//                updateMyMiningBlock(blocks, isFinish);
                 break;
             // get block chain height return
             case TaucoinClientMessage.MSG_CHAIN_HEIGHT:
                 replyData = message.getData();
                 long height =  replyData.getLong(TransmitKey.RemoteResult.HEIGHT);
                 updateSynchronizedBlockNum(height);
-                getBlockList(height);
+//                getBlockList(height);
                 break;
             case TaucoinClientMessage.MSG_SUBMIT_TRANSACTION_RESULT:
-                replyData = message.getData();
-                replyData.setClassLoader(Transaction.class.getClassLoader());
-                Transaction transaction = replyData.getParcelable(TransmitKey.RemoteResult.TRANSACTION);
-                submitTransactionResult(transaction);
+//                replyData = message.getData();
+//                replyData.setClassLoader(Transaction.class.getClassLoader());
+//                Transaction transaction = replyData.getParcelable(TransmitKey.RemoteResult.TRANSACTION);
+//                submitTransactionResult(transaction);
                 break;
             case TaucoinClientMessage.MSG_CLOSE_DONE:
                 cancelLocalConnector();
                 EventBusUtil.post(MessageEvent.EventCode.MINING_STATE);
-                break;
-            case TaucoinClientMessage.MSG_BLOCK_TX_REINDEX:
-                replyData = message.getData();
-                replyData.setClassLoader(BlockTxReindex.class.getClassLoader());
-                BlockTxReindex tx = replyData.getParcelable("checkoutcome");
-                handleUpdatingRewardData(tx);
                 break;
             default:
                 isClaimed = false;
@@ -284,8 +270,24 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         return isClaimed;
     }
 
-    private void saveMiningReward(TransactionExecuatedOutcome outCome) {
-        getMiningModel().saveMiningReward(outCome);
+    private void startSyncAndMining() {
+        logger.info("startSyncAndMining");
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if (keyValue != null) {
+            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
+            boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
+            if(isSyncStart){
+                if(isMiningStart){
+                    MyApplication.getRemoteConnector().startBlockForging();
+                }else{
+                    MyApplication.getRemoteConnector().stopBlockForging();
+                }
+                MyApplication.getRemoteConnector().startSyncAll();
+            }else{
+                MyApplication.getRemoteConnector().stopSyncAll();
+                MyApplication.getRemoteConnector().stopBlockForging();
+            }
+        }
     }
 
     private void handleSynchronizedBlock(BlockEventData block, boolean isConnect) {
@@ -303,27 +305,6 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     }
                 }
             });
-        }
-    }
-
-    private void updateMyMiningBlock(BlockEventData blockData, boolean isFinish) {
-        if((null == blockData || blockData.block == null) && isFinish){
-            Logger.d("number= null, " + true);
-            isSyncMe = 1;
-            EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-        }else{
-            if(blockData != null && blockData.block != null){
-//                Logger.d("number=" + blockData.block.getNumber() + ", " + isFinish);
-                getMiningModel().updateMyMiningBlock(blockData, new LogicObserver<Boolean>() {
-                    @Override
-                    public void handleData(Boolean aBoolean) {
-                        if(isFinish){
-                            isSyncMe = 1;
-                            EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                        }
-                    }
-                });
-            }
         }
     }
 
@@ -347,49 +328,5 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
             }
         });
-    }
-
-    private void submitTransactionResult(Transaction transaction){
-        getMiningModel().updateTransactionHistory(transaction);
-    }
-
-    @Override
-    public void getBlockList(int num, long height) {
-        getMiningModel().getMaxBlockNum(height, new LogicObserver<Long>(){
-
-            @Override
-            public void handleData(Long max) {
-                Logger.d("number=getBlockListByStartNumberSuccess(" + max +","+ height+")");
-                if(max == height){
-                    isSyncMe = 1;
-                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                }else{
-                    long num = max;
-                    int limit = (int) (height - num) + 1;
-                    isSyncMe = 0;
-                    EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                    Logger.d("number=getBlockListByStartNumber(" + num +","+ limit+")");
-                    if(mTaucoinConnector != null && limit > 0){
-                        mTaucoinConnector.getBlockListByStartNumber(mHandlerIdentifier, num, limit);
-                    }
-                }
-            }
-        });
-    }
-
-    private void startUpdatingRewardData() {
-        getMiningModel().startUpdatingRewardData(new LogicObserver<String>(){
-            @Override
-            public void handleData(String blockHash) {
-                if(mTaucoinConnector != null){
-                    byte[] bytesBlockHash = Utils.parseAsHexOrBase58(blockHash);
-                    mTaucoinConnector.getRewardsByBlockHash(mHandlerIdentifier, bytesBlockHash);
-                }
-            }
-        });
-    }
-
-    private void handleUpdatingRewardData(BlockTxReindex tx) {
-        getMiningModel().handleUpdatingRewardData(tx);
     }
 }

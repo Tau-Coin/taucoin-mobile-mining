@@ -4,12 +4,8 @@ import io.taucoin.util.RLP;
 import io.taucoin.util.RLPList;
 import io.taucoin.util.ByteUtil;
 
-import org.spongycastle.util.encoders.Hex;
-
 import java.io.Serializable;
 import java.math.BigInteger;
-
-import static io.taucoin.crypto.HashUtil.*;
 
 public class TransactionInfo implements Serializable {
 

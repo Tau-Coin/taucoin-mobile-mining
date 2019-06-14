@@ -32,7 +32,6 @@ import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
-import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.ChainDetail;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
@@ -82,6 +81,7 @@ public class TxService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        NotifyManager.getInstance().sendNotify();
         KeyValue keyValue = MyApplication.getKeyValue();
         if(intent != null){
             String action = intent.getAction();
@@ -307,12 +307,10 @@ public class TxService extends Service {
         intent.setClass(context, TxService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
-            NotifyManager.getInstance().sendNotify();
         } else {
             context.startService(intent);
         }
     }
-
 
     public static void stopService() {
         Context context = MyApplication.getInstance();

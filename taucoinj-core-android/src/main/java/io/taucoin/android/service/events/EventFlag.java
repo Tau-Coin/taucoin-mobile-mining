@@ -110,5 +110,10 @@ public enum EventFlag {
     /**
      * Chain information changed event.
      */
-    EVENT_CHAININFO_CHANGED
+    EVENT_CHAININFO_CHANGED,
+
+    /**
+     * Stop sync blocks evnet.
+     */
+    EVENT_STOP_SYNC
 }

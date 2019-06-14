@@ -146,26 +146,6 @@ public class CommonConfig {
     }
 
     @Bean
-    public BlockHeaderValidator headerValidator() {
-
-        List<BlockHeaderRule> rules = new ArrayList<>();
-        rules.add(new ProofOfTransactionRule());
-
-        return new BlockHeaderValidator(rules);
-    }
-
-    @Bean
-    public ParentBlockHeaderValidator parentHeaderValidator() {
-
-        List<DependentBlockHeaderRule> rules = new ArrayList<>(asList(
-                new ParentNumberRule(),
-                new DifficultyRule()
-        ));
-
-        return new ParentBlockHeaderValidator(rules);
-    }
-
-    @Bean
     public SystemProperties systemProperties() {
         return SystemProperties.CONFIG;
     }

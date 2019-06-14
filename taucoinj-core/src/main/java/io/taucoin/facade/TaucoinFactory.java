@@ -1,16 +1,11 @@
 package io.taucoin.facade;
 
-//import io.taucoin.config.DefaultConfig;
-import io.taucoin.config.NoAutoscan;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.net.tau.TauVersion;
 import io.taucoin.util.BuildInfo;
 import io.taucoin.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Singleton;
 

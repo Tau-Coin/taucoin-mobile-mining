@@ -43,7 +43,7 @@ public class SyncManager {
     private SyncState state;
     private final Object stateMutex = new Object();
 
-    private ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService worker;
 
     Blockchain blockchain;
 
@@ -91,6 +91,9 @@ public class SyncManager {
         for (SyncState state : syncStates.values()) {
             ((AbstractSyncState)state).setSyncManager(this);
         }
+
+        // Init sync queue
+        this.queue.init();
     }
 
     public void setRequestManager(RequestManager requestManager) {
@@ -113,13 +116,12 @@ public class SyncManager {
             @Override
             public void run() {
 
-                // sync queue
-                queue.init();
-
                 if (!config.isSyncEnabled()) {
                     logger.info("Sync Manager: OFF");
                     return;
                 }
+
+                queue.start();
                 logger.info("Sync Manager: ON");
                 //set IDLE state at the beginning
                 state = syncStates.get(IDLE);
@@ -127,6 +129,7 @@ public class SyncManager {
                 //set current net work initial sync state.
                 changeState(initialState());
 
+                worker = Executors.newSingleThreadScheduledExecutor();
                 worker.scheduleWithFixedDelay(new Runnable() {
                     @Override
                     public void run() {
@@ -158,7 +161,12 @@ public class SyncManager {
 
         if (queue != null) {
             queue.stop();
-            queue = null;
+        }
+    }
+
+    public void close() {
+        if (queue != null) {
+            queue.close();
         }
     }
 

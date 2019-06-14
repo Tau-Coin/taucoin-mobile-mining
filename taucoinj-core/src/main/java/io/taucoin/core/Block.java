@@ -2,9 +2,9 @@ package io.taucoin.core;
 
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.ECKey.ECDSASignature;
-import io.taucoin.crypto.ECKey.MissingPrivateKeyException;
 import io.taucoin.crypto.HashUtil;
 import io.taucoin.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.Arrays;
@@ -16,8 +16,6 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static io.taucoin.config.SystemProperties.CONFIG;
 
 /**
  * The block in taucoin is the collection of relevant pieces of information

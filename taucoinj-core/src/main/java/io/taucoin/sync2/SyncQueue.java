@@ -4,7 +4,6 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.datasource.mapdb.MapDBFactory;
 import io.taucoin.db.*;
-import io.taucoin.validator.BlockHeaderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -59,7 +58,9 @@ public class SyncQueue {
      */
     private BlockQueue blockQueue;
 
-    public boolean noParent = false;
+    private AtomicBoolean noParent = new AtomicBoolean(false);
+
+    private final Object noParentLock = new Object();
 
     SystemProperties config = SystemProperties.CONFIG;
 
@@ -67,19 +68,33 @@ public class SyncQueue {
 
     private SyncManager syncManager;
 
-    private BlockHeaderValidator headerValidator;
-
     private MapDBFactory mapDBFactory;
 
     private Thread worker = null;
 
     private byte[] genesisBlockHash = null;
 
+    private AtomicBoolean inited = new AtomicBoolean(false);
+
+    // The task of connecting blocks.
+    private Runnable queueProducer = new Runnable(){
+
+        @Override
+        public void run() {
+            produceQueue();
+        }
+   };
+
     private AtomicBoolean isImportingBlocks = new AtomicBoolean(false);
 
-    public SyncQueue(Blockchain blockchain, BlockHeaderValidator headerValidator) {
+    // As soon as possbile stop connecting worker.
+    private AtomicBoolean isRequestStopped = new AtomicBoolean(true);
+    private final Object requestStoppedLock = new Object();
+
+    private AtomicBoolean isRequestClose = new AtomicBoolean(false);
+
+    public SyncQueue(Blockchain blockchain) {
         this.blockchain = blockchain;
-        this.headerValidator = headerValidator;
     }
 
     public void setSyncManager(SyncManager syncManager) {
@@ -91,6 +106,9 @@ public class SyncQueue {
      * starts {@link #produceQueue()} thread
      */
     public void init() {
+        if (inited.get()) {
+            return;
+        }
 
         logger.info("Start loading sync queue");
 
@@ -113,28 +131,109 @@ public class SyncQueue {
         blockQueue.open();
 
         if (!config.isSyncEnabled()) {
+            logger.warn("Sync disabled");
             return;
         }
 
-        Runnable queueProducer = new Runnable(){
-
-            @Override
-            public void run() {
-                produceQueue();
-            }
-        };
-
+        // Init thread of connecting blocks.
         this.worker = new Thread (queueProducer);
         worker.start();
+
+        inited.set(true);
     }
 
-    public void stop() {
-        if (worker != null) {
-            worker.interrupt();
-            worker = null;
+    public synchronized void start() {
+        // If not inited, has been started or has been closed, just return;
+        if (!inited.get() || !isRequestStopped.get() || isRequestClose.get()) {
+            return;
         }
 
-        isImportingBlocks.set(false);
+        isRequestStopped.set(false);
+        notifyStart();
+    }
+
+    public synchronized void stop() {
+        if (isRequestStopped.get() || isRequestClose.get()) {
+            return;
+        }
+
+        isRequestStopped.set(true);
+
+        // Clear cache
+        if (hashStore != null) {
+            hashStore.clear();
+        }
+        if (headerStore != null) {
+            headerStore.clear();
+        }
+        if (blockNumbersStore != null) {
+            blockNumbersStore.clear();
+        }
+        if (blockQueue != null) {
+            if (blockQueue instanceof BlockQueueMem) {
+                //blockQueue.clear();
+            }
+        }
+    }
+
+    public synchronized void close() {
+
+        if (!inited.get() || isRequestClose.get()) {
+            return;
+        }
+
+        isRequestClose.set(true);
+
+        // Close db.
+        if (hashStore != null) {
+            hashStore.close();
+        }
+        if (headerStore != null) {
+            headerStore.close();
+        }
+        if (blockNumbersStore != null) {
+            blockNumbersStore.close();
+        }
+        if (blockQueue != null) {
+            blockQueue.close();
+        }
+
+        // If is stopped, maybe blocks for start, wakeup asap.
+        if (isRequestStopped.get()) {
+            notifyStart();
+        }
+        // If now is waiting for gap recovery, wakeup asap.
+        if (noParent.get()) {
+            notifyRecovery();
+        } else if (blockQueue.size() == 0) {
+            // In this condition, thread blocks for taking block wrapper,
+            // so interrupt it.
+            worker.interrupt();
+        }
+
+        inited.set(false);
+    }
+
+    private void waitForStart() {
+        while (isRequestStopped.get()) {
+            synchronized(requestStoppedLock) {
+                try {
+                    requestStoppedLock.wait();
+                } catch (InterruptedException e) {
+                    logger.error("Waiting for start is interrupted {}", e);
+                }
+            }
+        }
+    }
+
+    private void notifyStart() {
+        synchronized(requestStoppedLock) {
+            requestStoppedLock.notify();
+        }
+    }
+
+    private boolean isStoppedOrClosed() {
+        return isRequestStopped.get() || isRequestClose.get();
     }
 
     /**
@@ -142,7 +241,9 @@ public class SyncQueue {
      */
     private void produceQueue() {
 
-        while (!Thread.interrupted()){
+        while (!Thread.interrupted() && !isRequestClose.get()){
+
+            waitForStart();
 
             BlockWrapper wrapper = null;
             try {
@@ -151,22 +252,6 @@ public class SyncQueue {
                 isImportingBlocks.set(true);
                 ImportResult importResult = blockchain.tryToConnect(wrapper.getBlock());
                 isImportingBlocks.set(false);
-
-                // In case we don't have a parent on the chain
-                // return the try and wait for more blocks to come.
-                if (importResult == NO_PARENT) {
-//                    logger.info("No parent on the chain for block.number: {} block.hash: {}", wrapper.getNumber(), wrapper.getBlock().getShortHash());
-                    wrapper.importFailed();
-                    //syncManager.tryGapRecovery(wrapper);
-                    // Here not add this block into block queue, because we don't
-                    // know its block number. This node will request block headers
-                    // and block bodies ASAP.
-                    //blockQueue.add(wrapper);
-                    noParent = true;
-                    sleep(2000);
-                } else {
-                    noParent = false;
-                }
 
                 if (wrapper.isNewBlock() && importResult.isSuccessful())
                     syncManager.notifyNewBlockImported(wrapper);
@@ -188,15 +273,58 @@ public class SyncQueue {
                             importResult.name(), wrapper.getNumber(), wrapper.getBlock().getShortHash());
                 }
 
+                // In case we don't have a parent on the chain
+                // return the try and wait for more blocks to come.
+                if (importResult == NO_PARENT) {
+                    logger.info("No parent on the chain for block.number: {} block.hash: {}", wrapper.getNumber(), wrapper.getBlock().getShortHash());
+                    wrapper.importFailed();
+                    // Here not add this block into block queue, because we don't
+                    // know its block number. This node will request block headers
+                    // and block bodies ASAP.
+                    blockQueue.add(wrapper);
+                    tryGapRecovery(wrapper);
+                    noParent.set(true);
+                    waitForRecovery();
+                } else {
+                    noParent.set(false);
+                }
             } catch (Throwable e) {
                 e.printStackTrace();
                 logger.error("Error processing block {}: ", wrapper.getBlock().toString(), e);
                 //logger.error("Block dump: {}", Hex.toHexString(wrapper.getBlock().getEncoded()));
-
-                isImportingBlocks.set(false);
             }
-
         }
+
+        isImportingBlocks.set(false);
+        if (isRequestClose.get()) {
+            logger.warn("Close sync worker");
+        }
+    }
+
+    private void waitForRecovery() {
+        while (noParent.get()) {
+            synchronized(noParentLock) {
+                try {
+                    noParentLock.wait();
+                } catch (InterruptedException e) {
+                    logger.error("Waiting for recovery is interrupted {}", e);
+                }
+            }
+        }
+    }
+
+    private void notifyRecovery() {
+        synchronized(noParentLock) {
+            noParentLock.notify();
+        }
+    }
+
+    private void tryGapRecovery(BlockWrapper wrapper) {
+        long bestBlockNumber = blockchain.getBestBlock().getNumber();
+        long expectedEndNumber = wrapper.getNumber() - 1;
+
+        logger.warn("Try gap recovery from {} end {}", bestBlockNumber + 1, expectedEndNumber);
+        addBlockNumbers(bestBlockNumber + 1, expectedEndNumber);
     }
 
     public boolean isImportingBlocksFinished() {
@@ -213,6 +341,7 @@ public class SyncQueue {
     public void addAndValidate(List<Block> blocks, byte[] nodeId) {
 
         // run basic checks
+	    /*
         for (Block b : blocks) {
             if (!isValid(b.getHeader())) {
 
@@ -224,7 +353,7 @@ public class SyncQueue {
                 return;
             }
         }
-
+        */
         addList(blocks, nodeId);
     }
 
@@ -237,6 +366,10 @@ public class SyncQueue {
     public void addList(List<Block> blocks, byte[] nodeId) {
 
         if (blocks.isEmpty()) {
+            return;
+        }
+        if (isStoppedOrClosed()) {
+            logger.warn("Drop blocks");
             return;
         }
 
@@ -252,6 +385,13 @@ public class SyncQueue {
                 blockQueue.size(),
                 blocks.get(blocks.size() - 1).getNumber()
         );
+
+        if (noParent.get()) {
+            BlockWrapper firstEntry = blockQueue.peek();
+            if (firstEntry.getNumber() <= blockchain.getBestBlock().getNumber() + 1) {
+                notifyRecovery();
+            }
+        }
     }
 
     /**
@@ -263,10 +403,12 @@ public class SyncQueue {
     public void addNew(Block block, byte[] nodeId) {
 
         // run basic checks
+		/*
         if (!isValid(block.getHeader())) {
             syncManager.reportBadAction(nodeId);
             return;
         }
+		*/
 
         BlockWrapper wrapper = new BlockWrapper(block, true, nodeId);
         wrapper.setReceivedAt(System.currentTimeMillis());
@@ -377,7 +519,12 @@ public class SyncQueue {
      *
      * @param numbers numbers
      */
-    public void addBlockNumbers(List<Long> numbers) {
+    public synchronized void addBlockNumbers(List<Long> numbers) {
+        if (isStoppedOrClosed()) {
+            logger.warn("Drop block numbers");
+            return;
+        }
+
         List<Long> filtered = blockQueue.filterExistingNumbers(numbers);
         blockNumbersStore.addBatch(filtered);
 
@@ -391,7 +538,12 @@ public class SyncQueue {
      *
      * @param numbers numbers
      */
-    public void addBlockNumbers(long startNumber, long endNumber) {
+    public synchronized void addBlockNumbers(long startNumber, long endNumber) {
+        if (isStoppedOrClosed()) {
+            logger.warn("Drop block numbers, from {} to {}", startNumber, endNumber);
+            return;
+        }
+
         List<Long> numbers = new ArrayList<>();
         while (startNumber <= endNumber) {
             numbers.add(startNumber);
@@ -411,7 +563,7 @@ public class SyncQueue {
      *
      * @param numbers returning numbers
      */
-    public void returnBlockNumbers(List<Long> numbers) {
+    public synchronized void returnBlockNumbers(List<Long> numbers) {
 
         if (numbers.isEmpty()) return;
 
@@ -424,7 +576,7 @@ public class SyncQueue {
      *
      * @return A list of block numbers for which blocks need to be retrieved.
      */
-    public List<Long> pollBlockNumbers() {
+    public synchronized List<Long> pollBlockNumbers() {
         return blockNumbersStore.pollBatch(config.maxBlocksAsk());
     }
 
@@ -439,7 +591,7 @@ public class SyncQueue {
     public List<BlockHeader> addAndValidateHeaders(List<BlockHeader> headers, byte[] nodeId) {
         List<BlockHeader> newHeaders = new ArrayList<BlockHeader>();
         List<BlockHeader> filtered = blockQueue.filterExistingHeaders(headers);
-
+        /*
         for (BlockHeader header : filtered) {
 
             if (!isValid(header)) {
@@ -454,7 +606,7 @@ public class SyncQueue {
                 newHeaders.add(header);
             }
         }
-
+        */
         headerStore.addBatch(newHeaders);
 
         if (logger.isDebugEnabled())
@@ -577,6 +729,7 @@ public class SyncQueue {
      * @param header block header
      * @return true if block is valid, false otherwise
      */
+	/*
     private boolean isValid(BlockHeader header) {
 
         if (!headerValidator.validate(header)) {
@@ -589,7 +742,7 @@ public class SyncQueue {
 
         return true;
     }
-
+    */
     public static void fillupHeadersNumber(List<BlockHeader> headers,
             long startNumber, long lastNumber) {
         if (headers == null || headers.size() == 0) {

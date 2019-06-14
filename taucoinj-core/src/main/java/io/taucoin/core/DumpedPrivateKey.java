@@ -17,12 +17,14 @@
 
 package io.taucoin.core;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import io.taucoin.crypto.ECKey;
+
 import java.util.Arrays;
 
 import javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Parses and generates private keys in the form used by the taucoin "dumpprivkey" command. This is the private key
