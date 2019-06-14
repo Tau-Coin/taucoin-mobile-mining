@@ -273,9 +273,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    ConnectionManager provideConnectionManager(
-            TaucoinListener listener) {
-        return new ConnectionManager(listener);
+    ConnectionManager provideConnectionManager() {
+        return new ConnectionManager();
     }
 
     @Provides
