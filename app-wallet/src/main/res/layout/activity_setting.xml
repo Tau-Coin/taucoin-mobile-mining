@@ -30,6 +30,7 @@
             app:itemLeftText="@string/setting_transaction_expiry" />
 
         <io.taucoin.android.wallet.widget.ItemTextView
+            android:visibility="gone"
             android:id="@+id/tv_reset_data"
             android:layout_width="match_parent"
             android:layout_height="50dp"
