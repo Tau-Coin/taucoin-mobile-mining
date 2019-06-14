@@ -211,6 +211,7 @@ public class SyncQueue {
             worker.interrupt();
         }
 
+        isImportingBlocks.set(false);
         inited.set(false);
     }
 
@@ -221,6 +222,7 @@ public class SyncQueue {
                     requestStoppedLock.wait();
                 } catch (InterruptedException e) {
                     logger.error("Waiting for start is interrupted {}", e);
+                    isImportingBlocks.set(false);
                 }
             }
         }
@@ -292,6 +294,7 @@ public class SyncQueue {
                 e.printStackTrace();
                 logger.error("Error processing block {}: ", wrapper.getBlock().toString(), e);
                 //logger.error("Block dump: {}", Hex.toHexString(wrapper.getBlock().getEncoded()));
+                isImportingBlocks.set(false);
             }
         }
 
@@ -308,6 +311,7 @@ public class SyncQueue {
                     noParentLock.wait();
                 } catch (InterruptedException e) {
                     logger.error("Waiting for recovery is interrupted {}", e);
+                    isImportingBlocks.set(false);
                 }
             }
         }
@@ -328,6 +332,8 @@ public class SyncQueue {
     }
 
     public boolean isImportingBlocksFinished() {
+        logger.info("Block queue size: {}, is connecting: {}",
+                blockQueue.size(), isImportingBlocks);
         return isBlocksEmpty() && !isImportingBlocks.get();
     }
 
