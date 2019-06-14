@@ -102,8 +102,8 @@ public class TaucoinModule {
     @Provides
     @Singleton
     io.taucoin.core.Blockchain provideBlockchain(BlockStore blockStore, io.taucoin.core.Repository repository,
-                                                   PendingState pendingState, TaucoinListener listener) {
-        return new BlockchainImpl(blockStore, repository, pendingState, listener);
+                                                   PendingState pendingState, TaucoinListener listener,ChainInfoManager chainInfoManager) {
+        return new BlockchainImpl(blockStore, repository, pendingState, listener,chainInfoManager);
     }
 
     @Provides

@@ -6,6 +6,7 @@ import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.db.BlockStore;
 import io.taucoin.listener.TaucoinListener;
+import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.util.AdvancedDeviceUtils;
 import io.taucoin.util.ByteUtil;
 
@@ -78,6 +79,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private PendingState pendingState;
 
+    private ChainInfoManager chainInfoManager;
+
 
     SystemProperties config = SystemProperties.CONFIG;
 
@@ -96,11 +99,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     //todo: autowire over constructor
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
-                          PendingState pendingState, TaucoinListener listener) {
+                          PendingState pendingState, TaucoinListener listener,ChainInfoManager chainInfoManager) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.pendingState = pendingState;
         this.listener = listener;
+        this.chainInfoManager = chainInfoManager;
     }
 
     @Override
@@ -794,9 +798,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         boolean isValid = true;
         int txCount = 0;
 
-        boolean isForgedSelf = false;
-        if (block.getForgerAddress().equals(config.getForgerCoinbase())) {
-            isForgedSelf = true;
+        /**
+         * when this block is forged by self or newest block synced
+         * this will broadcast.
+         */
+        boolean isAssociatedSelf = false;
+        if (chainInfoManager.getHeight() <= block.getNumber()) {
+            isAssociatedSelf = true;
         }
 
         for (Transaction tx : block.getTransactionsList()) {
@@ -804,7 +812,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
             cacheTrack = repo.startTracking();
             TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
-            executor.setForgedByself(isForgedSelf);
+            executor.setAssociatedByself(isAssociatedSelf);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
             if (!executor.init()) {

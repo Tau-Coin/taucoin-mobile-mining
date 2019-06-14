@@ -202,38 +202,51 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
                 if (iterc.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterc.next();
-                    appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                    }
                 }
 
                 Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
                 if (iterl.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterl.next();
-                    appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                    }
                 }
 
                 Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
                 while (iters.hasNext()) {
                     Map.Entry<byte[], Long> entry = iters.next();
-                    appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                    }
                 }
             } else {
                 Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
                 if (iterc.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterc.next();
-                    appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
+                    }
                 }
 
                 Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
                 if (iterl.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterl.next();
-                    appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
+                    }
                 }
 
                 Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
                 while (iters.hasNext()) {
                     Map.Entry<byte[], Long> entry = iters.next();
-                    appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                        appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
+                    }
                 }
+                appWanted.setBlockHash(outcome.getBlockhash());
                 broadcastEvent(EventFlag.EVENT_TRANSACTION_EXECUATED, new TransactionExecuatedEvent(appWanted));
                 appWanted.getSenderAssociated().clear();
                 appWanted.getLastWintess().clear();
