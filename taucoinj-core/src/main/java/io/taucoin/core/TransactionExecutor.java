@@ -251,7 +251,7 @@ public class TransactionExecutor {
         // Increase forge power.
         track.increaseforgePower(tx.getSender());
 
-        logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
+        logger.debug("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
         //AccountState accountState = track.getAccountState(tx.getSender());
         if (blockchain.getSize() > MaxHistoryCount + 1
