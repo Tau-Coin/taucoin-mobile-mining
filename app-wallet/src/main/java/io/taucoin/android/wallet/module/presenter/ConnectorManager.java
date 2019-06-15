@@ -289,6 +289,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public void stopBlockForging(){
+        mExceptionStop = null;
         stopBlockForging(-1);
     }
 

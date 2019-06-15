@@ -1,5 +1,6 @@
 <resources>
 
+    <dimen name="dimen_size_05">0.5dip</dimen>
     <dimen name="dimen_size_12">12dip</dimen>
     <dimen name="dimen_size_14">14dip</dimen>
     <dimen name="dimen_size_15">15dip</dimen>

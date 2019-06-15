@@ -139,7 +139,7 @@
     <string name="home_mining_power">Power</string>
     <string name="home_mining_sync">Synced</string>
     <string name="home_mining_tip">Mining</string>
-    <string name="home_sync_tip">Sync</string>
+    <string name="home_sync_tip">Synchronizing</string>
     <string name="home_on">On</string>
     <string name="home_off">Off</string>
 

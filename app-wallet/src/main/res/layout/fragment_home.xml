@@ -82,7 +82,7 @@
 
                     <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_weight="1.6"
+                        android:layout_weight="2"
                         android:layout_gravity="center_vertical"
                         android:layout_height="wrap_content">
 
@@ -191,49 +191,56 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:gravity="bottom"
-                            android:layout_height="wrap_content">
+                            android:layout_height="30dp">
 
                             <TextView
                                 android:id="@+id/tv_balance_title"
                                 style="@style/style_middle_grey"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_horizontal"
+                                android:layout_height="match_parent"
+                                android:gravity="bottom"
+                                android:paddingBottom="1dp"
                                 android:text="@string/home_balance"/>
 
                             <TextView
                                 android:id="@+id/tv_balance"
-                                style="@style/style_mining_yellow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:layout_marginStart="7dp"
                                 android:textColor="@color/color_black"
+                                android:gravity="bottom"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMaxTextSize="@dimen/dimen_size_24"
+                                app:autoSizeMinTextSize="@dimen/dimen_size_14"
+                                app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                 android:text="0.00TAU"/>
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:gravity="bottom"
-                            android:layout_marginTop="2dp"
-                            android:layout_height="wrap_content">
+                            android:layout_height="30dp">
 
                             <TextView
                                 android:id="@+id/tv_mining_income_title"
                                 style="@style/style_middle_grey"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_horizontal"
-                                android:drawablePadding="2dp"
+                                android:layout_height="match_parent"
+                                android:gravity="bottom"
+                                android:paddingBottom="1dp"
                                 android:text="@string/home_mining_income"/>
 
                             <TextView
                                 android:id="@+id/tv_mining_income"
-                                style="@style/style_mining_yellow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:layout_marginStart="7dp"
                                 android:textColor="@color/color_black"
+                                android:gravity="bottom"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMaxTextSize="@dimen/dimen_size_24"
+                                app:autoSizeMinTextSize="@dimen/dimen_size_14"
+                                app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                 android:text="0.00TAU"/>
 
                         </LinearLayout>
