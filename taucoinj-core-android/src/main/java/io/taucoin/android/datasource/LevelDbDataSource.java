@@ -52,7 +52,7 @@ public class LevelDbDataSource implements KeyValueDataSource {
         options.compressionType(CompressionType.NONE);
         options.blockSize(10 * 1024 * 1024);
         options.writeBufferSize(10 * 1024 * 1024);
-        options.cacheSize(0);
+        options.cacheSize(50 * 1024 * 1024);
         options.paranoidChecks(false);
         options.verifyChecksums(false);
 
