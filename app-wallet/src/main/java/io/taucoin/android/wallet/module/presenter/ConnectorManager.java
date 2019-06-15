@@ -167,8 +167,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
                 addLogEntry("Connector Disconnected");
                 mTaucoinConnector.removeListener(mHandlerIdentifier);
                 isTaucoinConnected = false;
+                mTaucoinConnector = null;
                 isInit = -1;
                 isSyncMe = -1;
+                init();
             }
         }catch (Exception ignore){}
     }
