@@ -250,6 +250,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 }
                 UserUtil.setUserInfo(tvPower, tvMiningIncome, tvMined);
                 UserUtil.setBalance(tvBalance);
+                // If the connection with the mining process is interrupted, restore the connection
+                MyApplication.getRemoteConnector().restoreConnection();
                 break;
             case BLOCK_HEIGHT:
                 MiningUtil.setBlockHeight(tvChainHeight);

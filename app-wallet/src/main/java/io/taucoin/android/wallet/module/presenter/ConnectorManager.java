@@ -205,6 +205,15 @@ public abstract class ConnectorManager implements ConnectorHandler {
                 BOOT_UP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
     }
 
+    /**
+     * If the connection with the mining process is interrupted, restore the connection
+     * */
+    public void restoreConnection(){
+        if(mTaucoinConnector == null || !isTaucoinConnected){
+            init();
+        }
+    }
+
     private class InitTask implements Runnable {
         private TaucoinConnector taucoinConnector;
         private String handlerIdentifier;
