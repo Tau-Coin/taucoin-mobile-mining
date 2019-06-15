@@ -78,7 +78,7 @@ dependencies {
     //compile "com.google.dagger:dagger:2.1-SNAPSHOT"
     api "com.j256.ormlite:ormlite-android:4.48"
     api "org.glassfish:javax.annotation:10.0-b28"
-    api "org.iq80.leveldb:leveldb:0.7"
+    api "org.iq80.leveldb:leveldb:0.8"
     api ('com.github.tony19:logback-android-core:1.1.1-6')
     api ('com.github.tony19:logback-android-classic:1.1.1-6') {
         exclude group: 'com.google.android'

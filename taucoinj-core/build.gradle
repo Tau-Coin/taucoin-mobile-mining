@@ -92,7 +92,7 @@ test {
 
 ext {
     slf4jVersion = '1.7.12'
-    leveldbVersion = '0.7'
+    leveldbVersion = '0.8'
     scastleVersion = '1.51.0.0'
     log4jVersion = '1.2.17'
     hibernateVersion = '4.3.10.Final'
@@ -100,9 +100,6 @@ ext {
 }
 
 dependencies {
-//    compile 'com.google.dagger:dagger:2.17'
-//    compile 'com.google.dagger:dagger-compiler:2.17'
-
     compile 'com.google.dagger:dagger:2.17'
     compile 'com.google.dagger:dagger-android-support:2.17'
 
@@ -115,6 +112,7 @@ dependencies {
     compile "com.madgag.spongycastle:core:${scastleVersion}" // for SHA3 and SECP256K1
     compile "com.madgag.spongycastle:prov:${scastleVersion}" // for SHA3 and SECP256K1
 
+    compile "org.iq80.leveldb:leveldb-api:${leveldbVersion}"
     compile "org.iq80.leveldb:leveldb:${leveldbVersion}"
 
     compile "org.fusesource.leveldbjni:leveldbjni:1.8"
