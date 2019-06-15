@@ -1,7 +1,6 @@
 package io.taucoin.db;
 
 import io.taucoin.core.Block;
-import io.taucoin.core.BlockHeader;
 import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.util.ByteUtil;
 
@@ -296,6 +295,9 @@ public class IndexedBlockStore implements BlockStore {
 
                     byte[] hash = blockInfo.getHash();
                     byte[] blockRlp = blocks.get(hash);
+                    if (blockRlp == null){
+                        return null;
+                    }
                     return new Block(blockRlp);
                 }
             }

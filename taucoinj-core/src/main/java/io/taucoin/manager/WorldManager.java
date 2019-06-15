@@ -2,7 +2,6 @@ package io.taucoin.manager;
 
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
-import io.taucoin.crypto.HashUtil;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
 import io.taucoin.debug.RefWatcher;
@@ -12,20 +11,14 @@ import io.taucoin.listener.TaucoinListener;
 import io.taucoin.net.client.PeerClient;
 import io.taucoin.sync2.SyncManager;
 import io.taucoin.sync2.PoolSynchronizer;
-import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static io.taucoin.config.SystemProperties.CONFIG;
-import static io.taucoin.crypto.HashUtil.EMPTY_TRIE_HASH;
 
 /**
  * WorldManager is a singleton containing references to different parts of the system.
