@@ -5,6 +5,7 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
 import io.taucoin.db.BlockStore;
+import io.taucoin.debug.RefWatcher;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.sync2.ChainInfoManager;
 import io.taucoin.util.AdvancedDeviceUtils;
@@ -93,18 +94,22 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private boolean fork = false;
 
+    private RefWatcher refWatcher;
+
     public BlockchainImpl() {
     }
 
     //todo: autowire over constructor
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
-                          PendingState pendingState, TaucoinListener listener,ChainInfoManager chainInfoManager) {
+            PendingState pendingState, TaucoinListener listener,
+            ChainInfoManager chainInfoManager, RefWatcher refWatcher) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.pendingState = pendingState;
         this.listener = listener;
         this.chainInfoManager = chainInfoManager;
+        this.refWatcher = refWatcher;
     }
 
     @Override
@@ -272,11 +277,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     listener.onBlockConnected(newBlocks.get(i));
                 }
 
-//                if (needFlush(block)) {
+                if (needFlush(block)) {
                     repository.flush();
                     blockStore.flush();
                     System.gc();
-//                }
+                }
 
                 return IMPORTED_BEST;
             } else {
@@ -357,7 +362,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         // The simple case got the block
         // to connect to the main chain
         if (bestBlock.isParentOf(block)) {
-            recordBlock(block);
+            //recordBlock(block);
 
             if (addBlock(block)) {
                 listener.onBlockConnected(block);
@@ -366,12 +371,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     lock.notify();
                 }
 
+                final long currentBlockNumber = block.getNumber();
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        //pendingState.processBest(block);
-                        if (block.getNumber() > config.getMutableRange()) {
-                            blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                        if ( currentBlockNumber > config.getMutableRange()) {
+                            blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
                         }
                     }
                 });
@@ -382,7 +387,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         } else {
 
             if (blockStore.isBlockExist(block.getPreviousHeaderHash())) {
-                recordBlock(block);
+                //recordBlock(block);
                 ImportResult result = tryConnectAndFork(block);
 
                 if (result == IMPORTED_BEST) {
@@ -391,12 +396,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                         lock.notify();
                     }
 
+                    final long currentBlockNumber = block.getNumber();
                     EventDispatchThread.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            //pendingState.processBest(block);
-                            if (block.getNumber() > config.getMutableRange()) {
-                                blockStore.delNonChainBlocksByNumber(block.getNumber() - config.getMutableRange());
+                            if (currentBlockNumber > config.getMutableRange()) {
+                                blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
                             }
                         }
                     });
@@ -445,21 +450,25 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Override
     public synchronized boolean addBlock(Block block) {
 
+        /**
         if (exitOn < block.getNumber()) {
             logger.warn("Exiting after block.number {}", bestBlock.getNumber());
             repository.flush();
             blockStore.flush();
             System.exit(-1);
         }
+        */
 
         if (!isValidBlock(block, repository)) {
             logger.error("Invalid block with number: {}", block.getNumber());
             return false;
         }
 
+        /**
         if (block.getNumber() >= config.traceStartBlock() && config.traceStartBlock() != -1) {
             AdvancedDeviceUtils.adjustDetailedTracing(block.getNumber());
         }
+        */
 
         track = repository.startTracking();
 
@@ -472,15 +481,17 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         storeBlock(block);
 
-//        if (needFlush(block)) {
+        listener.onBlock(block);
+
+        if (needFlush(block)) {
             repository.flush();
             blockStore.flush();
             System.gc();
-//        }
+
+            //refWatcher.watch(this);
+        }
 
         listener.trace(String.format("Block chain size: [ %d ]", this.getSize()));
-
-        listener.onBlock(block);
 
         return true;
     }
