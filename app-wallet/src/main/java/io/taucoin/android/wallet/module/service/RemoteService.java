@@ -50,6 +50,9 @@ public class RemoteService extends TaucoinRemoteService {
         init();
         // Crashlytics
         Fabric.with(this, new Crashlytics());
+
+        NotifyManager.NotifyData mData = new NotifyManager.NotifyData();
+        NotifyManager.getInstance().sendNotify(this, builder, mData);
     }
 
     @Override
