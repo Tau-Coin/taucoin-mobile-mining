@@ -30,6 +30,8 @@ public class LevelDbDataSource implements KeyValueDataSource {
 
     private static final Logger logger = LoggerFactory.getLogger("db");
 
+    private static final int MAX_OPEN_FILES = 128;
+
     private String name;
     private DB db;
     private boolean alive;
@@ -55,6 +57,7 @@ public class LevelDbDataSource implements KeyValueDataSource {
         options.cacheSize(10 * 1024 * 1024);
         options.paranoidChecks(false);
         options.verifyChecksums(false);
+        options.maxOpenFiles(MAX_OPEN_FILES);
 
         try {
             logger.debug("Opening database");

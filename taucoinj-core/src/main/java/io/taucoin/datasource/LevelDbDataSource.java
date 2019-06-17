@@ -50,6 +50,7 @@ public class LevelDbDataSource implements KeyValueDataSource {
         options.cacheSize(10 * 1024 * 1024);
         options.paranoidChecks(true);
         options.verifyChecksums(true);
+        options.maxOpenFiles(128);
 
         try {
             logger.debug("Opening database");

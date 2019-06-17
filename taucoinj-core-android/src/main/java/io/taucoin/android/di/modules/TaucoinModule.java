@@ -3,6 +3,7 @@ package io.taucoin.android.di.modules;
 import android.content.Context;
 
 import io.taucoin.android.datasource.LevelDbDataSource;
+import io.taucoin.android.db.AccountStateDatabaseImpl;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.config.SystemProperties;
@@ -146,7 +147,8 @@ public class TaucoinModule {
     @Singleton
     Repository provideRepository() {
         LevelDbDataSource stateDS = new LevelDbDataSource();
-        return new RepositoryImpl(stateDS);
+        AccountStateDatabaseImpl accountStateDb = new AccountStateDatabaseImpl(stateDS);
+        return new RepositoryImpl(accountStateDb);
     }
 
     @Provides
