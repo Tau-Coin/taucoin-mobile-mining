@@ -295,6 +295,15 @@ public class SyncQueue {
                 logger.error("Error processing block {}: ", wrapper.getBlock().toString(), e);
                 //logger.error("Block dump: {}", Hex.toHexString(wrapper.getBlock().getEncoded()));
                 isImportingBlocks.set(false);
+
+                // Return this block into queue, wait for a while and try again.
+                blockQueue.add(wrapper);
+                logger.warn("Sxs-debug, try connect block with number {}", wrapper.getNumber());
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ie) {
+                    logger.error("Sync queue interrupted {}", ie);
+                }
             }
         }
 
