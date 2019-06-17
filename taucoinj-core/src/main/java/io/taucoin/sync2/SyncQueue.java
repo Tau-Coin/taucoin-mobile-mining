@@ -298,7 +298,7 @@ public class SyncQueue {
 
                 // Return this block into queue, wait for a while and try again.
                 blockQueue.add(wrapper);
-                logger.warn("Sxs-debug, try connect block with number {}", wrapper.getNumber());
+                logger.warn("Exception happends, try connecting block again with number {}", wrapper.getNumber());
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
