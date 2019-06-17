@@ -123,7 +123,7 @@ public class TaucoinRemoteService extends TaucoinService {
         // super.onDestroy will call taucoin.close()
         super.onDestroy();
         unregisterNetworkStateListener();
-        clearListeners();
+        //clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
     }
@@ -135,7 +135,7 @@ public class TaucoinRemoteService extends TaucoinService {
             taucoin.close();
             taucoin = null;
         }
-        clearListeners();
+        //clearListeners();
         TaucoinModule.close();
         isTaucoinStarted = false;
     }
