@@ -151,9 +151,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
             addLogEntry("Connector Connected");
             isTaucoinConnected = true;
             mTaucoinConnector.addListener(mHandlerIdentifier, EnumSet.allOf(EventFlag.class));
-
             isInit = -1;
-            init();
         }
     }
 

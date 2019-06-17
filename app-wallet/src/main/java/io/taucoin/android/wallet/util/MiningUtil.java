@@ -231,10 +231,10 @@ public class MiningUtil {
                 public void handleData(Boolean isSuccess) {
                     Logger.d("MiningUtil.clearAndReloadBlocks=" + isSuccess);
                     ProgressManager.closeProgressDialog();
-                    AppUtil.killProcess(MyApplication.getInstance(), false);
                     if(isSuccess){
                         ToastUtils.showShortToast(R.string.setting_reset_data_success);
                         MyApplication.getRemoteConnector().cancelRemoteConnector();
+                        AppUtil.killProcess(MyApplication.getInstance(), false);
                         MyApplication.getRemoteConnector().init();
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                     }else {
