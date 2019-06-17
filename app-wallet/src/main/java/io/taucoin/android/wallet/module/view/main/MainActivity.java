@@ -29,6 +29,7 @@ import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.util.ActivityManager;
+import io.taucoin.foundation.util.AppUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
 
 public class MainActivity extends BaseActivity implements IMainView {
@@ -146,17 +147,15 @@ public class MainActivity extends BaseActivity implements IMainView {
         ProgressManager.closeProgressDialog();
         TxService.stopService();
         UpgradeService.stopUpdateService();
-        MyApplication.getRemoteConnector().cancelRemoteProgress();
+        MyApplication.getRemoteConnector().cancelRemoteConnector();
 
-        // wait service destroy
-        Observable.timer(300, TimeUnit.MILLISECONDS)
+        Observable.timer(100, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new CommonObserver<Long>() {
 
                 @Override
                 public void onComplete() {
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(0);
+                    AppUtil.killProcess(MyApplication.getInstance(), true);
                 }
             });
     }

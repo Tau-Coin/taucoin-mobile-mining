@@ -186,8 +186,11 @@ public class NotifyManager {
     }
 
     synchronized void sendNotify(Service service, NotificationCompat.Builder builder, NotifyManager.NotifyData notifyData) {
-        if(service == null || notifyData == null || !PermissionUtils.isNotificationEnabled()){
+        if(service == null || !PermissionUtils.isNotificationEnabled()){
             return;
+        }
+        if(notifyData == null){
+            notifyData = new NotifyData();
         }
         RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.notification_notice);
         if(StringUtil.isNotEmpty(notifyData.cpuUsage)){

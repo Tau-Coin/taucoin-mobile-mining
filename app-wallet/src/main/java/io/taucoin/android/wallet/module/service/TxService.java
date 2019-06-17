@@ -62,8 +62,7 @@ public class TxService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 
     @Override
@@ -81,11 +80,13 @@ public class TxService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        MyApplication.getRemoteConnector().restoreConnection();
         NotifyManager.getInstance().sendNotify();
         KeyValue keyValue = MyApplication.getKeyValue();
         if(intent != null){
             String action = intent.getAction();
             String serviceType = intent.getStringExtra(TransmitKey.SERVICE_TYPE);
+            serviceType = StringUtil.isNotEmpty(serviceType) ? serviceType : "";
             if(StringUtil.isNotEmpty(action) || keyValue == null){
                 NotifyManager.getInstance().handlerNotifyClickEvent(action, serviceType);
                 return super.onStartCommand(intent, flags, startId);

@@ -72,8 +72,9 @@ public class SettingActivity extends BaseActivity {
     private void resetData() {
         if(UserUtil.isImportKey()){
             KeyValue KeyValue = MyApplication.getKeyValue();
-            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
+            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start) ||
+                    StringUtil.isSame(KeyValue.getSyncState(), TransmitKey.MiningState.Start)){
+                ToastUtils.showShortToast(R.string.setting_reset_data_first);
                 return;
             }
             View view = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);

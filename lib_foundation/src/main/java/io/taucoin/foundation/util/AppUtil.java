@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.github.naturs.logger.Logger;
+
 import java.util.List;
 
 public class AppUtil {
@@ -111,5 +113,27 @@ public class AppUtil {
         } catch (Exception ignore) {
         }
         return result;
+    }
+
+    public static void killProcess(Context context, boolean isKillMainProcess) {
+        int myPid = android.os.Process.myPid();
+        String packageName = context.getPackageName();
+        ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager
+                .getRunningAppProcesses()) {
+            String processName = appProcess.processName;
+            if (StringUtil.isNotEmpty(processName) &&
+                    processName.contains(packageName) && myPid != appProcess.pid) {
+                Logger.d("killProcess.RemoteService=" + appProcess.pid);
+                android.os.Process.killProcess(appProcess.pid);
+                break;
+            }
+        }
+
+        if(isKillMainProcess){
+            android.os.Process.killProcess(myPid);
+            Logger.d("killProcess=" + myPid);
+            System.exit(0);
+        }
     }
 }

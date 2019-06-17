@@ -42,6 +42,7 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.AppUtil;
 
 public class MiningUtil {
 
@@ -218,7 +219,6 @@ public class MiningUtil {
 
                 BlockInfoDaoUtils.getInstance().reloadBlocks();
                 KeyValueDaoUtils.getInstance().reloadBlocks();
-                EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 emitter.onNext(true);
             }catch (Exception ex){
                 emitter.onNext(false);
@@ -231,8 +231,12 @@ public class MiningUtil {
                 public void handleData(Boolean isSuccess) {
                     Logger.d("MiningUtil.clearAndReloadBlocks=" + isSuccess);
                     ProgressManager.closeProgressDialog();
+                    AppUtil.killProcess(MyApplication.getInstance(), false);
                     if(isSuccess){
                         ToastUtils.showShortToast(R.string.setting_reset_data_success);
+                        MyApplication.getRemoteConnector().cancelRemoteConnector();
+                        MyApplication.getRemoteConnector().init();
+                        EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                     }else {
                         ToastUtils.showShortToast(R.string.setting_reset_data_fail);
                     }

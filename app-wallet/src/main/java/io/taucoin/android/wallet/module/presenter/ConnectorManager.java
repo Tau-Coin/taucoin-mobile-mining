@@ -83,6 +83,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
     public void cancelRemoteConnector(){
         if (mTaucoinConnector != null) {
             addLogEntry("Cancel Remote Connector...");
+            stopSyncAll();
+            stopBlockForging();
             closeTaucoin();
             cancelLocalConnector();
         }

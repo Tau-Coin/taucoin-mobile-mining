@@ -16,12 +16,18 @@
 package io.taucoin.android.wallet.module.service;
 
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 
 import com.crashlytics.android.Crashlytics;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -37,8 +43,10 @@ import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.core.TransactionExecuatedOutcome;
 
 public class RemoteService extends TaucoinRemoteService {
+    private static final Logger logger = LoggerFactory.getLogger("RemoteService");
     private NotificationCompat.Builder builder;
     private NotificationManager mNotificationManager;
+    private ServiceConnection serviceConnection;
 
     public RemoteService() {
         super();
@@ -51,8 +59,15 @@ public class RemoteService extends TaucoinRemoteService {
         // Crashlytics
         Fabric.with(this, new Crashlytics());
 
-        NotifyManager.NotifyData mData = new NotifyManager.NotifyData();
-        NotifyManager.getInstance().sendNotify(this, builder, mData);
+        sendNotify();
+        serviceConnection = new RemoteServiceConnection();
+        startLocalService();
+        logger.debug("RemoteService onCreate");
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return super.onBind(intent);
     }
 
     @Override
@@ -62,15 +77,25 @@ public class RemoteService extends TaucoinRemoteService {
             if(mData != null){
                 mData.miningState = TransmitKey.MiningState.Start;
             }
-            NotifyManager.getInstance().sendNotify(this, builder, mData);
-
-            int type = intent.getIntExtra(TransmitKey.SERVICE_TYPE, -1);
-            if(type == TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS){
-                android.os.Process.killProcess(android.os.Process.myPid());
-                System.exit(0);
-            }
+            sendNotify(mData);
+//            int type = intent.getIntExtra(TransmitKey.SERVICE_TYPE, -1);
+//            if(type == TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS){
+//                android.os.Process.killProcess(android.os.Process.myPid());
+//                System.exit(0);
+//            }
+        }else{
+            sendNotify();
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void sendNotify() {
+        NotifyManager.NotifyData mData = new NotifyManager.NotifyData();
+        sendNotify(mData);
+    }
+
+    private void sendNotify(NotifyManager.NotifyData mData) {
+        NotifyManager.getInstance().sendNotify(this, builder, mData);
     }
 
     @Override
@@ -146,5 +171,23 @@ public class RemoteService extends TaucoinRemoteService {
         // notification manager
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         builder = NotifyManager.getInstance().createNotificationBuilder(this, mNotificationManager);
+    }
+
+    class RemoteServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            logger.debug("RemoteService onServiceDisconnected");
+            startLocalService();
+        }
+    }
+
+    private void startLocalService() {
+        startService(new Intent(this, TxService.class));
+        bindService(new Intent(this, TxService.class), serviceConnection, BIND_AUTO_CREATE);
     }
 }

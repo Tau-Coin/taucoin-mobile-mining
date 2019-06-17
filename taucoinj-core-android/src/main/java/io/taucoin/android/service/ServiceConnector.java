@@ -88,10 +88,12 @@ public class ServiceConnector {
             // interact with the service. We are communicating with the
             // service using a Messenger, so here we get a client-side
             // representation of that from the raw IBinder object.
-            serviceMessenger = new Messenger(service);
-            isBound = true;
-            for (ConnectorHandler handler: handlers) {
-                handler.onConnectorConnected();
+            if(serviceMessenger == null){
+                serviceMessenger = new Messenger(service);
+                isBound = true;
+                for (ConnectorHandler handler: handlers) {
+                    handler.onConnectorConnected();
+                }
             }
         }
 
