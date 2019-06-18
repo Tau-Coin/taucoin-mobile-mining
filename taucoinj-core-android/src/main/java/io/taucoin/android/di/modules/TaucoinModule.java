@@ -165,8 +165,8 @@ public class TaucoinModule {
 
     @Provides
     @Singleton
-    SyncQueue provideSyncQueue(Blockchain blockchain) {
-        return new SyncQueue(blockchain);
+    SyncQueue provideSyncQueue(Blockchain blockchain, MapDBFactory mapDBFactory) {
+        return new SyncQueue(blockchain, mapDBFactory);
     }
 
     @Provides

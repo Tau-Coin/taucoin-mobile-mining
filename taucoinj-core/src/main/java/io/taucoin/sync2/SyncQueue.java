@@ -33,7 +33,12 @@ public class SyncQueue {
     private static final Logger logger = LoggerFactory.getLogger("blockqueue");
 
     private static final int SCAN_BLOCKS_LIMIT = 1000;
+
+    // BlockQueueMem implementation configuration.
     private static final int BLOCK_QUEUE_LIMIT = 20000;
+
+    // BlockQueueImpl implementation configuration.
+    //private static final int BLOCK_QUEUE_LIMIT = Integer.MAX_VALUE;
 
     /**
      * Store holding a list of hashes of the heaviest chain on the network,
@@ -93,8 +98,9 @@ public class SyncQueue {
 
     private AtomicBoolean isRequestClose = new AtomicBoolean(false);
 
-    public SyncQueue(Blockchain blockchain) {
+    public SyncQueue(Blockchain blockchain, MapDBFactory mapDBFactory) {
         this.blockchain = blockchain;
+        this.mapDBFactory = mapDBFactory;
     }
 
     public void setSyncManager(SyncManager syncManager) {
@@ -116,6 +122,8 @@ public class SyncQueue {
         headerStore = new HeaderStoreMem();
         blockNumbersStore = new BlockNumberStoreMem();
         blockQueue = new BlockQueueMem();
+        //blockQueue = new BlockQueueImpl();
+        //((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
 
 //        hashStore = new HashStoreImpl();
 //        ((HashStoreImpl)hashStore).setMapDBFactory(mapDBFactory);
