@@ -33,6 +33,7 @@ public class NetWorkManager {
     private static NetWorkManager mInstance;
     private static Retrofit retrofit;
     private static Retrofit retrofitMain;
+    private static Retrofit retrofitMysql;
     private static Context mContext;
 
 
@@ -72,6 +73,15 @@ public class NetWorkManager {
 
         OkHttpClient okHttpClient = okHttpClientBuilder.build();
 
+        // init mysql retrofit
+        retrofitMysql = new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(PropertyUtils.getMysqlApiUrl())
+                .addConverterFactory(GsonConverterFactory.create())
+                // Configure callback libraries using RxJava
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
         // init main retrofit
         retrofitMain = new Retrofit.Builder()
                 .client(okHttpClient)
@@ -98,6 +108,10 @@ public class NetWorkManager {
 
     public static <T> T createMainApiService(Class<T> tClass) {
         return retrofitMain.create(tClass);
+    }
+
+    public static <T> T createMysqlApiService(Class<T> tClass) {
+        return retrofitMysql.create(tClass);
     }
 
     public static Context getContent() {

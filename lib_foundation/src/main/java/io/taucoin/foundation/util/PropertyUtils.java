@@ -58,6 +58,18 @@ public class PropertyUtils {
     }
 
     /**
+     * Get BaseUrl for Mysql
+     *
+     */
+    public static String getMysqlApiUrl() {
+        if (mProps == null) {
+            throw new IllegalArgumentException("must call #init(context) in application");
+        } else {
+            return mProps.getProperty("api.mysql.url", "");
+        }
+    }
+
+    /**
      * Is it an online version?
      *
      */

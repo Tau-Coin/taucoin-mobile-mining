@@ -112,7 +112,7 @@ public class TxModel implements ITxModel {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getMinerInfo(map)
             .subscribeOn(Schedulers.io())
             .subscribeOn(scheduler)
@@ -212,7 +212,7 @@ public class TxModel implements ITxModel {
     public void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer) {
         Map<String, List<String>> map = new HashMap<>();
         map.put("txids", txIds);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRawTransaction(map)
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
@@ -510,7 +510,7 @@ public class TxModel implements ITxModel {
                     Map<String,String> map = new HashMap<>();
                     map.put("address", address);
                     map.put("time", time);
-                    NetWorkManager.createMainApiService(TransactionService.class)
+                    NetWorkManager.createMysqlApiService(TransactionService.class)
                         .getTxRecords(map)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(scheduler)

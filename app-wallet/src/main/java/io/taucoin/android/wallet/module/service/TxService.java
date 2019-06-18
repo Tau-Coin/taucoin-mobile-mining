@@ -95,7 +95,7 @@ public class TxService extends Service {
                 case TransmitKey.ServiceType.GET_HOME_DATA:
                     if(!mIsGetBalance){
                         getBalance(serviceType);
-                        getMinerInfo();
+                        getMinerInfo(true);
                     }
                     if(!mIsChecked){
                         checkRawTransaction();
@@ -106,6 +106,7 @@ public class TxService extends Service {
                     break;
                 case TransmitKey.ServiceType.GET_BALANCE:
                     getBalance(serviceType);
+                    getMinerInfo(false);
                     break;
                 case TransmitKey.ServiceType.GET_RAW_TX:
                     if(!mIsChecked){
@@ -231,24 +232,28 @@ public class TxService extends Service {
                 .subscribe(new CommonObserver<Long>() {
                     @Override
                     public void onComplete() {
-                        getMinerInfo();
+                        getMinerInfo(true);
                     }
                 });
     }
 
-    private void getMinerInfo() {
+    private void getMinerInfo(boolean isDelay) {
         mTxModel.getMinerInfo(new LogicObserver<KeyValue>(){
 
             @Override
             public void handleError(int code, String msg) {
-                getMinerInfoDelay();
+                if(isDelay){
+                    getMinerInfoDelay();
+                }
             }
 
             @Override
             public void handleData(KeyValue keyValue) {
                 MyApplication.setKeyValue(keyValue);
                 EventBusUtil.post(MessageEvent.EventCode.BALANCE);
-                getMinerInfoDelay();
+                if(isDelay){
+                    getMinerInfoDelay();
+                }
             }
         });
     }
