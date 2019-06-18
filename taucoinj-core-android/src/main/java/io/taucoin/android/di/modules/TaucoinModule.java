@@ -3,6 +3,7 @@ package io.taucoin.android.di.modules;
 import android.content.Context;
 
 import io.taucoin.android.datasource.LevelDbDataSource;
+import io.taucoin.android.datasource.RocksDbDataSource;
 import io.taucoin.android.db.AccountStateDatabaseImpl;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.android.manager.BlockLoader;
@@ -130,7 +131,8 @@ public class TaucoinModule {
                 .counterEnable()
                 .makeOrGet();
 
-        KeyValueDataSource blocksDB = new io.taucoin.android.datasource.LevelDbDataSource("blocks");
+        // KeyValueDataSource blocksDB = new io.taucoin.android.datasource.LevelDbDataSource("blocks");
+        KeyValueDataSource blocksDB = new io.taucoin.android.datasource.RocksDbDataSource("blocks");
         blocksDB.init();
 
         IndexedBlockStore cache = new IndexedBlockStore();
@@ -146,7 +148,8 @@ public class TaucoinModule {
     @Provides
     @Singleton
     Repository provideRepository() {
-        LevelDbDataSource stateDS = new LevelDbDataSource();
+        //LevelDbDataSource stateDS = new LevelDbDataSource();
+        RocksDbDataSource stateDS = new RocksDbDataSource();
         AccountStateDatabaseImpl accountStateDb = new AccountStateDatabaseImpl(stateDS);
         return new RepositoryImpl(accountStateDb);
     }
