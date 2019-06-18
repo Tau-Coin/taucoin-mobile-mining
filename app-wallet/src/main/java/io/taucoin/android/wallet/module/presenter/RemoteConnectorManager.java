@@ -277,12 +277,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
             boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
             boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
             if(isSyncStart){
+                MyApplication.getRemoteConnector().startSyncAll();
                 if(isMiningStart){
                     MyApplication.getRemoteConnector().startBlockForging();
                 }else{
                     MyApplication.getRemoteConnector().stopBlockForging();
                 }
-                MyApplication.getRemoteConnector().startSyncAll();
             }else{
                 MyApplication.getRemoteConnector().stopSyncAll();
                 MyApplication.getRemoteConnector().stopBlockForging();

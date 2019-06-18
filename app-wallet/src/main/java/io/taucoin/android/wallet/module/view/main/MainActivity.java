@@ -2,6 +2,7 @@ package io.taucoin.android.wallet.module.view.main;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.module.service.DaemonJobService;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
 import io.taucoin.android.wallet.module.view.main.iview.IMainView;
@@ -145,6 +147,9 @@ public class MainActivity extends BaseActivity implements IMainView {
 
     private void appExit(){
         ProgressManager.closeProgressDialog();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            DaemonJobService.closeJob(this);
+        }
         TxService.stopService();
         UpgradeService.stopUpdateService();
         MyApplication.getRemoteConnector().cancelRemoteConnector();

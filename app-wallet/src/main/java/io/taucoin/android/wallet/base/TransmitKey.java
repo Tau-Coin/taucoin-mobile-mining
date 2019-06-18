@@ -76,5 +76,6 @@ public class TransmitKey {
         public static final String P2P_EXCHANGE = "https://www.taucoin.io/p2pexchange";
         public static final String BLOCKS_INFO = "http://tau.taucoin.io/blocksInfo/";
         public static final String MINING_INFO = "http://tau.taucoin.io/miningInfo?address=";
+        public static final String MINING_GROUP = "https://t.me/joinchat/Ifw8BhBICAMUVCXrWbq4OQ";
     }
 }

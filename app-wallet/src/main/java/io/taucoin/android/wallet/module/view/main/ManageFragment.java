@@ -58,7 +58,8 @@ public class ManageFragment extends BaseFragment implements IManageView {
         onEvent(EventBusUtil.getMessageEvent(MessageEvent.EventCode.ALL));
     }
 
-    @OnClick({R.id.tv_nick, R.id.item_keys, R.id.item_address_note, R.id.item_help, R.id.tv_version, R.id.item_setting, R.id.item_p2p_exchange})
+    @OnClick({R.id.tv_nick, R.id.item_keys, R.id.item_address_note, R.id.item_help, R.id.tv_version,
+            R.id.item_setting, R.id.item_p2p_exchange, R.id.item_mining_group})
     public void onClick(View view) {
        switch (view.getId()){
            case R.id.tv_nick:
@@ -96,6 +97,9 @@ public class ManageFragment extends BaseFragment implements IManageView {
                break;
            case R.id.item_p2p_exchange:
                ActivityUtil.openUri(getActivity(), TransmitKey.ExternalUrl.P2P_EXCHANGE);
+               break;
+           case R.id.item_mining_group:
+               ActivityUtil.openUri(getActivity(), TransmitKey.ExternalUrl.MINING_GROUP);
                break;
            default:
                break;

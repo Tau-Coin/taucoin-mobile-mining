@@ -115,6 +115,15 @@
             app:rightText="@string/manager_p2p_exchange"
             app:rightTextColor="@color/color_black" />
 
+        <io.taucoin.android.wallet.widget.ItemLineView
+            android:id="@+id/item_mining_group"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            app:leftImage="@mipmap/icon_mining_group"
+            app:rightText="@string/manager_mining_group"
+            app:rightTextColor="@color/color_black" />
+
     </LinearLayout>
 
     <TextView

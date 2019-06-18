@@ -315,7 +315,9 @@ public class TaucoinRemoteService extends TaucoinService {
 
     @Override
     protected void createTaucoin(String privateKey) {
-
+        if(taucoin != null){
+            return;
+        }
         System.setProperty("sun.arch.data.model", "32");
         System.setProperty("leveldb.mmap", "false");
 

@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 
 import com.github.naturs.logger.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppUtil {
@@ -135,5 +136,21 @@ public class AppUtil {
             Logger.d("killProcess=" + myPid);
             System.exit(0);
         }
+    }
+
+    public static boolean isServiceRunning(Context context, String serviceName) {
+        if (StringUtil.isEmpty(serviceName)){
+            return false;
+        }
+        ActivityManager myManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+                .getRunningServices(30);
+        for (int i = 0; i < runningService.size(); i++) {
+            String className = runningService.get(i).service.getClassName();
+            if (StringUtil.isSame(className, serviceName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
