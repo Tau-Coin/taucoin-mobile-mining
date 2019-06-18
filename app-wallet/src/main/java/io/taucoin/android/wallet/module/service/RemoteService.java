@@ -187,7 +187,7 @@ public class RemoteService extends TaucoinRemoteService {
     }
 
     private void startLocalService() {
-        TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+        TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         bindService(new Intent(this, TxService.class), serviceConnection, BIND_AUTO_CREATE);
     }
 }

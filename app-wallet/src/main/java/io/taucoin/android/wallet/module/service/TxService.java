@@ -95,6 +95,7 @@ public class TxService extends Service {
                 case TransmitKey.ServiceType.GET_HOME_DATA:
                     if(!mIsGetBalance){
                         getBalance(serviceType);
+                        getMinerInfo();
                     }
                     if(!mIsChecked){
                         checkRawTransaction();
@@ -191,7 +192,6 @@ public class TxService extends Service {
     private void getBalance(String serviceType) {
         mIsGetBalance = true;
         getIncomeInfo();
-        getMinerInfo();
         mTxModel.getBalance(new LogicObserver<KeyValue>() {
 
             @Override
@@ -225,13 +225,30 @@ public class TxService extends Service {
         });
     }
 
+    private void getMinerInfoDelay() {
+        Observable.timer(60, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CommonObserver<Long>() {
+                    @Override
+                    public void onComplete() {
+                        getMinerInfo();
+                    }
+                });
+    }
+
     private void getMinerInfo() {
         mTxModel.getMinerInfo(new LogicObserver<KeyValue>(){
+
+            @Override
+            public void handleError(int code, String msg) {
+                getMinerInfoDelay();
+            }
 
             @Override
             public void handleData(KeyValue keyValue) {
                 MyApplication.setKeyValue(keyValue);
                 EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+                getMinerInfoDelay();
             }
         });
     }

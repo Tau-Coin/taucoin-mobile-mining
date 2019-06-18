@@ -17,28 +17,27 @@ import io.taucoin.foundation.util.AppUtil;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class DaemonJobService extends JobService {
     private static final int JOB_ID = 10;
+    private static final int JOB_PERIODIC = 2 * 1000; // 2s
+    private static final int BACKOFF_CRITERIA = 10 * 1000; // 10s
 
     public static void startJob(Context context) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(context.getPackageName(), DaemonJobService.class.getName()));
 
-        // 1s
-        long time = 1000;
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            // Execute job every 1s
-            builder.setPeriodic(time);
+            // Execute job every 10s
+            builder.setPeriodic(JOB_PERIODIC);
         } else {
             // Delayed execution of tasks
-            builder.setMinimumLatency(time);
+            builder.setMinimumLatency(JOB_PERIODIC);
             // Setting deadline will start execution if the deadline has not met the required conditions
-            builder.setOverrideDeadline(time);
+            builder.setOverrideDeadline(JOB_PERIODIC);
         }
         // Setting Network Conditions
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE);
         // Linear Retry Scheme
-        builder.setBackoffCriteria(time, JobInfo.BACKOFF_POLICY_LINEAR);
+        builder.setBackoffCriteria(BACKOFF_CRITERIA, JobInfo.BACKOFF_POLICY_LINEAR);
 
         if (jobScheduler != null) {
             jobScheduler.schedule(builder.build());
@@ -63,7 +62,7 @@ public class DaemonJobService extends JobService {
         boolean isLocalRun = AppUtil.isServiceRunning(this, TxService.class.getName());
         boolean isRemoteRun = AppUtil.isServiceRunning(this, RemoteService.class.getName());
         if (!isLocalRun || !isRemoteRun) {
-            TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+            TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
 
             Intent intent =  new Intent(this, RemoteService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
