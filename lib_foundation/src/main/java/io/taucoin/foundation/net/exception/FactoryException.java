@@ -28,7 +28,7 @@ public class FactoryException {
      * Analytical anomaly
      */
     public static ApiException analysisException(Throwable e) {
-        Logger.e(e, "FactoryException.analysisException");
+        Logger.e("FactoryException.analysisException=" + e.getMessage());
         ApiException apiException = new ApiException(e);
         if (!AppUtil.isNetworkConnected(NetWorkManager.getContent())) {
             apiException.setCode(CodeException.NETWORK_ERROR);
