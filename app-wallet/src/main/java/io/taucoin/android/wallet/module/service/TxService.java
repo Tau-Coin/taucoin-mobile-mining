@@ -180,7 +180,7 @@ public class TxService extends Service {
     private void getBalanceDelay(String serviceType) {
         mIsChecked = true;
         mIsGetBalance = true;
-        Observable.timer(5, TimeUnit.SECONDS)
+        Observable.timer(30, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override
@@ -227,7 +227,7 @@ public class TxService extends Service {
     }
 
     private void getMinerInfoDelay() {
-        Observable.timer(60, TimeUnit.SECONDS)
+        Observable.timer(2, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new CommonObserver<Long>() {
                     @Override
