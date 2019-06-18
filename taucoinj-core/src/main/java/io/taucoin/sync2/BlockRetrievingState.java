@@ -45,12 +45,5 @@ public class BlockRetrievingState extends AbstractSyncState {
             syncManager.changeState(IDLE);
             return;
         }
-
-        // Block queue is empty but block number queue is not empty.
-        // GetBlocksMessage is timeout. Change into idle state to sync again.
-        if (syncManager.queue.isImportingBlocksFinished()) {
-            syncManager.changeState(IDLE);
-            return;
-        }
     }
 }
