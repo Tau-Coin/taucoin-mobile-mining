@@ -297,8 +297,13 @@ public class SyncQueue {
                 isImportingBlocks.set(false);
 
                 // Return this block into queue, wait for a while and try again.
-                blockQueue.add(wrapper);
-                logger.warn("Exception happends, try connecting block again with number {}", wrapper.getNumber());
+                if (wrapper != null) {
+                    blockQueue.add(wrapper);
+                    logger.warn("Try connecting block again with number {}", wrapper.getNumber());
+                } else {
+                    logger.warn("Peek null and try again");
+                }
+
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
