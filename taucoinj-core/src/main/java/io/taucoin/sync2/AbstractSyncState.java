@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractSyncState implements SyncState {
 
-    private static final Logger logger = LoggerFactory.getLogger("sync");
+    protected static final Logger logger = LoggerFactory.getLogger("sync2");
 
     protected SyncManager syncManager;
 

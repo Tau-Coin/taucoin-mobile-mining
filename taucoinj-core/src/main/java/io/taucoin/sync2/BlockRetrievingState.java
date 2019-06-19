@@ -29,12 +29,14 @@ public class BlockRetrievingState extends AbstractSyncState {
         // if retrieving block further will lead to memory disaster.
         if (!syncManager.queue.isMoreBlocksNeeded()) {
             syncManager.changeState(IDLE);
+            logger.info("Block queue don't more blocks");
             return;
         }
 
         // If network is disconnected, don't download blocks until network recovery.
         if (!syncManager.connectionManager.isNetworkConnected()) {
             syncManager.changeState(IDLE);
+            logger.info("Network is disconnected");
             return;
         }
 
@@ -42,6 +44,7 @@ public class BlockRetrievingState extends AbstractSyncState {
         // there are no blocks corresponding to numbers for retrieving.
         if (syncManager.queue.isBlockNumbersEmpty()) {
 
+            logger.info("Block number queue is empty");
             syncManager.changeState(IDLE);
             return;
         }

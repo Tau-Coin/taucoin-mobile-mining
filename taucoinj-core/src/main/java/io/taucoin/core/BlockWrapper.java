@@ -117,7 +117,7 @@ public class BlockWrapper {
     }
 
     public byte[] getBytes() {
-        byte[] blockBytes = block.getEncoded();
+        byte[] blockBytes = block.getEncodedMsg();
         byte[] importFailedBytes = RLP.encodeBigInteger(BigInteger.valueOf(importFailedAt));
         byte[] receivedAtBytes = RLP.encodeBigInteger(BigInteger.valueOf(receivedAt));
         byte[] newBlockBytes = RLP.encodeByte((byte) (newBlock ? 1 : 0));
@@ -135,7 +135,7 @@ public class BlockWrapper {
         byte[] receivedAtBytes = wrapper.get(2).getRLPData();
         byte[] newBlockBytes = wrapper.get(3).getRLPData();
 
-        this.block = new Block(blockBytes);
+        this.block = new Block(blockBytes, true);
         this.importFailedAt = importFailedBytes == null ? 0 : new BigInteger(1, importFailedBytes).longValue();
         this.receivedAt = receivedAtBytes == null ? 0 : new BigInteger(1, receivedAtBytes).longValue();
         byte newBlock = newBlockBytes == null ? 0 : new BigInteger(1, newBlockBytes).byteValue();
