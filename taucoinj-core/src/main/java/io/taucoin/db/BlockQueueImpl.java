@@ -293,7 +293,16 @@ public class BlockQueueImpl implements BlockQueue {
 
     @Override
     public List<Long> filterExistingNumbers(Collection<Long> numbers) {
-        return Collections.emptyList();
+        awaitInit();
+
+        List<Long> filtered = new ArrayList<>();
+        for (Long n : numbers) {
+            if (!index.contains(n)) {
+                filtered.add(n);
+            }
+        }
+
+        return filtered;
     }
 
     @Override

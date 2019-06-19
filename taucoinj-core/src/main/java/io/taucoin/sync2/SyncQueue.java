@@ -35,10 +35,10 @@ public class SyncQueue {
     private static final int SCAN_BLOCKS_LIMIT = 1000;
 
     // BlockQueueMem implementation configuration.
-    private static final int BLOCK_QUEUE_LIMIT = 20000;
+    //private static final int BLOCK_QUEUE_LIMIT = 20000;
 
     // BlockQueueImpl implementation configuration.
-    //private static final int BLOCK_QUEUE_LIMIT = Integer.MAX_VALUE;
+    private static final int BLOCK_QUEUE_LIMIT = Integer.MAX_VALUE;
 
     /**
      * Store holding a list of hashes of the heaviest chain on the network,
@@ -121,9 +121,9 @@ public class SyncQueue {
         hashStore = new HashStoreMem();
         headerStore = new HeaderStoreMem();
         blockNumbersStore = new BlockNumberStoreMem();
-        blockQueue = new BlockQueueMem();
-        //blockQueue = new BlockQueueImpl();
-        //((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
+        //blockQueue = new BlockQueueMem();
+        blockQueue = new BlockQueueImpl();
+        ((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
 
 //        hashStore = new HashStoreImpl();
 //        ((HashStoreImpl)hashStore).setMapDBFactory(mapDBFactory);
@@ -689,6 +689,8 @@ public class SyncQueue {
     }
 
     public boolean isMoreBlocksNeeded() {
+        logger.info("blockQueue size/limit {}/{}", blockQueue.size(),
+                BLOCK_QUEUE_LIMIT);
         return blockQueue.size() < BLOCK_QUEUE_LIMIT;
     }
 
