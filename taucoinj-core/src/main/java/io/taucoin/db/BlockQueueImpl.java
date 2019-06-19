@@ -73,8 +73,6 @@ public class BlockQueueImpl implements BlockQueue {
                     }
 
                     index = new ArrayListIndex(blocks.keySet());
-                    removeUnusedBlocks();
-
                     initDone = true;
                     readHits = 0;
                     init.signalAll();
@@ -91,35 +89,34 @@ public class BlockQueueImpl implements BlockQueue {
         return String.format("%s/%s", STORE_NAME, STORE_NAME);
     }
 
-    // NOTE:
-    //  1. When application is killed, shutdown by lower power or replaced,
-    //    db commit wasn't commited. Maybe some unused blocks exists.
-    //  2. This method must be called in 'open()' method and must be locked
-    //    by 'initLock';
-    private void removeUnusedBlocks() {
-        if (index.size() == 0) {
-            return;
-        }
+    public void removeUnusedBlocks() {
+        awaitInit();
 
-        long bestNumber = blockchain.getBestBlock().getNumber();
-        long removedStart = 0;
-        BlockWrapper wrapper = poll();
-        removedStart = wrapper.getNumber();
-        if (removedStart > bestNumber) {
-            logger.info("No need to remove unused blocks start {} best {}",
-                    removedStart, bestNumber);
-            add(wrapper);
-            return;
-        }
+        synchronized (readMutex) {
+            if (index.size() == 0) {
+                return;
+            }
 
-        logger.info("Remove unused blocks from {} to {}", removedStart, bestNumber);
-
-        while ((removedStart < bestNumber) && index.size() > 0) {
-            wrapper = poll();
+            long bestNumber = blockchain.getBestBlock().getNumber();
+            long removedStart = 0;
+            BlockWrapper wrapper = poll();
             removedStart = wrapper.getNumber();
-        }
+            if (removedStart > bestNumber) {
+                logger.info("No need to remove unused blocks start {} best {}",
+                        removedStart, bestNumber);
+                add(wrapper);
+                return;
+            }
 
-        db.commit();
+            logger.info("Remove unused blocks from {} to {}", removedStart, bestNumber);
+
+            while ((removedStart < bestNumber) && index.size() > 0) {
+                wrapper = poll();
+                removedStart = wrapper.getNumber();
+            }
+
+            db.commit();
+        }
     }
 
     @Override
