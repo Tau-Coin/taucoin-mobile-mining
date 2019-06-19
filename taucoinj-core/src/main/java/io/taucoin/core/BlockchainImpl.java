@@ -748,6 +748,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     private void wrapBlockTransactions(Block block, Repository repo) {
+        long saveTime = System.nanoTime();
         for (Transaction tx : block.getTransactionsList()) {
 
             tx.setIsCompositeTx(false);
@@ -758,8 +759,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             AccountState txReceiverAccount= repo.getAccountState(txReceiverAdd);
 
             if(txSenderAdd != null) {
-                // logger.info("tx sender address is ====> {}",Hex.toHexString(txSenderAdd);
-                // logger.info("is sender account empty ====> {}",repo.getAccountState(txSenderAdd) == null);
                 byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
                 ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
                 byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
@@ -784,6 +783,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 tx.setIsCompositeTx(true);
             }
         }
+        long totalTime = System.nanoTime() - saveTime;
+        logger.info("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
     }
 
     private boolean processBlock(Block block, Repository repo) {
