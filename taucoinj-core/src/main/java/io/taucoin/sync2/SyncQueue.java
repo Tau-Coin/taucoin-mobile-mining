@@ -124,6 +124,7 @@ public class SyncQueue {
         //blockQueue = new BlockQueueMem();
         blockQueue = new BlockQueueImpl();
         ((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
+        ((BlockQueueImpl)blockQueue).setBlockchain(blockchain);
 
 //        hashStore = new HashStoreImpl();
 //        ((HashStoreImpl)hashStore).setMapDBFactory(mapDBFactory);

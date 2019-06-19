@@ -1,5 +1,6 @@
 package io.taucoin.db;
 
+import io.taucoin.core.Blockchain;
 import io.taucoin.core.BlockHeader;
 import io.taucoin.core.BlockWrapper;
 import io.taucoin.datasource.mapdb.MapDBFactory;
@@ -25,7 +26,7 @@ public class BlockQueueImpl implements BlockQueue {
 
     private final static Logger logger = LoggerFactory.getLogger("blockqueue");
 
-    private static final int READ_HITS_COMMIT_THRESHOLD = 10;
+    private static final int READ_HITS_COMMIT_THRESHOLD = 100;
     private int readHits;
 
     private final static String STORE_NAME = "blockqueue";
@@ -46,6 +47,8 @@ public class BlockQueueImpl implements BlockQueue {
 
     private final Object writeMutex = new Object();
     private final Object readMutex = new Object();
+
+    private Blockchain blockchain;
 
     @Override
     public void open() {
@@ -70,6 +73,8 @@ public class BlockQueueImpl implements BlockQueue {
                     }
 
                     index = new ArrayListIndex(blocks.keySet());
+                    removeUnusedBlocks();
+
                     initDone = true;
                     readHits = 0;
                     init.signalAll();
@@ -84,6 +89,37 @@ public class BlockQueueImpl implements BlockQueue {
 
     private String dbName() {
         return String.format("%s/%s", STORE_NAME, STORE_NAME);
+    }
+
+    // NOTE:
+    //  1. When application is killed, shutdown by lower power or replaced,
+    //    db commit wasn't commited. Maybe some unused blocks exists.
+    //  2. This method must be called in 'open()' method and must be locked
+    //    by 'initLock';
+    private void removeUnusedBlocks() {
+        if (index.size() == 0) {
+            return;
+        }
+
+        long bestNumber = blockchain.getBestBlock().getNumber();
+        long removedStart = 0;
+        BlockWrapper wrapper = poll();
+        removedStart = wrapper.getNumber();
+        if (removedStart > bestNumber) {
+            logger.info("No need to remove unused blocks start {} best {}",
+                    removedStart, bestNumber);
+            add(wrapper);
+            return;
+        }
+
+        logger.info("Remove unused blocks from {} to {}", removedStart, bestNumber);
+
+        while ((removedStart < bestNumber) && index.size() > 0) {
+            wrapper = poll();
+            removedStart = wrapper.getNumber();
+        }
+
+        db.commit();
     }
 
     @Override
@@ -333,6 +369,10 @@ public class BlockQueueImpl implements BlockQueue {
 
     public void setMapDBFactory(MapDBFactory mapDBFactory) {
         this.mapDBFactory = mapDBFactory;
+    }
+
+    public void setBlockchain(Blockchain blockchain) {
+        this.blockchain = blockchain;
     }
 
     public interface Index {
