@@ -796,6 +796,7 @@ public class TaucoinRemoteService extends TaucoinService {
         }
     }
 
+    @Deprecated
     protected void getBlockTxReindex(Message message) {
         Message replyMessage = Message.obtain(null,TaucoinClientMessage.MSG_BLOCK_TX_REINDEX,0,0);
         Bundle replyData = new Bundle();
@@ -860,6 +861,7 @@ public class TaucoinRemoteService extends TaucoinService {
         }
     }
 
+    @Deprecated
     protected void getBlockTx(Message message) {
         if (taucoin != null) {
             new getBlockTxTask(message).execute(taucoin);
@@ -868,6 +870,7 @@ public class TaucoinRemoteService extends TaucoinService {
         }
     }
 
+    @Deprecated
     protected class getBlockTxTask extends AsyncTask<Taucoin,Void,Block> {
         Messenger messenger;
         byte[] hash;

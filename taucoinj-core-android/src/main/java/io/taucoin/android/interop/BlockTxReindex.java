@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.HashMap;
 
+@Deprecated
 public class BlockTxReindex implements Parcelable {
     boolean isCompleted = false;
     boolean isFind = true;
