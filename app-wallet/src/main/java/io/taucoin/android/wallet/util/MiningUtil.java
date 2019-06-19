@@ -212,10 +212,10 @@ public class MiningUtil {
                 Logger.d(dataDir);
                 String blocksDir = dataDir + File.separator + "blocks";
                 String stateDir = dataDir + File.separator + "state";
-                File blocksFile = new File(blocksDir);
-                FileUtil.deleteFile(blocksFile);
-                File stateFile = new File(stateDir);
-                FileUtil.deleteFile(stateFile);
+                String blockQueueDir = dataDir + File.separator + "blockqueue";
+                FileUtil.deleteFile(new File(blocksDir));
+                FileUtil.deleteFile(new File(stateDir));
+                FileUtil.deleteFile(new File(blockQueueDir));
 
                 BlockInfoDaoUtils.getInstance().reloadBlocks();
                 KeyValueDaoUtils.getInstance().reloadBlocks();

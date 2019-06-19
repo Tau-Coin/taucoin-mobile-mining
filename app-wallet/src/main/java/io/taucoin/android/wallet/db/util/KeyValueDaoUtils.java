@@ -108,12 +108,12 @@ public class KeyValueDaoUtils {
     }
 
     public void reloadBlocks() {
-        List<KeyValue> list = getKeyValueDao().queryBuilder()
-                .list();
+        List<KeyValue> list = getKeyValueDao().queryBuilder().list();
         if(list.size() > 0){
             for(KeyValue keyValue : list){
                 keyValue.setSyncBlockNum(0);
                 keyValue.setMiningState(TransmitKey.MiningState.Stop);
+                keyValue.setSyncState(TransmitKey.MiningState.Stop);
                 update(keyValue);
             }
         }
