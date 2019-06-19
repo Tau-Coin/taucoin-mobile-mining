@@ -277,11 +277,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     listener.onBlockConnected(newBlocks.get(i));
                 }
 
-                if (needFlush(block)) {
+                //if (needFlush(block)) {
                     repository.flush();
                     blockStore.flush();
                     System.gc();
-                }
+                //}
 
                 return IMPORTED_BEST;
             } else {
@@ -483,13 +483,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         listener.onBlock(block);
 
-        if (needFlush(block)) {
+        //if (needFlush(block)) {
             repository.flush();
             blockStore.flush();
             System.gc();
-
-            //refWatcher.watch(this);
-        }
+        //}
 
         listener.trace(String.format("Block chain size: [ %d ]", this.getSize()));
 
