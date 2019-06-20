@@ -73,8 +73,11 @@ public class BlockQueueImpl implements BlockQueue {
                     }
 
                     index = new ArrayListIndex(blocks.keySet());
+
                     initDone = true;
                     readHits = 0;
+
+                    removeUnusedBlocks();
                     init.signalAll();
 
                     logger.info("Block queue loaded, size [{}]", size());
@@ -89,11 +92,10 @@ public class BlockQueueImpl implements BlockQueue {
         return String.format("%s/%s", STORE_NAME, STORE_NAME);
     }
 
-    public void removeUnusedBlocks() {
-        awaitInit();
-
+    private void removeUnusedBlocks() {
         synchronized (readMutex) {
-            if (index.size() == 0) {
+            if (index.isEmpty()) {
+                logger.info("Empty index and no need to remove unused blocks");
                 return;
             }
 
@@ -110,7 +112,7 @@ public class BlockQueueImpl implements BlockQueue {
 
             logger.info("Remove unused blocks from {} to {}", removedStart, bestNumber);
 
-            while ((removedStart < bestNumber) && index.size() > 0) {
+            while ((removedStart < bestNumber) && !index.isEmpty()) {
                 wrapper = poll();
                 removedStart = wrapper.getNumber();
             }
@@ -232,6 +234,9 @@ public class BlockQueueImpl implements BlockQueue {
 
             Long idx = index.poll();
             BlockWrapper block = blocks.get(idx);
+            if (block.getNumber() == 0) {
+                block.getBlock().setNumber(idx);
+            }
             blocks.remove(idx);
 
             if (block != null) {
@@ -253,7 +258,12 @@ public class BlockQueueImpl implements BlockQueue {
             }
 
             Long idx = index.peek();
-            return blocks.get(idx);
+            BlockWrapper wrapper = blocks.get(idx);
+            if (wrapper.getNumber() == 0) {
+                wrapper.getBlock().setNumber(idx);
+            }
+
+            return wrapper;
         }
     }
 

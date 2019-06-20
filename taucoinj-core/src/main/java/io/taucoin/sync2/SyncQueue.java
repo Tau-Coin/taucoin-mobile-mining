@@ -280,10 +280,6 @@ public class SyncQueue {
 
                 if (importResult == IMPORTED_BEST || importResult == IMPORTED_NOT_BEST) {
                     if (logger.isDebugEnabled()) logger.debug(Hex.toHexString(wrapper.getBlock().getEncoded()));
-                } else if (importResult == EXIST) {
-                    if (blockQueue instanceof BlockQueueImpl) {
-                        ((BlockQueueImpl)blockQueue).removeUnusedBlocks();
-                    }
                 } else {
                     logger.error("Import block failed: result: {}, block.number: {}, block.hash: {}",
                             importResult.name(), wrapper.getNumber(), wrapper.getBlock().getShortHash());
@@ -402,10 +398,13 @@ public class SyncQueue {
         if (blocks.isEmpty()) {
             return;
         }
+
+        /**
         if (isStoppedOrClosed()) {
             logger.warn("Drop blocks");
             return;
         }
+        */
 
         List<BlockWrapper> wrappers = new ArrayList<>(blocks.size());
         for (Block b : blocks) {

@@ -83,6 +83,7 @@ public class WorldManager {
 
         // must be initialized after blockchain is loaded
         pendingState.init();
+        syncManager.init();
     }
 
     public void addListener(TaucoinListener listener) {

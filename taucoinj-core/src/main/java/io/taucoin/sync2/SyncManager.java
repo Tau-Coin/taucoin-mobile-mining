@@ -91,9 +91,6 @@ public class SyncManager {
         for (SyncState state : syncStates.values()) {
             ((AbstractSyncState)state).setSyncManager(this);
         }
-
-        // Init sync queue
-        this.queue.init();
     }
 
     public void setRequestManager(RequestManager requestManager) {
@@ -103,6 +100,11 @@ public class SyncManager {
         for (SyncState state : syncStates.values()) {
             ((AbstractSyncState)state).setRequestManager(requestManager);
         }
+    }
+
+    public void init() {
+        // Init sync queue
+        this.queue.init();
     }
 
     public void start() {
