@@ -650,7 +650,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
         byte[] address = block.getForgerAddress();
         BigInteger forgingPower = repo.getforgePower(address);
-        logger.info("Address: {}, forge power: {}", Hex.toHexString(address), forgingPower);
+        logger.debug("Address: {}, forge power: {}", Hex.toHexString(address), forgingPower);
 
         long blockTime = ByteUtil.byteArrayToLong(block.getTimestamp());
         Block preBlock = blockStore.getBlockByHash(block.getPreviousHeaderHash());
@@ -663,9 +663,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         BigInteger targetValue = ProofOfTransaction.
                 calculateMinerTargetValue(block.getBaseTarget(), forgingPower, blockTime - preBlockTime);
 
-        logger.info("Generation Signature {}", Hex.toHexString(block.getGenerationSignature()));
+        logger.debug("Generation Signature {}", Hex.toHexString(block.getGenerationSignature()));
         BigInteger hit = ProofOfTransaction.calculateRandomHit(block.getGenerationSignature());
-        logger.info("verify block target value {}, hit {}", targetValue, hit);
+        logger.debug("verify block target value {}, hit {}", targetValue, hit);
 
         if (targetValue.compareTo(hit) < 0) {
             logger.error("Target value is smaller than hit!");
@@ -784,7 +784,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             }
         }
         long totalTime = System.nanoTime() - saveTime;
-        logger.info("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
+        logger.debug("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
     }
 
     private boolean processBlock(Block block, Repository repo) {
@@ -801,7 +801,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private boolean applyBlock(Block block, Repository repo) {
 
-        logger.info("applyBlock: block: [{}] tx.list: [{}]", block.getNumber(), block.getTransactionsList().size());
+        logger.debug("applyBlock: block: [{}] tx.list: [{}]", block.getNumber(), block.getTransactionsList().size());
         long saveTime = System.nanoTime();
 
         Repository cacheTrack;
@@ -868,7 +868,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         else
             blockStore.saveBlock(block, totalDifficulty, true);
 
-        logger.info("Block saved: number: {}, hash: {}, TD: {}",
+        logger.debug("Block saved: number: {}, hash: {}, TD: {}",
                 block.getNumber(), block.getShortHash(), totalDifficulty);
 
         setBestBlock(block);
@@ -898,7 +898,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Override
     public synchronized void setBestBlock(Block block) {
         bestBlock = block;
-        logger.info("Set best block with number {}, hash {}, raw {}", bestBlock.getNumber(),
+        logger.debug("Set best block with number {}, hash {}, raw {}", bestBlock.getNumber(),
                  Hex.toHexString(bestBlock.getHash()), bestBlock.getHash());
     }
 
@@ -923,7 +923,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Override
     public synchronized void updateTotalDifficulty(Block block) {
         totalDifficulty = block.getCumulativeDifficulty();
-        logger.info("TD: updated to {}", totalDifficulty);
+        logger.debug("TD: updated to {}", totalDifficulty);
     }
 
     @Override

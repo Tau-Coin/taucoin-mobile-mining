@@ -186,7 +186,7 @@ public class BlockForger {
     }
 
     private void onBlockConnected(Block newBlock) {
-        logger.info("On block {} {} connected, remote block {}",
+        logger.debug("On block {} {} connected, remote block {}",
                 newBlock.getNumber(), Hex.toHexString(newBlock.getHash()),
                 Hex.toHexString(chainInfoManager.getCurrentBlockHash()));
 
@@ -258,19 +258,19 @@ public class BlockForger {
 //                    String.valueOf(medianFee));
 //        }
 
-        logger.info("base target {}, forging power {}", baseTarget, forgingPower);
+        logger.debug("base target {}, forging power {}", baseTarget, forgingPower);
 
         generationSignature = ProofOfTransaction.
                 calculateNextBlockGenerationSignature(bestBlock.getGenerationSignature(), CONFIG.getForgerPubkey());
-        logger.info("generationSignature {}", Hex.toHexString(generationSignature));
+        logger.debug("generationSignature {}", Hex.toHexString(generationSignature));
 
         BigInteger hit = ProofOfTransaction.calculateRandomHit(generationSignature);
-        logger.info("hit {}", hit.longValue());
+        logger.debug("hit {}", hit.longValue());
 
         long timeInterval = ProofOfTransaction.calculateForgingTimeInterval(hit, baseTarget, forgingPower);
         logger.info("timeInterval {}", timeInterval);
         BigInteger targetValue = ProofOfTransaction.calculateMinerTargetValue(baseTarget, forgingPower, timeInterval);
-        logger.info("target value {}", hit.longValue(), targetValue);
+        logger.debug("target value {}", hit.longValue(), targetValue);
         long timeNow = System.currentTimeMillis() / 1000;
         long timePreBlock = new BigInteger(bestBlock.getTimestamp()).longValue();
         logger.info("Block forged time {}", timePreBlock + timeInterval);
@@ -316,9 +316,9 @@ public class BlockForger {
                 calculateCumulativeDifficulty(bestBlock.getCumulativeDifficulty(), baseTarget);
 
         if (bestBlock.equals(blockchain.getBestBlock())) {
-            logger.info("~~~~~~~~~~~~~~~~~~Forging a new block...~~~~~~~~~~~~~~~~~~");
+            logger.debug("~~~~~~~~~~~~~~~~~~Forging a new block...~~~~~~~~~~~~~~~~~~");
         } else {
-            logger.info("~~~~~~~~~~~~~~~~~~Got a new best block, continue forging...~~~~~~~~~~~~~~~~~~");
+            logger.debug("~~~~~~~~~~~~~~~~~~Got a new best block, continue forging...~~~~~~~~~~~~~~~~~~");
             return ForgeStatus.FORGE_CONTINUE;
         }
 
@@ -343,7 +343,7 @@ public class BlockForger {
     protected void blockForged(Block newBlock) throws InterruptedException {
 
         fireBlockForged(newBlock);
-        logger.info("Wow, block mined !!!: {}", newBlock.toString());
+        logger.debug("Wow, block mined !!!: {}", newBlock.toString());
 
         miningBlock = null;
 
@@ -470,18 +470,18 @@ public class BlockForger {
 
         @Override
         public void forgingStarted() {
-            logger.info("Forging started...");
+            logger.debug("Forging started...");
         }
 
         @Override
         public void forgingStopped(ForgeStatus status) {
-            logger.info("Forging stopped status: {}",status.getMsg());
+            logger.debug("Forging stopped status: {}",status.getMsg());
             forger.removeListener(this);
         }
 
         @Override
         public void blockForgingStarted(Block block) {
-            logger.info("Block forging started...");
+            logger.debug("Block forging started...");
         }
 
         @Override

@@ -129,7 +129,7 @@ public class IndexedBlockStore implements BlockStore {
             if (indexDB != null) {
                 indexDB.commit();
             }
-            logger.info("Flush block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
+            logger.debug("Flush block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
         } finally {
             w.unlock();
         }
@@ -170,7 +170,7 @@ public class IndexedBlockStore implements BlockStore {
         index.put(block.getNumber(), blockInfos);
 
         blocks.put(block.getHash(), block.getEncoded());
-        logger.info("Save block with number {}, hash {}, raw {}", block.getNumber(),
+        logger.debug("Save block with number {}, hash {}, raw {}", block.getNumber(),
                 Hex.toHexString(block.getHash()), block.getHash());
     }
 

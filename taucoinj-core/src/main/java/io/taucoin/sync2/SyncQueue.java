@@ -359,7 +359,7 @@ public class SyncQueue {
     }
 
     public boolean isImportingBlocksFinished() {
-        logger.info("Block queue size: {}, is connecting: {}",
+        logger.debug("Block queue size: {}, is connecting: {}",
                 blockQueue.size(), isImportingBlocks);
         return isBlocksEmpty() && !isImportingBlocks.get();
     }
@@ -697,7 +697,7 @@ public class SyncQueue {
     }
 
     public boolean isMoreBlocksNeeded() {
-        logger.info("blockQueue size/limit {}/{}", blockQueue.size(),
+        logger.debug("blockQueue size/limit {}/{}", blockQueue.size(),
                 BLOCK_QUEUE_LIMIT);
         return blockQueue.size() < BLOCK_QUEUE_LIMIT;
     }

@@ -79,7 +79,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     @Override
     public void updateBatch(HashMap<ByteArrayWrapper, AccountState> stateCache) {
 
-        logger.info("updatingBatch: stateCache.size: {}", stateCache.size());
+        logger.debug("updatingBatch: stateCache.size: {}", stateCache.size());
 
         for (ByteArrayWrapper hash : stateCache.keySet()) {
 
@@ -103,7 +103,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         }
 
 
-        logger.info("updated: stateCache.size: {}", stateCache.size());
+        logger.debug("updated: stateCache.size: {}", stateCache.size());
 
         stateCache.clear();
     }
