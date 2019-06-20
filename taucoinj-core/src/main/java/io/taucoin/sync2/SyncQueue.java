@@ -17,6 +17,7 @@ import static java.lang.Thread.sleep;
 import static io.taucoin.core.ImportResult.IMPORTED_NOT_BEST;
 import static io.taucoin.core.ImportResult.NO_PARENT;
 import static io.taucoin.core.ImportResult.IMPORTED_BEST;
+import static io.taucoin.core.ImportResult.EXIST;
 
 /**
  * The processing queue for blocks to be validated and added to the blockchain.
@@ -279,6 +280,10 @@ public class SyncQueue {
 
                 if (importResult == IMPORTED_BEST || importResult == IMPORTED_NOT_BEST) {
                     if (logger.isDebugEnabled()) logger.debug(Hex.toHexString(wrapper.getBlock().getEncoded()));
+                } else if (importResult == EXIST) {
+                    if (blockQueue instanceof BlockQueueImpl) {
+                        ((BlockQueueImpl)blockQueue).removeUnusedBlocks();
+                    }
                 } else {
                     logger.error("Import block failed: result: {}, block.number: {}, block.hash: {}",
                             importResult.name(), wrapper.getNumber(), wrapper.getBlock().getShortHash());
