@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 
 import io.taucoin.android.wallet.MyApplication;
@@ -65,6 +66,8 @@ public class DaemonJobService extends JobService {
             TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
 
             Intent intent =  new Intent(this, RemoteService.class);
+            Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
+            intent.putExtra("bean", parcelable);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(intent);
             }else {
