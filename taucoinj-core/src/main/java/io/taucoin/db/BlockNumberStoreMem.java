@@ -103,7 +103,6 @@ public class BlockNumberStoreMem implements BlockNumberStore {
             // We only poll continuously numbers;
             Long prevNumber = this.numbers.poll();
             numbers.add(prevNumber);
-            qty -= 1;
 
             while (numbers.size() < qty) {
                 Long n = this.numbers.poll();
