@@ -121,6 +121,11 @@ public class BlockQueueImpl implements BlockQueue {
         }
     }
 
+    public void flush() {
+        awaitInit();
+        db.commit();
+    }
+
     @Override
     public void close() {
         awaitInit();

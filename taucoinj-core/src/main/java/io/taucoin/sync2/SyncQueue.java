@@ -180,8 +180,8 @@ public class SyncQueue {
             blockNumbersStore.clear();
         }
         if (blockQueue != null) {
-            if (blockQueue instanceof BlockQueueMem) {
-                //blockQueue.clear();
+            if (blockQueue instanceof BlockQueueImpl) {
+                ((BlockQueueImpl)blockQueue).flush();
             }
         }
     }
@@ -205,6 +205,9 @@ public class SyncQueue {
             blockNumbersStore.close();
         }
         if (blockQueue != null) {
+            if (blockQueue instanceof BlockQueueImpl) {
+                ((BlockQueueImpl)blockQueue).flush();
+            }
             blockQueue.close();
         }
 

@@ -99,9 +99,23 @@ public class BlockNumberStoreMem implements BlockNumberStore {
             if (qty > size()) {
                 qty = size();
             }
+
+            // We only poll continuously numbers;
+            Long prevNumber = this.numbers.poll();
+            numbers.add(prevNumber);
+            qty -= 1;
+
             while (numbers.size() < qty) {
                 Long n = this.numbers.poll();
-                numbers.add(n);
+                if (n == prevNumber + 1) {
+                    numbers.add(n);
+                    prevNumber = n;
+                } else {
+                    logger.info("Not continuously numbers prev {} current {}",
+                            prevNumber, n);
+                    add(n);
+                    break;
+                }
             }
 
             return numbers;
