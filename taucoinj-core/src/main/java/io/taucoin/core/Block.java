@@ -57,6 +57,7 @@ public class Block {
 
     protected byte[] rlpEncoded;
     private byte[] rlpEncodedMsg;
+    private byte[] rlpEncodedCache = null;
     private byte[] rlpRaw;
     private boolean isMsg = false;
     private boolean parsed = false;
@@ -132,7 +133,6 @@ public class Block {
             this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
-            logger.debug("signature size is {}",signature.size());
             // Parse blockSignature
             byte[] r = signature.get(0).getRLPData();
             byte[] s = signature.get(1).getRLPData();
@@ -169,12 +169,10 @@ public class Block {
         } else {
             RLPList params = RLP.decode2(rlpEncodedMsg);
             RLPList block = (RLPList) params.get(0);
-
             // Parse block
             this.version = block.get(0).getRLPData() == null ? (byte) 0 : block.get(0).getRLPData()[0];
             this.timeStamp = block.get(1).getRLPData();
             RLPList signature = (RLPList) RLP.decode2(block.get(2).getRLPData()).get(0);
-            logger.debug("signature size is {}",signature.size());
 
             // Parse blockSignature
             byte[] r = signature.get(0).getRLPData();
@@ -195,6 +193,15 @@ public class Block {
         this.parsed = true;
     }
 
+    /**
+     * this situation blocks and tx are from another store
+     * although isMsg is false,block is not verified by block chain
+     * which is msg treated.
+     */
+    public void rlpSyncParseDisk(){
+
+        //todo
+    }
 
     public boolean isMsg() {
         return isMsg;
@@ -362,9 +369,6 @@ public class Block {
         toStringBuff.setLength(0);
         toStringBuff.append("BlockData [");
         toStringBuff.append("hash=").append(ByteUtil.toHexString(this.getHash()));
-//        toStringBuff.append(header.toFlatString());
-//        toStringBuff.append("blocksig=" + ByteUtil.toHexString(this.blockSignature));
-//        toStringBuff.append("option=" + ByteUtil.toHexString(this.option));
 
         for (Transaction tx : getTransactionsList()) {
             toStringBuff.append("\n");
@@ -402,6 +406,7 @@ public class Block {
     }
 
     private byte[] getSignatureEncoded() {
+        if (!parsed) parseRLP();
         byte[] r, s,v;
         r = RLP.encodeElement(BigIntegers.asUnsignedByteArray(blockSignature.r));
         s = RLP.encodeElement(BigIntegers.asUnsignedByteArray(blockSignature.s));
@@ -431,6 +436,16 @@ public class Block {
         int i = 0;
         for (Transaction tx : transactionsList) {
             transactionsEncoded[i] = tx.getEncoded();
+            ++i;
+        }
+        return RLP.encodeList(transactionsEncoded);
+    }
+
+    private byte[] getTransactionEncodedForCache() {
+        byte[][] transactionsEncoded = new byte[transactionsList.size()][];
+        int i = 0;
+        for (Transaction tx : transactionsList) {
+            transactionsEncoded[i] = tx.getEncodedForCache();
             ++i;
         }
         return RLP.encodeList(transactionsEncoded);
@@ -485,6 +500,27 @@ public class Block {
         return rlpEncodedMsg;
     }
 
+    //encode block from net into mapdb cache
+    public byte[] getEncodedCacheData() {
+        if (rlpEncodedCache == null) {
+            if (!parsed) parseRLP();
+            byte[] version = RLP.encodeByte(this.version);
+            byte[] timestamp = RLP.encodeElement(this.timeStamp);
+            byte[] signature = getSignatureEncoded();
+            byte[] previousHeaderHash = RLP.encodeElement(this.previousHeaderHash);
+
+            List<byte[]> block = getBodyElementsCache();
+            block.add(0, version);
+            block.add(1,timestamp);
+            block.add(2,signature);
+            block.add(3,previousHeaderHash);
+            byte[][] elements = block.toArray(new byte[block.size()][]);
+
+            this.rlpEncodedCache = RLP.encodeList(elements);
+        }
+        return rlpEncodedCache;
+    }
+
     //encode block for signature
     public byte[] getEncodedRaw() {
         if (rlpRaw == null) {
@@ -514,7 +550,7 @@ public class Block {
         if (!parsed) parseRLP();
 
         byte[] option = RLP.encodeByte(this.option);
-        byte[] transactions = getTransactionsEncoded();
+        byte[] transactions = getTransactionEncodeForBlockSig();
 
         List<byte[]> body = new ArrayList<>();
         body.add(option);
@@ -523,6 +559,15 @@ public class Block {
         return body;
     }
 
+    private byte[] getTransactionEncodeForBlockSig() {
+        byte[][] transactionsEncoded = new byte[transactionsList.size()][];
+        int i = 0;
+        for (Transaction tx : transactionsList) {
+            transactionsEncoded[i] = tx.getEncodeForSig();
+            ++i;
+        }
+        return RLP.encodeList(transactionsEncoded);
+    }
     private List<byte[]> getBodyElements() {
         if (!parsed) parseRLP();
 
@@ -536,6 +581,18 @@ public class Block {
         return body;
     }
 
+    private List<byte[]> getBodyElementsCache() {
+        if (!parsed) parseRLP();
+
+        byte[] option = getOptionEncoded();
+        byte[] transactions = getTransactionEncodedForCache();
+
+        List<byte[]> body = new ArrayList<>();
+        body.add(option);
+        body.add(transactions);
+
+        return body;
+    }
     private List<byte[]> getFullBodyElements() {
         if (!parsed) parseRLP();
 

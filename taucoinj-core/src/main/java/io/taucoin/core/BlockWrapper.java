@@ -117,7 +117,7 @@ public class BlockWrapper {
     }
 
     public byte[] getBytes() {
-        byte[] blockBytes = block.getEncodedMsg();
+        byte[] blockBytes = block.getEncodedCacheData();
         byte[] importFailedBytes = RLP.encodeBigInteger(BigInteger.valueOf(importFailedAt));
         byte[] receivedAtBytes = RLP.encodeBigInteger(BigInteger.valueOf(receivedAt));
         byte[] newBlockBytes = RLP.encodeByte((byte) (newBlock ? 1 : 0));

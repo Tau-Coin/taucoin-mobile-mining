@@ -20,18 +20,6 @@ public class TransactionExecuatedOutcome extends io.taucoin.core.TransactionExec
         setSenderAssociated(in.readHashMap(io.taucoin.core.TransactionExecuatedOutcome.class.getClassLoader()));
         setLastWintess(in.readHashMap(io.taucoin.core.TransactionExecuatedOutcome.class.getClassLoader()));
         setCurrentWintess(in.readHashMap(io.taucoin.core.TransactionExecuatedOutcome.class.getClassLoader()));
-//        byte[] sendAddress = new byte[20];
-//        in.readByteArray(sendAddress);
-//        setSenderAddress(sendAddress);
-//        byte[] receiveAddress = new byte[20];
-//        in.readByteArray(receiveAddress);
-//        setReceiveAddress(receiveAddress);
-//        boolean[] isTxCompleted = new boolean[1];
-//        in.readBooleanArray(isTxCompleted);
-//        setTxComplete(isTxCompleted[0]);
-//        byte[] txid = new byte[32];
-//        in.readByteArray(txid);
-//        setTxid(txid);
     }
     @Override
     public int describeContents() {
@@ -44,12 +32,6 @@ public class TransactionExecuatedOutcome extends io.taucoin.core.TransactionExec
         parcel.writeMap(outcome.getSenderAssociated());
         parcel.writeMap(outcome.getLastWintess());
         parcel.writeMap(outcome.getCurrentWintess());
-        parcel.writeByteArray(outcome.getSenderAddress());
-        parcel.writeByteArray(outcome.getReceiveAddress());
-        boolean[] txid = new boolean[1];
-        txid[0] = outcome.isTxComplete();
-        parcel.writeBooleanArray(txid);
-        parcel.writeByteArray(outcome.getTxid());
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

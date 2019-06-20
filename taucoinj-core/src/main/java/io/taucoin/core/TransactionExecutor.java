@@ -145,18 +145,12 @@ public class TransactionExecutor {
         logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
         logger.debug("in executation isTxCompleted is {}", isTxCompleted);
-        outcome.setTxid(tx.getHash());
-        logger.debug("in executation tx hash is {}", Hex.toHexString(tx.getHash()));
-        outcome.setSenderAddress(tx.getSender());
-        logger.debug("in executation sender is {}", Hex.toHexString(tx.getSender()));
 
         // Receiver add balance
         String receiverHexAddress = Hex.toHexString(tx.getReceiveAddress());
         if (!receiverHexAddress.equals(Constants.BURN_COIN_ADDR)) {
             track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         }
-        outcome.setReceiveAddress(tx.getReceiveAddress());
-        logger.debug("in executation receiver is {}", receiverHexAddress);
 
         FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
         logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));

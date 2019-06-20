@@ -62,8 +62,12 @@ public class Transaction {
     /* 520 bytes,the elliptic curve signature
      * (including public key recovery bits) */
     private ECDSASignature signature = null;
-    
-    private byte[] sendAddress;
+
+    /**
+     * sender Address to used retrieve account info quickly.
+     * it is a key to Turbo apk.local app also used it.
+     */
+    private byte[] sendAddress = null;
     
     private byte[] hash;
 
@@ -86,6 +90,9 @@ public class Transaction {
 
     /* Tx in encoded form */
     protected byte[] rlpEncoded;
+    private byte[] rlpEncodedSig = null;
+    private byte[] rlpEncodedHash = null;
+    private byte[] rlpEncodedCache = null;
     private byte[] rlpRaw;
     private byte[] rlpEncodedComposite;
     private boolean isCompositeTx = false;
@@ -274,6 +281,18 @@ public class Transaction {
             } else {
                 logger.debug("RLP encoded tx is not signed!");
             }
+
+            /**
+             * a<item></>
+             * transaction from memory pool hasn't contained sendAddress
+             * transaction from block synced has contained sendAddress.
+             * e<item></>
+             * transaction from block mined by self hasn't contained senderAddress
+             */
+            if (transaction.size() > 10) {
+                this.sendAddress = transaction.get(10).getRLPData();
+            }
+
         } else {
             RLPList decodedTxList = RLP.decode2(rlpEncodedComposite);
             RLPList transaction = (RLPList) decodedTxList.get(0);
@@ -314,8 +333,28 @@ public class Transaction {
             } else {
                 logger.debug("RLP encoded tx is not signed!");
             }
+
+            /**
+             * b<item></>
+             * transaction from block stored local disk
+             *   1,up to now this hasn't contained senderAddress.
+             *   2,current this has contained senderAddress.
+             */
+            if (transaction.size() > 14) {
+                this.sendAddress = transaction.get(14).getRLPData();
+            }
         }
         this.parsed = true;
+    }
+
+    /**
+     * this situation blocks and tx are from another store
+     */
+    public void rlpSyncParseDisk(){
+
+        if (sendAddress != null) {
+           return;
+        }
     }
 
     public boolean validate() {
@@ -342,7 +381,7 @@ public class Transaction {
     public byte[] getHash() {
         if (!isEmpty(hash)) return hash;
         if (!parsed) rlpParse();
-        byte[] plainMsg = this.getEncoded();
+        byte[] plainMsg = this.getEncodedHash();
         hash = HashUtil.sha3(plainMsg);
         return hash;
     }
@@ -395,19 +434,21 @@ public class Transaction {
         return signature;
     }
 
-    /*
+    /**
      * Crypto, recover ECKey that only contains compressd pubkey
      */
-
     public ECKey getKey() {
         byte[] hash = getRawHash();
         return ECKey.recoverFromSignature(signature.v, signature, hash, true);
     }
-    /*
-    * Crypto,recover compressed pubkey from signature further get sender address
-    */
 
+    /**
+     * firstly,try to parse from transaction if not contained
+     * secondly,Crypto,recover compressed pubkey from signature further get sender address
+    */
     public byte[] getSender() {
+        if (sendAddress != null) return sendAddress;
+        if (!parsed) rlpParse();
         try {
             if (sendAddress == null) {
                 ECKey key = ECKey.signatureToKey(getRawHash(), getSignature().toBase64());
@@ -465,6 +506,12 @@ public class Transaction {
         return rlpRaw;
     }
 
+    /**
+     * this method encode transaction used to transfer this to peer
+     * and get hash of it also used to encode tx in block will be
+     * sent to peer.
+     * @return
+     */
     public byte[] getEncoded() {
         if (!parsed) rlpParse();
         if (rlpEncoded != null) return rlpEncoded;
@@ -489,10 +536,112 @@ public class Transaction {
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
         }
 
+        /**
+         * c<item></>
+         * transaction that is built local node hasn't contained senderAddress
+         * transaction that included in block forged by self hasn't contained
+         * senderAddress,so nothing to do...
+         */
         this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
                 toAddress, amount, fee, expireTime, v, r, s);
 
         return rlpEncoded;
+    }
+
+    public byte[] getEncodedForCache() {
+        if (!parsed) rlpParse();
+        if (rlpEncodedCache != null) return rlpEncodedCache;
+
+        byte[] version = RLP.encodeByte(this.version);
+        byte[] option = RLP.encodeByte(this.option);
+        byte[] timeStamp = RLP.encodeElement(this.timeStamp);
+        byte[] toAddress = RLP.encodeElement(this.toAddress);
+        byte[] amount = RLP.encodeElement(this.amount);
+        byte[] fee = RLP.encodeElement(this.fee);
+        byte[] expireTime = RLP.encodeElement(this.expireTime);
+
+        byte[] v, r, s;
+
+        if (signature != null) {
+            v = RLP.encodeByte(signature.v);
+            r = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.r));
+            s = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.s));
+        } else {
+            v = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+        }
+        /**
+         * because this cache is turboing ,it should be saved in block
+         */
+        if (sendAddress == null) {
+            this.sendAddress = getSender();
+        }
+        byte[] sendAddress = RLP.encodeElement(this.sendAddress);
+        this.rlpEncodedCache = RLP.encodeList(version, option, timeStamp,
+                toAddress, amount, fee, expireTime, v, r, s,sendAddress);
+
+        return rlpEncodedCache;
+    }
+
+    public byte[] getEncodeForSig() {
+        if (!parsed) rlpParse();
+        if (rlpEncodedSig != null) return rlpEncodedSig;
+
+        byte[] version = RLP.encodeByte(this.version);
+        byte[] option = RLP.encodeByte(this.option);
+        byte[] timeStamp = RLP.encodeElement(this.timeStamp);
+        byte[] toAddress = RLP.encodeElement(this.toAddress);
+        byte[] amount = RLP.encodeElement(this.amount);
+        byte[] fee = RLP.encodeElement(this.fee);
+        byte[] expireTime = RLP.encodeElement(this.expireTime);
+
+        byte[] v, r, s;
+
+        if (signature != null) {
+            v = RLP.encodeByte(signature.v);
+            r = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.r));
+            s = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.s));
+        } else {
+            v = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+        }
+
+        this.rlpEncodedSig = RLP.encodeList(version, option, timeStamp,
+                toAddress, amount, fee, expireTime, v, r, s);
+
+        return rlpEncodedSig;
+    }
+
+    public byte[] getEncodedHash() {
+        if (!parsed) rlpParse();
+        if (rlpEncodedHash != null) return rlpEncodedHash;
+
+        byte[] version = RLP.encodeByte(this.version);
+        byte[] option = RLP.encodeByte(this.option);
+        byte[] timeStamp = RLP.encodeElement(this.timeStamp);
+        byte[] toAddress = RLP.encodeElement(this.toAddress);
+        byte[] amount = RLP.encodeElement(this.amount);
+        byte[] fee = RLP.encodeElement(this.fee);
+        byte[] expireTime = RLP.encodeElement(this.expireTime);
+
+        byte[] v, r, s;
+
+        if (signature != null) {
+            v = RLP.encodeByte(signature.v);
+            r = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.r));
+            s = RLP.encodeElement(BigIntegers.asUnsignedByteArray(signature.s));
+        } else {
+            v = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+            s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
+        }
+
+        this.rlpEncodedHash = RLP.encodeList(version, option, timeStamp,
+                toAddress, amount, fee, expireTime, v, r, s);
+
+        return rlpEncodedHash;
     }
 
     //encode transaction used to disk.
@@ -533,8 +682,19 @@ public class Transaction {
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
         }
 
+        /**
+         * d<item></>
+         * transaction included in block forged by self hasn't contained senderAddress.
+         * transaction included in block up to now hasn't contained senderAddress.
+         * transaction included in block synced from peer has contained senderAddress currently
+         */
+        if (sendAddress == null) {
+            this.sendAddress = getSender();
+        }
+
+        byte[] sendAddress = RLP.encodeElement(this.sendAddress);
         this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee,expireTime, senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,v, r, s);
+                toAddress, amount, fee,expireTime, senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,v, r, s,sendAddress);
 
         return rlpEncodedComposite;
     }
