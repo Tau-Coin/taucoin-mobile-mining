@@ -119,7 +119,7 @@ public class RequestQueue {
     public void receivedMessage(Message msg) throws InterruptedException {
 
         ethereumListener.trace("[Recv: " + msg + "]");
-        logger.info("Recv message {}", msg);
+        logger.debug("Recv message {}", msg);
 
         if (requestQueue.peek() != null) {
             RequestRoundtrip requestRoundtrip = requestQueue.peek();

@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.log;
 
 public class ProofOfTransaction {
-    private static final Logger logger = LoggerFactory.getLogger("proofoftransaction");
+    private static final Logger logger = LoggerFactory.getLogger("POT");
 
     private final static int MAXRATIO = 335;
     private final static int MINRATIO = 265;
@@ -118,20 +118,20 @@ public class ProofOfTransaction {
         System.arraycopy(generationSignature,0,headBytes,0,8);
 
         BigInteger bhit = new BigInteger(1, headBytes);
-        logger.info("bhit:{}", bhit);
+        logger.debug("bhit:{}", bhit);
 
         BigInteger bhitUzero = bhit.add(BigInteger.ONE);
-        logger.info("bhitUzero:{}", bhitUzero);
+        logger.debug("bhitUzero:{}", bhitUzero);
 
         double logarithm = abs(log(bhitUzero.doubleValue()) - 2 * log(DiffAdjustNumeratorHalf.doubleValue()));
         logarithm = logarithm * 1000;
-        logger.info("logarithm:{}", logarithm);
+        logger.debug("logarithm:{}", logarithm);
 
         long ulogarithm = (new Double(logarithm)).longValue();
-        logger.info("ulogarithm:{}", ulogarithm);
+        logger.debug("ulogarithm:{}", ulogarithm);
 
         BigInteger adjustHit = DiffAdjustNumeratorCoe.multiply(BigInteger.valueOf(ulogarithm)).divide(BigInteger.valueOf(1000));
-        logger.info("adjustHit:{}", adjustHit);
+        logger.debug("adjustHit:{}", adjustHit);
 
         return adjustHit;
     }

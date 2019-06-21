@@ -110,7 +110,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
     @Override
     public synchronized void flush() {
-        gLogger.info("flushing to disk");
+        gLogger.debug("flushing to disk");
     }
 
     @Override
