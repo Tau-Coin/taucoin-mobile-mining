@@ -1,15 +1,14 @@
 package io.taucoin.core;
 
 public class FeeDistributor {
-    public static int integrityShare = 3;
-    //public static int receiveShare = 1;
+
     public static int lastWitShare = 1;
     public static int currentWitShare = 1;
     public static int lastAssShare = 1;
+    public static int integrityShare = lastWitShare + currentWitShare + lastAssShare;
 
     private long txFee;
 
-    //private long receiveFee = 0;
     private long lastWitFee = 0;
     private long currentWitFee = 0;
     private long lastAssociFee = 0;
@@ -25,7 +24,6 @@ public class FeeDistributor {
 
         long residual = txFee % integrityShare;
         long stakeShare = txFee / integrityShare;
-        //this.receiveFee = stakeShare * receiveShare;
         this.lastWitFee = stakeShare * lastWitShare;
         this.currentWitFee = stakeShare * currentWitShare + residual;
         this.lastAssociFee = stakeShare * lastAssShare;
@@ -35,10 +33,6 @@ public class FeeDistributor {
         }
         return true;
     }
-
-//    public long getReceiveFee() {
-//        return receiveFee;
-//    }
 
     public long getLastWitFee() {
         return lastWitFee;

@@ -17,6 +17,8 @@ public interface Blockchain {
 
     public Block getBlockByNumber(long blockNr);
 
+    long getBlockTimeByNumber(long blockNumber);
+
     public void setBestBlock(Block block);
 
     public Block getBestBlock();

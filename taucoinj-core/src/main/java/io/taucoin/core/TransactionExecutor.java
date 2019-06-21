@@ -136,15 +136,19 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
-        // Sender subtract balance
-        BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
-        track.addBalance(tx.getSender(), totalCost.negate());
 
         TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
         outcome.setBlockHash(blockhash);
         logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
         logger.debug("in executation isTxCompleted is {}", isTxCompleted);
+
+        // Sender subtract balance
+        BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
+        track.addBalance(tx.getSender(), totalCost.negate());
+
+        // Increase forge power.
+        track.increaseforgePower(tx.getSender());
 
         // Receiver add balance
         String receiverHexAddress = Hex.toHexString(tx.getReceiveAddress());
@@ -242,8 +246,6 @@ public class TransactionExecutor {
         if(isTxCompleted) {
             logger.debug("in executation finish =========================");
         }
-        // Increase forge power.
-        track.increaseforgePower(tx.getSender());
 
         logger.debug("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), basicTxFee);
 
@@ -253,7 +255,7 @@ public class TransactionExecutor {
             // if earliest transaction is beyond expire time
             // it will be removed.
             long freshTime = blockchain.getSize() - MaxHistoryCount;
-            long bechTime = ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime - 1).getTimestamp());
+            long bechTime = blockchain.getBlockTimeByNumber(freshTime - 1);
 
             Iterator<Map.Entry<Long,byte[]>> it = senderAccountState.getTranHistory().entrySet().iterator();
             while (it.hasNext()) {

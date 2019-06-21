@@ -128,6 +128,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     @Override
+    public long getBlockTimeByNumber(long blockNumber) {
+        return blockStore.getBlockTimeByNumber(blockNumber);
+    }
+
+    @Override
     public Transaction getTransactionByHash(byte[] hash) {
         throw new UnsupportedOperationException("TODO: will be implemented soon "); // FIXME: go and fix me
     }
@@ -618,7 +623,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
 
         if (referenceHeight <= bestBlockNum) {
-            referenceTime = blockStore.getBlockTimeByNumber(referenceHeight);
+            referenceTime = getBlockTimeByNumber(referenceHeight);
         } else {
             return false;
         }
