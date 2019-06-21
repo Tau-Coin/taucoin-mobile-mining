@@ -130,10 +130,6 @@ public class AccountState implements Serializable {
             this.associatedAddress.add(associatedAddress);
             this.stateHeight = stateHeight;
         }
-        for (int i=0; i <this.associatedAddress.size();++i) {
-//            log.info("At state height {} address {} index {}",
-//                    this.stateHeight,Hex.toHexString(this.associatedAddress.get(i)),i);
-        }
     }
 
     public void updateAssociatedAddress(List<byte[]> associatedAddressList,long stateHeight) {
