@@ -340,11 +340,7 @@ public class TxService extends Service {
     public static void startTxService(Intent intent){
         Context context = MyApplication.getInstance();
         intent.setClass(context, TxService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
+        context.startService(intent);
     }
 
     public static void stopService() {

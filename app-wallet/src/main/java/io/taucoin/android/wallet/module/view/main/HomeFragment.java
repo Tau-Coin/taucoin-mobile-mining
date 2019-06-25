@@ -3,6 +3,7 @@ package io.taucoin.android.wallet.module.view.main;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -42,12 +43,12 @@ import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
-import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DrawablesUtil;
@@ -73,7 +74,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     @BindView(R.id.tv_chain_height_title)
     TextView tvChainHeightTitle;
     @BindView(R.id.tv_mined)
-    LoadingTextView tvMined;
+    TextView tvMined;
     @BindView(R.id.tv_mined_title)
     TextView tvMinedTitle;
     @BindView(R.id.tv_cpu)
@@ -183,15 +184,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
         return false;
     }
-
-//    @OnCheckedChanged({R.id.iv_mining_switch})
-//    void onMiningSwitchChanged(boolean isChecked){
-//        if(tvMiningSwitch != null){
-//            tvMiningSwitch.setText(isChecked ? R.string.home_mining_on : R.string.home_mining_off);
-//            int colorRes = isChecked ? R.color.color_yellow : R.color.color_grey;
-//            tvMiningSwitch.setTextColor(ResourcesUtil.getColor(colorRes));
-//        }
-//    }
 
     private void starOrStopSync() {
         if(ivSyncSwitch == null){
@@ -323,9 +315,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
-        int blockSync = 0;
-        int blockHeight = 0;
-        int miners = 0;
+        long blockSync = 0;
+        long blockHeight = 0;
+        long miners = 0;
 
         if(blockInfo != null){
             blockHeight = blockInfo.getBlockHeight();
@@ -334,9 +326,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
             UserUtil.setMiningConditions(ivMiningPower, ivMiningSync, blockInfo, !isRefreshMined);
         }
-        tvSynchronized.setText(String.valueOf(blockSync));
-        tvChainHeight.setText(String.valueOf(blockHeight));
-        tvMiners.setText(String.valueOf(miners));
+        String blockSyncStr = FmtMicrometer.fmtPower(blockSync);
+        tvSynchronized.setText(blockSyncStr);
+        String blockHeightStr = FmtMicrometer.fmtPower(blockHeight);
+        tvChainHeight.setText(blockHeightStr);
+        String minersStr = FmtMicrometer.fmtPower(miners);
+        tvMiners.setText(minersStr);
     }
 
     @Override
@@ -356,16 +351,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         requestWriteLOgPermissions();
     }
 
-    @Override
-    public void onDestroy() {
-        if(tvMiningSwitch != null){
-            tvMined.closeLoading();
-        }
-        super.onDestroy();
-    }
-
     private void requestWriteLOgPermissions() {
-        if(BuildConfig.DEBUG){
+        boolean isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+        if(BuildConfig.DEBUG && !isAndroidQ){
             String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
             EasyPermissions.requestPermissions(getActivity(),
                     this.getString(R.string.permission_tip_upgrade_denied),

@@ -101,7 +101,9 @@ public class MiningUtil {
                     @Override
                     public void handleData(Integer blockHeight) {
                         Logger.d("UserUtil.setBlockHeight=" + blockHeight);
-                        textView.setText(String.valueOf(blockHeight));
+                        long chainHeight = blockHeight;
+                        String chainHeightStr = FmtMicrometer.fmtPower(chainHeight);
+                        textView.setText(chainHeightStr);
                     }
                 });
     }

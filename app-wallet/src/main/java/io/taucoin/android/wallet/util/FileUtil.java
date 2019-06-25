@@ -119,8 +119,14 @@ public class FileUtil {
      * @return  path
      */
     public static String getDownloadFilePath() {
+        Context context = MyApplication.getInstance();
+        File file = context.getExternalFilesDir(null);
         String path;
-        path = Environment.getExternalStorageDirectory() + File.separator + BuildConfig.APPLICATION_ID;
+        if(file != null && file.exists()){
+            path = file.getAbsolutePath();
+        }else{
+            path = Environment.getExternalStorageDirectory() + File.separator + BuildConfig.APPLICATION_ID;
+        }
         path = path + File.separator + "download";
         createDir(path);
 

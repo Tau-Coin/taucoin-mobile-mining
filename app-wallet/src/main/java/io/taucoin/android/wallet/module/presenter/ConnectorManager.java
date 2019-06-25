@@ -99,11 +99,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         Intent intent = new Intent(context, RemoteService.class);
         intent.putExtra("bean", parcelable);
         intent.putExtra(TransmitKey.SERVICE_TYPE, TaucoinServiceMessage.MSG_CLOSE_MINING_PROGRESS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
+        context.startService(intent);
     }
 
     void cancelLocalConnector(){

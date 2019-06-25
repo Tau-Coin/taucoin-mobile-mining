@@ -47,7 +47,7 @@ public class FmtMicrometer {
         return df.format(bigDecimal);
     }
 
-    static String fmtPower(Long power) {
+    public static String fmtPower(Long power) {
         DecimalFormat df = getDecimalFormatInstance();
         df.applyPattern("###,##0");
         df.setRoundingMode(RoundingMode.FLOOR);
