@@ -185,6 +185,9 @@ public class DownloadManager {
      */
     private void installApk() {
         if(mVersionBean == null) return;
+        if(mVersionBean.isForced()){
+            MyApplication.getRemoteConnector().cancelRemoteConnector();
+        }
         String allPath = mVersionBean.getDownloadFilePath() + mVersionBean.getDownloadFileName();
         File file = new File(allPath);
         installApk(file);

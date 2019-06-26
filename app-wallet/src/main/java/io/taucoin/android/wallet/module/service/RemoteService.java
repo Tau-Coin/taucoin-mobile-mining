@@ -39,6 +39,8 @@ import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.TransactionExecuatedEvent;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.util.AppPowerManger;
+import io.taucoin.android.wallet.util.AppWifiManger;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.core.TransactionExecuatedOutcome;
 
@@ -63,6 +65,8 @@ public class RemoteService extends TaucoinRemoteService {
         serviceConnection = new RemoteServiceConnection();
         startLocalService();
         logger.debug("RemoteService onCreate");
+        AppPowerManger.acquireWakeLock(this);
+        AppWifiManger.acquireWakeLock(this);
     }
 
     @Override
@@ -87,6 +91,20 @@ public class RemoteService extends TaucoinRemoteService {
             sendNotify();
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
     }
 
     private void sendNotify() {

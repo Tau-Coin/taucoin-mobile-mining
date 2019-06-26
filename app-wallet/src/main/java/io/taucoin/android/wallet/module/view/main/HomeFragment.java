@@ -110,6 +110,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
         TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
+        requestWriteLOgPermissions();
         return view;
     }
 
@@ -343,12 +344,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         if (!UserUtil.isImportKey()) {
             refreshLayout.finishRefresh(1000);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        requestWriteLOgPermissions();
     }
 
     private void requestWriteLOgPermissions() {

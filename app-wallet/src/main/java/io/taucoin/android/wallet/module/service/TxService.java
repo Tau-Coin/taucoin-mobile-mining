@@ -42,6 +42,8 @@ import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.HomeFragment;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.net.callback.TxObserver;
+import io.taucoin.android.wallet.util.AppPowerManger;
+import io.taucoin.android.wallet.util.AppWifiManger;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
@@ -76,6 +78,8 @@ public class TxService extends Service {
         NotifyManager.getInstance().initNotificationManager(this);
         NotifyManager.getInstance().initNotify();
         Logger.i("TxService onCreate");
+        AppPowerManger.acquireWakeLock(this);
+        AppWifiManger.acquireWakeLock(this);
     }
 
     @Override
@@ -322,12 +326,16 @@ public class TxService extends Service {
     public void onDestroy() {
         Logger.i("TxService onDestroy");
         NotifyManager.getInstance().cancelNotify();
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
         super.onDestroy();
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         NotifyManager.getInstance().cancelNotify();
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
         super.onTaskRemoved(rootIntent);
     }
 

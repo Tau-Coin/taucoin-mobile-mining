@@ -35,6 +35,7 @@
     <!--Allow programs to access reorder tasks-->
     <uses-permission android:name="android.permission.REORDER_TASKS"/>
 
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:name="io.taucoin.android.wallet.MyApplication"
