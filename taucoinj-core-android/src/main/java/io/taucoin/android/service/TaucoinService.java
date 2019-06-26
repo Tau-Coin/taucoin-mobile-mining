@@ -202,7 +202,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
                 if (iterc.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterc.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
                     }
                 }
@@ -210,7 +210,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
                 if (iterl.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterl.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
                     }
                 }
@@ -218,7 +218,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
                 while (iters.hasNext()) {
                     Map.Entry<byte[], Long> entry = iters.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
                     }
                 }
@@ -226,7 +226,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iterc = outcome.getCurrentWintess().entrySet().iterator();
                 if (iterc.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterc.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateCurrentWintessBalance(entry.getKey(), entry.getValue());
                     }
                 }
@@ -234,7 +234,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iterl = outcome.getLastWintess().entrySet().iterator();
                 if (iterl.hasNext()) {
                     Map.Entry<byte[], Long> entry = iterl.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateLastWintessBalance(entry.getKey(), entry.getValue());
                     }
                 }
@@ -242,7 +242,7 @@ public class TaucoinService extends Service {
                 Iterator<Map.Entry<byte[],Long>> iters = outcome.getSenderAssociated().entrySet().iterator();
                 while (iters.hasNext()) {
                     Map.Entry<byte[], Long> entry = iters.next();
-                    if (entry.getKey().equals(CONFIG.getForgerCoinbase())) {
+                    if (Arrays.equals(entry.getKey(), CONFIG.getForgerCoinbase())) {
                         appWanted.updateSenderAssociated(entry.getKey(), entry.getValue());
                     }
                 }
