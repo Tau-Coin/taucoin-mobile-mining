@@ -25,8 +25,12 @@ public class MemoryPoolEntry {
     }
     @Override
     public boolean equals(Object entry){
-        if(entry.hashCode() == entry.hashCode())
-            return true;
+        if (entry == null) return false;
+        if (entry instanceof MemoryPoolEntry) {
+            MemoryPoolEntry tempEntry = (MemoryPoolEntry)entry;
+            if (this.hashCode() == tempEntry.hashCode())
+                return true;
+        }
         return false;
     }
 }
