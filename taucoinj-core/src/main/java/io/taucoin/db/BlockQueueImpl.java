@@ -10,6 +10,7 @@ import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -81,6 +82,10 @@ public class BlockQueueImpl implements BlockQueue {
                     init.signalAll();
 
                     logger.info("Block queue loaded, size [{}]", size());
+                } catch (Exception e) {
+                    logger.error("Block queue open error:{}", e);
+
+                    tryToRecoverDB();
                 } finally {
                     initLock.unlock();
                 }
@@ -119,6 +124,39 @@ public class BlockQueueImpl implements BlockQueue {
 
             db.commit();
         }
+    }
+
+    private void tryToRecoverDB() {
+        logger.warn("Try to recover block queue database");
+
+        if (db != null) {
+            db.close();
+        }
+
+        // Remove db file and create it again.
+        File dbFile = new File(CONFIG.databaseDir() + "/" + STORE_NAME);
+        if (dbFile.exists() && dbFile.isDirectory()) {
+            for (File f : dbFile.listFiles()) {
+                f.delete();
+            }
+
+            dbFile.delete();
+        }
+
+        db = mapDBFactory.createTransactionalDB(dbName());
+        blocks = db.hashMapCreate(STORE_NAME)
+                .keySerializer(Serializer.LONG)
+                .valueSerializer(Serializers.BLOCK_WRAPPER)
+                .makeOrGet();
+        hashes = db.hashSetCreate(HASH_SET_NAME)
+                .serializer(Serializers.BYTE_ARRAY_WRAPPER)
+                .makeOrGet();
+
+        index = new ArrayListIndex(blocks.keySet());
+
+        initDone = true;
+        readHits = 0;
+        init.signalAll();
     }
 
     public void flush() {
