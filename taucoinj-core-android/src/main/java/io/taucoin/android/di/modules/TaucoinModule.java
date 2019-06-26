@@ -302,7 +302,10 @@ public class TaucoinModule {
 
         worldManager = null;
         taucoin = null;
-        sBlockStore = null;
+        if (sBlockStore != null) {
+            sBlockStore.close();
+            sBlockStore = null;
+        }
         isStarted = false;
     }
 }

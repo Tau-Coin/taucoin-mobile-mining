@@ -28,7 +28,7 @@ public class MapDBDataSource implements KeyValueDataSource {
 
 
         db = DBMaker.fileDB(dbFile)
-                .transactionDisable()
+                //.transactionDisable()
                 .closeOnJvmShutdown()
                 .make();
 

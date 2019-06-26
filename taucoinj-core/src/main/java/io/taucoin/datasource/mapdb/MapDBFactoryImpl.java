@@ -30,15 +30,25 @@ public class MapDBFactoryImpl implements MapDBFactory {
         return createDB(name, true);
     }
 
-    private DB createDB(String name, boolean transactional) {
+    private synchronized DB createDB(String name, boolean transactional) {
         String database = CONFIG.databaseDir();
         File dbFile = new File(database + "/" + name);
         if (!dbFile.getParentFile().exists()) dbFile.getParentFile().mkdirs();
         DBMaker.Maker dbMaker = DBMaker.fileDB(dbFile)
                 .closeOnJvmShutdown();
+
+        // Here ignore the argument of disabling transaction.
         if (!transactional) {
-            dbMaker.transactionDisable();
+            //dbMaker.transactionDisable();
         }
-        return dbMaker.make();
+
+        DB db = null;
+        try {
+            db = dbMaker.make();
+            return db;
+        } catch (Exception e) {
+            db = dbMaker.make();
+            return db;
+        }
     }
 }
