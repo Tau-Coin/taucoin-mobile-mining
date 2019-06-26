@@ -27,10 +27,6 @@ import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.InputDialog;
 import io.taucoin.android.wallet.widget.ItemTextView;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.ActivityManager;
-import io.taucoin.foundation.util.StringUtil;
-
-import static android.os.Build.VERSION_CODES.M;
 
 public class SettingActivity extends BaseActivity {
 
@@ -71,12 +67,6 @@ public class SettingActivity extends BaseActivity {
 
     private void resetData() {
         if(UserUtil.isImportKey()){
-            KeyValue KeyValue = MyApplication.getKeyValue();
-            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start) ||
-                    StringUtil.isSame(KeyValue.getSyncState(), TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.setting_reset_data_first);
-                return;
-            }
             View view = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);
             TextView tvMsg = view.findViewById(R.id.tv_msg);
             tvMsg.setText(R.string.setting_reset_data_tips);
@@ -86,7 +76,17 @@ public class SettingActivity extends BaseActivity {
                 .setPositiveButton(R.string.common_yes, (dialog, which) -> {
                     dialog.cancel();
                     ProgressManager.showProgressDialog(this);
-                    MiningUtil.clearAndReloadBlocks();
+                    MiningUtil.clearAndReloadBlocks(new LogicObserver<Boolean>() {
+                        @Override
+                        public void handleData(Boolean isSuccess) {
+                            ProgressManager.closeProgressDialog();
+                            if(isSuccess){
+                                ToastUtils.showShortToast(R.string.setting_reset_data_success);
+                            }else{
+                                ToastUtils.showShortToast(R.string.setting_reset_data_fail);
+                            }
+                        }
+                    });
                 }).setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
                 .create().show();
         }

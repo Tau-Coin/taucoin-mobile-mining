@@ -18,7 +18,6 @@ package io.taucoin.android.wallet.module.presenter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Parcelable;
 
 import com.github.naturs.logger.Logger;

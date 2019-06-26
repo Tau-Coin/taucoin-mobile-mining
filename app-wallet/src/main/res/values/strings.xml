@@ -197,6 +197,5 @@
     <string name="setting_reset_data_success">Successful</string>
     <string name="setting_reset_data_fail">Failed</string>
     <string name="setting_reset_data_tips" formatted="false">Do you want to reset blockchain data?</string>
-    <string name="setting_reset_data_first">Please stop synchronizing and mining first</string>
 
 </resources>

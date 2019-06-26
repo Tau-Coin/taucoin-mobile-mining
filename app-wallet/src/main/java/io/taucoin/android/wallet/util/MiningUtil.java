@@ -26,6 +26,7 @@ import io.taucoin.android.wallet.R;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -35,10 +36,10 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
-import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.core.Transaction;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -206,7 +207,9 @@ public class MiningUtil {
             });
     }
 
-    public static void clearAndReloadBlocks() {
+    public static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver) {
+        MyApplication.getRemoteConnector().stopSyncAll();
+        MyApplication.getRemoteConnector().stopBlockForging();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
                 Context context = MyApplication.getInstance();
@@ -220,7 +223,6 @@ public class MiningUtil {
                 FileUtil.deleteFile(new File(blockQueueDir));
 
                 BlockInfoDaoUtils.getInstance().reloadBlocks();
-                KeyValueDaoUtils.getInstance().reloadBlocks();
                 emitter.onNext(true);
             }catch (Exception ex){
                 emitter.onNext(false);
@@ -232,15 +234,26 @@ public class MiningUtil {
                 @Override
                 public void handleData(Boolean isSuccess) {
                     Logger.d("MiningUtil.clearAndReloadBlocks=" + isSuccess);
-                    ProgressManager.closeProgressDialog();
+                    logicObserver.onNext(isSuccess);
                     if(isSuccess){
-                        ToastUtils.showShortToast(R.string.setting_reset_data_success);
                         MyApplication.getRemoteConnector().cancelRemoteConnector();
                         AppUtil.killProcess(MyApplication.getInstance(), false);
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
-                    }else {
-                        ToastUtils.showShortToast(R.string.setting_reset_data_fail);
                     }
+                    initRemoteConnectorDelay();
+                }
+            });
+    }
+
+    private static void initRemoteConnectorDelay() {
+        Observable.timer(1, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new CommonObserver<Long>() {
+
+                @Override
+                public void onComplete() {
+                    MyApplication.getRemoteConnector().init();
                 }
             });
     }
