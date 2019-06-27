@@ -1,6 +1,7 @@
 package io.taucoin.datasource.mapdb;
 
 import io.taucoin.config.SystemProperties;
+import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.datasource.KeyValueDataSource;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -34,21 +35,21 @@ public class MapDBFactoryImpl implements MapDBFactory {
         String database = CONFIG.databaseDir();
         File dbFile = new File(database + "/" + name);
         if (!dbFile.getParentFile().exists()) dbFile.getParentFile().mkdirs();
-        DBMaker.Maker dbMaker = DBMaker.fileDB(dbFile)
-                .closeOnJvmShutdown();
 
-        // Here ignore the argument of disabling transaction.
-        if (!transactional) {
-            //dbMaker.transactionDisable();
-        }
+        DBMaker.Maker dbMaker;
 
-        DB db = null;
         try {
-            db = dbMaker.make();
-            return db;
-        } catch (Exception e) {
-            db = dbMaker.make();
-            return db;
+            dbMaker = DBMaker.fileDB(dbFile)
+                    .closeOnJvmShutdown();
+
+            // Here ignore the argument of disabling transaction.
+            if (!transactional) {
+                //dbMaker.transactionDisable();
+            }
+
+            return dbMaker.make();
+        } catch (Exception dbExp) {
+            throw new DBCorruptionException(dbExp);
         }
     }
 }

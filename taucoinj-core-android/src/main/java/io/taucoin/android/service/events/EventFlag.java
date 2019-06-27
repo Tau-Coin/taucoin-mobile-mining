@@ -115,5 +115,10 @@ public enum EventFlag {
     /**
      * Stop sync blocks evnet.
      */
-    EVENT_STOP_SYNC
+    EVENT_STOP_SYNC,
+
+    /**
+     * Creating taucoin blockchain failed due to db corruption.
+     */
+    EVENT_TAUCOIN_DB_CORRUPTION
 }

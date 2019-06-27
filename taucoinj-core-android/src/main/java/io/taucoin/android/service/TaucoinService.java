@@ -66,7 +66,7 @@ public class TaucoinService extends Service {
         }
     }
 
-    protected class InitializeTask extends AsyncTask<Void, Void, Void> {
+    protected class InitializeTask extends AsyncTask<Void, Void, CreateTaucoinResult> {
 
         protected List<String> privateKeys = null;
         protected Object reply = null;
@@ -79,22 +79,22 @@ public class TaucoinService extends Service {
             this.reply = reply;
         }
 
-        protected Void doInBackground(Void... args) {
+        protected CreateTaucoinResult doInBackground(Void... args) {
 
-            createTaucoin(this.privateKeys.size() != 0 ? this.privateKeys.get(0) : "");
-            return null;
+            return createTaucoin(this.privateKeys.size() != 0 ? this.privateKeys.get(0) : "");
         }
 
-        protected void onPostExecute(Void results) {
+        protected void onPostExecute(CreateTaucoinResult results) {
 
-            onTaucoinCreated(privateKeys, replyTo, reply);
+            onTaucoinCreated(privateKeys, replyTo, reply, results);
         }
     }
 
-    protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply) {
+    protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply, CreateTaucoinResult result) {
     }
 
-    protected void createTaucoin(String privateKey) {
+    protected CreateTaucoinResult createTaucoin(String privateKey) {
+        return CreateTaucoinResult.SUCCESSFUL;
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.taucoin.android.datasource;
 
 import io.taucoin.config.SystemProperties;
 
+import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.datasource.KeyValueDataSource;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
@@ -76,7 +77,7 @@ public class LevelDbDataSource implements KeyValueDataSource {
             alive = true;
         } catch (IOException ioe) {
             logger.error(ioe.getMessage(), ioe);
-            throw new RuntimeException("Can't initialize database:" + ioe.toString());
+            throw new DBCorruptionException(ioe);
         }
     }
 

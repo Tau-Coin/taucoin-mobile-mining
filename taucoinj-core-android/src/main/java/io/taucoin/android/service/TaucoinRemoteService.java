@@ -23,6 +23,7 @@ import io.taucoin.config.MainNetParams;
 import io.taucoin.core.*;
 import io.taucoin.crypto.ECKey;
 import io.taucoin.crypto.HashUtil;
+import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.android.Taucoin;
 import io.taucoin.forge.ForgeStatus;
 import io.taucoin.http.ConnectionManager;
@@ -267,9 +268,9 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     @Override
-    protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply) {
+    protected void onTaucoinCreated(List<String> privateKeys, Messenger replyTo, Object reply, CreateTaucoinResult result) {
 
-        if (taucoin != null) {
+        if (taucoin != null && result.isSuccessful()) {
             System.out.println("Loading genesis");
             broadcastEvent(EventFlag.EVENT_TRACE, new TraceEventData("Loading genesis block. This may take a few minutes..."));
 
@@ -310,14 +311,43 @@ public class TaucoinRemoteService extends TaucoinService {
                     logger.error("Exception sending taucoin created event: " + e.getMessage());
                 }
             }
+        } else if (result.isDBCorrupted()) {
+            // Send reply
+            if (replyTo != null && reply != null) {
+                Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_EVENT, 0, 0, reply);
+                Bundle replyData = new Bundle();
+                replyData.putSerializable("event", EventFlag.EVENT_TAUCOIN_DB_CORRUPTION);
+                replyMessage.setData(replyData);
+                try {
+                    replyTo.send(replyMessage);
+                    logger.info("Taucoin database is corrupted.");
+                } catch (RemoteException e) {
+                    logger.error("Exception sending db corruption event: " + e.getMessage());
+                }
+            }
+        } else if (result.isExisted()) {
+            // Send reply
+            if (replyTo != null && reply != null) {
+                Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_EVENT, 0, 0, reply);
+                Bundle replyData = new Bundle();
+                replyData.putSerializable("event", EventFlag.EVENT_TAUCOIN_EXIST);
+                replyMessage.setData(replyData);
+                try {
+                    replyTo.send(replyMessage);
+                    logger.info("Taucoin existed");
+                } catch (RemoteException e) {
+                    logger.error("Exception sending taucoin existed event: " + e.getMessage());
+                }
+            }
         }
     }
 
     @Override
-    protected void createTaucoin(String privateKey) {
+    protected CreateTaucoinResult createTaucoin(String privateKey) {
         if(taucoin != null){
-            return;
+            return CreateTaucoinResult.EXISTED;
         }
+
         System.setProperty("sun.arch.data.model", "32");
         System.setProperty("leveldb.mmap", "false");
 
@@ -332,12 +362,21 @@ public class TaucoinRemoteService extends TaucoinService {
                 .taucoinModule(new TaucoinModule(this))
                 .build();
 
-        taucoin = component.taucoin();
+        try {
+            taucoin = component.taucoin();
+        } catch (Exception e) {
+            if (e instanceof DBCorruptionException) {
+                logger.error("database corrupted:{}", e);
+                return CreateTaucoinResult.DB_CORRUPTED;
+            }
+        }
         connectionManager = component.connectionManager();
         taucoin.addListener(new TaucoinListener());
         taucoin.getBlockForger().addListener(new TaucoinForgerListener());
         taucoin.getPendingState().setBlockchain(taucoin.getBlockchain());
         // You can also add some other initialization logic.
+
+        return CreateTaucoinResult.SUCCESSFUL;
     }
 
 
