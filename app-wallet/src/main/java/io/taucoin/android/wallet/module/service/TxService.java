@@ -18,7 +18,6 @@ package io.taucoin.android.wallet.module.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 
 import com.github.naturs.logger.Logger;
@@ -85,7 +84,7 @@ public class TxService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         MyApplication.getRemoteConnector().restoreConnection();
-        NotifyManager.getInstance().sendNotify();
+        NotifyManager.getInstance().sendNotify(this);
         KeyValue keyValue = MyApplication.getKeyValue();
         if(intent != null){
             String action = intent.getAction();

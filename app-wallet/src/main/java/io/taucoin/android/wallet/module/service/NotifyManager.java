@@ -174,7 +174,16 @@ public class NotifyManager {
 
     }
 
-    public synchronized void sendNotify(){
+    synchronized void sendNotify(Service service){
+        if(mService == null){
+            initNotificationManager(service);
+            initNotify();
+        }else{
+            sendNotify();
+        }
+    }
+
+    private synchronized void sendNotify(){
         if(mService == null){
             return;
         }
@@ -186,7 +195,7 @@ public class NotifyManager {
     }
 
     synchronized void sendNotify(Service service, NotificationCompat.Builder builder, NotifyManager.NotifyData notifyData) {
-        if(service == null || !PermissionUtils.isNotificationEnabled()){
+        if(service == null){
             return;
         }
         if(notifyData == null){
