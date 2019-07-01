@@ -80,7 +80,7 @@ public class TauMessageCodec extends MessageToMessageCodec<HttpObject, Message> 
             if (content instanceof LastHttpContent) {
                 Message message;
                 try {
-                    logger.info("http response payload {}", contentsStream);
+                    logger.debug("http response payload {}", contentsStream);
                     message = createMessage(contentsStream);
                 } catch (Exception e) {
                     throw new DecoderException("decode exception", e);
