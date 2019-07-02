@@ -157,4 +157,10 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     public void closeLoading() {
         isLoading = false;
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        closeLoading();
+        super.onDetachedFromWindow();
+    }
 }

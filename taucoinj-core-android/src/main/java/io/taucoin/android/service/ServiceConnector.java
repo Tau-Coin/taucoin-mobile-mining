@@ -131,7 +131,7 @@ public class ServiceConnector {
     }
 
     /** Unbind from the service */
-    public void unbindService() {
+    public synchronized void unbindService() {
 
         if (isBound && serviceConnection != null) {
             context.getApplicationContext().unbindService(serviceConnection);

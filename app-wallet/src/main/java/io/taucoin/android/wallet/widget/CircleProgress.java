@@ -193,4 +193,10 @@ public class CircleProgress extends View {
         }
         return result;
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        closeLoading();
+        super.onDetachedFromWindow();
+    }
 }

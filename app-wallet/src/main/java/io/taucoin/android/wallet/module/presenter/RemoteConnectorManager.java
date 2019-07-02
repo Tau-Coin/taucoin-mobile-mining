@@ -45,6 +45,7 @@ import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
+import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.foundation.util.TrafficUtil;
@@ -164,6 +165,9 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                     case EVENT_TAUCOIN_EXIST:
                         isInit = 1;
                         startSyncAndMining();
+                        break;
+                    case EVENT_TAUCOIN_DB_CORRUPTION:
+                        MiningUtil.clearAndReloadBlocks();
                         break;
                     case EVENT_BLOCK_DISCONNECT:
                         blockEventData = data.getParcelable("data");

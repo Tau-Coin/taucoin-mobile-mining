@@ -53,22 +53,22 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     static final org.slf4j.Logger logger = LoggerFactory.getLogger("ConnectorManager");
     private ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
-    TaucoinConnector mTaucoinConnector = null;
+    private TaucoinConnector mTaucoinConnector = null;
 
     @SuppressLint("SimpleDateFormat")
     private DateFormat mDateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");
-    String mHandlerIdentifier = UUID.randomUUID().toString();
+    private String mHandlerIdentifier = UUID.randomUUID().toString();
     private String mConsoleLog = "";
     private boolean isTaucoinConnected = false;
     int isInit = -1;
-    int isSyncMe = -1;
+    private int isSyncMe = -1;
     BlockForgeExceptionStopEvent mExceptionStop;
 
     private final static int CONSOLE_LENGTH = 10000;
     private static final int BOOT_UP_DELAY_INIT_SECONDS = 2;
     private static final int BOOT_UP_DELAY_FORGE_SECONDS = 20;
 
-    public void createRemoteConnector(){
+    private void createRemoteConnector(){
         if (mTaucoinConnector == null) {
             addLogEntry("Create Remote Connector...");
             Context context = MyApplication.getInstance();
@@ -145,15 +145,17 @@ public abstract class ConnectorManager implements ConnectorHandler {
         if (!isTaucoinConnected) {
             addLogEntry("Connector Connected");
             isTaucoinConnected = true;
-            mTaucoinConnector.addListener(mHandlerIdentifier, EnumSet.allOf(EventFlag.class));
             if(!isInit()){
                 isInit = -1;
-                init();
             }
+        }
+        if(isTaucoinConnected && mTaucoinConnector != null){
+            init();
+            mTaucoinConnector.addListener(mHandlerIdentifier, EnumSet.allOf(EventFlag.class));
         }
     }
 
-    void addLogEntry(String message) {
+    private void addLogEntry(String message) {
         Date date = new Date();
         addLogEntry(date.getTime(), message);
     }
@@ -190,14 +192,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
         EventBusUtil.post(MessageEvent.EventCode.CONSOLE_LOG);
     }
 
-    public void importForgerPrivkey(String privateKey){
+    private void importForgerPrivkey(String privateKey){
         Logger.d("importForgerPrivkey");
         if(mTaucoinConnector != null){
             mTaucoinConnector.importForgerPrivkey(privateKey);
         }
     }
 
-    public void importPrivkeyAndInit(String privateKey){
+    private void importPrivkeyAndInit(String privateKey){
         Logger.d("importPrivkeyAndInit");
         initializer.schedule(new InitTask(mTaucoinConnector, mHandlerIdentifier, privateKey),
                 BOOT_UP_DELAY_INIT_SECONDS, TimeUnit.SECONDS);
@@ -292,7 +294,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         startBlockForging(-1);
     }
 
-    public void startBlockForging(int targetAmount){
+    private void startBlockForging(int targetAmount){
         initializer.schedule(new ForgingTask(mTaucoinConnector, targetAmount),
                 BOOT_UP_DELAY_FORGE_SECONDS, TimeUnit.SECONDS);
     }
@@ -302,7 +304,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         stopBlockForging(-1);
     }
 
-    public void stopBlockForging(int targetAmount){
+    private void stopBlockForging(int targetAmount){
         if(mTaucoinConnector != null && isInit()){
             logger.info("stopBlockForging=" + targetAmount);
             mTaucoinConnector.stopBlockForging(targetAmount);
@@ -342,7 +344,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         getBlockList(0, height);
     }
 
-    public void getBlockList(int num, long height){
+    private void getBlockList(int num, long height){
         Logger.d("getBlockList num=" + num + "\theight=" + height);
         isSyncMe = -1;
         int limit = (int) height - num + 1;
@@ -354,14 +356,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
     /**
      * get chain height (block sync)
      * */
-    public void getChainHeight(){
+    private void getChainHeight(){
         Logger.d("getChainHeight");
         if(mTaucoinConnector != null){
             mTaucoinConnector.getChainHeight(mHandlerIdentifier);
         }
     }
 
-    public void closeTaucoin(){
+    private void closeTaucoin(){
         Logger.d("closeTaucoin");
         if(mTaucoinConnector != null){
             mTaucoinConnector.closeEthereum();

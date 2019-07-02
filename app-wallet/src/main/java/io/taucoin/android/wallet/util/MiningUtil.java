@@ -207,9 +207,14 @@ public class MiningUtil {
             });
     }
 
+    public static void clearAndReloadBlocks() {
+        clearAndReloadBlocks(null);
+    }
+
     public static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver) {
         MyApplication.getRemoteConnector().stopSyncAll();
         MyApplication.getRemoteConnector().stopBlockForging();
+        MyApplication.getRemoteConnector().cancelRemoteConnector();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
                 Context context = MyApplication.getInstance();
@@ -234,9 +239,10 @@ public class MiningUtil {
                 @Override
                 public void handleData(Boolean isSuccess) {
                     Logger.d("MiningUtil.clearAndReloadBlocks=" + isSuccess);
-                    logicObserver.onNext(isSuccess);
+                    if(logicObserver != null){
+                        logicObserver.onNext(isSuccess);
+                    }
                     if(isSuccess){
-                        MyApplication.getRemoteConnector().cancelRemoteConnector();
                         AppUtil.killProcess(MyApplication.getInstance(), false);
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                     }
