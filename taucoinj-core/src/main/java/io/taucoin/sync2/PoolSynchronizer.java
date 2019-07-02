@@ -59,12 +59,8 @@ public class PoolSynchronizer implements ForgerListener {
 
     private Runnable task = new Runnable() {
         public void run() {
-            long requestAmount = PullPoolTxsAmount - (long)pendingState.size();
-            if (requestAmount <= 0) {
-                return;
-            }
             try {
-                requestManager.startPullPoolTxs(requestAmount);
+                requestManager.startPullPoolTxs(PullPoolTxsAmount);
             } catch (Throwable t) {
                 logger.error("Unhandled exception ", t);
             }
