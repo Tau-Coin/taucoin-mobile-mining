@@ -818,7 +818,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
          * this will broadcast.
          */
         boolean isAssociatedSelf = false;
-        if (chainInfoManager.getHeight() <= block.getNumber()) {
+        if (chainInfoManager.getHeight() <= block.getNumber() && chainInfoManager.getHeight() != 0) {
             isAssociatedSelf = true;
         }
 
