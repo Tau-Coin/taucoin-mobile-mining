@@ -305,6 +305,13 @@ public class SyncQueue {
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
+
+                // If request close, break loop asap.
+                if (isRequestClose.get() || wrapper == null) {
+                    logger.warn("Sync worker quits");
+                    break;
+                }
+
                 logger.error("Error processing block {}: ", wrapper.getBlock().toString(), e);
                 //logger.error("Block dump: {}", Hex.toHexString(wrapper.getBlock().getEncoded()));
                 isImportingBlocks.set(false);
