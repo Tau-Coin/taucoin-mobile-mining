@@ -23,6 +23,13 @@ public class MemoryPoolEntry {
     public static MemoryPoolEntry with(Transaction tx) {
         return new MemoryPoolEntry(tx);
     }
+
+    
+    @Override
+    public int hashCode(){
+        return this.tx.hashCode();
+    }
+
     @Override
     public boolean equals(Object entry){
         if (entry == null) return false;

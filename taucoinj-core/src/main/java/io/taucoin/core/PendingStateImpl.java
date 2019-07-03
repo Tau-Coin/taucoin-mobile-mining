@@ -55,12 +55,6 @@ public class PendingStateImpl implements PendingState {
         @Override
         public void onBlockConnected(final Block block) {
             processBest(block);
-//            EventDispatchThread.invokeLater(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                }
-//            });
         }
     };
 
@@ -93,10 +87,15 @@ public class PendingStateImpl implements PendingState {
      * @return
      */
     public List<Transaction> getWireTransactions() {
+
         List<Transaction> list = new ArrayList<Transaction>();
-        for(MemoryPoolEntry entry : wireTransactions){
-            list.add(entry.tx);
+
+        synchronized (wireTransactions) {
+            for(MemoryPoolEntry entry : wireTransactions){
+                list.add(entry.tx);
+            }
         }
+
         return list;
     }
 
@@ -128,24 +127,13 @@ public class PendingStateImpl implements PendingState {
 
         // tight synchronization here since a lot of duplicate transactions can arrive from many peers
         // and isValid(tx) call is very expensive
-        synchronized (this) {
+        synchronized (wireTransactions) {
             for(Transaction tx : newTxs) {
                 MemoryPoolEntry entry = MemoryPoolEntry.with(tx);
                 wireTransactions.offer(entry);
             }
         }
 
-        /**
-        if (!newTxs.isEmpty()) {
-            EventDispatchThread.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onPendingTransactionsReceived(newTxs);
-                    listener.onPendingStateChanged(PendingStateImpl.this);
-                }
-            });
-        }
-        */
         logger.info("Wire transaction list added: {} new, {} valid of received {}", unknownTx, newTxs.size(), transactions.size());
         return newTxs;
     }
@@ -245,23 +233,36 @@ public class PendingStateImpl implements PendingState {
             }
         }
 
+        // wire transactionś job 
+
 		return true;
     }
 
     @Override
     public void processBest(Block block) {
 
-        clearWire(block.getTransactionsList());
+        clearWireTransactions(block.getTransactionsList());
 
-        clearOutdated();
+        clearOutdatedTransactions();
 
         clearParticleTx(block.getTransactionsList());
     }
 
-    //Block Number -> Time
-    private void clearOutdated() {
+    // Remove wire transactions in block
+    private void clearWireTransactions(List<Transaction> txs) {
+        synchronized (wireTransactions) {
+            for (Transaction tx : txs) {
+                MemoryPoolEntry entry = new MemoryPoolEntry(tx);
+                if (wireTransactions.contains(entry)){
+                    wireTransactions.remove(entry);
+                }
+                removeExpendList(tx);
+            }
+        }
+    }
 
-        List<Transaction> outdated = new ArrayList<>();
+    //Block Number -> Time
+    private void clearOutdatedTransactions() {
 
         //clear wired transactions
         synchronized (wireTransactions) {
@@ -283,29 +284,10 @@ public class PendingStateImpl implements PendingState {
                 }
                 if (benchBlock != null && !entry.tx.checkTime(benchBlock) ) {
                     removeExpendList(entry.tx);
-                    outdated.add(entry.tx);
-                }
-            }
-
-		    if(!outdated.isEmpty()) {
-                for (Transaction tr:
-                     outdated) {
-                    MemoryPoolEntry entry = new MemoryPoolEntry(tr);
                     wireTransactions.remove(entry);
                 }
             }
-        }
-    }
 
-    private void clearWire(List<Transaction> txs) {
-        synchronized (wireTransactions) {
-            for (Transaction tx : txs) {
-                MemoryPoolEntry entry = new MemoryPoolEntry(tx);
-                if (wireTransactions.contains(entry)){
-                    wireTransactions.remove(entry);
-                }
-                removeExpendList(tx);
-            }
         }
     }
 
@@ -350,6 +332,10 @@ public class PendingStateImpl implements PendingState {
 
     @Override
     public int size() {
-        return wireTransactions.size();
+
+        synchronized (wireTransactions) {
+            return wireTransactions.size();
+        }
+
     }
 }
