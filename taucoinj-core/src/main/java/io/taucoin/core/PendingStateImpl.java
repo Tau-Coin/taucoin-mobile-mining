@@ -234,6 +234,13 @@ public class PendingStateImpl implements PendingState {
         }
 
         // wire transactionś job 
+        synchronized (wireTransactions) {
+            MemoryPoolEntry entry = new MemoryPoolEntry(tx);
+            if (wireTransactions.contains(entry)){
+                logger.info("Transaction into pool, already have txHash");
+                return false;
+            }
+        }
 
 		return true;
     }
