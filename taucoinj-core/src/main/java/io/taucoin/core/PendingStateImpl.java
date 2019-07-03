@@ -42,16 +42,10 @@ public class PendingStateImpl implements PendingState {
     private boolean isSyncdone = false;
     @Resource
     private final PriorityQueue<MemoryPoolEntry> wireTransactions = new PriorityQueue<MemoryPoolEntry>(1,new MemoryPoolPolicy());
-    // To filter out the transactions we have already processed
-    // transactions could be sent by peers even if they were already included into blocks
-    private final Map<ByteArrayWrapper, Object> receivedTxs = new LRUMap<>(500000);
 
     private final Map<String, BigInteger> expendList = new LRUMap<String, BigInteger>(500000);
 
     private final Map<String, HashSet<Long>> particleTx = new HashMap<>(50);
-
-    @Resource
-    private final List<Transaction> pendingStateTransactions = new ArrayList<>();
 
     private Repository pendingState;
 
@@ -152,8 +146,7 @@ public class PendingStateImpl implements PendingState {
             });
         }
         */
-
-        logger.info("Wire transaction list added: {} new, {} valid of received {}, #of known txs: {}", unknownTx, newTxs.size(), transactions.size(), receivedTxs.size());
+        logger.info("Wire transaction list added: {} new, {} valid of received {}", unknownTx, newTxs.size(), transactions.size());
         return newTxs;
     }
 
@@ -229,8 +222,7 @@ public class PendingStateImpl implements PendingState {
 
             BigInteger senderBalance = getRepository().getBalance(tx.getSender());
             if (!isCovers(senderBalance, expendList.get(senderTmp))) {
-                if (logger.isWarnEnabled())
-                    logger.warn("No enough balance: Require: {}, Sender's balance: {}", expendList.get(senderTmp), senderBalance);
+                logger.info("Transaction into pool, no enough balance");
                 tx.TRANSACTION_STATUS = "sorry,No enough balance";
                 return false;
             }
@@ -245,6 +237,7 @@ public class PendingStateImpl implements PendingState {
             } else {
                 HashSet<Long> hashSet = particleTx.get(senderTmp);
                 if (hashSet.contains(txTime)) {
+                    logger.info("Transaction into pool, already have txTime");
                     return false;
                 } else {
                     hashSet.add(txTime);
@@ -252,43 +245,7 @@ public class PendingStateImpl implements PendingState {
             }
         }
 
-        /**
-         *update precessed transaction memory pool
-         *if transactions survived in this container that means
-         *it has been added into memory pool (wire or pending )
-         *node needn't to add it again.
-         */
-        synchronized (receivedTxs){
-            if (!receivedTxs.containsKey(hash)) {
-                receivedTxs.put(hash, null);
-                return true;
-            } else {
-                tx.TRANSACTION_STATUS = "have processed transaction,can't be accepted";
-                return false;
-            }
-        }
-    }
-
-    @Override
-    public boolean addPendingTransaction(Transaction tx) {
-        if (addNewTxIfNotExist(tx)) {
-            synchronized (this) {
-                pendingStateTransactions.add(tx);
-            }
-            boolean retval = isValid(tx);
-            if(retval){
-                wireTransactions.offer(new MemoryPoolEntry(tx));
-                pendingStateTransactions.remove(tx);
-            }
-            return retval;
-        }
-
-        return false;
-    }
-
-    @Override
-    public List<Transaction> getPendingTransactions() {
-        return pendingStateTransactions;
+		return true;
     }
 
     @Override
@@ -296,12 +253,9 @@ public class PendingStateImpl implements PendingState {
 
         clearWire(block.getTransactionsList());
 
-        clearPendingState(block.getTransactionsList());
-
         clearOutdated();
 
         clearParticleTx(block.getTransactionsList());
-        //updateState(Block block);
     }
 
     //Block Number -> Time
@@ -341,30 +295,6 @@ public class PendingStateImpl implements PendingState {
                 }
             }
         }
-        outdated.clear();
-
-        //clear pending transactions
-        synchronized (pendingStateTransactions) {
-            for (Transaction tx : pendingStateTransactions) {
-                long expireTime = ByteUtil.byteArrayToLong(tx.getExpireTime());
-                long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
-                Block benchBlock = null;
-                if(unlockTime >= 0) {
-                    benchBlock = blockStore.getChainBlockByNumber(unlockTime);
-                }else{
-                    logger.warn("dangerous behavior expire " +
-                                    "time too long tx:{} expire time:{}",
-                            ByteUtil.toHexString(tx.getHash()),
-                            ByteUtil.byteArrayToLong(tx.getExpireTime()));
-                }
-                if (benchBlock != null && !tx.checkTime(benchBlock)) {
-                    removeExpendList(tx);
-                    outdated.add(tx);
-                }
-            }
-		    if(!outdated.isEmpty())
-                pendingStateTransactions.removeAll(outdated);
-        }
     }
 
     private void clearWire(List<Transaction> txs) {
@@ -374,7 +304,6 @@ public class PendingStateImpl implements PendingState {
                 if (wireTransactions.contains(entry)){
                     wireTransactions.remove(entry);
                 }
-
                 removeExpendList(tx);
             }
         }
@@ -395,41 +324,6 @@ public class PendingStateImpl implements PendingState {
         }
     }
 
-    private void clearPendingState(List<Transaction> txs) {
-        synchronized (pendingStateTransactions) {
-            for (Transaction tx : txs){
-                if (pendingStateTransactions.contains(tx)){
-                    pendingStateTransactions.remove(tx);
-                }
-            }
-            /**
-             * because a new block has been insert into block chain
-             * a smart node should move some unsure transactions into
-             * wire transaction because it is valid time now.
-             * state changes from pending to wire
-             */
-            synchronized (wireTransactions){
-                for(Transaction tx: pendingStateTransactions){
-                    if(isValid(tx)){
-                        MemoryPoolEntry entry = new MemoryPoolEntry(tx);
-                        wireTransactions.offer(entry);
-                        pendingStateTransactions.remove(tx);
-                        logger.info("transaction: {} change from invalid to valid",
-                                ByteUtil.toHexString(entry.tx.getHash()));
-                    }
-                }
-            }
-        }
-    }
-
-    /*
-    private void updateState(Block block) {
-
-        for (Transaction tx : block.getTransactionsList()) {
-        }
-    }
-    */
-
     /*
      * Transaction execution, which can be seen in transactionExecutor.java
      * 1. validation of sender's balance, subtract
@@ -449,12 +343,6 @@ public class PendingStateImpl implements PendingState {
         this.blockchain = blockchain;
     }
 
-    public boolean pendingStateContains(Transaction tx) {
-        if (pendingStateTransactions.contains(tx)||wireTransactions.contains(tx))
-            return true;
-		return false;
-    }
-
     @Override
     public void onSyncDone(){
         isSyncdone = true;
@@ -462,6 +350,6 @@ public class PendingStateImpl implements PendingState {
 
     @Override
     public int size() {
-        return wireTransactions.size() + pendingStateTransactions.size();
+        return wireTransactions.size();
     }
 }

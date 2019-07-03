@@ -170,7 +170,6 @@ public class BlockForger {
 
     protected List<Transaction> getAllPendingTransactions() {
         List<Transaction> txList = new ArrayList<Transaction>();
-        // txList.addAll(pendingState.getPendingTransactions());
         txList.addAll(pendingState.getWireTransactions());
 
         List<Transaction> txListTemp;

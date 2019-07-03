@@ -219,7 +219,10 @@ public class TaucoinImpl implements Taucoin {
 
     @Override
     public Transaction submitTransaction(Transaction transaction) {
-         boolean submitResult = pendingState.addPendingTransaction(transaction);
+
+         // boolean submitResult = pendingState.addWireTransactions(transaction);
+         boolean submitResult= true;
+
          if (submitResult) {
              boolean sendResult = requestManager.submitNewTransaction(transaction);
              if (sendResult) {
@@ -243,11 +246,6 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public List<Transaction> getWireTransactions() {
         return worldManager.getPendingState().getWireTransactions();
-    }
-
-    @Override
-    public List<Transaction> getPendingStateTransactions() {
-        return worldManager.getPendingState().getPendingTransactions();
     }
 
     @Override

@@ -143,10 +143,6 @@ public interface Taucoin {
      */
     List<Transaction> getWireTransactions();
 
-    /**
-     * @return - currently pending transactions sent to the net
-     */
-    List<Transaction> getPendingStateTransactions();
 
     BlockLoader getBlockLoader();
 

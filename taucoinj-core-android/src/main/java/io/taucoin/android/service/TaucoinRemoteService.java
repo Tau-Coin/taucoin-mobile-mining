@@ -818,9 +818,6 @@ public class TaucoinRemoteService extends TaucoinService {
 
         ArrayList<String> pendingTxs = new ArrayList<String>();
         if (taucoin != null) {
-            for(Transaction tx: taucoin.getPendingStateTransactions()){
-               pendingTxs.add("0x" + Hex.toHexString(tx.getHash()));
-            }
             for(Transaction tx: taucoin.getWireTransactions()) {
                pendingTxs.add("0x" + Hex.toHexString(tx.getHash()));
             }

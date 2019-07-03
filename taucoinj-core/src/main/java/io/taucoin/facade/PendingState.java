@@ -20,8 +20,4 @@ public interface PendingState {
      */
     List<Transaction> getWireTransactions();
 
-    /**
-     * @return list of pending transactions
-     */
-    List<Transaction> getPendingTransactions();
 }

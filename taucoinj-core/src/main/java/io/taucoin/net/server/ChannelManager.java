@@ -277,9 +277,9 @@ public class ChannelManager {
             Channel channel = null;
             try {
                 channel = newActivePeers.take();
-                List<Transaction> pendingTransactions = pendingState.getPendingTransactions();
-                if (!pendingTransactions.isEmpty()) {
-                    channel.sendTransactionsCapped(pendingTransactions);
+                List<Transaction> wireTransactions = pendingState.getWireTransactions();
+                if (!wireTransactions.isEmpty()) {
+                    channel.sendTransactionsCapped(wireTransactions);
                 }
             } catch (InterruptedException e) {
                 break;

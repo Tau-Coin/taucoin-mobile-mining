@@ -24,15 +24,6 @@ public interface PendingState extends io.taucoin.facade.PendingState{
     List<Transaction> addWireTransactions(Set<Transaction> transactions);
 
     /**
-     * Adds transaction to the list of pending state txs  <br>
-     * For the moment this list is populated with txs sent by our peer only <br>
-     * Triggers an update of pending state
-     *
-     * @param tx transaction
-     */
-    boolean addPendingTransaction(Transaction tx);
-
-    /**
      * It should be called on each block imported as <b>BEST</b> <br>
      * Does several things:
      * <ul>
@@ -44,9 +35,6 @@ public interface PendingState extends io.taucoin.facade.PendingState{
      * @param block block imported into blockchain as a <b>BEST</b> one
      */
     void processBest(Block block);
-
-	//PendingState Contains Tx
-    boolean pendingStateContains(Transaction tx);
 
     void setBlockchain(Blockchain blockchain);
 
