@@ -18,7 +18,8 @@ public class MessageEvent{
         CLEAR_SEND,
         FORGED_TIME,
         APPLICATION_INFO,
-        MINING_INCOME
+        MINING_INCOME,
+        IRREPARABLE_ERROR
     }
     private Object data;
 

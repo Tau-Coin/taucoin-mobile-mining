@@ -68,11 +68,14 @@ public class BlockInfoDaoUtils {
         getBlockInfoDao().insertOrReplace(blockInfo);
     }
 
-    public void reloadBlocks() {
+    public int reloadBlocks() {
         BlockInfo blockInfo = query();
+        int blockSync = 0;
         if(blockInfo != null){
+            blockSync = blockInfo.getBlockSync();
             blockInfo.setBlockSync(0);
             insertOrReplace(blockInfo);
         }
+        return blockSync;
     }
 }

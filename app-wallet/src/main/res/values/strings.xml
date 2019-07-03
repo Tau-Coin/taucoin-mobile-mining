@@ -165,6 +165,7 @@
     <string name="home_mining_miner_participant">Miner\n&#38;\nParticipant</string>
     <string name="home_mining_mined_calculating">Calculating</string>
     <string name="home_mining_power_tips">Sender will increase one mining power with a successful transaction.</string>
+    <string name="home_database_irreparable_error">There is something wrong with the synchronized block data. It\'s reloading now. Please wait&#8230;</string>
 
     <string name="block_list_title">Blocks Synchronized &#38; Mined</string>
     <string name="block_list_all">ALL</string>

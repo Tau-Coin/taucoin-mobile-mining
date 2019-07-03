@@ -95,6 +95,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ProgressView ivMiningPower;
     @BindView(R.id.iv_mining_sync)
     ProgressView ivMiningSync;
+    @BindView(R.id.tv_irreparable_error)
+    TextView tvIrreparableError;
 
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
@@ -265,6 +267,12 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 BlockInfo blockInfo = (BlockInfo) object.getData();
                 showMiningView(blockInfo, false);
                 break;
+            case IRREPARABLE_ERROR:
+                if(object.getData() != null && tvIrreparableError != null){
+                    tvIrreparableError.setVisibility(View.VISIBLE);
+                    tvIrreparableError.setTag(object.getData());
+                }
+                break;
             default:
                 break;
         }
@@ -333,6 +341,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         tvChainHeight.setText(blockHeightStr);
         String minersStr = FmtMicrometer.fmtPower(miners);
         tvMiners.setText(minersStr);
+        int errorBlock = StringUtil.getIntTag(tvIrreparableError);
+        if(blockSync >= errorBlock && tvIrreparableError.getVisibility() != View.GONE){
+            tvIrreparableError.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -53,6 +53,13 @@ public class EventBusUtil {
         EventBus.getDefault().post(msg);
     }
 
+    public static void post(MessageEvent.EventCode code, Object object){
+        MessageEvent msg = new MessageEvent();
+        msg.setCode(code);
+        msg.setData(object);
+        EventBus.getDefault().post(msg);
+    }
+
     public static void post(MessageEvent msgEvent){
         EventBus.getDefault().post(msgEvent);
     }

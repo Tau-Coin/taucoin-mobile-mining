@@ -227,7 +227,10 @@ public class MiningUtil {
                 FileUtil.deleteFile(new File(stateDir));
                 FileUtil.deleteFile(new File(blockQueueDir));
 
-                BlockInfoDaoUtils.getInstance().reloadBlocks();
+                if(logicObserver == null){
+                    int blockSync = BlockInfoDaoUtils.getInstance().reloadBlocks();
+                    EventBusUtil.post(MessageEvent.EventCode.IRREPARABLE_ERROR, blockSync);
+                }
                 emitter.onNext(true);
             }catch (Exception ex){
                 emitter.onNext(false);

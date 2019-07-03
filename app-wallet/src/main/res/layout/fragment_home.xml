@@ -483,6 +483,18 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:visibility="visible"
+                    android:id="@+id/tv_irreparable_error"
+                    style="@style/style_middle_red"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/home_database_irreparable_error"
+                    android:layout_height="wrap_content" />
+
             </LinearLayout>
         </ScrollView>
 
