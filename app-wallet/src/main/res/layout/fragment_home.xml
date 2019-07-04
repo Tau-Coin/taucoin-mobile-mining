@@ -484,7 +484,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:id="@+id/tv_irreparable_error"
                     style="@style/style_middle_red"
                     android:layout_width="wrap_content"
