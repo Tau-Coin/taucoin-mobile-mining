@@ -339,6 +339,10 @@ public class BlockQueueMem implements BlockQueue {
         }
     }
 
+    @Override
+    public Long getMaxBlockNumber() {
+        return index.getMax();
+    }
 
     private void awaitInit() {
         initLock.lock();
@@ -381,6 +385,8 @@ public class BlockQueueMem implements BlockQueue {
         void clear();
 
         void removeAll(Collection<Long> indexes);
+
+        Long getMax();
     }
 
     public static class ArrayListIndex implements Index {
@@ -447,6 +453,15 @@ public class BlockQueueMem implements BlockQueue {
 
         public synchronized void removeAll(Collection<Long> indexes) {
             index.removeAll(indexes);
+        }
+
+        @Override
+        public synchronized Long getMax() {
+            if (isEmpty()) {
+                return Long.MIN_VALUE;
+            }
+
+            return index.get(size() - 1);
         }
     }
 }

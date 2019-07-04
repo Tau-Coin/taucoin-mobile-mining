@@ -273,5 +273,10 @@ public class TaucoinService extends Service {
                 byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
             broadcastEvent(EventFlag.EVENT_CHAININFO_CHANGED, new ChainInfoChangedData(height, medianFee));
         }
+
+        @Override
+        public void onBlocksDownloaded(long from, long end) {
+            broadcastEvent(EventFlag.EVENT_BLOCKS_DOWNLOADED, new BlocksDownloadedData(from, end));
+        }
     }
 }

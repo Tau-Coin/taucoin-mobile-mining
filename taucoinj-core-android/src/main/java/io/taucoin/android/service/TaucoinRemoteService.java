@@ -26,6 +26,7 @@ import io.taucoin.crypto.HashUtil;
 import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.android.Taucoin;
 import io.taucoin.forge.ForgeStatus;
+import io.taucoin.forge.NextBlockForgedDetail;
 import io.taucoin.http.ConnectionManager;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.Utils;
@@ -1350,6 +1351,12 @@ public class TaucoinRemoteService extends TaucoinService {
         public void nextBlockForgedInternal(long internal) {
             broadcastEvent(EventFlag.EVENT_BLOCK_FORGED_TIME_INTERNAL,
                    new BlockForgedInternalEventData(internal));
+        }
+
+        @Override
+        public void nextBlockForgedDetail(NextBlockForgedDetail detail) {
+            broadcastEvent(EventFlag.EVENT_BLOCK_FORGED_POT_DETAIL,
+                   new NextBlockForgedPOTDetail(detail));
         }
 
         @Override

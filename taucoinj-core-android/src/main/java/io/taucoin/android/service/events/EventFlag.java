@@ -120,5 +120,15 @@ public enum EventFlag {
     /**
      * Creating taucoin blockchain failed due to db corruption.
      */
-    EVENT_TAUCOIN_DB_CORRUPTION
+    EVENT_TAUCOIN_DB_CORRUPTION,
+
+    /**
+     * Blocks downloaded from peer.
+     */
+    EVENT_BLOCKS_DOWNLOADED,
+
+    /**
+     *  Next block forged POT detail event.
+     */
+    EVENT_BLOCK_FORGED_POT_DETAIL
 }

@@ -103,4 +103,8 @@ public class TaucoinListenerAdapter implements TaucoinListener {
 
     }
 
+    @Override
+    public void onBlocksDownloaded(long from, long end) {
+    }
+
 }

@@ -279,6 +279,10 @@ public class BlockForger {
             long sleepTime = nextBlockForgedTimePoint - timeNow;
             logger.debug("Sleeping " + sleepTime + " s before importing...");
             fireNextBlockForgedInternal(sleepTime);
+            fireNextBlockForgedDetail(new NextBlockForgedDetail(baseTarget,
+                    new BigInteger(1, generationSignature),
+                    bestBlock.getCumulativeDifficulty(), forgingPower, hit));
+
             synchronized (blockchain.getLockObject()) {
                 try {
                     blockchain.getLockObject().wait(sleepTime * 1000);
@@ -398,6 +402,12 @@ public class BlockForger {
         }
     }
 
+    protected void fireNextBlockForgedDetail(NextBlockForgedDetail detail) {
+        for (ForgerListener l : listeners) {
+            l.nextBlockForgedDetail(detail);
+        }
+    }
+
     private void waitForPullTxPool() throws InterruptedException {
         logger.info("Wait for pulling pool txs");
         synchronized(pullTxPoolLock) {
@@ -486,6 +496,10 @@ public class BlockForger {
         @Override
         public void nextBlockForgedInternal(long internal) {
             logger.info("Next block forged wait itme {}s", internal);
+        }
+
+        @Override
+        public void nextBlockForgedDetail(NextBlockForgedDetail detail) {
         }
 
         @Override

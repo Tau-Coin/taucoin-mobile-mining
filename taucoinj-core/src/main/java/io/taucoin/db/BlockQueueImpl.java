@@ -395,10 +395,17 @@ public class BlockQueueImpl implements BlockQueue {
     public boolean isBlockExist(byte[] hash) {
         return hashes.contains(new ByteArrayWrapper(hash));
     }
+
     @Override
     public void drop(byte[] nodeId, int scanLimit){
 
     }
+
+    @Override
+    public Long getMaxBlockNumber() {
+        return index.getMax();
+    }
+
     private void awaitInit() {
         initLock.lock();
         try {
@@ -442,6 +449,8 @@ public class BlockQueueImpl implements BlockQueue {
         int size();
 
         void clear();
+
+        Long getMax();
     }
 
     public static class ArrayListIndex implements Index {
@@ -499,6 +508,15 @@ public class BlockQueueImpl implements BlockQueue {
 
         private void sort() {
             Collections.sort(index);
+        }
+
+        @Override
+        public synchronized Long getMax() {
+            if (isEmpty()) {
+                return Long.MIN_VALUE;
+            }
+
+            return index.get(size() - 1);
         }
     }
 }

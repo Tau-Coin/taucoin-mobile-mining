@@ -177,7 +177,7 @@ public class RequestManager implements RequestQueue.MessageListener {
                 break;
 
             case HASH_RETRIEVING:
-                startForkCoverage();
+                decideBlocksNeedDownloaded();
                 break;
 
             case BLOCK_RETRIEVING:
@@ -262,6 +262,41 @@ public class RequestManager implements RequestQueue.MessageListener {
 
             logger.error("Processing BlockHashes fatal error start {}, reverse {}",
                     msg.getStartNumber(), msg.getReverse());
+        }
+    }
+
+    private void decideBlocksNeedDownloaded() {
+
+        if (!connectionManager.isNetworkConnected()) {
+            logger.warn("network disconnected, change hash retriving done");
+            changeSyncState(DONE_HASH_RETRIEVING);
+            return;
+        }
+
+        // Decide which blocks will be synced.
+        // If importing blocks is completed, just call "startForkCoverage()".
+        // Else push the numbers into the block number queue.
+        //     a) get the max block number S downloaded from block queue.
+        //     b) get the height H of remote peer.
+        //     c) push [S + 1, H] into block number queue.
+        //     d) transmit to the state of "DONE_HASH_RETRIEVING".
+        if (queue.isImportingBlocksFinished()) {
+            startForkCoverage();
+        } else {
+            fillupBlockNumbers();
+            changeSyncState(DONE_HASH_RETRIEVING);
+        }
+    }
+
+    private void fillupBlockNumbers() {
+        long localMaxBlockNumber = queue.getBlockqueueMaxNumber();
+        long remoteBestNumber = chainInfoManager.getHeight();
+
+        if (localMaxBlockNumber >= blockchain.getSize()
+                && localMaxBlockNumber + 1 <= remoteBestNumber) {
+            logger.info("Blocks from {} to {} need sync", localMaxBlockNumber + 1,
+                    remoteBestNumber);
+            pushBlockNumbers(localMaxBlockNumber + 1);
         }
     }
 
@@ -372,6 +407,11 @@ public class RequestManager implements RequestQueue.MessageListener {
         }
 
         List<Long> coveredNumbers = preprocessBlocksMessage(msg);
+        if (coveredNumbers.size() > 0) {
+            long first = coveredNumbers.get(0);
+            long last  = coveredNumbers.get(coveredNumbers.size() - 1);
+            listener.onBlocksDownloaded(min(first, last), max(first, last));
+        }
 
         List<Block> blocksList = msg.getBlocks();
 

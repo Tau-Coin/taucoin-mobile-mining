@@ -59,8 +59,6 @@ public class SyncManager {
 
     ConnectionManager connectionManager;
 
-    Thread workerThread = null;
-
     private long getChainInfoTimestamp = 0;
     private long pullChainInfoPeriod = config.pullChainInfoPeriod();
 
@@ -108,60 +106,66 @@ public class SyncManager {
     }
 
     public void start() {
+        startImport();
+        startSync();
+    }
+
+    public void stop() {
+        stopSync();
+        stopImport();
+    }
+
+    public void startSync() {
         if (started.get()) {
             return;
         }
         started.set(true);
 
-        // make it asynchronously
-        this.workerThread = new Thread(new Runnable() {
+        logger.info("Start sync");
+
+        //set IDLE state at the beginning
+        state = syncStates.get(IDLE);
+        //set current net work initial sync state.
+        changeState(initialState());
+
+        worker = Executors.newSingleThreadScheduledExecutor();
+        worker.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-
-                if (!config.isSyncEnabled()) {
-                    logger.info("Sync Manager: OFF");
-                    return;
+                try {
+                    maintainState();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    logger.error("Exception in main sync worker", t);
                 }
-
-                queue.start();
-                logger.info("Sync Manager: ON");
-                //set IDLE state at the beginning
-                state = syncStates.get(IDLE);
-
-                //set current net work initial sync state.
-                changeState(initialState());
-
-                worker = Executors.newSingleThreadScheduledExecutor();
-                worker.scheduleWithFixedDelay(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            maintainState();
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                            logger.error("Exception in main sync worker", t);
-                        }
-                    }
-                }, WORKER_TIMEOUT, WORKER_TIMEOUT, TimeUnit.MILLISECONDS);
             }
-        });
-
-        workerThread.start();
+        }, WORKER_TIMEOUT, WORKER_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
-    public void stop() {
+    public void stopSync() {
+        if (!started.get()) {
+            return;
+        }
         started.set(false);
+
+        logger.info("Stop sync");
+
         if (worker != null) {
             worker.shutdownNow();
             worker = null;
         }
+    }
 
-        if (workerThread != null) {
-            workerThread.interrupt();
-            workerThread = null;
-        }
-
+    public void startImport() {
         if (queue != null) {
+            logger.info("Start importing");
+            queue.start();
+        }
+    }
+
+    public void stopImport() {
+        if (queue != null) {
+            logger.info("Stop importing");
             queue.stop();
         }
     }

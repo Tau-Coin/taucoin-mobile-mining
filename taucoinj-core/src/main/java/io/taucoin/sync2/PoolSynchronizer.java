@@ -7,6 +7,7 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.forge.BlockForger;
 import io.taucoin.forge.ForgeStatus;
 import io.taucoin.forge.ForgerListener;
+import io.taucoin.forge.NextBlockForgedDetail;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
@@ -122,6 +123,10 @@ public class PoolSynchronizer implements ForgerListener {
             // Start a timer to pull pool txs
             startTimerTask(internal * 1000);
         }
+    }
+
+    @Override
+    public void nextBlockForgedDetail(NextBlockForgedDetail detail) {
     }
 
     private void startTimerTask(long delay) {

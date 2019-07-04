@@ -163,4 +163,11 @@ public class CompositeTaucoinListener implements TaucoinListener {
                     currentBlockHash, totalDiff, medianFee);
         }
     }
+
+    @Override
+    public void onBlocksDownloaded(long from, long end) {
+        for (TaucoinListener listener : listeners) {
+            listener.onBlocksDownloaded(from, end);
+        }
+    }
 }

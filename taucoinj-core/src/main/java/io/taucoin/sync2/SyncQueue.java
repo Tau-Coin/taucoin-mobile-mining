@@ -623,6 +623,10 @@ public class SyncQueue {
         return blockNumbersStore.pollBatch(config.maxBlocksAsk());
     }
 
+    public synchronized long getBlockqueueMaxNumber() {
+        return blockQueue.getMaxBlockNumber();
+    }
+
     /**
      * Adds list of headers received from remote host <br>
      * Runs header validation before addition <br>
