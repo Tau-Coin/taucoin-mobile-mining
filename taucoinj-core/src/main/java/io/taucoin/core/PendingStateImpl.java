@@ -123,7 +123,7 @@ public class PendingStateImpl implements PendingState {
                     newTxs.add(tx);
                     unknownTx++;
                 }
-                if(unknownTx > MAXTNO){
+                if(unknownTx >= MAXTNO){
                     break;
                 }
             }
