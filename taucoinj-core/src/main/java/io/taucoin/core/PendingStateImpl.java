@@ -39,6 +39,7 @@ public class PendingStateImpl implements PendingState {
     private BlockStore blockStore;
     private Blockchain blockchain;
     private static final int MaxExpireTime = 144;
+    private static final int MAXTNO= 50;
     private boolean isSyncdone = false;
     @Resource
     private final PriorityQueue<MemoryPoolEntry> wireTransactions = new PriorityQueue<MemoryPoolEntry>(1,new MemoryPoolPolicy());
@@ -118,9 +119,12 @@ public class PendingStateImpl implements PendingState {
 
         for (Transaction tx : transactions) {
             if (addNewTxIfNotExist(tx)) {
-                unknownTx++;
                 if (isValid(tx)) {
                     newTxs.add(tx);
+                    unknownTx++;
+                }
+                if(unknownTx > MAXTNO){
+                    break;
                 }
             }
         }
