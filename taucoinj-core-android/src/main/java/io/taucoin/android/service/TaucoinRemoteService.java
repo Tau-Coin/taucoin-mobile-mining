@@ -19,6 +19,7 @@ import io.taucoin.android.di.components.DaggerTaucoinComponent;
 import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.interop.BlockTxReindex;
 import io.taucoin.android.service.events.*;
+import io.taucoin.android.settings.TaucoinSettings;
 import io.taucoin.config.MainNetParams;
 import io.taucoin.core.*;
 import io.taucoin.crypto.ECKey;
@@ -61,6 +62,8 @@ public class TaucoinRemoteService extends TaucoinService {
     private ConnectionManager connectionManager = null;
     private IntentFilter intentFilter = null;
     private NetworkStateListener networkStateListener = null;
+
+    private TaucoinSettings taucoinSettings;
 
     private RefWatcher refWatcher;
 
@@ -372,6 +375,7 @@ public class TaucoinRemoteService extends TaucoinService {
             }
         }
         connectionManager = component.connectionManager();
+        taucoinSettings = component.taucoinSettings();
         taucoin.addListener(new TaucoinListener());
         taucoin.getBlockForger().addListener(new TaucoinForgerListener());
         taucoin.getPendingState().setBlockchain(taucoin.getBlockchain());
@@ -757,6 +761,12 @@ public class TaucoinRemoteService extends TaucoinService {
         if (taucoin != null) {
             replyData.putSerializable("event", EventFlag.EVENT_START_SYNC);
             taucoin.startSync();
+
+            taucoinSettings.init();
+            if (taucoinSettings.isSyncDownloadDisabled()) {
+                logger.info("Stop downloading accroding to wifi only setting");
+                taucoin.stopDownload();
+            }
         }
 
         replyMessage.setData(replyData);
@@ -774,6 +784,7 @@ public class TaucoinRemoteService extends TaucoinService {
         if (taucoin != null) {
             replyData.putSerializable("event", EventFlag.EVENT_STOP_SYNC);
             taucoin.stopSync();
+            taucoinSettings.destory();
         }
 
         replyMessage.setData(replyData);

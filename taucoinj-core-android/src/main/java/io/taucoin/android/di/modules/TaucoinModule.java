@@ -7,6 +7,7 @@ import io.taucoin.android.datasource.RocksDbDataSource;
 import io.taucoin.android.db.AccountStateDatabaseImpl;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.android.manager.BlockLoader;
+import io.taucoin.android.settings.TaucoinSettings;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.Account;
 import io.taucoin.core.Blockchain;
@@ -99,6 +100,12 @@ public class TaucoinModule {
                              io.taucoin.manager.BlockLoader blockLoader, PendingState pendingState,
                              BlockForger blockForger, RequestManager requestManager, RefWatcher refWatcher) {
         return new io.taucoin.android.Taucoin(worldManager, blockLoader, pendingState, blockForger, requestManager, refWatcher);
+    }
+
+    @Provides
+    @Singleton
+    TaucoinSettings provideTaucoinSettings(WorldManager worldManager) {
+        return new TaucoinSettings(this.context, worldManager);
     }
 
     @Provides

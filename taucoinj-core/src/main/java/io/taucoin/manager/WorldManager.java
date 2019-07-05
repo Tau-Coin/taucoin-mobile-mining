@@ -53,6 +53,8 @@ public class WorldManager {
 
     private volatile boolean isSyncRunning = false;
 
+    private volatile boolean isSyncDownloading = false;
+
     SystemProperties config = SystemProperties.CONFIG;
 
     @Inject
@@ -104,6 +106,7 @@ public class WorldManager {
             return;
         }
         isSyncRunning = true;
+        isSyncDownloading = true;
 
         // First of all, start net components
         requestManager.start();
@@ -116,10 +119,29 @@ public class WorldManager {
             return;
         }
         isSyncRunning = false;
+        isSyncDownloading = false;
 
         syncManager.stop();
         requestManager.stop();
         poolSynchronizer.stop();
+    }
+
+    public void startDownload() {
+        if (isSyncDownloading) {
+            return;
+        }
+        isSyncDownloading = true;
+
+        syncManager.startSyncWithPeer();
+    }
+
+    public void stopDownload() {
+        if (!isSyncDownloading) {
+            return;
+        }
+        isSyncDownloading = false;
+
+        syncManager.stopSyncWithPeer();
     }
 
     public TaucoinListener getListener() {

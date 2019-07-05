@@ -3,6 +3,7 @@ package io.taucoin.android.di.components;
 import android.content.Context;
 
 import io.taucoin.android.di.modules.TaucoinModule;
+import io.taucoin.android.settings.TaucoinSettings;
 import io.taucoin.android.Taucoin;
 import io.taucoin.http.ConnectionManager;
 
@@ -17,5 +18,5 @@ public interface TaucoinComponent {
     Context context();
     Taucoin taucoin();
     ConnectionManager connectionManager();
-
+    TaucoinSettings taucoinSettings();
 }

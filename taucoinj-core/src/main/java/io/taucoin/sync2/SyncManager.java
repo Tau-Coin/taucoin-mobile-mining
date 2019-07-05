@@ -107,15 +107,18 @@ public class SyncManager {
 
     public void start() {
         startImport();
-        startSync();
+        startSyncWithPeer();
     }
 
     public void stop() {
-        stopSync();
+        stopSyncWithPeer();
         stopImport();
     }
 
-    public void startSync() {
+    /**
+     * Start state machine. But importing procedure is still on.
+     */
+    public void startSyncWithPeer() {
         if (started.get()) {
             return;
         }
@@ -142,7 +145,10 @@ public class SyncManager {
         }, WORKER_TIMEOUT, WORKER_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
-    public void stopSync() {
+    /**
+     * Stop state machine. But importing procedure is still on.
+     */
+    public void stopSyncWithPeer() {
         if (!started.get()) {
             return;
         }

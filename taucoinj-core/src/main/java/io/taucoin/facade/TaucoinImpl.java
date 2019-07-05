@@ -134,6 +134,16 @@ public class TaucoinImpl implements Taucoin {
     }
 
     @Override
+    public void startDownload() {
+        worldManager.startDownload();
+    }
+
+    @Override
+    public void stopDownload() {
+        worldManager.stopDownload();
+    }
+
+    @Override
     public void connect(InetAddress addr, int port, String remoteId) {
         connect(addr.getHostName(), port, remoteId);
     }

@@ -17,6 +17,7 @@ public class NextBlockForgedPOTDetail extends EventData {
     public BigInteger cumulativeDifficulty;
     public BigInteger forgingPower;
     public BigInteger hitValue;
+    public long timeInternal;
 
     public NextBlockForgedPOTDetail(NextBlockForgedDetail detail) {
 
@@ -26,6 +27,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.cumulativeDifficulty = detail.getCumulativeDifficulty();
         this.forgingPower = detail.getForgingPower();
         this.hitValue = detail.getHitValue();
+        this.timeInternal = detail.getTimeInternal();
     }
 
     @Override
@@ -43,6 +45,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         parcel.writeString(cumulativeDifficulty.toString(16));
         parcel.writeString(forgingPower.toString(16));
         parcel.writeString(hitValue.toString(16));
+        parcel.writeLong(timeInternal);
     }
 
     public static final Parcelable.Creator<NextBlockForgedPOTDetail> CREATOR
@@ -67,5 +70,6 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.cumulativeDifficulty = new BigInteger(in.readString(), 16);
         this.forgingPower = new BigInteger(in.readString(), 16);
         this.hitValue = new BigInteger(in.readString(), 16);
+        this.timeInternal = in.readLong();
     }
 }

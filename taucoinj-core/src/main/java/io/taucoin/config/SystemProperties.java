@@ -803,6 +803,17 @@ public class SystemProperties {
         return config.getInt("sync2.pooltxs.minfee");
     }
 
+    @ValidateMe
+    public int blockStoreFileMaxSize() {
+        return (int)(config.getInt("filestore.blockstore.file.maxsize")
+                * 1024 * 1024);
+    }
+
+    @ValidateMe
+    public int indexStoreFileMetaMaxAmount() {
+        return (int)config.getInt("filestore.indexstore.file.maxamount");
+    }
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }
