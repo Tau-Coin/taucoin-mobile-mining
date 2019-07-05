@@ -767,6 +767,10 @@ public class TaucoinRemoteService extends TaucoinService {
                 logger.info("Stop downloading accroding to wifi only setting");
                 taucoin.stopDownload();
             }
+
+            // broadcast total blocks amount which were synchronized from peers
+            // but have not been imported.
+            broadcastSynchronizedBlocksAmount();
         }
 
         replyMessage.setData(replyData);
@@ -1377,4 +1381,15 @@ public class TaucoinRemoteService extends TaucoinService {
         public void blockForgingCanceled(Block block) {}
     }
 
+    // Get total blocks amount which were synchronized from peers
+    // but have not been imported.
+    protected long getSynchronizedBlocksAmount() {
+        return taucoin.getWorldManager().getSyncManager().getSynchronizedBlocksAmount();
+    }
+
+    protected void broadcastSynchronizedBlocksAmount() {
+        long amount = getSynchronizedBlocksAmount();
+        logger.info("Synchronized blocks amount {}", amount);
+        broadcastEvent(EventFlag.EVENT_BLOCKS_DOWNLOADED, new BlocksDownloadedData(amount, amount));
+    }
 }

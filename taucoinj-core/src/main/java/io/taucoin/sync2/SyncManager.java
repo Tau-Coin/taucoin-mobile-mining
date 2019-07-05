@@ -236,4 +236,14 @@ public class SyncManager {
     public boolean hasToPullChainInfo() {
         return pullChainInfoPeriod < System.currentTimeMillis() - getChainInfoTimestamp;
     }
+
+    // Get total blocks amount which were synchronized from peers
+    // but have not been imported.
+    public long getSynchronizedBlocksAmount() {
+        if (queue != null) {
+            return queue.getBlockqueueMaxNumber();
+        }
+
+        return 0;
+    }
 }
