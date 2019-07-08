@@ -393,6 +393,8 @@ public class BlockQueueImpl implements BlockQueue {
 
     @Override
     public boolean isBlockExist(byte[] hash) {
+        awaitInit();
+
         return hashes.contains(new ByteArrayWrapper(hash));
     }
 
@@ -403,6 +405,8 @@ public class BlockQueueImpl implements BlockQueue {
 
     @Override
     public Long getMaxBlockNumber() {
+        awaitInit();
+
         return index.getMax();
     }
 

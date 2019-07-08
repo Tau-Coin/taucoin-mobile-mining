@@ -768,9 +768,15 @@ public class TaucoinRemoteService extends TaucoinService {
                 taucoin.stopDownload();
             }
 
-            // broadcast total blocks amount which were synchronized from peers
-            // but have not been imported.
-            broadcastSynchronizedBlocksAmount();
+            EventDispatchThread.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    // broadcast total blocks amount which were synchronized from peers
+                    // but have not been imported.
+                    broadcastSynchronizedBlocksAmount();
+
+                }
+            });
         }
 
         replyMessage.setData(replyData);
