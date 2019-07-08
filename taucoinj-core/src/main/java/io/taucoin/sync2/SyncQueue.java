@@ -624,7 +624,8 @@ public class SyncQueue {
     }
 
     public synchronized long getBlockqueueMaxNumber() {
-        return blockQueue.getMaxBlockNumber();
+        long maxNumber = blockQueue.getMaxBlockNumber();
+        return maxNumber > 0 ? maxNumber : 0;
     }
 
     /**
