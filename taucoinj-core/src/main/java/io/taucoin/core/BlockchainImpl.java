@@ -652,7 +652,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             }
         }
 
-        //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
         byte[] address = block.getForgerAddress();
         BigInteger forgingPower = repo.getforgePower(address);
         logger.debug("Address: {}, forge power: {}", Hex.toHexString(address), forgingPower);
@@ -660,7 +659,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         long blockTime = ByteUtil.byteArrayToLong(block.getTimestamp());
         Block preBlock = blockStore.getBlockByHash(block.getPreviousHeaderHash());
         if (preBlock == null) {
-            logger.error("Previous block is null!");
+            logger.error("Previous block is null with hash {}!",
+                    Hex.toHexString(block.getPreviousHeaderHash()));
             return false;
         }
         long preBlockTime = ByteUtil.byteArrayToLong(preBlock.getTimestamp());
@@ -674,6 +674,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         if (targetValue.compareTo(hit) < 0) {
             logger.error("Target value is smaller than hit!");
+            logger.error("dump POT details...");
+            logger.error("address: {}, forge power: {}, time: {}, pretime: {}",
+                    Hex.toHexString(address), forgingPower, blockTime, preBlockTime);
+            logger.error("base target: {}, target value: {}, geneSig: {}, hit: {}",
+                    block.getBaseTarget(), targetValue,
+                    Hex.toHexString(block.getGenerationSignature()), hit);
+
             return false;
         }
 
