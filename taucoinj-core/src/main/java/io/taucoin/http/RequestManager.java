@@ -423,8 +423,10 @@ public class RequestManager implements RequestQueue.MessageListener {
         // Here, just simply get random peer id to use orginal api.
         queue.addList(blocksList, peersManager.getRandomPeer().getId());
 
-        if (syncState == BLOCK_RETRIEVING) {
+        if (syncState == BLOCK_RETRIEVING && syncManager.isSyncRunning()) {
             sendGetBlocks();
+        } else if (!syncManager.isSyncRunning()) {
+            logger.info("Stop retriving blocks due to sync module off");
         }
     }
 

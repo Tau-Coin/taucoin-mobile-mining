@@ -162,6 +162,10 @@ public class SyncManager {
         }
     }
 
+    public boolean isSyncRunning() {
+        return started.get();
+    }
+
     public void startImport() {
         if (queue != null) {
             logger.info("Start importing");
