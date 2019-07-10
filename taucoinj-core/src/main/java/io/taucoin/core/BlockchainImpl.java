@@ -382,6 +382,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     public void run() {
                         if ( currentBlockNumber > config.getMutableRange()) {
                             blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
+                            blockStore.delChainBlockByNumber(currentBlockNumber - config.getMutableRange());
                         }
                     }
                 });

@@ -28,11 +28,15 @@ public interface BlockStore {
 
     void saveBlock(Block block, BigInteger cummDifficulty, boolean mainChain);
 
-    public void delNonChainBlock(byte[] hash);
+    void delNonChainBlock(byte[] hash);
 
-    public void delNonChainBlocksEndWith(byte[] hash);
+    void delNonChainBlocksEndWith(byte[] hash);
 
-    public void delNonChainBlocksByNumber(long number);
+    void delNonChainBlocksByNumber(long number);
+
+    void delChainBlocksWithNumberLessThan(long number);
+
+    void delChainBlockByNumber(long number);
 
     BigInteger getTotalDifficultyForHash(byte[] hash);
 

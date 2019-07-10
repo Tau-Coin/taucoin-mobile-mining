@@ -51,6 +51,14 @@ public class BlockStoreImpl implements BlockStore {
     }
 
     @Override
+    public void delChainBlocksWithNumberLessThan(long number) {
+    }
+
+    @Override
+    public void delChainBlockByNumber(long number) {
+    }
+
+    @Override
     public boolean getForkBlocksInfo(Block forkBlock, List<Block> undoBlocks, List<Block> newBlocks) {
         return true;
     }

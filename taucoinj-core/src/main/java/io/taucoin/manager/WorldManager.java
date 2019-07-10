@@ -20,6 +20,8 @@ import java.math.BigInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * WorldManager is a singleton containing references to different parts of the system.
  *
@@ -222,6 +224,18 @@ public class WorldManager {
                     blockchain.getBestBlock().getNumber(),
                     blockchain.getTotalDifficulty().toString(),
                     Hex.toHexString(blockchain.getBestBlock().getHash()));
+
+            final long bestNumber = bestBlock.getNumber();
+            logger.info("Blockchain best number {}", bestNumber);
+            if (bestNumber > config.getMutableRange()) {
+                EventDispatchThread.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        blockStore.delChainBlocksWithNumberLessThan(
+                                bestNumber - config.getMutableRange());
+                    }
+                });
+            }
         }
 
 /* todo: return it when there is no state conflicts on the chain

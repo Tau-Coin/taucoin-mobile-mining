@@ -15,6 +15,7 @@ import org.spongycastle.util.encoders.Hex;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.LinkedHashMap;
@@ -77,7 +78,7 @@ public class IndexedBlockStore implements BlockStore {
     public Block getBestBlock(){
 
         Long maxLevel = getMaxNumber();
-        logger.info("getBestBlock maxLevel is {}",maxLevel.intValue());
+        logger.info("getBestBlock maxLevel is {}", maxLevel);
         if (maxLevel < 0) return null;
 
         Block bestBlock = getChainBlockByNumber(maxLevel);
@@ -98,7 +99,6 @@ public class IndexedBlockStore implements BlockStore {
     public byte[] getBlockHashByNumber(long blockNumber){
         return getChainBlockByNumber(blockNumber).getHash(); // FIXME: can be improved by accessing the hash directly in the index
     }
-
 
     @Override
     public void flush(){
@@ -134,7 +134,6 @@ public class IndexedBlockStore implements BlockStore {
             w.unlock();
         }
     }
-
 
     @Override
     public void saveBlock(Block block, BigInteger cummDifficulty, boolean mainChain){
@@ -173,7 +172,6 @@ public class IndexedBlockStore implements BlockStore {
         logger.debug("Save block with number {}, hash {}, raw {}", block.getNumber(),
                 Hex.toHexString(block.getHash()), block.getHash());
     }
-
 
     public void delNonChainBlock(byte[] hash) {
         w.lock();
@@ -247,6 +245,49 @@ public class IndexedBlockStore implements BlockStore {
         }
     }
 
+    @Override
+    public void delChainBlocksWithNumberLessThan(long number) {
+        long startTime = System.nanoTime();
+        final long startNumber = number;
+
+        while (--number > 0) {
+            delChainBlockByNumber(number);
+        }
+
+        logger.info("Remove block with numbe from {} to {} cost {}ns",
+                startNumber, number, System.nanoTime() - startTime);
+    }
+
+    @Override
+    public void delChainBlockByNumber(long number) {
+        if (number <= 0) {
+            return;
+        }
+
+        w.lock();
+        try {
+            if (cache != null) {
+                cache.delChainBlockByNumber(number);
+            }
+
+            // Remove blocks
+            List<BlockInfo> blockInfos = index.get(number);
+            if (blockInfos == null)
+                return;
+            for (BlockInfo blockInfo : blockInfos) {
+                blocks.delete(blockInfo.hash);
+            }
+
+            // Remove index
+            index.remove(number);
+            if (indexDB != null) {
+                indexDB.commit();
+            }
+            logger.info("remove block with number {}", number);
+        } finally {
+            w.unlock();
+        }
+    }
 
     public List<Block> getBlocksByNumber(long number){
 
@@ -433,20 +474,28 @@ public class IndexedBlockStore implements BlockStore {
     }
 
     @Override
-    public long getMaxNumber(){
+    public long getMaxNumber() {
+        return getIndexMaxNumber();
+    }
 
-        Long bestIndex = 0L;
+    public long getIndexMaxNumber() {
+        long maxNumber = -1;
+        long minNumber = -1;
 
         r.lock();
         try {
             if (index.size() > 0){
-                bestIndex = (long) index.size();
+                maxNumber = Collections.max(index.keySet());
+                minNumber = Collections.min(index.keySet());
+                logger.debug("Block store min number {}, max number {}, size {}",
+                        minNumber, maxNumber, index.size());
             }
 
             if (cache != null){
-                return bestIndex + cache.index.size() - 1L;
+                long cacheMaxNumber = cache.getIndexMaxNumber();
+                return maxNumber >= cacheMaxNumber ? maxNumber : cacheMaxNumber;
             } else
-                return bestIndex - 1L;
+                return maxNumber;
         } finally {
             r.unlock();
         }

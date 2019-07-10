@@ -23,7 +23,7 @@ import static io.taucoin.util.ByteUtil.wrap;
  * Created on: 16/1/2019
  */
 
-public class InMemoryBlockStore implements BlockStore{
+public class InMemoryBlockStore implements BlockStore {
 
     private static final Logger logger = LoggerFactory.getLogger("general");
 
@@ -214,16 +214,27 @@ public class InMemoryBlockStore implements BlockStore{
         s.close();
     }
 
+    @Override
     public void delNonChainBlock(byte[] hash) {
 
     }
 
+    @Override
     public void delNonChainBlocksEndWith(byte[] hash) {
 
     }
 
+    @Override
     public void delNonChainBlocksByNumber(long number) {
 
+    }
+
+    @Override
+    public void delChainBlocksWithNumberLessThan(long number) {
+    }
+
+    @Override
+    public void delChainBlockByNumber(long number) {
     }
 
     public void load(){
