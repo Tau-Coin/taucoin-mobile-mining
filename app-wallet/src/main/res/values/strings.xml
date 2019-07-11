@@ -147,6 +147,7 @@
     <string name="home_mining_sync">Synced</string>
     <string name="home_mining">Mining</string>
     <string name="home_download">Download</string>
+    <string name="home_download_data_size">Blockchain&#160;Data:&#160;%sM</string>
     <string name="home_verify">Verify</string>
     <string name="home_sync_tip">Synchronizing</string>
     <string name="home_on">On</string>

@@ -120,6 +120,8 @@
                         android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:layout_marginEnd="3dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         android:orientation="vertical"
                         android:background="@drawable/white_rect_round_bg_no_border">
 
@@ -127,9 +129,10 @@
                             android:id="@+id/tv_mining"
                             style="@style/style_middle_blue"
                             android:layout_width="match_parent"
-                            android:layout_height="32dp"
-                            android:layout_marginTop="7dp"
+                            android:layout_height="wrap_content"
                             android:textSize="@dimen/dimen_size_22"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="5dp"
                             android:text="@string/common_percentage_zero"
                             android:maxLines="1"
                             android:gravity="center_vertical|center" />
@@ -138,8 +141,9 @@
                             android:layout_width="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
+                            android:layout_marginTop="11dp"
                             android:layout_gravity="center_horizontal"
-                            android:layout_height="26dp">
+                            android:layout_height="wrap_content">
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_mining"
@@ -151,6 +155,7 @@
                                 android:layout_width="wrap_content"
                                 android:text="@string/home_mining"
                                 android:gravity="center_vertical"
+                                android:includeFontPadding="false"
                                 android:layout_marginStart="5dp"
                                 android:layout_height="match_parent" />
 
@@ -163,6 +168,8 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="3dp"
                         android:layout_marginEnd="3dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         android:orientation="vertical"
                         android:background="@drawable/white_rect_round_bg_no_border">
 
@@ -170,19 +177,38 @@
                             android:id="@+id/tv_download"
                             style="@style/style_middle_blue"
                             android:layout_width="match_parent"
-                            android:layout_height="32dp"
-                            android:layout_marginTop="7dp"
+                            android:layout_height="wrap_content"
                             android:textSize="@dimen/dimen_size_22"
+                            android:includeFontPadding="false"
                             android:text="@string/common_percentage_zero"
                             android:maxLines="1"
                             android:gravity="center_vertical|center" />
+
+                        <TextView
+                            android:id="@+id/tv_block_chain_data"
+                            style="@style/style_small_light_grey"
+                            android:layout_width="match_parent"
+                            android:layout_height="14dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:includeFontPadding="false"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
+                            android:maxLines="2"
+                            android:gravity="center_horizontal|center"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMaxTextSize="12dp"
+                            app:autoSizeMinTextSize="6dp"
+                            app:autoSizeStepGranularity="@dimen/dimen_size_05"
+                            android:background="@drawable/selector_reward_forecast_bg"/>
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
+                            android:layout_marginTop="2dp"
                             android:layout_gravity="center_horizontal"
-                            android:layout_height="26dp">
+                            android:layout_height="wrap_content">
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_download"
@@ -194,6 +220,7 @@
                                 android:layout_width="wrap_content"
                                 android:text="@string/home_download"
                                 android:gravity="center_vertical"
+                                android:includeFontPadding="false"
                                 android:layout_marginStart="5dp"
                                 android:layout_height="match_parent" />
 
@@ -205,6 +232,8 @@
                         android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:layout_marginStart="3dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         android:orientation="vertical"
                         android:background="@drawable/white_rect_round_bg_no_border">
 
@@ -212,9 +241,10 @@
                             android:id="@+id/tv_verify"
                             style="@style/style_middle_blue"
                             android:layout_width="match_parent"
-                            android:layout_height="32dp"
-                            android:layout_marginTop="7dp"
+                            android:layout_height="wrap_content"
                             android:textSize="@dimen/dimen_size_22"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="5dp"
                             android:text="@string/common_percentage_zero"
                             android:maxLines="1"
                             android:gravity="center_vertical|center" />
@@ -223,8 +253,9 @@
                             android:layout_width="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
+                            android:layout_marginTop="11dp"
                             android:layout_gravity="center_horizontal"
-                            android:layout_height="26dp">
+                            android:layout_height="wrap_content">
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_verify"
@@ -237,6 +268,7 @@
                                 android:text="@string/home_verify"
                                 android:gravity="center_vertical"
                                 android:layout_marginStart="5dp"
+                                android:includeFontPadding="false"
                                 android:layout_height="match_parent" />
 
                         </LinearLayout>

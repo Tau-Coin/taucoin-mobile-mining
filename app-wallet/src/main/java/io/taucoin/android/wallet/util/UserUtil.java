@@ -301,7 +301,7 @@ public class UserUtil {
         }
     }
 
-    public static void setDownloadConditions(TextView tvDownload, ProgressView ivDownload, BlockInfo blockInfo) {
+    public static void setDownloadConditions(TextView tvDownload, ProgressView ivDownload, TextView tvBlockChainData, BlockInfo blockInfo) {
         try{
             if(blockInfo != null && isImportKey()){
                 String miningState = MyApplication.getKeyValue().getMiningState();
@@ -312,6 +312,12 @@ public class UserUtil {
                 String progressStr = ResourcesUtil.getText(R.string.common_percentage);
                 progressStr = (int)progress + progressStr;
                 tvDownload.setText(progressStr);
+
+                // 6K / block
+                double data = downloadHeight * 6 / 1024;
+                String dataStr = ResourcesUtil.getText(R.string.home_download_data_size);
+                dataStr = String.format(dataStr, FmtMicrometer.fmtDecimal(data));
+                tvBlockChainData.setText(dataStr);
 
                 if(progress != 100 && isStart){
                     ivDownload.setOn();
