@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/color_home_grey_light"
+    android:background="@color/color_home_bg"
     android:orientation="vertical">
 
     <io.taucoin.android.wallet.widget.ToolbarView
@@ -27,476 +27,493 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:fillViewport="true"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/color_white"
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:background="@color/color_home_grey_light"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:paddingStart="5dp"
-                    android:baselineAligned="true"
-                    android:paddingEnd="2dp"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:paddingTop="25dp"
-                        android:paddingBottom="20dp"
-                        android:layout_height="wrap_content">
-
-                        <io.taucoin.android.wallet.widget.ProgressView
-                            android:id="@+id/iv_mining_power"
-                            android:layout_width="60dp"
-                            app:center_text="@string/home_mining_power"
-                            android:layout_gravity="center_horizontal|center"
-                            android:layout_height="60dp" />
-
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:paddingTop="25dp"
-                        android:paddingBottom="20dp"
-                        android:layout_height="wrap_content">
-
-                        <io.taucoin.android.wallet.widget.ProgressView
-                            android:id="@+id/iv_mining_sync"
-                            android:layout_width="60dp"
-                            app:center_text="@string/home_mining_sync"
-                            android:layout_gravity="center_horizontal|center"
-                            android:layout_height="60dp" />
-
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="2"
-                        android:layout_gravity="center_vertical"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_height="wrap_content">
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_gravity="start"
-                                android:paddingTop="10dp"
-                                android:orientation="horizontal"
-                                android:layout_height="wrap_content">
-
-                                <Switch
-                                    android:id="@+id/iv_sync_switch"
-                                    android:layout_width="wrap_content"
-                                    android:switchMinWidth="70dp"
-                                    android:track="@drawable/grey_switch_rect_round_bg"
-                                    android:thumb="@drawable/shape_switch_white"
-                                    android:switchTextAppearance="@style/style_switch_grey_dark"
-                                    android:textOn="@string/home_on"
-                                    android:showText="true"
-                                    android:textOff="@string/home_off"
-                                    android:checked="false"
-                                    android:layout_height="wrap_content"
-                                    tools:ignore="UnusedAttribute" />
-
-                                <TextView
-                                    android:id="@+id/tv_sync_switch"
-                                    style="@style/style_middle_grey_dark"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_horizontal|center"
-                                    android:layout_marginStart="5dp"
-                                    android:text="@string/home_sync_tip"
-                                    tools:ignore="RelativeOverlap" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_gravity="start"
-                                android:paddingTop="10dp"
-                                android:orientation="horizontal"
-                                android:layout_height="wrap_content">
-
-                                <Switch
-                                    android:id="@+id/iv_mining_switch"
-                                    android:layout_width="wrap_content"
-                                    android:switchMinWidth="70dp"
-                                    android:track="@drawable/grey_switch_rect_round_bg"
-                                    android:thumb="@drawable/shape_switch_white"
-                                    android:switchTextAppearance="@style/style_switch_grey_dark"
-                                    android:textOn="@string/home_on"
-                                    android:showText="true"
-                                    android:textOff="@string/home_off"
-                                    android:checked="false"
-                                    android:layout_height="wrap_content"
-                                    tools:ignore="UnusedAttribute" />
-
-                                <TextView
-                                    android:id="@+id/tv_mining_switch"
-                                    style="@style/style_middle_grey_dark"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_horizontal|center"
-                                    android:layout_marginStart="5dp"
-                                    android:text="@string/home_mining_tip"
-                                    tools:ignore="RelativeOverlap" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </FrameLayout>
-
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:background="@color/color_white"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:background="@color/color_home_grey_light"
-                        android:layout_height="85dp"/>
-
-                    <LinearLayout
-                        android:background="@drawable/white_rect_round_bg"
-                        android:layout_width="match_parent"
-                        android:orientation="vertical"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:gravity="bottom"
-                            android:layout_height="30dp">
-
-                            <TextView
-                                android:id="@+id/tv_balance_title"
-                                style="@style/style_middle_grey"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="bottom"
-                                android:paddingBottom="1dp"
-                                android:text="@string/home_balance"/>
-
-                            <TextView
-                                android:id="@+id/tv_balance"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="7dp"
-                                android:textColor="@color/color_black"
-                                android:gravity="bottom"
-                                app:autoSizeTextType="uniform"
-                                app:autoSizeMaxTextSize="@dimen/dimen_size_24"
-                                app:autoSizeMinTextSize="@dimen/dimen_size_14"
-                                app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                                android:text="0.00TAU"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp">
-
-                            <TextView
-                                android:id="@+id/tv_mining_income_title"
-                                style="@style/style_middle_grey"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="bottom"
-                                android:paddingBottom="1dp"
-                                android:text="@string/home_mining_income"/>
-
-                            <TextView
-                                android:id="@+id/tv_mining_income"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="7dp"
-                                android:textColor="@color/color_black"
-                                android:gravity="bottom"
-                                app:autoSizeTextType="uniform"
-                                app:autoSizeMaxTextSize="@dimen/dimen_size_24"
-                                app:autoSizeMinTextSize="@dimen/dimen_size_14"
-                                app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                                android:text="0.00TAU"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:gravity="bottom"
-                            android:layout_marginTop="2dp"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:id="@+id/tv_power_title"
-                                style="@style/style_middle_grey"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:drawablePadding="2dp"
-                                android:gravity="center_horizontal"
-                                android:text="@string/home_power"/>
-
-                            <TextView
-                                android:id="@+id/tv_power"
-                                style="@style/style_mining_yellow"
-                                android:layout_width="wrap_content"
-                                android:maxLines="1"
-                                android:ellipsize="end"
-                                android:layout_marginStart="7dp"
-                                android:layout_height="wrap_content"
-                                android:text="0"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:gravity="bottom"
-                            android:layout_marginTop="2dp"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                style="@style/style_middle_grey"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:drawablePadding="2dp"
-                                android:gravity="center_horizontal"
-                                android:text="@string/home_miners"/>
-
-                            <TextView
-                                android:id="@+id/tv_miners"
-                                style="@style/style_mining_yellow"
-                                android:layout_width="wrap_content"
-                                android:maxLines="1"
-                                android:ellipsize="end"
-                                android:layout_marginStart="7dp"
-                                android:layout_height="wrap_content"
-                                android:text="0"/>
-
-                        </LinearLayout>
-                    </LinearLayout>
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
                     android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_height="wrap_content">
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="20dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_balance"
+                        android:layout_marginTop="3dp"
+                        android:layout_height="16dp" />
 
                     <TextView
-                        style="@style/style_small_grey"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.06"
+                        style="@style/style_normal_grey"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text="@string/home_cpu"/>
-
-                    <TextView
-                        style="@style/style_small_grey"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text="@string/home_memory"/>
-
-                    <TextView
-                        style="@style/style_small_grey"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text="@string/home_data_storage"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="3dp"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tv_cpu"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.06"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text=""/>
-
-                    <TextView
-                        android:id="@+id/tv_memory"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text=""/>
-
-                    <TextView
-                        android:id="@+id/tv_data_storage"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.1"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text=""/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_height="wrap_content">
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1.06"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/tv_chain_height_title"
-                            style="@style/style_small_grey"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:drawablePadding="2dp"
-                            android:text="@string/home_chain_height"/>
-
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/tv_synchronized_title"
-                            style="@style/style_small_grey"
-                            android:layout_width="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:text="@string/home_synchronized"/>
-
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1.1"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/tv_mined_title"
-                            style="@style/style_small_grey"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="4dp"
-                            android:gravity="center_horizontal"
-                            android:text="@string/home_mined"/>
-
-                    </FrameLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="3dp"
-                    android:paddingBottom="10dp"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tv_chain_height"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.06"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal|center"
-                        app:autoSizeTextType="uniform"
-                        app:autoSizeMaxTextSize="@dimen/dimen_size_22"
-                        app:autoSizeMinTextSize="@dimen/dimen_size_12"
-                        app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                        android:text=""/>
-
-                    <TextView
-                        android:id="@+id/tv_synchronized"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:maxLines="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal|center"
-                        app:autoSizeTextType="uniform"
-                        app:autoSizeMaxTextSize="@dimen/dimen_size_22"
-                        app:autoSizeMinTextSize="@dimen/dimen_size_12"
-                        app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                        android:text=""/>
-
-                    <TextView
-                        android:id="@+id/tv_mined"
-                        style="@style/style_power_black"
-                        android:layout_width="0dp"
-                        android:layout_weight="1.1"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:gravity="center_horizontal|center"
-                        app:autoSizeTextType="uniform"
-                        app:autoSizeMaxTextSize="@dimen/dimen_size_22"
-                        app:autoSizeMinTextSize="@dimen/dimen_size_12"
-                        app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                        android:text=""/>
-
+                        android:text="@string/home_balance"/>
                 </LinearLayout>
 
                 <TextView
-                    android:visibility="gone"
-                    android:id="@+id/tv_irreparable_error"
-                    style="@style/style_middle_red"
+                    android:id="@+id/tv_balance"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="2dp"
                     android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    android:layout_marginStart="10dp"
+                    android:textColor="@color/color_yellow"
+                    android:textSize="@dimen/dimen_size_26"
+                    android:gravity="center_vertical|center"
+                    android:text="@string/common_zero_unit"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginStart="20dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_dashboard"
+                        android:layout_marginTop="3dp"
+                        android:layout_height="16dp" />
+
+                    <TextView
+                        style="@style/style_normal_grey"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_mining_dashboard"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:visibility="gone"
+                        android:id="@+id/tv_irreparable_error"
+                        style="@style/style_middle_red"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/home_database_irreparable_error"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="3dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/white_rect_round_bg_no_border">
+
+                        <TextView
+                            android:id="@+id/tv_mining"
+                            style="@style/style_middle_blue"
+                            android:layout_width="match_parent"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="7dp"
+                            android:textSize="@dimen/dimen_size_22"
+                            android:text="@string/common_percentage_zero"
+                            android:maxLines="1"
+                            android:gravity="center_vertical|center" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_height="26dp">
+
+                            <io.taucoin.android.wallet.widget.ProgressView
+                                android:id="@+id/iv_mining"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"/>
+
+                            <TextView
+                                style="@style/style_middle_black"
+                                android:layout_width="wrap_content"
+                                android:text="@string/home_mining"
+                                android:gravity="center_vertical"
+                                android:layout_marginStart="5dp"
+                                android:layout_height="match_parent" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginEnd="3dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/white_rect_round_bg_no_border">
+
+                        <TextView
+                            android:id="@+id/tv_download"
+                            style="@style/style_middle_blue"
+                            android:layout_width="match_parent"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="7dp"
+                            android:textSize="@dimen/dimen_size_22"
+                            android:text="@string/common_percentage_zero"
+                            android:maxLines="1"
+                            android:gravity="center_vertical|center" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_height="26dp">
+
+                            <io.taucoin.android.wallet.widget.ProgressView
+                                android:id="@+id/iv_download"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"/>
+
+                            <TextView
+                                style="@style/style_middle_black"
+                                android:layout_width="wrap_content"
+                                android:text="@string/home_download"
+                                android:gravity="center_vertical"
+                                android:layout_marginStart="5dp"
+                                android:layout_height="match_parent" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="3dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/white_rect_round_bg_no_border">
+
+                        <TextView
+                            android:id="@+id/tv_verify"
+                            style="@style/style_middle_blue"
+                            android:layout_width="match_parent"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="7dp"
+                            android:textSize="@dimen/dimen_size_22"
+                            android:text="@string/common_percentage_zero"
+                            android:maxLines="1"
+                            android:gravity="center_vertical|center" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_height="26dp">
+
+                            <io.taucoin.android.wallet.widget.ProgressView
+                                android:id="@+id/iv_verify"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"/>
+
+                            <TextView
+                                style="@style/style_middle_black"
+                                android:layout_width="wrap_content"
+                                android:text="@string/home_verify"
+                                android:gravity="center_vertical"
+                                android:layout_marginStart="5dp"
+                                android:layout_height="match_parent" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="0dp"
                     android:layout_marginEnd="10dp"
-                    android:text="@string/home_database_irreparable_error"
-                    android:layout_height="wrap_content" />
+                    android:baselineAligned="false"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end"
+                        android:layout_height="wrap_content">
+
+                        <io.taucoin.android.wallet.widget.DashboardLayout
+                            android:id="@+id/dashboard_layout"
+                            android:layout_marginTop="5dp"
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content" />
+
+                        <RelativeLayout
+                            android:layout_width="150dp"
+                            android:orientation="vertical"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginStart="20dp"
+                            android:gravity="center_horizontal"
+                            android:layout_height="wrap_content">
+
+                            <Switch
+                                android:id="@+id/iv_mining_switch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:switchMinWidth="40dp"
+                                android:track="@drawable/grey_switch_rect_round_bg"
+                                android:thumb="@drawable/shape_switch_white"
+                                android:switchTextAppearance="@style/style_switch_grey_dark"
+                                android:textOn="@string/home_on"
+                                android:showText="true"
+                                android:textOff="@string/home_off"
+                                android:checked="false"
+                                tools:ignore="UnusedAttribute" />
+
+                            <TextView
+                                android:layout_below="@+id/iv_mining_switch"
+                                style="@style/style_small_grey_light"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal|center"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/home_mining"
+                                tools:ignore="RelativeOverlap" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginStart="2dp"
+                                android:layout_toEndOf="@+id/iv_mining_switch"
+                                android:layout_height="wrap_content">
+
+                                <CheckBox
+                                    android:id="@+id/cb_wifi_only"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+
+                                <TextView
+                                    style="@style/style_small_grey_light"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center_horizontal|center"
+                                    android:text="@string/home_wifi_only"
+                                    tools:ignore="RelativeOverlap" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_marginTop="20dp"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            style="@style/style_small_grey_light"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/home_mining_income"/>
+
+                        <TextView
+                            android:id="@+id/tv_mining_income"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:textColor="@color/color_yellow"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:textSize="@dimen/dimen_size_20"
+                            android:gravity="center_vertical|center"
+                            android:text="@string/common_zero_unit"/>
+
+                        <TextView
+                            android:id="@+id/tv_miners_online_title"
+                            style="@style/style_small_grey_light"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/home_miners_default_title"/>
+
+                        <TextView
+                            android:id="@+id/tv_miners_online"
+                            style="@style/style_big_blue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:gravity="center_vertical|center"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:text="@string/common_zero"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    style="@style/style_small_grey_light"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="@string/home_mining_Rank"/>
+
+                                <TextView
+                                    android:id="@+id/tv_mining_rank"
+                                    style="@style/style_big_blue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center_vertical|center"
+                                    android:layout_marginTop="2dp"
+                                    android:drawablePadding="5dp"
+                                    android:layout_marginBottom="2dp"
+                                    android:text="@string/common_zero"/>
+
+                                <TextView
+                                    style="@style/style_small_grey_light"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="@string/home_memory"/>
+
+                                <TextView
+                                    android:id="@+id/tv_memory"
+                                    style="@style/style_big_blue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center_vertical|center"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/common_zero"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    style="@style/style_small_grey_light"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="@string/home_cpu"/>
+
+                                <TextView
+                                    android:id="@+id/tv_cpu"
+                                    style="@style/style_big_blue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center_vertical|center"
+                                    android:layout_marginTop="2dp"
+                                    android:layout_marginBottom="2dp"
+                                    android:text="@string/common_zero"/>
+
+                                <TextView
+                                    style="@style/style_small_grey_light"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="@string/home_data_storage"/>
+
+                                <TextView
+                                    android:id="@+id/tv_data_storage"
+                                    style="@style/style_big_blue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center_vertical|center"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/common_zero"/>
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_reward"
+                        android:layout_marginTop="3dp"
+                        android:layout_height="16dp" />
+
+                    <TextView
+                        style="@style/style_normal_grey"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_future_reward"/>
+                </LinearLayout>
+
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/white_rect_round_bg_no_border"
+                    layout="@layout/item_reward_forecast" />
 
             </LinearLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
 
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 

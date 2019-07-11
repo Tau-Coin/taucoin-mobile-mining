@@ -11,9 +11,14 @@
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font>&nbsp;TAU]]> </Data></string>
     <string name="common_exit" formatted="false">Do you want to stop mining?</string>
     <string name="common_balance_unit">TAU</string>
+    <string name="common_zero_unit">0.00 TAU</string>
+    <string name="common_zero">0</string>
+    <string name="common_percentage_zero">0%</string>
+    <string name="common_percentage">&#37;</string>
     <string name="common_refresh_failed">Refresh Failed</string>
     <string name="common_see_more">Click to see more</string>
     <string name="common_install_browser">Please install mobile browser first!</string>
+    <string name="home_no_point">No.%s</string>
 
     <string name="splash_title">TAU mWallet %s</string>
     <string name="splash_subheading">Mobile Mining Wallet</string>
@@ -137,17 +142,45 @@
     </string>
 
     <string name="home_mining_balance">Balance</string>
-    <string name="home_mining_power">Power</string>
+    <string name="home_mining_power">Mining\nPower</string>
+    <string name="home_mining_rate">Mining&#160;Rate</string>
     <string name="home_mining_sync">Synced</string>
-    <string name="home_mining_tip">Mining</string>
+    <string name="home_mining">Mining</string>
+    <string name="home_download">Download</string>
+    <string name="home_verify">Verify</string>
     <string name="home_sync_tip">Synchronizing</string>
     <string name="home_on">On</string>
     <string name="home_off">Off</string>
 
+    <string name="home_mining_dashboard">Mining Dashboard</string>
+    <string name="home_mining_Rank">Mining Rank</string>
+    <string name="home_future_reward">Potential Future Reward Forecast</string>
+    <string name="home_wifi_only">Wifi Only</string>
+    <string name="home_Miner">As Miner</string>
+    <string name="home_participant">As TX Participant</string>
+    <string name="home_success_requires">Mining Success Requires</string>
+    <string name="home_current_condition">Current Condition</string>
+    <string name="home_last_block">Last Block</string>
+    <string name="home_last_tx">Last Tx</string>
+    <string name="home_last_tx_role">Role</string>
+    <string name="home_last_block_height">Height</string>
+    <string name="home_last_block_hash">Hash</string>
+    <string name="home_last_block_income">Income</string>
+    <string name="home_mining_history">View your mining history</string>
+
+    <string name="home_participant_history">View your participant history</string>
+    <string name="home_role_miner">Miner</string>
+    <string name="home_role_participant">Participant</string>
+    <string name="home_history_miner">History Miner</string>
+    <string name="home_self_participant">Self Participant</string>
+    <string name="home_tx_participant">TX Participant</string>
+
     <string name="home_balance">Total Balance</string>
-    <string name="home_mining_income">Historical Mining Income</string>
+    <string name="home_mining_income">Historical Mining Rewards</string>
     <string name="home_power">Mining&#160;Power</string>
-    <string name="home_miners">Miners&#160;Online</string>
+    <string name="home_miners_default_title">0.5&#160;/&#160;3&#160;/&#160;24</string>
+    <string name="home_miners_default_value">0&#160;/&#160;0&#160;/&#160;0</string>
+    <string name="home_miners_title">Miners&#160;Online(%sh)</string>
     <string name="home_synchronized">Latest&#160;Block</string>
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
@@ -188,7 +221,7 @@
     <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
     <string name="mining_sync_complete">Latest block need to be synced.</string>
-    <string name="mining_need_sync_open">Please turn on the synchronization switch first!</string>
+    <!--<string name="mining_need_sync_open">Please turn on the synchronization switch first!</string>-->
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

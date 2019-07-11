@@ -8,6 +8,8 @@ public class MinerInfoBean {
     private String message;
     @SerializedName(value = "mpno")
     private long minerPartNo;
+    @SerializedName(value = "mno")
+    private long minerNo;
 
     public int getStatus() {
         return status;
@@ -31,5 +33,13 @@ public class MinerInfoBean {
 
     public void setMinerPartNo(long minerPartNo) {
         this.minerPartNo = minerPartNo;
+    }
+
+    public long getMinerNo() {
+        return minerNo;
+    }
+
+    public void setMinerNo(long minerNo) {
+        this.minerNo = minerNo;
     }
 }

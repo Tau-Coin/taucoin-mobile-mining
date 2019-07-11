@@ -34,7 +34,7 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="15dp"
         android:contentDescription="@null"
-        android:src="@mipmap/icon_down" />
+        android:src="@mipmap/icon_rank_down" />
 
     <View
         android:id="@+id/view_line_bottom"

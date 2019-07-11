@@ -10,6 +10,7 @@ public class MessageEvent{
         UPGRADE,
         BLOCK_HEIGHT,
         MINING_INFO,
+        MINING_REWARD,
         MINING_NOTIFY,
         MINING_STATE,
         GET_BLOCK,
@@ -17,6 +18,7 @@ public class MessageEvent{
         CONSOLE_LOG,
         CLEAR_SEND,
         FORGED_TIME,
+        FORGED_POT_DETAIL,
         APPLICATION_INFO,
         MINING_INCOME,
         IRREPARABLE_ERROR

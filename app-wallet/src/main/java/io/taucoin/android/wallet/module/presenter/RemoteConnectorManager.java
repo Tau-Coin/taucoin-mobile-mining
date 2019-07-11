@@ -28,11 +28,13 @@ import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.events.BlockEventData;
 import io.taucoin.android.service.events.BlockForgeExceptionStopEvent;
 import io.taucoin.android.service.events.BlockForgedInternalEventData;
+import io.taucoin.android.service.events.BlocksDownloadedData;
 import io.taucoin.android.service.events.ChainInfoChangedData;
 import io.taucoin.android.service.events.EventData;
 import io.taucoin.android.service.events.EventFlag;
 import io.taucoin.android.service.events.MessageEventData;
 import io.taucoin.android.service.events.NetworkTrafficData;
+import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
 import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
@@ -223,6 +225,17 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         long height = chainInfoData.height;
                         updateBlockHeight(height);
                         break;
+                    case EVENT_BLOCKS_DOWNLOADED:
+                        BlocksDownloadedData blocksDownloadedData = data.getParcelable("data");
+                        updateBlocksDownloaded(blocksDownloadedData);
+                        break;
+                    case EVENT_BLOCK_FORGED_POT_DETAIL:
+                        NextBlockForgedPOTDetail nextBlockForgedPOTDetail = data.getParcelable("data");
+                        messageEvent = new MessageEvent();
+                        messageEvent.setData(nextBlockForgedPOTDetail);
+                        messageEvent.setCode(MessageEvent.EventCode.FORGED_POT_DETAIL);
+                        EventBusUtil.post(messageEvent);
+                        break;
                 }
                 break;
             case TaucoinClientMessage.MSG_POOL_TXS:
@@ -278,15 +291,10 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         logger.info("startSyncAndMining");
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue != null) {
-            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
             boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
-            if(isSyncStart){
+            if(isMiningStart){
                 MyApplication.getRemoteConnector().startSyncAll();
-                if(isMiningStart){
-                    MyApplication.getRemoteConnector().startBlockForging();
-                }else{
-                    MyApplication.getRemoteConnector().stopBlockForging();
-                }
+                MyApplication.getRemoteConnector().startBlockForging();
             }else{
                 MyApplication.getRemoteConnector().stopSyncAll();
                 MyApplication.getRemoteConnector().stopBlockForging();
@@ -332,5 +340,18 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                 EventBusUtil.post(MessageEvent.EventCode.BLOCK_HEIGHT);
             }
         });
+    }
+
+    private void updateBlocksDownloaded(BlocksDownloadedData blocksDownloadedData) {
+        if(blocksDownloadedData != null){
+            getMiningModel().updateBlocksDownloaded(blocksDownloadedData.end, new LogicObserver<Boolean>() {
+                @Override
+                public void handleData(Boolean aBoolean) {
+                    if(aBoolean){
+                        EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                    }
+                }
+            });
+        }
     }
 }

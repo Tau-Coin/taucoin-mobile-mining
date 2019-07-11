@@ -17,6 +17,10 @@ package io.taucoin.android.wallet.module.model;
 
 import io.reactivex.Scheduler;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
@@ -29,10 +33,15 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
+import io.taucoin.android.wallet.module.bean.MinerListBean;
+import io.taucoin.android.wallet.module.bean.ParticipantListBean;
+import io.taucoin.android.wallet.module.bean.ParticipantInfoBean;
+import io.taucoin.android.wallet.net.callback.TxObserver;
+import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.core.Block;
+import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.LogicObserver;
-import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
     private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(30));
@@ -68,25 +77,25 @@ public class MiningModel implements IMiningModel{
                 .subscribe(observer);
     }
 
-    @Override
-    public void updateSyncState(String syncState, LogicObserver<Boolean> observer) {
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-            KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
-            boolean isSuccess = false;
-            if(entry != null){
-                entry.setSyncState(syncState);
-                if(StringUtil.isSame(syncState, TransmitKey.MiningState.Stop)){
-                    entry.setMiningState(syncState);
-                }
-                isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
-            }
-            emitter.onNext(isSuccess);
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(scheduler)
-                .unsubscribeOn(scheduler)
-                .subscribe(observer);
-    }
+//    @Override
+//    public void updateSyncState(String syncState, LogicObserver<Boolean> observer) {
+//        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+//            String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+//            KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
+//            boolean isSuccess = false;
+//            if(entry != null){
+//                entry.setSyncState(syncState);
+//                if(StringUtil.isSame(syncState, TransmitKey.MiningState.Stop)){
+//                    entry.setMiningState(syncState);
+//                }
+//                isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
+//            }
+//            emitter.onNext(isSuccess);
+//        }).observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(scheduler)
+//                .unsubscribeOn(scheduler)
+//                .subscribe(observer);
+//    }
 
     @Override
     public void updateSynchronizedBlockNum(int blockSynchronized, LogicObserver<Boolean> observer) {
@@ -143,5 +152,93 @@ public class MiningModel implements IMiningModel{
                 .subscribeOn(scheduler)
                 .unsubscribeOn(scheduler)
                 .subscribe(observer);
+    }
+
+    @Override
+    public void updateBlocksDownloaded(long blockDownloaded, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            BlockInfo entry = BlockInfoDaoUtils.getInstance().query();
+            if(entry == null){
+                entry = new BlockInfo();
+            }
+            if(blockDownloaded > 0 && entry.getBlockDownload() != blockDownloaded){
+                entry.setBlockDownload((int) blockDownloaded);
+                BlockInfoDaoUtils.getInstance().insertOrReplace(entry);
+                emitter.onNext(true);
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
+    }
+
+    @Override
+    public void getParticipantInfo(LogicObserver<KeyValue> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  address);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getParticipantInfo(map)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(new TxObserver<ParticipantInfoBean>() {
+                @Override
+                public void handleError(String msg, int msgCode) {
+                    observer.handleError(msgCode, msg);
+                }
+
+                @Override
+                public void handleData(ParticipantInfoBean participantInfo) {
+                    if(participantInfo != null && participantInfo.getStatus() == 200){
+                        saveParticipantInfo(participantInfo, observer);
+                    }else{
+                        observer.onError();
+                    }
+                }
+            });
+    }
+
+    private void saveParticipantInfo(ParticipantInfoBean participantInfo, LogicObserver<KeyValue> observer) {
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
+
+            if(keyValue != null){
+                keyValue.setNextPart(participantInfo.getReward());
+                keyValue.setHistoryMiner(participantInfo.getMinerPart());
+                keyValue.setHistoryTx(participantInfo.getTxPart());
+            }
+            emitter.onNext(keyValue);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
+    }
+
+    @Override
+    public void getMinerHistory(TxObserver<MinerListBean> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  address);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getMinerHistory(map)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
+    }
+
+    @Override
+    public void getParticipantHistory(TxObserver<ParticipantListBean> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  address);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getParticipantHistory(map)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
     }
 }

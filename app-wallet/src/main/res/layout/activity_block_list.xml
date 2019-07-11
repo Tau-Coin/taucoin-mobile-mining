@@ -40,7 +40,7 @@
             android:layout_height="18dp"
             android:layout_centerVertical="true"
             android:contentDescription="@null"
-            android:src="@mipmap/icon_down"/>
+            android:src="@mipmap/icon_rank_down"/>
 
     </RelativeLayout>
 

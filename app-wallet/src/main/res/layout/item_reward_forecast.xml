@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_white"
+    android:orientation="vertical">
+
+    <RadioGroup
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:padding="1dp"
+        android:layout_height="40dp">
+
+        <RadioButton
+            android:id="@+id/rb_miner"
+            style="@style/style_middle_light_grey"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center"
+            android:background="@drawable/selector_reward_forecast_bg"
+            android:textColor="@drawable/reward_tab_color"
+            android:button="@null"
+            android:clickable="true"
+            android:checked="true"
+            android:focusable="true"
+            android:singleLine="true"
+            android:text="As Miner" />
+
+        <RadioButton
+            android:id="@+id/rb_participant"
+            style="@style/style_middle_light_grey"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center"
+            android:background="@drawable/selector_reward_forecast_bg"
+            android:textColor="@drawable/reward_tab_color"
+            android:button="@null"
+            android:clickable="true"
+            android:focusable="true"
+            android:singleLine="true"
+            android:text="As Tx Participant" />
+
+    </RadioGroup>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp">
+
+        <TextView
+            style="@style/style_big_blue"
+            android:id="@+id/tv_next_block_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""/>
+
+        <TextView
+            style="@style/style_big_blue"
+            android:id="@+id/tv_next_block_reward"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
+            android:text=""/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/color_main_line"
+        android:layout_marginTop="2dp"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:visibility="invisible"
+        android:id="@+id/ll_forged_time"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="20dp"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_countdown"
+            android:layout_marginTop="3dp"
+            android:layout_height="16dp" />
+
+        <io.taucoin.android.wallet.widget.LoadingTextView
+            android:id="@+id/tv_forged_time"
+            style="@style/style_normal_light_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/color_home_grey_dark"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical|center"
+            android:text=""/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_miner"
+        android:orientation="vertical"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/style_middle_light_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_success_requires"/>
+
+        <TextView
+            style="@style/style_small_light_grey"
+            android:id="@+id/tv_success_requires"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_current_condition"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/home_current_condition"/>
+
+            <TextView
+                style="@style/style_small_light_grey"
+                android:id="@+id/tv_current_condition"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/style_middle_light_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/home_last_block"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="7dp"
+                android:text="@string/home_last_block_height"/>
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1.8"
+                android:layout_marginStart="7dp"
+                android:layout_marginEnd="7dp"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:text="@string/home_last_block_hash"/>
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="7dp"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:text="@string/home_last_block_income"/>
+
+        </LinearLayout>
+
+        <io.taucoin.android.wallet.widget.ScrollDisabledListView
+            android:id="@+id/miner_list_view"
+            android:scrollbars="none"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_mining_history"
+            style="@style/style_middle_blue"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/home_mining_history"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_participant"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/style_middle_light_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_history_miner"/>
+
+                <TextView
+                    style="@style/style_small_light_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_self_participant"/>
+
+                <TextView
+                    android:id="@+id/tv_history_miner"
+                    style="@style/style_middle_blue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="5dp"
+                    android:text=""/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/style_middle_light_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_tx_participant"/>
+
+                <TextView
+                    style="@style/style_small_light_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_self_participant"/>
+
+                <TextView
+                    android:id="@+id/tv_tx_participant"
+                    style="@style/style_middle_blue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="5dp"
+                    android:text=""/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/style_middle_light_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/home_last_tx"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="7dp"
+                android:text="@string/home_last_tx_role"/>
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1.8"
+                android:layout_marginStart="7dp"
+                android:layout_marginEnd="7dp"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:text="@string/home_last_block_hash"/>
+
+            <TextView
+                style="@style/style_middle_light_grey"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="7dp"
+                android:gravity="start"
+                android:layout_height="wrap_content"
+                android:text="@string/home_last_block_income"/>
+
+        </LinearLayout>
+
+        <io.taucoin.android.wallet.widget.ScrollDisabledListView
+            android:id="@+id/part_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:scrollbars="none"/>
+
+        <TextView
+            android:id="@+id/tv_participant_history"
+            style="@style/style_middle_blue"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/home_participant_history"/>
+
+    </LinearLayout>
+
+</LinearLayout>

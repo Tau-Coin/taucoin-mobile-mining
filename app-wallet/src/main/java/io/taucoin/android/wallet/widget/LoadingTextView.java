@@ -33,6 +33,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     private String text = "";
     private String stopMsg = "";
     private BaseHandler mHandler;
+    private CountDownListener mCountDownListener;
 
     public LoadingTextView(Context context) {
         this(context, null);
@@ -47,15 +48,24 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         mHandler = new BaseHandler(this);
     }
 
-    public void setLoadingText(String text, long time, int stopMsg) {
+    public void setLoadingText(String text, long time, String stopMsg) {
         this.text = text;
         this.pointNum = time;
-        this.stopMsg = getResources().getString(stopMsg);
+        this.stopMsg = stopMsg;
         isTime = true;
         if(!isLoading){
             mHandler.sendEmptyMessage(0);
         }
         isLoading = true;
+    }
+
+    public void setLoadingText(String text, long time, int stopMsg) {
+        setLoadingText(text, time, getResources().getString(stopMsg));
+    }
+
+    public void setCountDown(long time, CountDownListener countDownListener) {
+        this.mCountDownListener = countDownListener;
+        setLoadingText("", time, "");
     }
 
     public synchronized void setLoadingText(String text){
@@ -89,20 +99,34 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
             setNormalText(stopMsg);
         }else{
             stringBuilder.append(text);
-            long min = pointNum / 60;
+            if(stringBuilder.length() > 0){
+                stringBuilder.append(": ");
+            }
+            long hour = pointNum / 60 / 60;
+            long min = pointNum / 60 % 60;
             long second = pointNum % 60;
 
-            stringBuilder.append(": ");
+            if(hour < 10){
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hour);
+            stringBuilder.append(":");
+
             if(min < 10){
                 stringBuilder.append(0);
             }
             stringBuilder.append(min);
             stringBuilder.append(":");
+
             if(second < 10){
                 stringBuilder.append(0);
             }
             stringBuilder.append(second);
+
             setText(stringBuilder.toString(), mBufferType);
+        }
+        if(mCountDownListener != null){
+            mCountDownListener.countDown(pointNum);
         }
     }
 
@@ -162,5 +186,9 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
     protected void onDetachedFromWindow() {
         closeLoading();
         super.onDetachedFromWindow();
+    }
+
+    public interface CountDownListener{
+        void countDown(long count);
     }
 }

@@ -73,6 +73,7 @@ public class NetWorkManager {
 
         OkHttpClient okHttpClient = okHttpClientBuilder.build();
 
+
         // init mysql retrofit
         retrofitMysql = new Retrofit.Builder()
                 .client(okHttpClient)

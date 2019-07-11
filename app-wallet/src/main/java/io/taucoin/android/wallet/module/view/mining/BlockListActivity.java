@@ -151,13 +151,13 @@
 //                }
 //                tvFilterSelect.setVisibility(visible);
 //                tvFilterSelect.setText(!mIsMe ? R.string.block_list_me : R.string.block_list_all);
-//                ivFilter.setImageResource(visible == View.GONE ? R.mipmap.icon_down : R.mipmap.icon_up);
+//                ivFilter.setImageResource(visible == View.GONE ? R.mipmap.icon_rank_down : R.mipmap.icon_up);
 //                break;
 //            case R.id.tv_filter_select:
 //                mIsMe = !mIsMe;
 //                tvFilter.setText(mIsMe ? R.string.block_list_me : R.string.block_list_all);
 //                tvFilterSelect.setVisibility(View.GONE);
-//                ivFilter.setImageResource(R.mipmap.icon_down);
+//                ivFilter.setImageResource(R.mipmap.icon_rank_down);
 //                onRefresh(null);
 //                break;
 //        }

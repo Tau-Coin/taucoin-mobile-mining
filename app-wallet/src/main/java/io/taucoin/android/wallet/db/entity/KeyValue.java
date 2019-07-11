@@ -21,17 +21,21 @@ public class KeyValue {
     private long balance;
     private long power;
     private long miningIncome;
-    private long minedBlocks;
     private String nickName;
     private String miningState;
-    private String syncState;
     private long transExpiry;
-    private long syncBlockNum;
-    @Generated(hash = 720700569)
+    private long blocksMined;
+    private long MinedNo;
+    private int miningRank;
+    private String nextPart;
+    private double historyMiner;
+    private double historyTx;
+    @Generated(hash = 159829412)
     public KeyValue(Long id, String pubKey, String priKey, String address,
             String rawAddress, long balance, long power, long miningIncome,
-            long minedBlocks, String nickName, String miningState, String syncState,
-            long transExpiry, long syncBlockNum) {
+            String nickName, String miningState, long transExpiry, long blocksMined,
+            long MinedNo, int miningRank, String nextPart, double historyMiner,
+            double historyTx) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -40,12 +44,15 @@ public class KeyValue {
         this.balance = balance;
         this.power = power;
         this.miningIncome = miningIncome;
-        this.minedBlocks = minedBlocks;
         this.nickName = nickName;
         this.miningState = miningState;
-        this.syncState = syncState;
         this.transExpiry = transExpiry;
-        this.syncBlockNum = syncBlockNum;
+        this.blocksMined = blocksMined;
+        this.MinedNo = MinedNo;
+        this.miningRank = miningRank;
+        this.nextPart = nextPart;
+        this.historyMiner = historyMiner;
+        this.historyTx = historyTx;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
@@ -98,12 +105,6 @@ public class KeyValue {
     public void setMiningIncome(long miningIncome) {
         this.miningIncome = miningIncome;
     }
-    public long getMinedBlocks() {
-        return this.minedBlocks;
-    }
-    public void setMinedBlocks(long minedBlocks) {
-        this.minedBlocks = minedBlocks;
-    }
     public String getNickName() {
         return this.nickName;
     }
@@ -116,22 +117,46 @@ public class KeyValue {
     public void setMiningState(String miningState) {
         this.miningState = miningState;
     }
-    public String getSyncState() {
-        return this.syncState;
-    }
-    public void setSyncState(String syncState) {
-        this.syncState = syncState;
-    }
     public long getTransExpiry() {
         return this.transExpiry;
     }
     public void setTransExpiry(long transExpiry) {
         this.transExpiry = transExpiry;
     }
-    public long getSyncBlockNum() {
-        return this.syncBlockNum;
+    public long getBlocksMined() {
+        return this.blocksMined;
     }
-    public void setSyncBlockNum(long syncBlockNum) {
-        this.syncBlockNum = syncBlockNum;
+    public void setBlocksMined(long blocksMined) {
+        this.blocksMined = blocksMined;
+    }
+    public long getMinedNo() {
+        return this.MinedNo;
+    }
+    public void setMinedNo(long MinedNo) {
+        this.MinedNo = MinedNo;
+    }
+    public int getMiningRank() {
+        return this.miningRank;
+    }
+    public void setMiningRank(int miningRank) {
+        this.miningRank = miningRank;
+    }
+    public String getNextPart() {
+        return this.nextPart;
+    }
+    public void setNextPart(String nextPart) {
+        this.nextPart = nextPart;
+    }
+    public double getHistoryMiner() {
+        return this.historyMiner;
+    }
+    public void setHistoryMiner(double historyMiner) {
+        this.historyMiner = historyMiner;
+    }
+    public double getHistoryTx() {
+        return this.historyTx;
+    }
+    public void setHistoryTx(double historyTx) {
+        this.historyTx = historyTx;
     }
 }

@@ -78,4 +78,6 @@ public class TransmitKey {
         public static final String MINING_INFO = "http://tau.taucoin.io/miningInfo?address=";
         public static final String MINING_GROUP = "https://t.me/joinchat/Ifw8BhBICAMUVCXrWbq4OQ";
     }
+
+    public static final String FORGING_WIFI_ONLY = "forging_wifi_only";
 }

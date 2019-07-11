@@ -29,7 +29,7 @@ public class FmtMicrometer {
     private static String mDecimal = "100";
     private static int mScale = 2;
 
-    static String fmtBalance(Long balance) {
+    public static String fmtBalance(Long balance) {
         DecimalFormat df = getDecimalFormatInstance();
         df.applyPattern("###,##0.00");
         df.setRoundingMode(RoundingMode.FLOOR);
@@ -53,6 +53,30 @@ public class FmtMicrometer {
         df.setRoundingMode(RoundingMode.FLOOR);
         BigDecimal bigDecimal = new BigDecimal(power);
         return df.format(bigDecimal);
+    }
+
+    static String fmtValue(double value) {
+        DecimalFormat df = getDecimalFormatInstance();
+        df.applyPattern("###,##0.##");
+        df.setRoundingMode(RoundingMode.FLOOR);
+        BigDecimal bigDecimal = new BigDecimal(value);
+        return df.format(bigDecimal);
+    }
+
+    public static String fmtDecimal(String value) {
+        try {
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("###,##0.##");
+            df.setRoundingMode(RoundingMode.FLOOR);
+            BigDecimal bigDecimal = new BigDecimal(value);
+            return df.format(bigDecimal);
+        } catch (Exception e) {
+            return value;
+        }
+    }
+
+    public static String fmtDecimal(double value) {
+        return fmtDecimal(String.valueOf(value));
     }
 
     private static DecimalFormat getDecimalFormatInstance() {

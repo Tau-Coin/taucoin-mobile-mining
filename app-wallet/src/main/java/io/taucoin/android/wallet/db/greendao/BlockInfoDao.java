@@ -27,9 +27,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property BlockHeight = new Property(1, int.class, "blockHeight", false, "BLOCK_HEIGHT");
         public final static Property BlockSync = new Property(2, int.class, "blockSync", false, "BLOCK_SYNC");
-        public final static Property AvgIncome = new Property(3, String.class, "avgIncome", false, "AVG_INCOME");
-        public final static Property MedianFee = new Property(4, String.class, "medianFee", false, "MEDIAN_FEE");
-        public final static Property MinerNo = new Property(5, String.class, "minerNo", false, "MINER_NO");
+        public final static Property BlockDownload = new Property(3, int.class, "blockDownload", false, "BLOCK_DOWNLOAD");
+        public final static Property AvgIncome = new Property(4, String.class, "avgIncome", false, "AVG_INCOME");
+        public final static Property MedianFee = new Property(5, String.class, "medianFee", false, "MEDIAN_FEE");
+        public final static Property MinerInfo = new Property(6, String.class, "minerInfo", false, "MINER_INFO");
+        public final static Property TotalPower = new Property(7, String.class, "totalPower", false, "TOTAL_POWER");
     }
 
 
@@ -48,9 +50,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 1: blockHeight
                 "\"BLOCK_SYNC\" INTEGER NOT NULL ," + // 2: blockSync
-                "\"AVG_INCOME\" TEXT," + // 3: avgIncome
-                "\"MEDIAN_FEE\" TEXT," + // 4: medianFee
-                "\"MINER_NO\" TEXT);"); // 5: minerNo
+                "\"BLOCK_DOWNLOAD\" INTEGER NOT NULL ," + // 3: blockDownload
+                "\"AVG_INCOME\" TEXT," + // 4: avgIncome
+                "\"MEDIAN_FEE\" TEXT," + // 5: medianFee
+                "\"MINER_INFO\" TEXT," + // 6: minerInfo
+                "\"TOTAL_POWER\" TEXT);"); // 7: totalPower
     }
 
     /** Drops the underlying database table. */
@@ -69,20 +73,26 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         }
         stmt.bindLong(2, entity.getBlockHeight());
         stmt.bindLong(3, entity.getBlockSync());
+        stmt.bindLong(4, entity.getBlockDownload());
  
         String avgIncome = entity.getAvgIncome();
         if (avgIncome != null) {
-            stmt.bindString(4, avgIncome);
+            stmt.bindString(5, avgIncome);
         }
  
         String medianFee = entity.getMedianFee();
         if (medianFee != null) {
-            stmt.bindString(5, medianFee);
+            stmt.bindString(6, medianFee);
         }
  
-        String minerNo = entity.getMinerNo();
-        if (minerNo != null) {
-            stmt.bindString(6, minerNo);
+        String minerInfo = entity.getMinerInfo();
+        if (minerInfo != null) {
+            stmt.bindString(7, minerInfo);
+        }
+ 
+        String totalPower = entity.getTotalPower();
+        if (totalPower != null) {
+            stmt.bindString(8, totalPower);
         }
     }
 
@@ -96,20 +106,26 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         }
         stmt.bindLong(2, entity.getBlockHeight());
         stmt.bindLong(3, entity.getBlockSync());
+        stmt.bindLong(4, entity.getBlockDownload());
  
         String avgIncome = entity.getAvgIncome();
         if (avgIncome != null) {
-            stmt.bindString(4, avgIncome);
+            stmt.bindString(5, avgIncome);
         }
  
         String medianFee = entity.getMedianFee();
         if (medianFee != null) {
-            stmt.bindString(5, medianFee);
+            stmt.bindString(6, medianFee);
         }
  
-        String minerNo = entity.getMinerNo();
-        if (minerNo != null) {
-            stmt.bindString(6, minerNo);
+        String minerInfo = entity.getMinerInfo();
+        if (minerInfo != null) {
+            stmt.bindString(7, minerInfo);
+        }
+ 
+        String totalPower = entity.getTotalPower();
+        if (totalPower != null) {
+            stmt.bindString(8, totalPower);
         }
     }
 
@@ -124,9 +140,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // blockHeight
             cursor.getInt(offset + 2), // blockSync
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // avgIncome
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // medianFee
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // minerNo
+            cursor.getInt(offset + 3), // blockDownload
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // avgIncome
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // medianFee
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // minerInfo
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // totalPower
         );
         return entity;
     }
@@ -136,9 +154,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setBlockHeight(cursor.getInt(offset + 1));
         entity.setBlockSync(cursor.getInt(offset + 2));
-        entity.setAvgIncome(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setMedianFee(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setMinerNo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setBlockDownload(cursor.getInt(offset + 3));
+        entity.setAvgIncome(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setMedianFee(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setMinerInfo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setTotalPower(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override

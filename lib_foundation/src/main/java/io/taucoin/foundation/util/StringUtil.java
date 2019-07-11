@@ -162,6 +162,14 @@ public class StringUtil {
         }
     }
 
+    public static long getLongString(String data) {
+        try{
+            return Long.valueOf(data);
+        }catch (Exception e){
+            return 0;
+        }
+    }
+
     public static String getString(int data) {
         try{
             return String.valueOf(data);
@@ -187,5 +195,19 @@ public class StringUtil {
     public static boolean isAddressValid(String address) {
         String regex = "^T[a-zA-Z0-9_]{33,}$";
         return address.matches(regex);
+    }
+
+    public static double getProgress(long height, long maxHeight) {
+        double progress = 0;
+        if(height > 0){
+            progress = (double) height * 100 / maxHeight;
+        }
+        if(progress < 0){
+            progress = 0;
+        }
+        if(progress > 100){
+            progress = 100;
+        }
+        return progress;
     }
 }

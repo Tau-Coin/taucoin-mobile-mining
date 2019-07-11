@@ -55,6 +55,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.foundation.util.DimensionsUtil;
 
 import static android.graphics.BlurMaskFilter.Blur;
 
@@ -90,6 +91,7 @@ public final class SpanUtils {
     private int bulletRadius;
     private int bulletGapWidth;
     private int fontSize;
+    private boolean fontAlignCenter;
     private boolean fontSizeIsDp;
     private float proportion;
     private float xProportion;
@@ -146,6 +148,7 @@ public final class SpanUtils {
         first = -1;
         bulletColor = COLOR_DEFAULT;
         fontSize = -1;
+        fontAlignCenter = false;
         proportion = -1;
         xProportion = -1;
         isStrikethrough = false;
@@ -322,6 +325,11 @@ public final class SpanUtils {
      */
     public SpanUtils setFontSize(@IntRange(from = 0) final int size) {
         return setFontSize(size, false);
+    }
+
+    public SpanUtils setCenterFontSize(boolean fontAlignCenter) {
+        this.fontAlignCenter = fontAlignCenter;
+        return this;
     }
 
     /**
@@ -832,7 +840,11 @@ public final class SpanUtils {
 //            }
 //        }
         if (fontSize != -1) {
-            mBuilder.setSpan(new AbsoluteSizeSpan(fontSize, fontSizeIsDp), start, end, flag);
+            if(fontAlignCenter){
+                mBuilder.setSpan(new CustomVerticalCenterSpan(fontSize, fontSizeIsDp, foregroundColor), start, end, flag);
+            }else{
+                mBuilder.setSpan(new AbsoluteSizeSpan(fontSize, fontSizeIsDp), start, end, flag);
+            }
         }
         if (proportion != -1) {
             mBuilder.setSpan(new RelativeSizeSpan(proportion), start, end, flag);
@@ -1337,6 +1349,55 @@ public final class SpanUtils {
         @Override
         public void updateDrawState(final TextPaint tp) {
             tp.setShadowLayer(radius, dx, dy, shadowColor);
+        }
+    }
+    public class CustomVerticalCenterSpan extends ReplacementSpan {
+        private int fontSizeSp;
+        private boolean isSp;
+        private int foregroundColor;
+
+        public CustomVerticalCenterSpan(int fontSizeSp){
+            this.fontSizeSp = fontSizeSp;
+        }
+
+        public CustomVerticalCenterSpan(int fontSizeSp, boolean isSp){
+            this.fontSizeSp = fontSizeSp;
+            this.isSp = isSp;
+        }
+
+        public CustomVerticalCenterSpan(int fontSize, boolean fontSizeIsDp, int foregroundColor) {
+            this.fontSizeSp = fontSize;
+            this.isSp = fontSizeIsDp;
+            this.foregroundColor = foregroundColor;
+        }
+
+        @Override
+        public int getSize(@NonNull Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
+            text = text.subSequence(start, end);
+            Paint p = getCustomTextPaint(paint);
+            return (int) p.measureText(text.toString());
+        }
+
+        @Override
+        public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, @NonNull Paint paint) {
+            text = text.subSequence(start, end);
+            Paint p = getCustomTextPaint(paint);
+            Paint.FontMetricsInt fm = p.getFontMetricsInt();
+            if (foregroundColor != COLOR_DEFAULT) {
+                p.setColor(foregroundColor);
+            }
+            canvas.drawText(text.toString(), x, y - ((y + fm.descent + y + fm.ascent) / 2 - (bottom + top) / 2), p);
+        }
+
+        private TextPaint getCustomTextPaint(Paint srcPaint) {
+            TextPaint paint = new TextPaint(srcPaint);
+            int textSize = fontSizeSp;
+            if(isSp){
+                textSize = DimensionsUtil.dip2px(MyApplication.getInstance(), fontSizeSp);
+            }
+            paint.setColor(srcPaint.getColor());
+            paint.setTextSize(textSize);
+            return paint;
         }
     }
 }

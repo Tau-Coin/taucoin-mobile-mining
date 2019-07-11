@@ -44,9 +44,9 @@ public class CircleProgress extends View {
     }
 
     public void setOn() {
-        RED = 124;
-        GREEN = 186;
-        BLUE = 89;
+        RED = 241;
+        GREEN = 147;
+        BLUE = 34;
         closeConnecting();
     }
 

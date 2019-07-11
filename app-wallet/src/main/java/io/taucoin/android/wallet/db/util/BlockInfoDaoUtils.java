@@ -74,6 +74,7 @@ public class BlockInfoDaoUtils {
         if(blockInfo != null){
             blockSync = blockInfo.getBlockSync();
             blockInfo.setBlockSync(0);
+            blockInfo.setBlockDownload(0);
             insertOrReplace(blockInfo);
         }
         return blockSync;

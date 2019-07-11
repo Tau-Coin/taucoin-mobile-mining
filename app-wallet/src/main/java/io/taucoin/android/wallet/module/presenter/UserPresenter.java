@@ -103,6 +103,7 @@ public class UserPresenter {
         ProgressManager.closeProgressDialog();
         mIImportKeyView.gotoKeysActivity();
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+        EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
         EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
     }
 

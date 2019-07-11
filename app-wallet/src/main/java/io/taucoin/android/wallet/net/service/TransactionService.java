@@ -23,9 +23,14 @@ import io.reactivex.Observable;
 import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.IncomeInfoBean;
+import io.taucoin.android.wallet.module.bean.MinerListBean;
 import io.taucoin.android.wallet.module.bean.MinerInfoBean;
+import io.taucoin.android.wallet.module.bean.NetworkInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
+import io.taucoin.android.wallet.module.bean.ParticipantListBean;
+import io.taucoin.android.wallet.module.bean.ParticipantInfoBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -55,4 +60,19 @@ public interface TransactionService {
 
     @POST("getminerinfo")
     Observable<MinerInfoBean> getMinerInfo(@Body Map<String,String> address);
+
+    @POST("getnetworkinfo")
+    Observable<NetworkInfoBean> getNetworkInfo(@Body Map<String,String> address);
+
+    @POST("getparticpantinfo")
+    Observable<ParticipantInfoBean> getParticipantInfo(@Body Map<String,String> address);
+
+    @POST("getminerhistory")
+    Observable<MinerListBean> getMinerHistory(@Body Map<String,String> address);
+
+    @POST("getpphistory")
+    Observable<ParticipantListBean> getParticipantHistory(@Body Map<String,String> address);
+
+    @POST("getrewardinfo")
+    Observable<RewardInfoBean> getRewardInfo(@Body Map<String,String> address);
 }

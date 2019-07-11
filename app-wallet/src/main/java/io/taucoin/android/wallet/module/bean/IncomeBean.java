@@ -8,8 +8,6 @@ public class IncomeBean {
     private String avgIncome;
     @SerializedName(value = "medianfee")
     private String medianFee;
-    @SerializedName(value = "minerno")
-    private String minerNo;
 
     public String getAvgIncome() {
         return avgIncome;
@@ -25,13 +23,5 @@ public class IncomeBean {
 
     public void setMedianFee(String medianFee) {
         this.medianFee = medianFee;
-    }
-
-    public String getMinerNo() {
-        return minerNo;
-    }
-
-    public void setMinerNo(String minerNo) {
-        this.minerNo = minerNo;
     }
 }

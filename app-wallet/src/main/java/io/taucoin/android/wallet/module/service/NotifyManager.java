@@ -46,7 +46,6 @@ import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.DateUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
-import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
@@ -326,14 +325,6 @@ public class NotifyManager {
     }
 
     private void updateMiningState(String serviceType) {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if (keyValue != null) {
-            boolean isSyncStart = StringUtil.isSame(keyValue.getSyncState(), TransmitKey.MiningState.Start);
-            if(!isSyncStart){
-                ToastUtils.showShortToast(R.string.mining_need_sync_open);
-                return;
-            }
-        }
         boolean isOn = StringUtil.isSame(serviceType, TransmitKey.MiningState.Start);
         isOn = !isOn;
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
@@ -347,9 +338,11 @@ public class NotifyManager {
                     isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                 }
                 if(isStart){
+                    MyApplication.getRemoteConnector().startSyncAll();
                     MyApplication.getRemoteConnector().startBlockForging();
                 }else{
                     MyApplication.getRemoteConnector().stopBlockForging();
+                    MyApplication.getRemoteConnector().stopSyncAll();
                 }
                 MessageEvent messageEvent = new MessageEvent();
                 messageEvent.setCode(MessageEvent.EventCode.MINING_NOTIFY);

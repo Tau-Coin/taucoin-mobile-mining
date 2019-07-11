@@ -38,6 +38,7 @@ public class ProgressView extends RelativeLayout {
     private void initView(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ProgressView);
         String centerText = a.getString(R.styleable.ProgressView_center_text);
+        float centerTextSize = a.getDimension(R.styleable.ProgressView_center_textSize, -1);
         centerImage = a.getResourceId(R.styleable.ProgressView_center_image, -1);
         a.recycle();
 
@@ -52,6 +53,9 @@ public class ProgressView extends RelativeLayout {
         if(StringUtil.isNotEmpty(centerText)){
             mViewHolder.text.setVisibility(VISIBLE);
             mViewHolder.text.setText(centerText);
+        }
+        if(centerTextSize != -1){
+            mViewHolder.text.setTextSize(centerTextSize);
         }
         setOff();
     }

@@ -50,6 +50,25 @@
     <declare-styleable name="ProgressView">
         <attr name="center_text" format="string" />
         <attr name="center_image" format="string" />
+        <attr name="center_textSize" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="DashboardView">
+        <attr name="antiAlias" />
+        <attr name="startAngle" />
+        <attr name="sweepAngle" />
+        <attr name="animTime" />
+        <attr name="maxValue" />
+        <attr name="value" />
+        <!-- Arc width -->
+        <attr name="arcWidth" />
+        <attr name="pointWidth" />
+        <attr name="pointArcColor"  format="color|reference"/>
+        <attr name="pointRadius" />
+        <attr name="arcColors" />
+        <!-- Background arc color -->
+        <attr name="bgArcColor" format="color|reference"/>
+        <!-- Background arc width -->
+        <attr name="bgArcWidth" format="dimension" />
+    </declare-styleable>
 </resources>
