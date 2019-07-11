@@ -484,10 +484,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
 
         track.commit();
-
         storeBlock(block);
-
-        listener.onBlock(block);
 
         //if (needFlush(block)) {
             repository.flush();
@@ -495,6 +492,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             System.gc();
         //}
 
+        listener.onBlock(block);
         listener.trace(String.format("Block chain size: [ %d ]", this.getSize()));
 
         return true;
