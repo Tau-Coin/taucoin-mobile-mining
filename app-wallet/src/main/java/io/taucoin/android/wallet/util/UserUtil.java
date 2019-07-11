@@ -314,7 +314,7 @@ public class UserUtil {
                 tvDownload.setText(progressStr);
 
                 // 6K / block
-                double data = downloadHeight * 6 / 1024;
+                double data = (double) downloadHeight * 6 / 1024;
                 String dataStr = ResourcesUtil.getText(R.string.home_download_data_size);
                 dataStr = String.format(dataStr, FmtMicrometer.fmtDecimal(data));
                 tvBlockChainData.setText(dataStr);
