@@ -134,6 +134,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     ScrollDisabledListView minerListView;
     @BindView(R.id.tv_block_chain_data)
     TextView tvBlockChainData;
+    @BindView(R.id.tv_median_fee)
+    TextView tvMedianFee;
+    @BindView(R.id.tv_txs_pool)
+    TextView tvTxsPool;
 
     private RewardAdapter minerRewardAdapter;
     private RewardAdapter partRewardAdapter;
@@ -365,7 +369,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);
         UserUtil.setMinersOnline(tvMinersOnline, tvMinersOnlineTitle, blockInfo);
-        UserUtil.setMiningRank(tvMiningRank);
+        UserUtil.setMiningRankAndOther(tvMiningRank, tvTxsPool, tvMedianFee, blockInfo);
 
         long blockSync = blockInfo != null ? blockInfo.getBlockSync() : 0;
         int errorBlock = StringUtil.getIntTag(tvIrreparableError);

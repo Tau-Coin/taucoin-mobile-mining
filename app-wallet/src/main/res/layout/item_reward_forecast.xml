@@ -175,7 +175,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="0dp"
-                android:layout_weight="1.8"
+                android:layout_weight="1.7"
                 android:layout_marginStart="7dp"
                 android:layout_marginEnd="7dp"
                 android:gravity="start"
@@ -185,7 +185,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1.2"
                 android:layout_marginStart="7dp"
                 android:gravity="start"
                 android:layout_height="wrap_content"
@@ -305,7 +305,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1.1"
                 android:gravity="start"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="7dp"
@@ -314,7 +314,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="0dp"
-                android:layout_weight="1.8"
+                android:layout_weight="1.6"
                 android:layout_marginStart="7dp"
                 android:layout_marginEnd="7dp"
                 android:gravity="start"
@@ -324,7 +324,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1.2"
                 android:layout_marginStart="7dp"
                 android:gravity="start"
                 android:layout_height="wrap_content"

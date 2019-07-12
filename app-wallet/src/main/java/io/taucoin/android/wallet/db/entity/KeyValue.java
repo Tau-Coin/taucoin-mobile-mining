@@ -26,16 +26,16 @@ public class KeyValue {
     private long transExpiry;
     private long blocksMined;
     private long MinedNo;
-    private int miningRank;
+    private String miningRank;
     private String nextPart;
-    private double historyMiner;
-    private double historyTx;
-    @Generated(hash = 159829412)
+    private String historyMiner;
+    private String historyTx;
+    @Generated(hash = 1896287259)
     public KeyValue(Long id, String pubKey, String priKey, String address,
             String rawAddress, long balance, long power, long miningIncome,
             String nickName, String miningState, long transExpiry, long blocksMined,
-            long MinedNo, int miningRank, String nextPart, double historyMiner,
-            double historyTx) {
+            long MinedNo, String miningRank, String nextPart, String historyMiner,
+            String historyTx) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -135,10 +135,10 @@ public class KeyValue {
     public void setMinedNo(long MinedNo) {
         this.MinedNo = MinedNo;
     }
-    public int getMiningRank() {
+    public String getMiningRank() {
         return this.miningRank;
     }
-    public void setMiningRank(int miningRank) {
+    public void setMiningRank(String miningRank) {
         this.miningRank = miningRank;
     }
     public String getNextPart() {
@@ -147,16 +147,16 @@ public class KeyValue {
     public void setNextPart(String nextPart) {
         this.nextPart = nextPart;
     }
-    public double getHistoryMiner() {
+    public String getHistoryMiner() {
         return this.historyMiner;
     }
-    public void setHistoryMiner(double historyMiner) {
+    public void setHistoryMiner(String historyMiner) {
         this.historyMiner = historyMiner;
     }
-    public double getHistoryTx() {
+    public String getHistoryTx() {
         return this.historyTx;
     }
-    public void setHistoryTx(double historyTx) {
+    public void setHistoryTx(String historyTx) {
         this.historyTx = historyTx;
     }
 }

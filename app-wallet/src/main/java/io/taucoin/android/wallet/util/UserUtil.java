@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.util;
 
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.view.View;
@@ -26,7 +27,10 @@ import com.github.naturs.logger.Logger;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
 import io.taucoin.android.wallet.R;
@@ -250,10 +254,20 @@ public class UserUtil {
             if(StringUtil.isNotEmpty(blockInfo.getMinerInfo())){
                 JSONObject jsonObject = new JSONObject(blockInfo.getMinerInfo());
                 Iterator<String> iterator = jsonObject.keys();
+                List<String> keys = new ArrayList<>();
                 while (iterator.hasNext()) {
-                    String key = iterator.next();
+                    keys.add(iterator.next());
+                }
+                Collections.sort(keys, (o1, o2) -> {
+                    try{
+                        double pre = StringUtil.getDoubleString(o1);
+                        double latter = StringUtil.getDoubleString(o2);
+                        return pre <= latter ? -1 : 1;
+                    }catch (Exception ignore){ }
+                    return 0;
+                });
+                for (String key : keys) {
                     String value = jsonObject.getString(key);
-
                     if(minersTitle.length() > 0){
                         minersTitle.append(" / ");
                         minersValue.append(" / ");
@@ -330,22 +344,34 @@ public class UserUtil {
         }
     }
 
-    public static void setMiningRank(TextView tvMiningRank) {
-        if(tvMiningRank == null){
+    public static void setMiningRankAndOther(TextView tvMiningRank, TextView tvTxsPool, TextView tvMedianFee, BlockInfo blockInfo) {
+        if(tvMiningRank == null || tvTxsPool == null || tvMedianFee == null || blockInfo == null){
             return;
         }
-        long miningRank = 0;
+        long miningRank = 0L;
+        Drawable drawable = null;
         if(isImportKey()){
-            miningRank = MyApplication.getKeyValue().getMiningRank();
-        }
-        if(miningRank != 0){
-            int icon = miningRank >= 0 ? R.mipmap.icon_rank_up : R.mipmap.icon_rank_down;
-            DrawablesUtil.setEndDrawable(tvMiningRank, icon, 12);
+            String miningRankStr = MyApplication.getKeyValue().getMiningRank();
+            String miningRankType = StringUtil.getPlusOrMinus(miningRankStr);
+            miningRank = StringUtil.getLongString(miningRankStr);
+            miningRank = Math.abs(miningRank);
+            if(StringUtil.isNotEmpty(miningRankType)){
+                int resId = StringUtil.isSame(miningRankType, "+") ? R.mipmap.icon_rank_up : R.mipmap.icon_rank_down;
+                drawable = DrawablesUtil.getDrawable(tvMiningRank.getContext(), resId, 12, 12);
+            }
         }
         String miningRankStr = ResourcesUtil.getText(R.string.home_no_point);
-        miningRank = Math.abs(miningRank);
         miningRankStr = String.format(miningRankStr, FmtMicrometer.fmtPower(miningRank));
-        tvMiningRank.setText(miningRankStr);
+        SpanUtils spannable = new SpanUtils()
+            .append(miningRankStr);
+        if(drawable != null){
+            spannable.append(" ")
+            .appendImage(drawable, SpanUtils.ALIGN_CENTER);
+        }
+        tvMiningRank.setText(spannable.create());
+
+        tvTxsPool.setText(FmtMicrometer.fmtPower(blockInfo.getTxsPool()));
+        tvMedianFee.setText(FmtMicrometer.fmtFeeValue(blockInfo.getMedianFee()));
     }
 
     public static void initSuccessRequires(TextView tvSuccessRequires) {
@@ -469,24 +495,36 @@ public class UserUtil {
         double historyMiner = 0;
         double historyTx = 0;
         if(isImportKey()){
-            historyMiner = MyApplication.getKeyValue().getHistoryMiner() * 100;
-            historyTx = MyApplication.getKeyValue().getHistoryTx() * 100;
+            String historyMinerStr = MyApplication.getKeyValue().getHistoryMiner();
+            String historyTxStr = MyApplication.getKeyValue().getHistoryTx();
+            historyMiner = StringUtil.getDoubleString(historyMinerStr) * 100;
+            historyTx = StringUtil.getDoubleString(historyTxStr) * 100;
+            historyMiner = Math.abs(historyMiner);
+            historyTx = Math.abs(historyTx);
+
+            String minerType = StringUtil.getPlusOrMinus(historyMinerStr);
+            String txType = StringUtil.getPlusOrMinus(historyTxStr);
+
+            if(StringUtil.isNotEmpty(minerType)){
+                int icon = StringUtil.isSame(minerType, "+") ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
+                DrawablesUtil.setEndDrawable(tvHistoryMiner, icon, 12);
+            }else {
+                DrawablesUtil.clearDrawable(tvHistoryMiner);
+            }
+            if(StringUtil.isNotEmpty(txType)){
+                int icon = StringUtil.isSame(txType, "+") ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
+                DrawablesUtil.setEndDrawable(tvTxParticipant, icon, 12);
+            }else {
+                DrawablesUtil.clearDrawable(tvTxParticipant);
+            }
         }
         String unit = "%";
 
-        if(historyMiner != 0){
-            int icon = historyMiner >= 0 ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
-            DrawablesUtil.setEndDrawable(tvHistoryMiner, icon, 12);
-        }
         historyMiner = Math.abs(historyMiner);
         String historyMinerStr = FmtMicrometer.fmtValue(historyMiner);
         historyMinerStr += unit;
         tvHistoryMiner.setText(historyMinerStr);
 
-        if(historyTx != 0){
-            int icon = historyTx >= 0 ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
-            DrawablesUtil.setEndDrawable(tvTxParticipant, icon, 12);
-        }
         historyTx = Math.abs(historyTx);
         String historyTxStr = FmtMicrometer.fmtValue(historyTx);
         historyTxStr += unit;

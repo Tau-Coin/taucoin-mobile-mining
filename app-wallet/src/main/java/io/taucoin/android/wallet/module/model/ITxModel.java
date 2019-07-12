@@ -68,5 +68,5 @@ public interface ITxModel {
 
     void getIncomeInfo(LogicObserver<BlockInfo> observer);
 
-    void getNetworkInfo(LogicObserver<KeyValue> observer);
+    void getRankInfo(LogicObserver<KeyValue> observer);
 }

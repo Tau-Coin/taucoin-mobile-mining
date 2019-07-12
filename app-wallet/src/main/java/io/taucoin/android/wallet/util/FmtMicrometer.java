@@ -48,11 +48,20 @@ public class FmtMicrometer {
     }
 
     public static String fmtPower(Long power) {
-        DecimalFormat df = getDecimalFormatInstance();
-        df.applyPattern("###,##0");
-        df.setRoundingMode(RoundingMode.FLOOR);
-        BigDecimal bigDecimal = new BigDecimal(power);
-        return df.format(bigDecimal);
+        return fmtPower(String.valueOf(power));
+    }
+
+    public static String fmtPower(String power) {
+        try {
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("###,##0");
+            df.setRoundingMode(RoundingMode.FLOOR);
+            BigDecimal bigDecimal = new BigDecimal(power);
+            return df.format(bigDecimal);
+        }catch (Exception ignore) {
+
+        }
+        return new BigInteger("0").toString();
     }
 
     static String fmtValue(double value) {
@@ -66,13 +75,13 @@ public class FmtMicrometer {
     public static String fmtDecimal(String value) {
         try {
             DecimalFormat df = getDecimalFormatInstance();
-            df.applyPattern("###,##0.##");
+            df.applyPattern("###,##0.00");
             df.setRoundingMode(RoundingMode.FLOOR);
             BigDecimal bigDecimal = new BigDecimal(value);
             return df.format(bigDecimal);
-        } catch (Exception e) {
-            return value;
+        } catch (Exception ignore) {
         }
+        return new BigInteger("0").toString();
     }
 
     public static String fmtDecimal(double value) {

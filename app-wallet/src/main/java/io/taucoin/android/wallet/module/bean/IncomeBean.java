@@ -8,6 +8,12 @@ public class IncomeBean {
     private String avgIncome;
     @SerializedName(value = "medianfee")
     private String medianFee;
+    @SerializedName(value = "minerinfo")
+    private String minerInfo;
+    @SerializedName(value = "totalpower")
+    private String totalPower;
+    @SerializedName(value = "txsno")
+    private String txsPool;
 
     public String getAvgIncome() {
         return avgIncome;
@@ -23,5 +29,29 @@ public class IncomeBean {
 
     public void setMedianFee(String medianFee) {
         this.medianFee = medianFee;
+    }
+
+    public String getMinerInfo() {
+        return minerInfo;
+    }
+
+    public void setMinerInfo(String minerInfo) {
+        this.minerInfo = minerInfo;
+    }
+
+    public String getTotalPower() {
+        return totalPower;
+    }
+
+    public void setTotalPower(String totalPower) {
+        this.totalPower = totalPower;
+    }
+
+    public String getTxsPool() {
+        return txsPool;
+    }
+
+    public void setTxsPool(String txsPool) {
+        this.txsPool = txsPool;
     }
 }

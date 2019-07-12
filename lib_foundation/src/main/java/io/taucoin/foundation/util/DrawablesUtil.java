@@ -60,7 +60,7 @@ public class DrawablesUtil {
         mDrawable.setBounds(0, 0, top, bottom);
         return mDrawable;
     }
-    private static Drawable getDrawable(Context context, int drawable, float width, float height) {
+    public static Drawable getDrawable(Context context, int drawable, float width, float height) {
         Drawable mDrawable = ContextCompat.getDrawable(context, drawable);
         width = DimensionsUtil.dp2px(context, width);
         height = DimensionsUtil.dp2px(context, height);
@@ -70,8 +70,8 @@ public class DrawablesUtil {
         return mDrawable;
     }
     public static void setUnderLine(TextView view) {
-        view.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
-        view.getPaint().setAntiAlias(true);//抗锯齿
+        view.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        view.getPaint().setAntiAlias(true);
     }
     public static int[] obtainTypedArray(Context context, @ArrayRes int arrayId) {
         TypedArray ar = context.getResources().obtainTypedArray(arrayId);

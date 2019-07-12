@@ -23,14 +23,17 @@ import io.taucoin.foundation.util.StringUtil;
 public class RewardAdapter extends BaseAdapter {
 
     private List<Object> list = new ArrayList<>();
+    private int type = 0;
 
     void setMinerListData(List<MinerListBean.MinerBean> list) {
+        this.type = 1;
         this.list.clear();
         this.list.addAll(list);
         notifyDataSetChanged();
     }
 
     void setPartListData(List<ParticipantListBean.ParticipantBean> list) {
+        this.type = 0;
         this.list.clear();
         this.list.addAll(list);
         notifyDataSetChanged();
@@ -55,7 +58,8 @@ public class RewardAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home_reward, parent, false);
+            int layout = type == 1 ? R.layout.item_home_reward : R.layout.item_home_reward_part;
+            convertView = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         } else {
@@ -66,17 +70,17 @@ public class RewardAdapter extends BaseAdapter {
         String incomeStr = "";
         if(position < list.size()){
             Object bean = list.get(position);
-            if(bean instanceof MinerListBean.MinerBean){
+            if(type == 1){
                 MinerListBean.MinerBean minerBean = (MinerListBean.MinerBean) bean;
                 String lastBlockNoStr = ResourcesUtil.getText(R.string.home_no_point);
                 long nextBlockNo = minerBean.getBlockHeight();
                 left = String.format(lastBlockNoStr, FmtMicrometer.fmtPower(nextBlockNo));
                 middle = minerBean.getBlockHash();
                 incomeStr = minerBean.getIncome();
-            }else if(bean instanceof ParticipantListBean.ParticipantBean){
+            }else{
                 ParticipantListBean.ParticipantBean partBean = (ParticipantListBean.ParticipantBean) bean;
                 if(partBean.getRole() == 1){
-                    left = ResourcesUtil.getText(R.string.home_role_miner);
+                    left = ResourcesUtil.getText(R.string.home_history_miner);
                 }else{
                     left = ResourcesUtil.getText(R.string.home_role_participant);
                 }

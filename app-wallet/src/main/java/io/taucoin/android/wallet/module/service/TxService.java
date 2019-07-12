@@ -99,7 +99,7 @@ public class TxService extends Service {
                     if(!mIsGetBalance){
                         getBalance(serviceType);
                         getMinerInfo(true);
-                        getNetWorkInfo(true);
+                        getRankInfo(true);
                     }
                     if(!mIsChecked){
                         checkRawTransaction();
@@ -111,7 +111,7 @@ public class TxService extends Service {
                 case TransmitKey.ServiceType.GET_BALANCE:
                     getBalance(serviceType);
                     getMinerInfo(false);
-                    getNetWorkInfo(false);
+                    getRankInfo(false);
                     break;
                 case TransmitKey.ServiceType.GET_RAW_TX:
                     if(!mIsChecked){
@@ -263,23 +263,23 @@ public class TxService extends Service {
         });
     }
 
-    private void getNetWorkInfoDelay() {
-        Observable.timer(2, TimeUnit.MINUTES)
+    private void getRankInfoDelay() {
+        Observable.timer(5, TimeUnit.MINUTES)
             .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override
                 public void onComplete() {
-                    getMinerInfo(true);
+                    getRankInfo(true);
                 }
             });
     }
 
-    private void getNetWorkInfo(boolean isDelay) {
-        mTxModel.getNetworkInfo(new LogicObserver<KeyValue>(){
+    private void getRankInfo(boolean isDelay) {
+        mTxModel.getRankInfo(new LogicObserver<KeyValue>(){
             @Override
             public void handleError(int code, String msg) {
                 if(isDelay){
-                    getNetWorkInfoDelay();
+                    getRankInfoDelay();
                 }
             }
             @Override
@@ -287,7 +287,7 @@ public class TxService extends Service {
                 MyApplication.setKeyValue(keyValue);
                 EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                 if(isDelay){
-                    getMinerInfoDelay();
+                    getRankInfoDelay();
                 }
             }
         });

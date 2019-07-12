@@ -16,7 +16,6 @@
 package io.taucoin.android.wallet.module.model;
 
 import com.github.naturs.logger.Logger;
-import com.google.gson.JsonObject;
 
 import io.reactivex.Scheduler;
 import io.taucoin.android.wallet.R;
@@ -49,9 +48,8 @@ import io.taucoin.android.wallet.module.bean.IncomeBean;
 import io.taucoin.android.wallet.module.bean.IncomeInfoBean;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.MinerInfoBean;
-import io.taucoin.android.wallet.module.bean.NetworkInfoBean;
+import io.taucoin.android.wallet.module.bean.RankInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
-import io.taucoin.android.wallet.module.bean.ParticipantInfoBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TransactionBean;
@@ -605,12 +603,18 @@ public class TxModel implements ITxModel {
                         if(blockInfo == null){
                             blockInfo = new BlockInfo();
                         }
-                        if(StringUtil.isNotSame(blockInfo.getAvgIncome(), incomeBean.getAvgIncome()) ||
-                                StringUtil.isNotSame(blockInfo.getMedianFee(), incomeBean.getMedianFee())){
-                            blockInfo.setAvgIncome(incomeBean.getAvgIncome());
-                            blockInfo.setMedianFee(incomeBean.getMedianFee());
-                            BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
-                        }
+                        blockInfo.setAvgIncome(incomeBean.getAvgIncome());
+                        blockInfo.setMedianFee(incomeBean.getMedianFee());
+                        blockInfo.setTotalPower(incomeBean.getTotalPower());
+                        blockInfo.setTxsPool(incomeBean.getTxsPool());
+
+//                        JsonObject jsonObject = incomeBean.getMinerInfo();
+//                        String minerInfo = null;
+//                        if(jsonObject != null && jsonObject.isJsonObject()){
+//                            minerInfo = jsonObject.toString();
+//                        }
+                        blockInfo.setMinerInfo(incomeBean.getMinerInfo());
+                        BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
                         observer.onNext(blockInfo);
                     }
                 }
@@ -618,44 +622,29 @@ public class TxModel implements ITxModel {
     }
 
     @Override
-    public void getNetworkInfo(LogicObserver<KeyValue> observer) {
+    public void getRankInfo(LogicObserver<KeyValue> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
         NetWorkManager.createMainApiService(TransactionService.class)
-            .getNetworkInfo(map)
+            .getRankInfo(map)
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
-            .subscribe(new TxObserver<NetworkInfoBean>() {
+            .subscribe(new TxObserver<RankInfoBean>() {
                 @Override
                 public void handleError(String msg, int msgCode) {
                     observer.handleError(msgCode, msg);
                 }
 
                 @Override
-                public void handleData(NetworkInfoBean networkInfo) {
-                    if(networkInfo != null && networkInfo.getStatus() == 200){
-                        BlockInfo blockInfo = BlockInfoDaoUtils.getInstance().query();
-                        if(blockInfo == null){
-                            blockInfo = new BlockInfo();
-                        }
-                        JsonObject jsonObject = networkInfo.getMinerInfo();
-                        String minerInfo = null;
-                        if(jsonObject != null && jsonObject.isJsonObject()){
-                            minerInfo = jsonObject.toString();
-                        }
-                        if(StringUtil.isNotSame(blockInfo.getTotalPower(), networkInfo.getTotalPower()) ||
-                                StringUtil.isNotSame(blockInfo.getMinerInfo(), minerInfo)){
-                            blockInfo.setTotalPower(networkInfo.getTotalPower());
-                            blockInfo.setMinerInfo(minerInfo);
-                            BlockInfoDaoUtils.getInstance().insertOrReplace(blockInfo);
-                        }
-
+                public void handleData(RankInfoBean miningRankInfo) {
+                    if(miningRankInfo != null && miningRankInfo.getStatus() == 200){
                         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
                         KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
 
                         if(keyValue != null){
-                            keyValue.setMiningRank(networkInfo.getRankNo());
+                            String miningRank = StringUtil.changeMiningRank(keyValue.getMiningRank(), miningRankInfo.getRankNo());
+                            keyValue.setMiningRank(miningRank);
                             observer.onNext(keyValue);
                         }else{
                             observer.onError();

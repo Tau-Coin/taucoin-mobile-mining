@@ -19,7 +19,6 @@ import io.reactivex.Scheduler;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -42,6 +41,7 @@ import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.core.Block;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class MiningModel implements IMiningModel{
     private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(30));
@@ -206,8 +206,10 @@ public class MiningModel implements IMiningModel{
 
             if(keyValue != null){
                 keyValue.setNextPart(participantInfo.getReward());
-                keyValue.setHistoryMiner(participantInfo.getMinerPart());
-                keyValue.setHistoryTx(participantInfo.getTxPart());
+                String miner = StringUtil.changePartData(keyValue.getHistoryMiner(), participantInfo.getMinerPart());
+                String tx = StringUtil.changePartData(keyValue.getHistoryTx(), participantInfo.getTxPart());
+                keyValue.setHistoryMiner(miner);
+                keyValue.setHistoryTx(tx);
             }
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())

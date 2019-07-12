@@ -170,10 +170,9 @@
     <string name="home_mining_history">View your mining history</string>
 
     <string name="home_participant_history">View your participant history</string>
-    <string name="home_role_miner">Miner</string>
     <string name="home_role_participant">Participant</string>
     <string name="home_history_miner">History Miner</string>
-    <string name="home_self_participant">Self Participant</string>
+    <string name="home_self_participant">Self Participation</string>
     <string name="home_tx_participant">TX Participant</string>
 
     <string name="home_balance">Total Balance</string>
@@ -186,6 +185,8 @@
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
+    <string name="home_txs_in_pool">Txs&#160;In&#160;Pool</string>
+    <string name="home_median_fee">Median&#160;Fee</string>
     <string name="home_data_storage">Daily&#160;Data&#160;(M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>

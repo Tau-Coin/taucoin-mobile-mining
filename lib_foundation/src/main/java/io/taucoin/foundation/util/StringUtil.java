@@ -170,6 +170,14 @@ public class StringUtil {
         }
     }
 
+    public static double getDoubleString(String data) {
+        try{
+            return Double.valueOf(data);
+        }catch (Exception e){
+            return 0;
+        }
+    }
+
     public static String getString(int data) {
         try{
             return String.valueOf(data);
@@ -209,5 +217,52 @@ public class StringUtil {
             progress = 100;
         }
         return progress;
+    }
+
+    public static String getPlusOrMinus(String value) {
+        if(isNotEmpty(value)){
+            if(value.startsWith("+")){
+                return "+";
+            }else if(value.startsWith("-")){
+                return "-";
+            }
+        }
+        return "";
+    }
+
+    public static String changePartData(String oldValue, double newValue) {
+        double value = StringUtil.getDoubleString(oldValue);
+        String type = StringUtil.getPlusOrMinus(oldValue);
+        value = Math.abs(value);
+        String changeValue = "";
+        if(value == 0 || value == newValue){
+            changeValue += type;
+        }else{
+            if(value < newValue){
+                changeValue += "+";
+            }else{
+                changeValue += "-";
+            }
+        }
+        changeValue += newValue;
+        return changeValue;
+    }
+
+    public static String changeMiningRank(String oldValue, long newValue) {
+        long value = StringUtil.getLongString(oldValue);
+        String type = StringUtil.getPlusOrMinus(oldValue);
+        value = Math.abs(value);
+        String changeValue = "";
+        if(value == 0 || value == newValue){
+            changeValue += type;
+        }else{
+            if(value < newValue){
+                changeValue += "-";
+            }else{
+                changeValue += "+";
+            }
+        }
+        changeValue += newValue;
+        return changeValue;
     }
 }

@@ -205,7 +205,12 @@ public class SysUtil {
         String lengthStr = bigDecimal.toString();
         int sub_string = lengthStr.indexOf(".");
         String result = lengthStr + "000";
-        result = result.substring(0, sub_string + 3) + "M";
+        result = result.substring(0, sub_string + 3);
+        if(lengthM >= 0.01){
+            result = result.substring(0, sub_string + 3) + "M";
+        }else{
+            result = "0M";
+        }
         return result;
     }
 

@@ -32,6 +32,7 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         public final static Property MedianFee = new Property(5, String.class, "medianFee", false, "MEDIAN_FEE");
         public final static Property MinerInfo = new Property(6, String.class, "minerInfo", false, "MINER_INFO");
         public final static Property TotalPower = new Property(7, String.class, "totalPower", false, "TOTAL_POWER");
+        public final static Property TxsPool = new Property(8, String.class, "txsPool", false, "TXS_POOL");
     }
 
 
@@ -54,7 +55,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
                 "\"AVG_INCOME\" TEXT," + // 4: avgIncome
                 "\"MEDIAN_FEE\" TEXT," + // 5: medianFee
                 "\"MINER_INFO\" TEXT," + // 6: minerInfo
-                "\"TOTAL_POWER\" TEXT);"); // 7: totalPower
+                "\"TOTAL_POWER\" TEXT," + // 7: totalPower
+                "\"TXS_POOL\" TEXT);"); // 8: txsPool
     }
 
     /** Drops the underlying database table. */
@@ -94,6 +96,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         if (totalPower != null) {
             stmt.bindString(8, totalPower);
         }
+ 
+        String txsPool = entity.getTxsPool();
+        if (txsPool != null) {
+            stmt.bindString(9, txsPool);
+        }
     }
 
     @Override
@@ -127,6 +134,11 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         if (totalPower != null) {
             stmt.bindString(8, totalPower);
         }
+ 
+        String txsPool = entity.getTxsPool();
+        if (txsPool != null) {
+            stmt.bindString(9, txsPool);
+        }
     }
 
     @Override
@@ -144,7 +156,8 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // avgIncome
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // medianFee
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // minerInfo
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // totalPower
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // totalPower
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // txsPool
         );
         return entity;
     }
@@ -159,6 +172,7 @@ public class BlockInfoDao extends AbstractDao<BlockInfo, Long> {
         entity.setMedianFee(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setMinerInfo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setTotalPower(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setTxsPool(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

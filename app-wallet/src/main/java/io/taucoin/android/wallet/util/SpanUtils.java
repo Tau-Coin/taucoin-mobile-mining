@@ -1171,9 +1171,11 @@ public final class SpanUtils {
         private CustomImageSpan(final Drawable d, final int verticalAlignment) {
             super(verticalAlignment);
             mDrawable = d;
-            mDrawable.setBounds(
-                    0, 0, mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()
-            );
+            if(mDrawable.getBounds().right == 0 || mDrawable.getBounds().bottom == 0){
+                mDrawable.setBounds(
+                        0, 0, mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()
+                );
+            }
         }
 
         private CustomImageSpan(final Uri uri, final int verticalAlignment) {
