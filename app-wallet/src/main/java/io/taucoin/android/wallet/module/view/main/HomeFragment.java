@@ -217,11 +217,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         boolean isOn = ivMiningSwitch.isChecked();
         if(isOn){
             MyApplication.getRemoteConnector().init();
-            MyApplication.getRemoteConnector().startSyncAll();
             MyApplication.getRemoteConnector().startBlockForging();
         }else{
             refreshNextBlockView(null, false);
-            MyApplication.getRemoteConnector().stopSyncAll();
             MyApplication.getRemoteConnector().stopBlockForging();
         }
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
@@ -338,7 +336,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         miningPresenter.getParticipantHistory(new LogicObserver<List<ParticipantListBean.ParticipantBean>>(){
             @Override
             public void handleData(List<ParticipantListBean.ParticipantBean> data) {
-                if(minerRewardAdapter != null && data != null){
+                if(partRewardAdapter != null && data != null){
                     partRewardAdapter.setPartListData(data);
                 }
             }
@@ -351,7 +349,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
             ivMiningSwitch.setChecked(isMiningStart);
             if(isMiningStart){
-                MyApplication.getRemoteConnector().startSyncAll();
                 MyApplication.getRemoteConnector().startBlockForging();
             }
         }

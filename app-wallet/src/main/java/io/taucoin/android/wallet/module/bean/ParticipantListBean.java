@@ -6,15 +6,15 @@ import java.util.List;
 
 public class ParticipantListBean extends BaseBean{
 
-    @SerializedName(value = "minerhistory")
-    private List<ParticipantBean> minerHistory;
+    @SerializedName(value = "pphistory")
+    private List<ParticipantBean> partHistory;
 
-    public List<ParticipantBean> getMinerHistory() {
-        return minerHistory;
+    public List<ParticipantBean> getPartHistory() {
+        return partHistory;
     }
 
-    public void setMinerHistory(List<ParticipantBean> minerHistory) {
-        this.minerHistory = minerHistory;
+    public void setPartHistory(List<ParticipantBean> partHistory) {
+        this.partHistory = partHistory;
     }
 
     public class ParticipantBean{

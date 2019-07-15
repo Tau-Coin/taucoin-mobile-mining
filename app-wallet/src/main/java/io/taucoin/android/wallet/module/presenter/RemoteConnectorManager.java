@@ -19,8 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 
-import com.github.naturs.logger.Logger;
-
 import java.util.Date;
 
 import io.taucoin.android.service.ConnectorHandler;
@@ -293,10 +291,8 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         if (keyValue != null) {
             boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
             if(isMiningStart){
-                MyApplication.getRemoteConnector().startSyncAll();
                 MyApplication.getRemoteConnector().startBlockForging();
             }else{
-                MyApplication.getRemoteConnector().stopSyncAll();
                 MyApplication.getRemoteConnector().stopBlockForging();
             }
         }

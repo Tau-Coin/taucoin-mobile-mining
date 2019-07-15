@@ -24,7 +24,7 @@ public class DaemonJobService extends JobService {
     public static void startJob(Context context) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
-        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(context.getPackageName(), DaemonJobService.class.getName()));
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(context, DaemonJobService.class.getName()));
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             // Execute job every 10s

@@ -212,7 +212,6 @@ public class MiningUtil {
     }
 
     public static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver) {
-        MyApplication.getRemoteConnector().stopSyncAll();
         MyApplication.getRemoteConnector().stopBlockForging();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {

@@ -118,8 +118,8 @@ public class MiningPresenter {
             @Override
             public void handleData(ParticipantListBean historyList) {
                 if(historyList != null && historyList.getStatus() == 200){
-                    if(historyList.getMinerHistory() != null){
-                        logicObserver.onNext(historyList.getMinerHistory());
+                    if(historyList.getPartHistory() != null){
+                        logicObserver.onNext(historyList.getPartHistory());
                     }else{
                         handleData();
                     }

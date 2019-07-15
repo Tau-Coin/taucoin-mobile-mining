@@ -47,6 +47,7 @@ import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
+import io.taucoin.android.wallet.util.WifiSettings;
 import io.taucoin.core.Transaction;
 
 public abstract class ConnectorManager implements ConnectorHandler {
@@ -54,6 +55,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     static final org.slf4j.Logger logger = LoggerFactory.getLogger("ConnectorManager");
     private ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
     private TaucoinConnector mTaucoinConnector = null;
+    WifiSettings mWifiSettings = null;
 
     @SuppressLint("SimpleDateFormat")
     private DateFormat mDateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");
@@ -70,6 +72,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     private void createRemoteConnector(){
         if (mTaucoinConnector == null) {
+            mWifiSettings = new WifiSettings();
+            mWifiSettings.init();
             addLogEntry("Create Remote Connector...");
             Context context = MyApplication.getInstance();
             Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
@@ -86,6 +90,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
             stopBlockForging();
             closeTaucoin();
             cancelLocalConnector();
+            mWifiSettings.destroy();
+            mWifiSettings = null;
         }
     }
 
@@ -104,7 +110,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
     void cancelLocalConnector(){
         if (mTaucoinConnector != null) {
             mTaucoinConnector.removeHandler(this);
-            mTaucoinConnector.unbindService();
+            try {
+                mTaucoinConnector.unbindService();
+            }catch (Exception e){
+                Logger.e(e, "cancelLocalConnector.unbindService is error!");
+            }
             mTaucoinConnector = null;
         }
         isInit = -1;
@@ -266,7 +276,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
      * 2、get block height
      * 3、get block list (update my mining block)
      * */
-    public void startSyncAll(){
+    private void startSyncAll(){
         if(mTaucoinConnector != null && isInit()){
             logger.info("startSyncAll");
             mTaucoinConnector.startSync();
@@ -274,7 +284,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
         }
     }
 
-    public void stopSyncAll(){
+    private void stopSyncAll(){
         if(mTaucoinConnector != null && isInit()){
             logger.info("stopSyncAll");
             mTaucoinConnector.stopSync();
@@ -290,6 +300,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public void startBlockForging(){
+        startSyncAll();
+        if(mWifiSettings != null){
+            mWifiSettings.onForgingWifiOnlySettingChanged();
+        }
         mExceptionStop = null;
         startBlockForging(-1);
     }
@@ -300,6 +314,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public void stopBlockForging(){
+        stopSyncAll();
+        stopDownload();
         mExceptionStop = null;
         stopBlockForging(-1);
     }
@@ -390,6 +406,20 @@ public abstract class ConnectorManager implements ConnectorHandler {
             }else{
                 createRemoteConnector();
             }
+        }
+    }
+
+    public void stopDownload(){
+        if(mTaucoinConnector != null && isInit()){
+            Logger.d("stopDownload");
+            mTaucoinConnector.stopDownload();
+        }
+    }
+
+    public void startDownload(){
+        if(mTaucoinConnector != null && isInit()){
+            Logger.d("startDownload");
+            mTaucoinConnector.startDownload();
         }
     }
 }

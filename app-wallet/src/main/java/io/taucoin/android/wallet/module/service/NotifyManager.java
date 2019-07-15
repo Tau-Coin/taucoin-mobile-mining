@@ -233,10 +233,13 @@ public class NotifyManager {
             pendingIntent = PendingIntent.getService(service, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         remoteViews.setOnClickPendingIntent(R.id.iv_mining, pendingIntent);
-
-        Notification mNotification = builder.build();
-        mNotification.flags = Notification.FLAG_NO_CLEAR;
-        service.startForeground(NOTIFICATION_ID, mNotification);
+        try {
+            Notification mNotification = builder.build();
+            mNotification.flags = Notification.FLAG_NO_CLEAR;
+            service.startForeground(NOTIFICATION_ID, mNotification);
+        }catch (Exception e){
+            Logger.e(e, "sendNotify notificationBuilder.build() is error");
+        }
     }
 
     void sendBlockNotify(Service service, NotificationManager notificationManager, NotificationCompat.Builder builder, String rewardMsg) {
@@ -254,9 +257,13 @@ public class NotifyManager {
         remoteViews.setTextViewText(R.id.tv_time, DateUtil.format(time, DateUtil.pattern0));
         builder.setCustomContentView(remoteViews);
         builder.setSound(null);
-        Notification notification = builder.build();
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(notifyId, notification);
+        try {
+            Notification notification = builder.build();
+            notification.flags = Notification.FLAG_AUTO_CANCEL;
+            notificationManager.notify(notifyId, notification);
+        }catch (Exception e){
+            Logger.e(e, "sendBlockNotify notificationBuilder.build() is error");
+        }
     }
 
     void cancelNotify(){
@@ -338,11 +345,9 @@ public class NotifyManager {
                     isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                 }
                 if(isStart){
-                    MyApplication.getRemoteConnector().startSyncAll();
                     MyApplication.getRemoteConnector().startBlockForging();
                 }else{
                     MyApplication.getRemoteConnector().stopBlockForging();
-                    MyApplication.getRemoteConnector().stopSyncAll();
                 }
                 MessageEvent messageEvent = new MessageEvent();
                 messageEvent.setCode(MessageEvent.EventCode.MINING_NOTIFY);
