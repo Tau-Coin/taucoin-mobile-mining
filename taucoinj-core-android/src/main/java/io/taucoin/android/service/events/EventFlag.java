@@ -130,5 +130,16 @@ public enum EventFlag {
     /**
      *  Next block forged POT detail event.
      */
-    EVENT_BLOCK_FORGED_POT_DETAIL
+    EVENT_BLOCK_FORGED_POT_DETAIL,
+
+    /**
+     * Start downloading blocks evnet.
+     */
+    EVENT_START_DOWNLOAD,
+
+    /**
+     * Stop downloading blocks evnet.
+     */
+    EVENT_STOP_DOWNLOAD
+
 }

@@ -164,4 +164,14 @@ public class TaucoinServiceMessage {
      */
     public static final int MSG_STOP_SYNC = 33;
 
+    /**
+     * Command to the service to start download
+     */
+    public static final int MSG_START_DOWNLOAD = 34;
+
+    /**
+     * Command to the service to stop download
+     */
+    public static final int MSG_STOP_DOWNLOAD = 35;
+
 }

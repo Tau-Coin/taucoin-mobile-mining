@@ -101,4 +101,14 @@ public class TaucoinClientMessage {
      * Send stopping sync result to client
      */
     public static final int MSG_STOP_SYNC_RESULT = 20;
+
+    /**
+     * Send starting download result to client
+     */
+    public static final int MSG_START_DOWNLOAD_RESULT = 21;
+
+    /**
+     * Send stopping download result to client
+     */
+    public static final int MSG_STOP_DOWNLOAD_RESULT = 22;
 }

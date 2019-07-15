@@ -160,6 +160,46 @@ public class TaucoinConnector extends ServiceConnector {
     }
 
     /**
+     * Start block downloading.
+     * Please handle TaucoinClientMessage.MSG_START_DOWNLOAD_RESULT for result
+     * of starting downloading.
+     */
+    public void startDownload() {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_START_DOWNLOAD, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(download) to service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Stop block downloading.
+     * Please handle TaucoinClientMessage.MSG_STOP_DOWNLOAD_RESULT for result
+     * of stopping downloading.
+     */
+    public void stopDownload() {
+        if (!isBound) {
+            System.out.println(" Not bound ???");
+            return;
+        }
+
+        Message msg = Message.obtain(null, TaucoinServiceMessage.MSG_STOP_DOWNLOAD, 0, 0);
+        msg.replyTo = clientMessenger;
+        try {
+            serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+            logger.error("Exception sending message(download) to service: " + e.getMessage());
+        }
+    }
+
+    /**
      * Get block hash list.
      *
      * @param start start height

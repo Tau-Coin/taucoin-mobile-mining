@@ -261,9 +261,19 @@ public class TaucoinRemoteService extends TaucoinService {
             case TaucoinServiceMessage.MSG_GET_ACCOUNT_STATE:
                 getAccountState(message);
                 break;
+
             case TaucoinServiceMessage.MSG_GET_BLOCK_TX_REINDEX:
                 getBlockTx(message);
                 break;
+
+            case TaucoinServiceMessage.MSG_START_DOWNLOAD:
+                startDownload(message);
+                break;
+
+            case TaucoinServiceMessage.MSG_STOP_DOWNLOAD:
+                stopDownload(message);
+                break;
+
             default:
                 return false;
         }
@@ -802,6 +812,40 @@ public class TaucoinRemoteService extends TaucoinService {
             message.replyTo.send(replyMessage);
         } catch (RemoteException e) {
             logger.error("Exception sending stopping sync result to client: " + e.getMessage());
+        }
+    }
+
+    protected void startDownload(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_START_DOWNLOAD_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        if (taucoin != null) {
+            replyData.putSerializable("event", EventFlag.EVENT_START_DOWNLOAD);
+            taucoin.getWorldManager().startDownload();
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending starting download result to client: " + e.getMessage());
+        }
+    }
+
+    protected void stopDownload(Message message) {
+        Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_STOP_DOWNLOAD_RESULT, 0, 0);
+        Bundle replyData = new Bundle();
+
+        if (taucoin != null) {
+            replyData.putSerializable("event", EventFlag.EVENT_STOP_DOWNLOAD);
+            taucoin.getWorldManager().stopDownload();
+        }
+
+        replyMessage.setData(replyData);
+        try {
+            message.replyTo.send(replyMessage);
+        } catch (RemoteException e) {
+            logger.error("Exception sending stopping download result to client: " + e.getMessage());
         }
     }
 
