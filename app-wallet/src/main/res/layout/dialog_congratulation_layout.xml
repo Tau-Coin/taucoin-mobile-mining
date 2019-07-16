@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_white"
+    android:gravity="center_horizontal"
+    android:clickable="true"
+    android:paddingTop="25dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="35dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:contentDescription="@null"
+        android:src="@mipmap/icon_congratulation"
+        android:layout_marginTop="15dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+    <TextView
+        style="@style/style_big_yellow"
+        android:text="@string/main_congratulation"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tv_msg"
+        style="@style/style_big_yellow"
+        android:text="@string/main_congratulation_msg"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_marginTop="55dp"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_toStartOf="@+id/positiveButton"
+            android:id="@+id/negativeButton"
+            style="@style/style_normal_yellow"
+            android:layout_width="wrap_content"
+            android:minWidth="@dimen/dimen_size_120"
+            android:layout_height="35dp"
+            android:textAllCaps="false"
+            android:layout_marginEnd="20dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:background="@drawable/black_light_rect_round_bg" />
+
+        <Button
+            android:id="@+id/positiveButton"
+            style="@style/style_normal_white"
+            android:layout_width="wrap_content"
+            android:minWidth="@dimen/dimen_size_120"
+            android:layout_alignParentEnd="true"
+            android:layout_height="35dp"
+            android:textAllCaps="false"
+            android:layout_marginEnd="30dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:background="@drawable/yellow_rect_small_round_bg" />
+
+    </RelativeLayout>
+</LinearLayout>

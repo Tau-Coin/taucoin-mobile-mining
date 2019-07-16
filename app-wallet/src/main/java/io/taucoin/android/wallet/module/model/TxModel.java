@@ -52,6 +52,7 @@ import io.taucoin.android.wallet.module.bean.RankInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.bean.TransactionBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import io.taucoin.android.wallet.module.bean.TxStatusBean;
@@ -652,5 +653,18 @@ public class TxModel implements ITxModel {
                     }
                 }
             });
+    }
+
+    @Override
+    public void getRewardInfo(TxObserver<RewardInfoBean> observer) {
+        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+        Map<String,String> map = new HashMap<>();
+        map.put("address",  address);
+        NetWorkManager.createMainApiService(TransactionService.class)
+            .getRewardInfo(map)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
     }
 }

@@ -147,6 +147,13 @@
             android:enabled="true"
             android:exported="false" />
 
+        <activity android:name="io.taucoin.android.wallet.module.view.tx.IncreaseActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
+        <activity android:name="io.taucoin.android.wallet.module.view.manage.CongratulationActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/transparent"/>
+
     </application>
 
 </manifest>

@@ -242,6 +242,13 @@ public class NotifyManager {
         }
     }
 
+    public void sendCongratulationNotify(String notifyMsg) {
+        if(mService == null){
+            return;
+        }
+        sendBlockNotify(mService, mNotificationManager, mBuilder, notifyMsg);
+    }
+
     void sendBlockNotify(Service service, NotificationManager notificationManager, NotificationCompat.Builder builder, String rewardMsg) {
         if(service == null || !PermissionUtils.isNotificationEnabled()){
             return;

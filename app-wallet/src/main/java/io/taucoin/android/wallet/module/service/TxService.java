@@ -34,11 +34,13 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.ChainDetail;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.model.AppModel;
 import io.taucoin.android.wallet.module.model.IAppModel;
 import io.taucoin.android.wallet.module.model.ITxModel;
 import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.view.main.HomeFragment;
+import io.taucoin.android.wallet.module.view.manage.CongratulationActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.util.AppPowerManger;
@@ -48,6 +50,7 @@ import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.net.callback.NetResultCode;
+import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.StringUtil;
 
 public class TxService extends Service {
@@ -123,6 +126,9 @@ public class TxService extends Service {
                     break;
                 case TransmitKey.ServiceType.GET_BLOCK_HEIGHT:
                     getBlockHeight(!mIsGetBlockHeight);
+                    break;
+                case TransmitKey.ServiceType.GET_REWARD_INFO:
+                    getRewardInfo();
                     break;
                 default:
                     break;
@@ -351,6 +357,21 @@ public class TxService extends Service {
                     getBlockHeight(true);
                 }
             });
+    }
+
+    private void getRewardInfo() {
+        mTxModel.getRewardInfo(new TxObserver<RewardInfoBean>() {
+            @Override
+            public void handleData(RewardInfoBean rewardInfo) {
+                super.handleData(rewardInfo);
+                if(rewardInfo != null){
+                    Context context = ActivityManager.getInstance().currentActivity();
+                    Intent intent = new Intent(context, CongratulationActivity.class);
+                    intent.putExtra(TransmitKey.BEAN, rewardInfo);
+                    context.startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override

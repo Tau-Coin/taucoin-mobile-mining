@@ -35,6 +35,7 @@ import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
+import io.taucoin.android.wallet.module.view.tx.IncreaseActivity;
 import io.taucoin.android.wallet.module.view.tx.SendActivity;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.CopyManager;
@@ -127,7 +128,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         });
     }
 
-    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right})
+    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right, R.id.btn_increase})
     void onClick(View view) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue == null && view.getId() != R.id.iv_tx_log_tips) {
@@ -138,6 +139,10 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         switch (view.getId()) {
             case R.id.btn_send:
                 Intent intent = new Intent(getActivity(), SendActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_increase:
+                intent = new Intent(getActivity(), IncreaseActivity.class);
                 startActivity(intent);
                 break;
             case R.id.iv_tx_log_tips:

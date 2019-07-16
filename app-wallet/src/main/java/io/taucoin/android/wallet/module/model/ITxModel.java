@@ -20,9 +20,9 @@ import java.util.List;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
-import io.taucoin.android.wallet.module.bean.AccountBean;
 import io.taucoin.android.wallet.module.bean.ChainBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
+import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.bean.TransactionBean;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -69,4 +69,6 @@ public interface ITxModel {
     void getIncomeInfo(LogicObserver<BlockInfo> observer);
 
     void getRankInfo(LogicObserver<KeyValue> observer);
+
+    void getRewardInfo(TxObserver<RewardInfoBean> observer);
 }

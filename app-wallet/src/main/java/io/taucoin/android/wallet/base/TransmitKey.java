@@ -25,6 +25,7 @@ public class TransmitKey {
         public static final String GET_RAW_TX = "get_raw_tx";
         public static final String GET_INFO = "get_info";
         public static final String GET_BLOCK_HEIGHT = "get_block_height";
+        public static final String GET_REWARD_INFO = "get_reward_info";
     }
 
     public static final String PUBLIC_KEY = "PubKey";

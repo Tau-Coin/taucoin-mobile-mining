@@ -8,6 +8,7 @@
     <string name="common_done">Done</string>
     <string name="common_yes">Yes</string>
     <string name="common_no">No</string>
+    <string name="common_continue">Continue</string>
     <string name="common_balance" formatted="false"><Data><![CDATA[<font color="#f19322">%s</font>&nbsp;TAU]]> </Data></string>
     <string name="common_exit" formatted="false">Do you want to stop mining?</string>
     <string name="common_balance_unit">TAU</string>
@@ -29,7 +30,10 @@
     <string name="main_manage">Manage</string>
     <string name="main_home_title">TAUcoin.io - Mobile Mining Wallet</string>
     <string name="main_exit">Click again to exit the application!</string>
+    <string name="main_congratulation">Congratulation!</string>
+    <string name="main_congratulation_msg">You\'ve successfully mined %s blocks, and %s TAU in the last %s hours!</string>
 
+    <string name="tx_increase">Increase</string>
     <string name="tx_send">Send</string>
     <string name="tx_receive">Receive</string>
     <string name="tx_log">Transaction log</string>
@@ -62,6 +66,7 @@
 
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
+    <string name="send_amount_increase">Amount:</string>
     <string name="send_memo">Memo</string>
     <string name="send_status">Status</string>
     <string name="send_tx_fee_tip">The higher fee, the faster trx processing.</string>
@@ -72,6 +77,8 @@
     <string name="send_tx_success">Transaction sent</string>
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
+    <string name="send_tx_increase_tip">Transactions to foundation coin sending address will increase power and participation reward.</string>
+    <string name="send_tx_increase_address" formatted="false"><Data><![CDATA[To:&nbsp;%s&nbsp;<font color="#f19322">(&nbsp;Foundation&nbsp;coin&nbsp;sending&nbsp;address&nbsp;)</font>]]> </Data></string>
 
     <string name="send_tx_small_fee">0.01</string>
     <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>

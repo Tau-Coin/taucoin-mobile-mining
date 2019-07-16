@@ -6,9 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -23,13 +27,21 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.android.wallet.module.bean.RewardInfoBean;
+import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.DaemonJobService;
+import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
 import io.taucoin.android.wallet.module.view.main.iview.IMainView;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
+import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.widget.CommonDialog;
+import io.taucoin.android.wallet.widget.CongratulationDialog;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
@@ -54,7 +66,7 @@ public class MainActivity extends BaseActivity implements IMainView {
         changeTab(0);
         initExitApp();
         UpgradeService.startUpdateService();
-
+        TxService.startTxService(TransmitKey.ServiceType.GET_REWARD_INFO);
     }
 
     @Override
