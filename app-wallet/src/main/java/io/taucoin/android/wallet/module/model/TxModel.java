@@ -627,7 +627,7 @@ public class TxModel implements ITxModel {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRankInfo(map)
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
@@ -660,7 +660,7 @@ public class TxModel implements ITxModel {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRewardInfo(map)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(scheduler)

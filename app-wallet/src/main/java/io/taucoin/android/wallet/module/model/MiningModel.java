@@ -177,7 +177,7 @@ public class MiningModel implements IMiningModel{
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getParticipantInfo(map)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(scheduler)
@@ -223,7 +223,7 @@ public class MiningModel implements IMiningModel{
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getMinerHistory(map)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(scheduler)
@@ -236,7 +236,7 @@ public class MiningModel implements IMiningModel{
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
-        NetWorkManager.createMainApiService(TransactionService.class)
+        NetWorkManager.createMysqlApiService(TransactionService.class)
             .getParticipantHistory(map)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(scheduler)

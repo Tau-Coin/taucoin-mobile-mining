@@ -364,7 +364,7 @@ public class TxService extends Service {
             @Override
             public void handleData(RewardInfoBean rewardInfo) {
                 super.handleData(rewardInfo);
-                if(rewardInfo != null){
+                if(rewardInfo != null && StringUtil.getLongString(rewardInfo.getBlockNo()) > 0){
                     Context context = ActivityManager.getInstance().currentActivity();
                     Intent intent = new Intent(context, CongratulationActivity.class);
                     intent.putExtra(TransmitKey.BEAN, rewardInfo);
