@@ -7,11 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 
+@Singleton
 public class FileBlockStore {
 
     private static final Logger logger = LoggerFactory.getLogger("fileblockqueue");
@@ -31,6 +34,7 @@ public class FileBlockStore {
 
     private long maxNumber;
 
+    @Inject
     public FileBlockStore() {
     }
 
@@ -108,7 +112,7 @@ public class FileBlockStore {
         }
 
         maxNumber = number;
-        logger.info("save block with number {} hash {} cost {}ns, postion {}",
+        logger.debug("save block with number {} hash {} cost {}ns, postion {}",
                 number, Hex.toHexString(block.getHash()),
                 System.nanoTime() - startTime, position);
     }
@@ -148,7 +152,7 @@ public class FileBlockStore {
                     + e.getMessage());
         }
 
-        logger.info("read block with number {} hash {} cost {}ns, postion {}",
+        logger.debug("read block with number {} hash {} cost {}ns, postion {}",
                 number, Hex.toHexString(block.getHash()),
                 System.nanoTime() - startTime, position);
         return block;
@@ -235,7 +239,11 @@ public class FileBlockStore {
         BlockWrapper block = new BlockWrapper(blockEncoded);
         long number = block.getNumber();
         if (number != maxNumber) {
-            throw new RuntimeException("Blcokqueue filesys is corrupted");
+            String errorMessage = String.format(
+                    "Block index corrupted, max number %d vs block number %d",
+                    maxNumber, number);
+            logger.error(errorMessage);
+            throw new RuntimeException(errorMessage);
         }
     }
 }

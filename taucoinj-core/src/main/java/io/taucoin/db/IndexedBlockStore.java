@@ -283,7 +283,7 @@ public class IndexedBlockStore implements BlockStore {
             if (indexDB != null) {
                 indexDB.commit();
             }
-            logger.info("remove block with number {}", number);
+            logger.debug("remove block with number {}", number);
         } finally {
             w.unlock();
         }

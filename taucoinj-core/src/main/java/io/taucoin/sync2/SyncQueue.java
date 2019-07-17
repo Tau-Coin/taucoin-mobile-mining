@@ -4,6 +4,8 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.datasource.mapdb.MapDBFactory;
 import io.taucoin.db.*;
+import io.taucoin.db.file.BlockQueueFileSys;
+import io.taucoin.db.file.FileBlockStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -64,6 +66,8 @@ public class SyncQueue {
      */
     private BlockQueue blockQueue;
 
+    private FileBlockStore fileBlockStore;
+
     private AtomicBoolean noParent = new AtomicBoolean(false);
 
     private final Object noParentLock = new Object();
@@ -99,9 +103,11 @@ public class SyncQueue {
 
     private AtomicBoolean isRequestClose = new AtomicBoolean(false);
 
-    public SyncQueue(Blockchain blockchain, MapDBFactory mapDBFactory) {
+    public SyncQueue(Blockchain blockchain, MapDBFactory mapDBFactory,
+            FileBlockStore fileBlockStore) {
         this.blockchain = blockchain;
         this.mapDBFactory = mapDBFactory;
+        this.fileBlockStore = fileBlockStore;
     }
 
     public void setSyncManager(SyncManager syncManager) {
@@ -122,18 +128,8 @@ public class SyncQueue {
         hashStore = new HashStoreMem();
         headerStore = new HeaderStoreMem();
         blockNumbersStore = new BlockNumberStoreMem();
-        //blockQueue = new BlockQueueMem();
-        blockQueue = new BlockQueueImpl();
-        ((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
-        ((BlockQueueImpl)blockQueue).setBlockchain(blockchain);
-
-//        hashStore = new HashStoreImpl();
-//        ((HashStoreImpl)hashStore).setMapDBFactory(mapDBFactory);
-//        headerStore = new HeaderStoreImpl();
-//        ((HeaderStoreImpl)headerStore).setMapDBFactory(mapDBFactory);
-//        blockQueue = new BlockQueueImpl();
-//        ((BlockQueueImpl)blockQueue).setMapDBFactory(mapDBFactory);
-
+        blockQueue = new BlockQueueFileSys(fileBlockStore);
+        ((BlockQueueFileSys)blockQueue).setBlockchain(blockchain);
 
         hashStore.open();
         headerStore.open();
@@ -299,7 +295,12 @@ public class SyncQueue {
                     blockQueue.add(wrapper);
                     tryGapRecovery(wrapper);
                     noParent.set(true);
-                    waitForRecovery();
+
+                    // If 'blockQueue' implementation is BlockQueueMem or BlockQueueImpl, it takes several
+                    // seconds to download blocks from network.
+                    if (blockQueue instanceof BlockQueueMem || blockQueue instanceof BlockQueueImpl) {
+                        waitForRecovery();
+                    }
                 } else {
                     noParent.set(false);
                 }
@@ -362,7 +363,15 @@ public class SyncQueue {
         long expectedEndNumber = wrapper.getNumber() - 1;
 
         logger.warn("Try gap recovery from {} end {}", bestBlockNumber + 1, expectedEndNumber);
-        addBlockNumbers(bestBlockNumber + 1, expectedEndNumber);
+
+        // Very arguly solution. TODO: gracefully recover blocks.
+        if (blockQueue instanceof BlockQueueMem || blockQueue instanceof BlockQueueImpl) {
+            addBlockNumbers(bestBlockNumber + 1, expectedEndNumber);
+        } else if (blockQueue instanceof BlockQueueFileSys) {
+            if (expectedEndNumber > bestBlockNumber) {
+                ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
+            }
+        }
     }
 
     public boolean isImportingBlocksFinished() {
@@ -429,7 +438,8 @@ public class SyncQueue {
                 blocks.get(blocks.size() - 1).getNumber()
         );
 
-        if (noParent.get()) {
+        if (noParent.get() && (blockQueue instanceof BlockQueueMem
+                || blockQueue instanceof BlockQueueImpl)) {
             BlockWrapper firstEntry = blockQueue.peek();
             if (firstEntry.getNumber() <= blockchain.getBestBlock().getNumber() + 1) {
                 notifyRecovery();

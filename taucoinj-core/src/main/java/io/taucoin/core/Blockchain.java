@@ -61,4 +61,11 @@ public interface Blockchain {
      * @return
      */
     Object getLockObject();
+
+    /**
+     * Check database sanity.
+     * Return false if there is nothing to do;
+     * Return true else;
+     */
+    boolean checkSanity();
 }

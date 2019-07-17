@@ -4,7 +4,9 @@ import io.taucoin.config.Constants;
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
+import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.db.BlockStore;
+import io.taucoin.db.file.FileBlockStore;
 import io.taucoin.debug.RefWatcher;
 import io.taucoin.listener.TaucoinListener;
 import io.taucoin.sync2.ChainInfoManager;
@@ -82,6 +84,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private ChainInfoManager chainInfoManager;
 
+    private FileBlockStore fileBlockStore;
 
     SystemProperties config = SystemProperties.CONFIG;
 
@@ -103,12 +106,14 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     @Inject
     public BlockchainImpl(BlockStore blockStore, Repository repository,
             PendingState pendingState, TaucoinListener listener,
-            ChainInfoManager chainInfoManager, RefWatcher refWatcher) {
+            ChainInfoManager chainInfoManager, FileBlockStore fileBlockStore,
+            RefWatcher refWatcher) {
         this.blockStore = blockStore;
         this.repository = repository;
         this.pendingState = pendingState;
         this.listener = listener;
         this.chainInfoManager = chainInfoManager;
+        this.fileBlockStore = fileBlockStore;
         this.refWatcher = refWatcher;
     }
 
@@ -283,7 +288,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 }
 
                 //if (needFlush(block)) {
-                    repository.flush();
+                    repository.flush(block.getNumber());
                     blockStore.flush();
                     System.gc();
                 //}
@@ -408,6 +413,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                         public void run() {
                             if (currentBlockNumber > config.getMutableRange()) {
                                 blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
+                                blockStore.delChainBlockByNumber(currentBlockNumber - config.getMutableRange());
                             }
                         }
                     });
@@ -487,7 +493,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         storeBlock(block);
 
         //if (needFlush(block)) {
-            repository.flush();
+            repository.flush(block.getNumber());
             blockStore.flush();
             System.gc();
         //}
@@ -1053,4 +1059,56 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return bodies;
     }
 
+    @Override
+    public synchronized boolean checkSanity() {
+        long blockStoreMaxNumber = blockStore.getMaxNumber();
+        long stateMaxNumber = repository.getMaxNumber();
+
+        logger.info("blockstore max number {}, state max number {}",
+                blockStoreMaxNumber, stateMaxNumber);
+        if (blockStoreMaxNumber == stateMaxNumber || stateMaxNumber == -1L) {
+            return false;
+        }
+
+        // From method 'tryConnect' and 'tryConnectAndFork' it can be found
+        // repository state database is updated firstly and then block store.
+        // But when app is killed, database consistency maybe happens.
+        if (stateMaxNumber == blockStoreMaxNumber + 1) {
+            // Rollback state database
+            Block undoBlock = fileBlockStore.get(blockStoreMaxNumber + 1).getBlock();
+
+            track = repository.startTracking();
+            logger.info("Try to disconnect block with number: {}, hash: {}",
+                    undoBlock.getNumber(), Hex.toHexString(undoBlock.getHash()));
+
+            List<Transaction> txs = undoBlock.getTransactionsList();
+            int size = txs.size();
+            for (int i = size - 1; i >= 0; i--) {
+                StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
+                        new StakeHolderIdentityUpdate(txs.get(i), track, undoBlock.getForgerAddress(),
+                                undoBlock.getNumber() - 1);
+                stakeHolderIdentityUpdate.rollbackStakeHolderIdentity();
+            }
+
+            for (int i = size - 1; i >= 0; i--) {
+                TransactionExecutor executor = new TransactionExecutor(txs.get(i), track, this, listener);
+                executor.setCoinbase(undoBlock.getForgerAddress());
+                executor.undoTransaction();
+            }
+
+            track.commit();
+            repository.flush(blockStoreMaxNumber);
+        } else if (blockStoreMaxNumber == stateMaxNumber + 1) {
+            // Maybe this condition never happens.
+            blockStore.delChainBlockByNumber(blockStoreMaxNumber);
+        } else {
+            String errorStr = String.format(
+                    "database corruption, blockstore number %s, statedb number %s",
+                    blockStoreMaxNumber, stateMaxNumber);
+            logger.error(errorStr);
+            //throw new DBCorruptionException(errorStr);
+        }
+
+        return true;
+    }
 }

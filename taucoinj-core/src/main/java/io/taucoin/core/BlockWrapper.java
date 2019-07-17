@@ -28,6 +28,9 @@ public class BlockWrapper {
     private boolean newBlock;
     private byte[] nodeId;
 
+    // Raw block from network doesn't inlucde 'number' feild.
+    private long number = 0;
+
     public BlockWrapper(Block block, byte[] nodeId) {
         this(block, false, nodeId);
     }
@@ -67,7 +70,11 @@ public class BlockWrapper {
     }
 
     public long getNumber() {
-        return block.getNumber();
+        if (number == 0) {
+            number = block.getNumber();
+        }
+
+        return number;
     }
 
     public byte[] getEncoded() {
@@ -118,12 +125,17 @@ public class BlockWrapper {
 
     public byte[] getBytes() {
         byte[] blockBytes = block.getEncodedCacheData();
+
+        /**
         byte[] importFailedBytes = RLP.encodeBigInteger(BigInteger.valueOf(importFailedAt));
         byte[] receivedAtBytes = RLP.encodeBigInteger(BigInteger.valueOf(receivedAt));
         byte[] newBlockBytes = RLP.encodeByte((byte) (newBlock ? 1 : 0));
         byte[] nodeIdBytes = RLP.encodeElement(nodeId);
         return RLP.encodeList(blockBytes, importFailedBytes,
                 receivedAtBytes, newBlockBytes, nodeIdBytes);
+        */
+        byte[] numberBytes = RLP.encodeBigInteger(BigInteger.valueOf(this.number));
+        return RLP.encodeList(blockBytes, numberBytes);
     }
 
     private void parse(byte[] bytes) {
@@ -131,6 +143,9 @@ public class BlockWrapper {
         List<RLPElement> wrapper = (RLPList) params.get(0);
 
         byte[] blockBytes = wrapper.get(0).getRLPData();
+        this.block = new Block(blockBytes, true);
+
+        /**
         byte[] importFailedBytes = wrapper.get(1).getRLPData();
         byte[] receivedAtBytes = wrapper.get(2).getRLPData();
         byte[] newBlockBytes = wrapper.get(3).getRLPData();
@@ -141,6 +156,10 @@ public class BlockWrapper {
         byte newBlock = newBlockBytes == null ? 0 : new BigInteger(1, newBlockBytes).byteValue();
         this.newBlock = newBlock == 1;
         this.nodeId = wrapper.get(4).getRLPData();
+        */
+        byte[] numberBytes = wrapper.get(1).getRLPData();
+        this.number = numberBytes == null ?
+                0 : (new BigInteger(1, numberBytes)).longValue();
     }
 
     @Override
