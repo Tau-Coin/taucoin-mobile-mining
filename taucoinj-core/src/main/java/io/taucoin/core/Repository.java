@@ -97,6 +97,14 @@ public interface Repository {
     void flush();
 
     /**
+     * Store latest height in reposity to solve the database consistency
+     * between block store and reposity.
+     */
+    void flush(long number);
+
+    long getMaxNumber();
+
+    /**
      * Store all the temporary changes made
      * to the repository in the actual database
      */

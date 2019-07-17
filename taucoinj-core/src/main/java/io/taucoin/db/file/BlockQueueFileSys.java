@@ -41,8 +41,8 @@ public class BlockQueueFileSys implements BlockQueue {
 
     private FileBlockStore fileBlockStore;
 
-    public BlockQueueFileSys() {
-        fileBlockStore = new FileBlockStore();
+    public BlockQueueFileSys(FileBlockStore fileBlockStore) {
+        this.fileBlockStore = fileBlockStore;
     }
 
     @Override
@@ -111,6 +111,11 @@ public class BlockQueueFileSys implements BlockQueue {
                 notEmpty.signalAll();
             } finally {
                 takeLock.unlock();
+            }
+
+            if (!numbers.isEmpty()) {
+                logger.info("Add block from {} to {}", numbers.get(0),
+                        numbers.get(numbers.size() - 1));
             }
         }
     }

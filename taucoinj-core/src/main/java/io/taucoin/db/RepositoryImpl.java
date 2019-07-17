@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.taucoin.core.AccountState;
 import io.taucoin.core.Block;
 import io.taucoin.core.Repository;
+import io.taucoin.core.Utils;
 import io.taucoin.datasource.KeyValueDataSource;
 import io.taucoin.json.EtherObjectMapper;
 import io.taucoin.json.JSONHelper;
 import io.taucoin.util.Functional;
+import io.taucoin.util.RLP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -46,6 +48,11 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     private static final Logger logger = LoggerFactory.getLogger("repository");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
 
+    HashMap<byte[], byte[]> writeBatch = new HashMap<>();
+
+    private static final String MAX_NUMBER_KEY_STR = "REPO_LATEST_NUMBER";
+    private static final byte[] MAX_NUMBER_KEY = MAX_NUMBER_KEY_STR.getBytes();
+
     private KeyValueDataSource stateDB = null;
 
     public RepositoryImpl() {
@@ -80,6 +87,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     public void updateBatch(HashMap<ByteArrayWrapper, AccountState> stateCache) {
 
         logger.debug("updatingBatch: stateCache.size: {}", stateCache.size());
+        clearAccountStateBatch();
 
         for (ByteArrayWrapper hash : stateCache.keySet()) {
 
@@ -91,7 +99,8 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
                         Hex.toHexString(hash.getData()));
 
             } else {
-                updateAccountState(hash.getData(), accountState);
+                //updateAccountState(hash.getData(), accountState);
+                updateAccountStateBatch(hash.getData(), accountState);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("update: [{}],forgePower: [{}] balance: [{}] \n",
@@ -111,6 +120,19 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     @Override
     public synchronized void flush() {
         gLogger.debug("flushing to disk");
+    }
+
+    @Override
+    public synchronized void flush(long number) {
+        packLastestNumber(number);
+        stateDB.updateBatch(writeBatch);
+        clearAccountStateBatch();
+        gLogger.debug("flushing to disk with number {}", number);
+    }
+
+    @Override
+    public synchronized long getMaxNumber() {
+        return getLastestNumber();
     }
 
     @Override
@@ -188,6 +210,30 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
     private synchronized void updateAccountState(final byte[] addr, final AccountState accountState) {
         stateDB.put(addr, accountState.getEncoded());
+    }
+
+    private synchronized void updateAccountStateBatch(final byte[] addr, final AccountState accountState) {
+        writeBatch.put(addr, accountState.getEncoded());
+    }
+
+    private synchronized void clearAccountStateBatch() {
+        writeBatch.clear();
+    }
+
+    private synchronized void packLastestNumber(long number) {
+        byte[] numberBytes = new byte[8];
+        Utils.uint64ToByteArrayLE(number, numberBytes, 0);
+        writeBatch.put(MAX_NUMBER_KEY, numberBytes);
+    }
+
+    private synchronized long getLastestNumber() {
+        byte[] numberBytes = stateDB.get(MAX_NUMBER_KEY);
+        if (numberBytes == null) {
+            return -1L;
+        }
+
+        long number = Utils.readInt64(numberBytes, 0);
+        return number;
     }
 
     private synchronized void updateGenesisAccountState(final byte[] addr, final AccountState accountState) {

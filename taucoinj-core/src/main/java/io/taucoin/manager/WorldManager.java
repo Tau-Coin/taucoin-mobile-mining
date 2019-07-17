@@ -215,6 +215,10 @@ public class WorldManager {
             logger.info("Genesis block loaded");
         } else {
 
+            // First of all, check database sanity
+            if (blockchain.checkSanity()) {
+                bestBlock = blockStore.getBestBlock();
+            }
             blockchain.setBestBlock(bestBlock);
 
             BigInteger totalDifficulty = blockStore.getTotalDifficulty();

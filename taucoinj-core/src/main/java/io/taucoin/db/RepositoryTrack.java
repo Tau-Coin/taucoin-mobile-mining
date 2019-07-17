@@ -198,6 +198,16 @@ public class RepositoryTrack implements Repository {
     }
 
     @Override
+    public void flush(long number) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getMaxNumber() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void commit() {
 
         repository.updateBatch(cacheAccounts);
