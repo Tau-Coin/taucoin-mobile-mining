@@ -128,6 +128,10 @@ public class WorldManager {
         poolSynchronizer.stop();
     }
 
+    public boolean isSync() {
+        return isSyncRunning;
+    }
+
     public void startDownload() {
         if (isSyncDownloading) {
             return;

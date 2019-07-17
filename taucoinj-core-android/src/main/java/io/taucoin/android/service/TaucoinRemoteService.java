@@ -462,8 +462,16 @@ public class TaucoinRemoteService extends TaucoinService {
                     if (NetworkInfo.State.CONNECTED == info.getState()
                             && info.isAvailable()) {
                         connectionManager.setConnectionState(CONNECTED);
+                        if (taucoin.getWorldManager().isSync()) {
+                            logger.info("try to start sync due to network connected");
+                            taucoin.getWorldManager().startDownload();
+                        }
                     } else {
                         connectionManager.setConnectionState(DISCONNECTED);
+                        if (taucoin.getWorldManager().isSync()) {
+                            logger.info("try to stop sync due to network disconnected");
+                            taucoin.getWorldManager().stopDownload();
+                        }
                     }
                 }
             }
