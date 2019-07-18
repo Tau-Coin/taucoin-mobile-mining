@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static java.math.BigInteger.ZERO;
 import static io.taucoin.crypto.HashUtil.shortHash;
+import static io.taucoin.config.SystemProperties.CONFIG;
 import static org.spongycastle.util.Arrays.areEqual;
 
 public class IndexedBlockStore implements BlockStore {
@@ -37,7 +38,7 @@ public class IndexedBlockStore implements BlockStore {
     DB indexDB;
 
     // Block time cache: height -> block time.
-    private static final int BLOCKTIME_CACHE_CAPACITY = 288;
+    private static final int BLOCKTIME_CACHE_CAPACITY = CONFIG.blockStoreCapability();
 
     private static LRUCache sBlockTimeCache
             = new LRUCache(BLOCKTIME_CACHE_CAPACITY, 0.75f);

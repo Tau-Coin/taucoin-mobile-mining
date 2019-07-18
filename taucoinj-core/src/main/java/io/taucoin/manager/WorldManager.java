@@ -235,12 +235,12 @@ public class WorldManager {
 
             final long bestNumber = bestBlock.getNumber();
             logger.info("Blockchain best number {}", bestNumber);
-            if (bestNumber > config.getMutableRange()) {
+            if (bestNumber > config.blockStoreCapability()) {
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         blockStore.delChainBlocksWithNumberLessThan(
-                                bestNumber - config.getMutableRange());
+                                bestNumber - config.blockStoreCapability());
                     }
                 });
             }
