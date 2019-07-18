@@ -814,6 +814,11 @@ public class SystemProperties {
         return (int)config.getInt("filestore.indexstore.file.maxamount");
     }
 
+    @ValidateMe
+    public int blockStoreCapability() {
+        return (int)config.getInt("blockstore.capability");
+    }
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }

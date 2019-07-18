@@ -385,9 +385,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 EventDispatchThread.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if ( currentBlockNumber > config.getMutableRange()) {
-                            blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
-                            blockStore.delChainBlockByNumber(currentBlockNumber - config.getMutableRange());
+                        if (currentBlockNumber > config.blockStoreCapability()) {
+                            blockStore.delChainBlockByNumber(
+                                    currentBlockNumber - config.blockStoreCapability());
                         }
                     }
                 });
@@ -411,9 +411,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     EventDispatchThread.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (currentBlockNumber > config.getMutableRange()) {
-                                blockStore.delNonChainBlocksByNumber(currentBlockNumber - config.getMutableRange());
-                                blockStore.delChainBlockByNumber(currentBlockNumber - config.getMutableRange());
+                            if (currentBlockNumber > config.blockStoreCapability()) {
+                                blockStore.delChainBlockByNumber(
+                                        currentBlockNumber - config.blockStoreCapability());
                             }
                         }
                     });
