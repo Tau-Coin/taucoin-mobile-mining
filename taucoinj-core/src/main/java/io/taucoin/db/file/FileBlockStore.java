@@ -36,6 +36,7 @@ public class FileBlockStore {
 
     @Inject
     public FileBlockStore() {
+        open();
     }
 
     public synchronized void open() {

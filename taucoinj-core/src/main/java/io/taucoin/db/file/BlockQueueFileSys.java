@@ -53,7 +53,7 @@ public class BlockQueueFileSys implements BlockQueue {
                 try {
                     initLock.lock();
 
-                    fileBlockStore.open();
+                    //fileBlockStore.open();
 
                     // Collect unimported block number.
                     Set<Long> unimportedNumbers = new HashSet<Long>();
