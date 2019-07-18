@@ -600,8 +600,10 @@ public class TaucoinRemoteService extends TaucoinService {
         TaucoinModule.close();
         isTaucoinStarted = false;
 
-        refWatcher.watch(component);
-        refWatcher.watch(taucoin);
+        if (refWatcher != null) {
+            refWatcher.watch(component);
+            refWatcher.watch(taucoin);
+        }
 
         Message replyMessage = Message.obtain(null, TaucoinClientMessage.MSG_CLOSE_DONE, 0, 0);
         try {
