@@ -273,7 +273,7 @@ public class NotifyManager {
         }
     }
 
-    void cancelNotify(){
+    public void cancelNotify(){
         if(mService == null){
             return;
         }

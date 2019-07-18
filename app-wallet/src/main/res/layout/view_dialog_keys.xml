@@ -7,14 +7,16 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <TextView
+    <io.taucoin.android.wallet.widget.MultilineTextView
         android:id="@+id/tv_msg"
         style="@style/style_super_yellow"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center_horizontal"
-        android:lineSpacingExtra="10dp"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="5dp"
         android:text="@string/keys_dialog_title" />
 
 </LinearLayout>

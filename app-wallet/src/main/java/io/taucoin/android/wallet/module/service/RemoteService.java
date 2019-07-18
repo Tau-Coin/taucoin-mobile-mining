@@ -129,6 +129,10 @@ public class RemoteService extends TaucoinRemoteService {
                 break;
             case TaucoinServiceMessage.MSG_SEND_BLOCK_NOTIFY:
                 break;
+            case TaucoinServiceMessage.MSG_CLOSE:
+                AppPowerManger.releaseWakeLock();
+                AppWifiManger.releaseWakeLock();
+                return super.handleMessage(message);
             default:
                 return super.handleMessage(message);
         }

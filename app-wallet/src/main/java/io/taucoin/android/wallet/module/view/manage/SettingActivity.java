@@ -73,7 +73,7 @@ public class SettingActivity extends BaseActivity {
             new CommonDialog.Builder(this)
                 .setContentView(view)
                 .setButtonWidth(240)
-                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                .setPositiveButton(R.string.send_dialog_yes, (dialog, which) -> {
                     dialog.cancel();
                     ProgressManager.showProgressDialog(this);
                     MiningUtil.clearAndReloadBlocks(new LogicObserver<Boolean>() {
@@ -87,7 +87,7 @@ public class SettingActivity extends BaseActivity {
                             }
                         }
                     });
-                }).setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
+                }).setNegativeButton(R.string.send_dialog_no, (dialog, which) -> dialog.cancel())
                 .create().show();
         }
     }

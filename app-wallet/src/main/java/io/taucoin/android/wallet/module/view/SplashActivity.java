@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
+
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
@@ -51,6 +53,7 @@ public class SplashActivity extends BaseActivity {
             // delay 3 seconds jump
             Observable.timer(3, TimeUnit.SECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
                     .subscribe(mDisposableObserver);
         }
     }

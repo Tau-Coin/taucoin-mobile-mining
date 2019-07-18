@@ -6,16 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
@@ -28,20 +25,16 @@ import io.reactivex.subjects.Subject;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
-import io.taucoin.android.wallet.module.bean.RewardInfoBean;
-import io.taucoin.android.wallet.module.model.MiningModel;
 import io.taucoin.android.wallet.module.service.DaemonJobService;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.service.UpgradeService;
 import io.taucoin.android.wallet.module.view.main.iview.IMainView;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
-import io.taucoin.android.wallet.net.callback.TxObserver;
-import io.taucoin.android.wallet.util.FmtMicrometer;
+import io.taucoin.android.wallet.util.AppPowerManger;
+import io.taucoin.android.wallet.util.AppWifiManger;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
-import io.taucoin.android.wallet.widget.CommonDialog;
-import io.taucoin.android.wallet.widget.CongratulationDialog;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
@@ -139,6 +132,7 @@ public class MainActivity extends BaseActivity implements IMainView {
         mBackClick.onNext(1);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
     private void initExitApp() {
         mBackClick.mergeWith(mBackClick.debounce(2000, TimeUnit.MILLISECONDS)
@@ -162,12 +156,16 @@ public class MainActivity extends BaseActivity implements IMainView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             DaemonJobService.closeJob(this);
         }
-        TxService.stopService();
         UpgradeService.stopUpdateService();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
+        NotifyManager.getInstance().cancelNotify();
+        TxService.stopService();
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
 
         Observable.timer(100, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
 
                 @Override

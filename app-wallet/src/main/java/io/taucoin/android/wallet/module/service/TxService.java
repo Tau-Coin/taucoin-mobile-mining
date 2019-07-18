@@ -385,6 +385,7 @@ public class TxService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        Logger.i("TxService onTaskRemoved");
         NotifyManager.getInstance().cancelNotify();
         AppPowerManger.releaseWakeLock();
         AppWifiManger.releaseWakeLock();
@@ -404,6 +405,7 @@ public class TxService extends Service {
     }
 
     public static void stopService() {
+        Logger.i("TxService stopService");
         Context context = MyApplication.getInstance();
         Intent intent = new Intent();
         intent.setClass(context, TxService.class);

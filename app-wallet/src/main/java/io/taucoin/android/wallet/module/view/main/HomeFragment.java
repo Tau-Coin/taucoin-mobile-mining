@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
@@ -426,6 +427,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         view.setEnabled(false);
         Observable.timer(delaySeconds, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
             .subscribe(new CommonObserver<Long>() {
                 @Override
                 public void onComplete() {

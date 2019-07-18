@@ -30,8 +30,8 @@ import io.taucoin.android.wallet.util.ResourcesUtil;
 
 public class DashboardLayout extends RelativeLayout {
     private ViewHolder viewHolder;
-    private long maxValue;
-    private long value;
+    private double maxValue;
+    private double value;
     private boolean isError;
 
     public DashboardLayout(Context context) {
@@ -50,10 +50,10 @@ public class DashboardLayout extends RelativeLayout {
     private void loadView() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.item_layout_dashboard, this, true);
         viewHolder = new ViewHolder(view);
-        setValue(0);
+//        setValue(0);
         setPercentage(0);
         viewHolder.dashboardView.setValueUpdateListener((value, maxValue) -> {
-            setValue((int)value);
+//            setValue((int)value);
             double percentage = 0;
             if(maxValue != 0){
                 percentage = value * 100 / maxValue;
@@ -79,10 +79,11 @@ public class DashboardLayout extends RelativeLayout {
 
     public void changeValue(long value, long maxValue) {
         if(this.value != value || this.maxValue != maxValue){
-            this.value = value;
-            this.maxValue = maxValue;
-            viewHolder.dashboardView.setMaxValue(maxValue);
-            viewHolder.dashboardView.setValue(value);
+            setValue(value);
+            this.value = Math.log1p(value);
+            this.maxValue = Math.log1p(maxValue);
+            viewHolder.dashboardView.setMaxValue(this.maxValue);
+            viewHolder.dashboardView.setValue(this.value);
             if(value > 0 && !isError){
                 viewHolder.ivMiningPower.setOn();
             }else{
@@ -111,6 +112,6 @@ public class DashboardLayout extends RelativeLayout {
     }
 
     interface ValueUpdateListener{
-        void update(float value, float maxValue);
+        void update(double value, double maxValue);
     }
 }

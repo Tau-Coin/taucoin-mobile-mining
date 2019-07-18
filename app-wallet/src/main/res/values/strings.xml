@@ -150,7 +150,7 @@
 
     <string name="home_mining_balance">Balance</string>
     <string name="home_mining_power">Mining\nPower</string>
-    <string name="home_mining_rate">Mining&#160;Rate</string>
+    <string name="home_mining_rate">Mining&#160;Rate(Log)</string>
     <string name="home_mining_sync">Synced</string>
     <string name="home_mining">Mining</string>
     <string name="home_download">Download</string>
@@ -239,6 +239,6 @@
     <string name="setting_reset_data">Reset Blockchain Data</string>
     <string name="setting_reset_data_success">Successful</string>
     <string name="setting_reset_data_fail">Failed</string>
-    <string name="setting_reset_data_tips" formatted="false">Do you want to reset blockchain data?</string>
+    <string name="setting_reset_data_tips">Resetting the data will restart the latest block without affecting the use of the private key and address.</string>
 
 </resources>

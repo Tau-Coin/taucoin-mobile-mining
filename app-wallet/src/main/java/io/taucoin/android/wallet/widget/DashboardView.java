@@ -40,8 +40,8 @@ public class DashboardView extends View {
     private int mDefaultSize;
     private boolean antiAlias;
 
-    private float mValue;
-    private float mMaxValue;
+    private double mValue;
+    private double mMaxValue;
 
     private Paint mArcPaint;
     private float mArcWidth;
@@ -218,16 +218,16 @@ public class DashboardView extends View {
         return antiAlias;
     }
 
-    public float getValue() {
+    public double getValue() {
         return mValue;
     }
 
-    public void setValue(float value) {
+    public void setValue(double value) {
         if (value > mMaxValue) {
             value = mMaxValue;
         }
         float start = mPercent;
-        float end = value / mMaxValue;
+        float end = (float) (value / mMaxValue);
         startAnimator(start, end, mAnimTime);
     }
 
@@ -245,11 +245,11 @@ public class DashboardView extends View {
         mAnimator.start();
     }
 
-    public float getMaxValue() {
+    public double getMaxValue() {
         return mMaxValue;
     }
 
-    public void setMaxValue(float maxValue) {
+    public void setMaxValue(double maxValue) {
         mMaxValue = maxValue;
     }
 
