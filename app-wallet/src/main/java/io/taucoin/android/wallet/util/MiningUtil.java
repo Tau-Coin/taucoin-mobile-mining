@@ -207,6 +207,17 @@ public class MiningUtil {
             });
     }
 
+    /**
+     * handle upgrade compatibility
+     * */
+    public static void handleUpgradeCompatibility() {
+        boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(TransmitKey.FORGING_RELOAD, false);
+        if(!isReload){
+            MiningUtil.clearAndReloadBlocks();
+            SharedPreferencesHelper.getInstance().putBoolean(TransmitKey.FORGING_RELOAD, true);
+        }
+    }
+
     public static void clearAndReloadBlocks() {
         clearAndReloadBlocks(null);
     }

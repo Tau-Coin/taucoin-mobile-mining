@@ -81,4 +81,5 @@ public class TransmitKey {
     }
 
     public static final String FORGING_WIFI_ONLY = "forging_wifi_only";
+    public static final String FORGING_RELOAD = "FORGING_RELOAD";
 }

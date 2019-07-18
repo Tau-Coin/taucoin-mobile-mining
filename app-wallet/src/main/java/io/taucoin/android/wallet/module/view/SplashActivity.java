@@ -7,7 +7,6 @@ import android.widget.TextView;
 import com.github.naturs.logger.Logger;
 
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
@@ -51,9 +50,9 @@ public class SplashActivity extends BaseActivity {
             initView();
 
             Logger.i("SplashActivity onCreate");
-            if(!BuildConfig.DEBUG){
-                MiningUtil.clearAndReloadBlocks();
-            }
+
+            MiningUtil.handleUpgradeCompatibility();
+
             // delay 3 seconds jump
             Observable.timer(3, TimeUnit.SECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
