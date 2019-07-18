@@ -11,14 +11,20 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 
+import com.github.naturs.logger.Logger;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.foundation.util.AppUtil;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class DaemonJobService extends JobService {
-    private static final int JOB_ID = 10;
-    private static final int JOB_PERIODIC = 2 * 1000; // 2s
+    private static final int JOB_ID = 10001;
+    private static final int JOB_PERIODIC = 5 * 1000; // 5s
     private static final int BACKOFF_CRITERIA = 10 * 1000; // 10s
 
     public static void startJob(Context context) {
@@ -48,7 +54,8 @@ public class DaemonJobService extends JobService {
     public static void closeJob(Context context) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
-            jobScheduler.cancel(JOB_ID);
+            jobScheduler.cancelAll();
+            Logger.i("cancelAll");
         }
     }
 
@@ -58,22 +65,26 @@ public class DaemonJobService extends JobService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             startJob(this);
         }
+        Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            //Combining two-process guardianship
+            boolean isLocalRun = AppUtil.isServiceRunning(this, TxService.class.getName());
+            boolean isRemoteRun = AppUtil.isServiceRunning(this, RemoteService.class.getName());
+            if (!isLocalRun || !isRemoteRun) {
+                TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
 
-        //Combining two-process guardianship
-        boolean isLocalRun = AppUtil.isServiceRunning(this, TxService.class.getName());
-        boolean isRemoteRun = AppUtil.isServiceRunning(this, RemoteService.class.getName());
-        if (!isLocalRun || !isRemoteRun) {
-            TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
-
-            Intent intent =  new Intent(this, RemoteService.class);
-            Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
-            intent.putExtra("bean", parcelable);
-            startService(intent);
-            if(!isRemoteRun){
-                MyApplication.getRemoteConnector().init();
+                Intent intent =  new Intent(this, RemoteService.class);
+                Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
+                intent.putExtra("bean", parcelable);
+                startService(intent);
+                if(!isRemoteRun){
+                    MyApplication.getRemoteConnector().init();
+                }
             }
-        }
-        return false;
+            jobFinished(params, false);
+        }) .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe();
+        return true;
     }
 
     @Override

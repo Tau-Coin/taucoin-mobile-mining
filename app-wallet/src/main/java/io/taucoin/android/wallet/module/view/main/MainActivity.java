@@ -60,6 +60,9 @@ public class MainActivity extends BaseActivity implements IMainView {
         initExitApp();
         UpgradeService.startUpdateService();
         TxService.startTxService(TransmitKey.ServiceType.GET_REWARD_INFO);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            DaemonJobService.startJob(this);
+        }
     }
 
     @Override
@@ -156,12 +159,13 @@ public class MainActivity extends BaseActivity implements IMainView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             DaemonJobService.closeJob(this);
         }
+        AppPowerManger.releaseWakeLock();
+        AppWifiManger.releaseWakeLock();
+
         UpgradeService.stopUpdateService();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
         NotifyManager.getInstance().cancelNotify();
         TxService.stopService();
-        AppPowerManger.releaseWakeLock();
-        AppWifiManger.releaseWakeLock();
 
         Observable.timer(100, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())

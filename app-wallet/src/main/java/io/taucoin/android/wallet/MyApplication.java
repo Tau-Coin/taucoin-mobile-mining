@@ -16,7 +16,6 @@
 package io.taucoin.android.wallet;
 
 import android.app.Activity;
-import android.os.Build;
 import android.support.multidex.MultiDexApplication;
 import android.os.Bundle;
 
@@ -24,7 +23,6 @@ import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
-import io.taucoin.android.wallet.module.service.DaemonJobService;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
@@ -86,9 +84,6 @@ public class MyApplication extends MultiDexApplication {
         registerCurrentActivityLifecycleCallbacks();
 
         mRemoteConnector = new RemoteConnectorManager();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            DaemonJobService.startJob(this);
-        }
     }
 
     private void initKeyValue() {

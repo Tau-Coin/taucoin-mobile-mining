@@ -95,7 +95,7 @@ public class TxService extends Service {
             serviceType = StringUtil.isNotEmpty(serviceType) ? serviceType : "";
             if(StringUtil.isNotEmpty(action) || keyValue == null){
                 NotifyManager.getInstance().handlerNotifyClickEvent(action, serviceType);
-                return super.onStartCommand(intent, flags, startId);
+                return START_NOT_STICKY;
             }
             switch (serviceType){
                 case TransmitKey.ServiceType.GET_HOME_DATA:
@@ -135,7 +135,7 @@ public class TxService extends Service {
             }
             Logger.i("TxService onStartCommand, ServiceType=" + serviceType);
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
     private void getInfo() {

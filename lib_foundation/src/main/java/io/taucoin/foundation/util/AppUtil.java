@@ -126,8 +126,10 @@ public class AppUtil {
             if (StringUtil.isNotEmpty(processName) &&
                     processName.contains(packageName) && myPid != appProcess.pid) {
                 Logger.d("killProcess.RemoteService=" + appProcess.pid);
-                android.os.Process.killProcess(appProcess.pid);
-                break;
+
+                if(isKillMainProcess || processName.contains("taucoin_service")){
+                    android.os.Process.killProcess(appProcess.pid);
+                }
             }
         }
 

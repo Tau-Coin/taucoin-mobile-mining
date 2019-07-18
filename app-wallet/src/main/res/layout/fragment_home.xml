@@ -154,8 +154,8 @@
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_mining"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"/>
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"/>
 
                             <TextView
                                 style="@style/style_middle_black"
@@ -219,8 +219,8 @@
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_download"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"/>
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"/>
 
                             <TextView
                                 style="@style/style_middle_black"
@@ -266,8 +266,8 @@
 
                             <io.taucoin.android.wallet.widget.ProgressView
                                 android:id="@+id/iv_verify"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"/>
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"/>
 
                             <TextView
                                 style="@style/style_middle_black"
