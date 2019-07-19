@@ -326,10 +326,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             return;
         }
         UserUtil.setTxParticipantInfo(tvHistoryMiner, tvTxParticipant);
-        if(mBlockInfo != null){
-            UserUtil.setNextBlockReward(rbMiner, tvNextBlockReward, mBlockInfo);
-            UserUtil.setNextBlockNo(tvNextBlockNo, mBlockInfo);
-        }
     }
 
     public void loadRewardData(){
@@ -393,6 +389,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             if(blockInfoTemp == null){
                 handleRewardView();
             }
+            UserUtil.setNextBlockReward(rbMiner, tvNextBlockReward, blockInfo);
+            UserUtil.setNextBlockNo(tvNextBlockNo, blockInfo);
         }
     }
 
