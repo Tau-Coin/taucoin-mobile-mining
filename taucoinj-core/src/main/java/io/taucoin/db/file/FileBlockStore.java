@@ -244,7 +244,7 @@ public class FileBlockStore {
                     "Block index corrupted, max number %d vs block number %d",
                     maxNumber, number);
             logger.error(errorMessage);
-            throw new RuntimeException(errorMessage);
+            //throw new RuntimeException(errorMessage);
         }
     }
 }
