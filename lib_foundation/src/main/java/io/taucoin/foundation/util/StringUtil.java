@@ -235,7 +235,7 @@ public class StringUtil {
         String type = StringUtil.getPlusOrMinus(oldValue);
         value = Math.abs(value);
         String changeValue = "";
-        if(value == 0 || value == newValue){
+        if(StringUtil.isEmpty(oldValue) || value == newValue){
             changeValue += type;
         }else{
             if(value < newValue){
@@ -253,7 +253,7 @@ public class StringUtil {
         String type = StringUtil.getPlusOrMinus(oldValue);
         value = Math.abs(value);
         String changeValue = "";
-        if(value == 0 || value == newValue){
+        if(StringUtil.isEmpty(oldValue) || value == newValue){
             changeValue += type;
         }else{
             if(value < newValue){

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class ParticipantInfoBean extends BaseBean{
 
     // Participant rewards TAU
-    @SerializedName(value = "preward")
+    @SerializedName(value = "reward")
     private String reward;
     // History Miner Self Participation: +0.0011, 0 < value < 1;
     @SerializedName(value = "hmsp")

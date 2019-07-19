@@ -71,7 +71,7 @@ public class TransmitKey {
     public static final String TYPE = "type";
 
     public static class ExternalUrl{
-        public static final String HOW_IMPORT_KEY_URL = "https://android.taucoin.io/static/help/help3.html";
+        public static final String HOW_IMPORT_KEY_URL = "http://tau.taucoin.io/static/html/help3.html";
         public static final String TAU_EXPLORER_TX_URL = "http://tau.taucoin.io/tx/";
         public static final String TAU_EXPLORER_SEE_MORE = "http://tau.taucoin.io/address/";
         public static final String P2P_EXCHANGE = "https://www.taucoin.io/p2pexchange";
