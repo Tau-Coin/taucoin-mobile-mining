@@ -381,25 +381,27 @@ public class UserUtil {
         SpannableStringBuilder spannable = new SpanUtils()
             .append("H")
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-            .append("it ")
+            .append(Html.fromHtml("it&nbsp;"))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
             .append("(Generation signature)")
             .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 10))
-            .append(" < ")
+            .append(Html.fromHtml("&nbsp;"))
+            .append("<")
             .setCenterFontSize(true)
             .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 22))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+            .append(Html.fromHtml("&nbsp;"))
             .append("T")
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-            .append("arget * ")
+            .append(Html.fromHtml("arget&nbsp;*&nbsp;"))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
             .append("P")
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-            .append("ower * ")
+            .append(Html.fromHtml("ower&nbsp;*&nbsp;"))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
             .append("C")
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-            .append("ountdown Time")
+            .append(Html.fromHtml("ountdown&nbsp;Time"))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
             .create();
         tvSuccessRequires.setText(spannable);
@@ -460,26 +462,28 @@ public class UserUtil {
             int result = leftValue.compareTo(rightValue);
             String resultStr;
             if(result > 0){
-                resultStr = " > ";
+                resultStr = ">";
             }else if(result == 0){
-                resultStr = " = ";
+                resultStr = "=";
             }else {
-                resultStr = " < ";
+                resultStr = "<";
             }
             SpannableStringBuilder spannable = new SpanUtils()
                 .append(FmtMicrometer.fmtPower(detail.hitValue.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(Html.fromHtml("&nbsp;"))
                 .append(resultStr)
                 .setCenterFontSize(true)
                 .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 22))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                .append(Html.fromHtml("&nbsp;"))
                 .append(FmtMicrometer.fmtPower(detail.baseTarget.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-                .append(" * ")
+                .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
                 .append(FmtMicrometer.fmtPower(detail.forgingPower.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-                .append(" * ")
+                .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
                 .append(FmtMicrometer.fmtPower(timeInternal))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
