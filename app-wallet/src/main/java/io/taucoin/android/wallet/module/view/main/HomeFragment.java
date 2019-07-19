@@ -402,8 +402,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         if(data != null && tvForgedTime != null && tvCurrentCondition != null){
             NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
             tvCurrentCondition.setTag(data);
-            UserUtil.setCurrentCondition(tvCurrentCondition, detail.timeInternal);
-            tvForgedTime.setCountDown(detail.timeInternal, count -> UserUtil.setCurrentCondition(tvCurrentCondition, count));
+            UserUtil.setCurrentCondition(tvCurrentCondition, detail.timePoint);
+            tvForgedTime.setCountDown(detail.timeInternal, count -> {
+                count = detail.timePoint + detail.timeInternal - count;
+                UserUtil.setCurrentCondition(tvCurrentCondition, count);
+            });
         }
     }
 
