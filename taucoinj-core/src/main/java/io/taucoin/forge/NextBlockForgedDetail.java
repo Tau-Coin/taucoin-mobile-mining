@@ -19,16 +19,18 @@ public class NextBlockForgedDetail {
     private BigInteger forgingPower;
     private BigInteger hitValue;
     private long timeInternal;
+    private long timePoint;
 
     public NextBlockForgedDetail(BigInteger baseTarget, BigInteger generationSignature,
             BigInteger cumulativeDifficulty, BigInteger forgingPower, BigInteger hitValue,
-            long timeInternal) {
+            long timeInternal, long timePoint) {
         this.baseTarget = baseTarget;
         this.generationSignature = generationSignature;
         this.cumulativeDifficulty = cumulativeDifficulty;
         this.forgingPower = forgingPower;
         this.hitValue = hitValue;
         this.timeInternal = timeInternal;
+        this.timePoint = timePoint;
     }
 
     public BigInteger getBaseTarget() {
@@ -53,5 +55,9 @@ public class NextBlockForgedDetail {
 
     public long getTimeInternal() {
         return timeInternal;
+    }
+
+    public long getTimePoint() {
+        return timePoint;
     }
 }

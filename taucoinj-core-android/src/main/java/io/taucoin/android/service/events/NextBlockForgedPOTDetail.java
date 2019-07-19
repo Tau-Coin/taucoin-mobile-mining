@@ -18,6 +18,7 @@ public class NextBlockForgedPOTDetail extends EventData {
     public BigInteger forgingPower;
     public BigInteger hitValue;
     public long timeInternal;
+    public long timePoint;
 
     public NextBlockForgedPOTDetail(NextBlockForgedDetail detail) {
 
@@ -28,6 +29,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.forgingPower = detail.getForgingPower();
         this.hitValue = detail.getHitValue();
         this.timeInternal = detail.getTimeInternal();
+        this.timePoint = detail.getTimePoint();
     }
 
     @Override
@@ -46,6 +48,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         parcel.writeString(forgingPower.toString(16));
         parcel.writeString(hitValue.toString(16));
         parcel.writeLong(timeInternal);
+        parcel.writeLong(timePoint);
     }
 
     public static final Parcelable.Creator<NextBlockForgedPOTDetail> CREATOR
@@ -71,5 +74,6 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.forgingPower = new BigInteger(in.readString(), 16);
         this.hitValue = new BigInteger(in.readString(), 16);
         this.timeInternal = in.readLong();
+        this.timePoint = in.readLong();
     }
 }
