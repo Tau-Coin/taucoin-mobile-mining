@@ -282,7 +282,7 @@ public class BlockForger {
             fireNextBlockForgedDetail(new NextBlockForgedDetail(baseTarget,
                     new BigInteger(1, generationSignature),
                     bestBlock.getCumulativeDifficulty(), forgingPower, hit,
-                    sleepTime, nextBlockForgedTimePoint));
+                    sleepTime, nextBlockForgedTimePoint, timePreBlock));
 
             synchronized (blockchain.getLockObject()) {
                 try {

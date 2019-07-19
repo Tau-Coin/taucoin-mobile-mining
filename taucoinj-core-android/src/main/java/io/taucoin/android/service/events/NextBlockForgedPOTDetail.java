@@ -19,6 +19,7 @@ public class NextBlockForgedPOTDetail extends EventData {
     public BigInteger hitValue;
     public long timeInternal;
     public long timePoint;
+    public long previousBlockTime;
 
     public NextBlockForgedPOTDetail(NextBlockForgedDetail detail) {
 
@@ -30,6 +31,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.hitValue = detail.getHitValue();
         this.timeInternal = detail.getTimeInternal();
         this.timePoint = detail.getTimePoint();
+        this.previousBlockTime = detail.getPreviousBlockTime();
     }
 
     @Override
@@ -49,6 +51,7 @@ public class NextBlockForgedPOTDetail extends EventData {
         parcel.writeString(hitValue.toString(16));
         parcel.writeLong(timeInternal);
         parcel.writeLong(timePoint);
+        parcel.writeLong(previousBlockTime);
     }
 
     public static final Parcelable.Creator<NextBlockForgedPOTDetail> CREATOR
@@ -75,5 +78,6 @@ public class NextBlockForgedPOTDetail extends EventData {
         this.hitValue = new BigInteger(in.readString(), 16);
         this.timeInternal = in.readLong();
         this.timePoint = in.readLong();
+        this.previousBlockTime = in.readLong();
     }
 }
