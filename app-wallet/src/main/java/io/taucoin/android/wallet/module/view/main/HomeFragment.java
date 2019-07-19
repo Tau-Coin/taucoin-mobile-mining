@@ -196,11 +196,19 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     UserUtil.setNextBlockReward(rbMiner, tvNextBlockReward);
                 }
                 break;
-            case R.id.tv_participant_history:
             case R.id.tv_mining_history:
                 if(UserUtil.isImportKey()){
                     String address = MyApplication.getKeyValue().getAddress();
-                    String uriStr = TransmitKey.ExternalUrl.MINING_INFO + address;
+                    String uriStr = TransmitKey.ExternalUrl.MINER_HISTORY + address;
+                    ActivityUtil.openUri(getActivity(), uriStr);
+                }else{
+                    ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+                }
+                break;
+            case R.id.tv_participant_history:
+                if(UserUtil.isImportKey()){
+                    String address = MyApplication.getKeyValue().getAddress();
+                    String uriStr = TransmitKey.ExternalUrl.PARTICIPANT_HISTORY + address;
                     ActivityUtil.openUri(getActivity(), uriStr);
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);

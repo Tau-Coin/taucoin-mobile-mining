@@ -29,8 +29,8 @@ import retrofit2.http.POST;
  * */
 public interface AppService {
 
-    @POST("getInfo/")
-    Observable<Object> getInfo(@Body Map<String, String> email);
+    @POST("tau/ips/")
+    Observable<Object> getIp(@Body Map<String, String> email);
 
     @POST("tau/helps/")
     Observable<DataResult<List<HelpBean>>> getHelpData();

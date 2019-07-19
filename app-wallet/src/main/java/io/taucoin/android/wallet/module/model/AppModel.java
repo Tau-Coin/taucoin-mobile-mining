@@ -43,10 +43,13 @@ public class AppModel implements IAppModel{
         Map<String,String> map=new HashMap<>();
         map.put("pubkey",  publicKey);
         NetWorkManager.createApiService(AppService.class)
-                .getInfo(map)
+                .getIp(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new TAUObserver<Object>() {
+                    @Override
+                    public void handleError(String msg, int msgCode) {
+                    }
                 });
     }
 
