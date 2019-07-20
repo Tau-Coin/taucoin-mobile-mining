@@ -424,7 +424,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void requestWriteLogPermissions() {
-        boolean isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+        boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
         if(BuildConfig.DEBUG && !isAndroidQ){
             String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
             EasyPermissions.requestPermissions(getActivity(),

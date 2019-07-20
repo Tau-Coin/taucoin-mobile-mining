@@ -109,7 +109,7 @@ public class DownloadManager {
                 installApk();
             } else {
                 String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                boolean isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+                boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
                 if (EasyPermissions.hasPermissions(activity, permission) || isAndroidQ) {
                     mDialog.cancel();
                     showProgressDialog(activity);
