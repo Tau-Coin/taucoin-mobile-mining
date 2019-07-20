@@ -222,7 +222,7 @@ public class UserUtil {
                 double progressMined = StringUtil.getProgress(minedNo, chainHeight);
 
                 String progressUnit = ResourcesUtil.getText(R.string.common_percentage);
-                String progressStr = (int)progress + progressUnit;
+                String progressStr = FmtMicrometer.fmtDecimal(progress) + progressUnit;
                 tvVerify.setText(progressStr);
 
                 if(progress != 100 && isStart){
@@ -231,7 +231,7 @@ public class UserUtil {
                     ivVerify.setOff();
                 }
 
-                String progressMinedStr = (int)progressMined + progressUnit;
+                String progressMinedStr = FmtMicrometer.fmtDecimal(progressMined) + progressUnit;
                 tvMining.setText(progressMinedStr);
                 if(progress == 100 && isStart){
                     ivMining.setOn();
@@ -269,8 +269,8 @@ public class UserUtil {
                 for (String key : keys) {
                     String value = jsonObject.getString(key);
                     if(minersTitle.length() > 0){
-                        minersTitle.append(" / ");
-                        minersValue.append(" / ");
+                        minersTitle.append("/");
+                        minersValue.append("/");
                     }
                     minersTitle.append(key);
                     long miner = StringUtil.getLongString(value);
@@ -324,7 +324,7 @@ public class UserUtil {
                 int downloadHeight =  blockInfo.getBlockDownload();
                 double progress = StringUtil.getProgress(downloadHeight, chainHeight);
                 String progressStr = ResourcesUtil.getText(R.string.common_percentage);
-                progressStr = (int)progress + progressStr;
+                progressStr = FmtMicrometer.fmtDecimal(progress) + progressStr;
                 tvDownload.setText(progressStr);
 
                 // 6K / block
@@ -383,9 +383,6 @@ public class UserUtil {
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
             .append(Html.fromHtml("it&nbsp;"))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
-            .append("(Generation signature)")
-            .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 10))
-            .append(Html.fromHtml("&nbsp;"))
             .append("<")
             .setCenterFontSize(true)
             .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 22))

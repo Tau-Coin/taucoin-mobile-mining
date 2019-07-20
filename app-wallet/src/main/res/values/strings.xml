@@ -33,7 +33,7 @@
     <string name="main_congratulation">Congratulation!</string>
     <string name="main_congratulation_msg">You\'ve successfully mined %s blocks, and %s TAU in the last %s hours!</string>
 
-    <string name="tx_increase">Increase</string>
+    <string name="tx_increase">Increase Power</string>
     <string name="tx_send">Send</string>
     <string name="tx_receive">Receive</string>
     <string name="tx_log">Transaction log</string>
@@ -168,7 +168,7 @@
     <string name="home_participant">As TX Participant</string>
     <string name="home_success_requires">Mining Success Requires</string>
     <string name="home_current_condition">Current Condition</string>
-    <string name="home_last_block">Last Block</string>
+    <string name="home_last_block">History Mined</string>
     <string name="home_last_tx">Last Tx</string>
     <string name="home_last_tx_role">Role</string>
     <string name="home_last_block_height">Height</string>
@@ -185,15 +185,15 @@
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Historical Mining Rewards</string>
     <string name="home_power">Mining&#160;Power</string>
-    <string name="home_miners_default_title">0.5&#160;/&#160;3&#160;/&#160;24</string>
-    <string name="home_miners_default_value">0&#160;/&#160;0&#160;/&#160;0</string>
+    <string name="home_miners_default_title">0.5/3/24</string>
+    <string name="home_miners_default_value">0/0/0</string>
     <string name="home_miners_title">Miners&#160;Online(%sh)</string>
     <string name="home_synchronized">Latest&#160;Block</string>
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
     <string name="home_txs_in_pool">Txs&#160;In&#160;Pool</string>
-    <string name="home_median_fee">Median&#160;Fee</string>
+    <string name="home_median_fee">Median&#160;Tx&#160;Fee</string>
     <string name="home_data_storage">Daily&#160;Data&#160;(M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
