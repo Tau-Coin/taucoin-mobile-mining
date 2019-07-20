@@ -1,12 +1,17 @@
 package io.taucoin.android.wallet.module.view;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
 
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.R;
 
 import java.util.concurrent.TimeUnit;
@@ -20,7 +25,9 @@ import io.taucoin.android.wallet.module.view.main.MainActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.foundation.util.AppUtil;
+import io.taucoin.foundation.util.permission.EasyPermissions;
 
 public class SplashActivity extends BaseActivity {
 
@@ -52,6 +59,7 @@ public class SplashActivity extends BaseActivity {
             Logger.i("SplashActivity onCreate");
 
             MiningUtil.handleUpgradeCompatibility();
+            requestWriteLogPermissions();
 
             // delay 3 seconds jump
             Observable.timer(3, TimeUnit.SECONDS)
@@ -88,5 +96,32 @@ public class SplashActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
 
+    }
+
+    private void requestWriteLogPermissions() {
+        boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
+        if(BuildConfig.DEBUG && !isAndroidQ){
+            String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            EasyPermissions.requestPermissions(this,
+                    this.getString(R.string.permission_tip_upgrade_denied),
+                    PermissionUtils.REQUEST_PERMISSIONS_STORAGE, permission);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PermissionUtils.REQUEST_PERMISSIONS_STORAGE:
+                if (grantResults.length > 0) {
+                    if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                        PermissionUtils.checkUserBanPermission(this, permissions[0], R.string.permission_tip_upgrade_never_ask_again);
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 }

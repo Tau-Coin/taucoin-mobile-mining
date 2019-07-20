@@ -1,11 +1,7 @@
 package io.taucoin.android.wallet.module.view.main;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +26,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
-import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.BaseFragment;
@@ -48,7 +43,6 @@ import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.EventBusUtil;
-import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.UserUtil;
@@ -59,7 +53,6 @@ import io.taucoin.android.wallet.widget.ScrollDisabledListView;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DrawablesUtil;
 import io.taucoin.foundation.util.StringUtil;
-import io.taucoin.foundation.util.permission.EasyPermissions;
 
 public class HomeFragment extends BaseFragment implements IHomeView {
 
@@ -158,7 +151,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
         TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
-        requestWriteLogPermissions();
         return view;
     }
 
@@ -234,9 +226,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
         miningPresenter.updateMiningState(miningState);
         NotifyManager.getInstance().sendNotify(miningState);
-        if(BuildConfig.DEBUG){
-            requestWriteLogPermissions();
-        }
     }
 
     @Override
@@ -423,16 +412,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
     }
 
-    private void requestWriteLogPermissions() {
-        boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
-        if(BuildConfig.DEBUG && !isAndroidQ){
-            String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-            EasyPermissions.requestPermissions(getActivity(),
-                    this.getString(R.string.permission_tip_upgrade_denied),
-                    PermissionUtils.REQUEST_PERMISSIONS_STORAGE, permission);
-        }
-    }
-
     public void throttleFirst(View view, long delaySeconds){
         view.setEnabled(false);
         Observable.timer(delaySeconds, TimeUnit.SECONDS)
@@ -444,22 +423,5 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     view.setEnabled(true);
                 }
             });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PermissionUtils.REQUEST_PERMISSIONS_STORAGE:
-                if (grantResults.length > 0) {
-                    if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                        PermissionUtils.checkUserBanPermission(getActivity(), permissions[0], R.string.permission_tip_upgrade_never_ask_again);
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
     }
 }
