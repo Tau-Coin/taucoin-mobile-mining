@@ -22,6 +22,7 @@ import io.taucoin.datasource.mapdb.MapDBFactoryImpl;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.file.FileBlockStore;
 import io.taucoin.db.IndexedBlockStore;
+import io.taucoin.db.MemoryIndexedBlockStore;
 import io.taucoin.db.RepositoryImpl;
 import io.taucoin.debug.RefWatcher;
 import io.taucoin.facade.Taucoin;
@@ -123,6 +124,7 @@ public class TaucoinModule {
     BlockStore provideBlockStore(MapDBFactory mapDBFactory) {
         //OrmLiteBlockStoreDatabase database = OrmLiteBlockStoreDatabase.getHelper(context);
         //return new InMemoryBlockStore(database, storeAllBlocks);
+        /**
         if (sBlockStore != null) {
             return sBlockStore;
         }
@@ -153,6 +155,8 @@ public class TaucoinModule {
         sBlockStore = indexedBlockStore;
 
         return sBlockStore;
+        */
+        return new MemoryIndexedBlockStore();
     }
 
     @Provides

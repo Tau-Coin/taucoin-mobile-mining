@@ -15,6 +15,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.HashMap;
@@ -137,10 +139,16 @@ public class MemoryIndexedBlockStore implements BlockStore {
             indexCache.clear();
 
             long t2 = System.nanoTime();
-            logger.info("Flush block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
+            logger.debug("Flush block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
         } finally {
             w.unlock();
         }
+
+        /**
+        IOTask task = new IOTask(new HashMap<ByteArrayWrapper, Block>(this.blocksCache),
+                new HashMap<Long, ArrayList<BlockInfo>>(this.indexCache));
+        DiskIOWorker.invokeLater(task);
+        */
     }
 
     @Override
@@ -438,7 +446,7 @@ public class MemoryIndexedBlockStore implements BlockStore {
             if (index.size() > 0){
                 maxNumber = index.lastKey();
                 minNumber = index.firstKey();
-                logger.info("Block store min number {}, max number {}, size {}",
+                logger.debug("Block store min number {}, max number {}, size {}",
                         minNumber, maxNumber, index.size());
             }
 
@@ -710,9 +718,9 @@ public class MemoryIndexedBlockStore implements BlockStore {
                 System.out.print(i);
                 for (BlockInfo blockInfo : levelInfos){
                     if (blockInfo.isMainChain())
-                        logger.info(" [" + shortHash(blockInfo.getHash()) + "] ");
+                        logger.info(blockInfo.getNumber() + " [" + shortHash(blockInfo.getHash()) + "] ");
                     else
-                        logger.info(" " + shortHash(blockInfo.getHash()) + " ");
+                        logger.info(blockInfo.getNumber() + " " + shortHash(blockInfo.getHash()) + " ");
                 }
             }
 
@@ -790,7 +798,7 @@ public class MemoryIndexedBlockStore implements BlockStore {
         throw new UnsupportedOperationException();
     }
 
-    private void initDirectory(String dir) {
+    private static void initDirectory(String dir) {
         String absolutePath = CONFIG.databaseDir() + File.separator + dir;
         File f = new File(absolutePath);
 
@@ -940,7 +948,7 @@ public class MemoryIndexedBlockStore implements BlockStore {
         removeIfExist(fileName);
     }
 
-    private static String getAbsoluteFileName(String name) {
+    private String getAbsoluteFileName(String name) {
         return CONFIG.databaseDir() + File.separator + BLOCKSTORE_DIRECTORY
                 + File.separator + name;
     }

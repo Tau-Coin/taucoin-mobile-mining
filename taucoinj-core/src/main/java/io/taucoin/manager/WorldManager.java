@@ -211,6 +211,7 @@ public class WorldManager {
             logger.info("blockStore class : {}",((Class) object).getName());
 
             blockStore.saveBlock(Genesis.getInstance(config), Genesis.getInstance(config).getCumulativeDifficulty(), true);
+            blockStore.flush();
             blockchain.setBestBlock(Genesis.getInstance(config));
             blockchain.setTotalDifficulty(Genesis.getInstance(config).getCumulativeDifficulty());
 
