@@ -233,9 +233,11 @@ public class MiningUtil {
                 String blocksDir = dataDir + File.separator + "blocks";
                 String stateDir = dataDir + File.separator + "state";
                 String blockQueueDir = dataDir + File.separator + "blockqueue";
+                String blockStoreDir = dataDir + File.separator + "blockstore";
                 FileUtil.deleteFile(new File(blocksDir));
                 FileUtil.deleteFile(new File(stateDir));
                 FileUtil.deleteFile(new File(blockQueueDir));
+                FileUtil.deleteFile(new File(blockStoreDir));
 
                 int blockSync = BlockInfoDaoUtils.getInstance().reloadBlocks();
                 if(logicObserver == null){
