@@ -137,6 +137,14 @@ public class BlockQueueFileSys implements BlockQueue {
                 } finally {
                     takeLock.unlock();
                 }
+            } else {
+                takeLock.lock();
+                try {
+                    index.add(block.getNumber());
+                    notEmpty.signalAll();
+                } finally {
+                    takeLock.unlock();
+                }
             }
         }
     }
