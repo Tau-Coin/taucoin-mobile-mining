@@ -11,6 +11,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 
@@ -33,6 +35,9 @@ public class FileBlockStore {
     private LargeFileStoreGroup indexStore;
 
     private long maxNumber;
+
+    private LRUCache blocksCache
+            = new LRUCache(CONFIG.blockStoreCapability() / 2, 0.75f);
 
     @Inject
     public FileBlockStore() {
@@ -77,10 +82,10 @@ public class FileBlockStore {
         checkSanity();
     }
 
-    public synchronized void put(long number, BlockWrapper block) {
+    public synchronized boolean put(long number, BlockWrapper block) {
         if (number <= maxNumber) {
             logger.error("Block with the number {} has existed.", number);
-            return;
+            return false;
         }
 
         long startTime = System.nanoTime();
@@ -112,10 +117,15 @@ public class FileBlockStore {
                     + e.getMessage());
         }
 
+        synchronized(blocksCache) {
+            blocksCache.put(number, block);
+        }
         maxNumber = number;
         logger.debug("save block with number {} hash {} cost {}ns, postion {}",
                 number, Hex.toHexString(block.getHash()),
                 System.nanoTime() - startTime, position);
+
+        return true;
     }
 
     public synchronized BlockWrapper get(long number) {
@@ -123,6 +133,13 @@ public class FileBlockStore {
             logger.error("Block with the number {}/{} hasn't existed.",
                     number, maxNumber);
             return null;
+        }
+
+        synchronized(blocksCache) {
+            BlockWrapper blockCache = blocksCache.get(number);
+            if (blockCache != null) {
+                return blockCache;
+            }
         }
 
         long startTime = System.nanoTime();
@@ -151,6 +168,10 @@ public class FileBlockStore {
             logger.error("Read block error: {}", e);
             throw new RuntimeException("FileSys block store read error:"
                     + e.getMessage());
+        }
+
+        synchronized(blocksCache) {
+            blocksCache.put(number, block);
         }
 
         logger.debug("read block with number {} hash {} cost {}ns, postion {}",
@@ -245,6 +266,21 @@ public class FileBlockStore {
                     maxNumber, number);
             logger.error(errorMessage);
             //throw new RuntimeException(errorMessage);
+        }
+    }
+
+    private static class LRUCache extends LinkedHashMap<Long, BlockWrapper> {
+        private static final long serialVersionUID = 1L;
+        private int capacity;
+
+        public LRUCache(int capacity, float loadFactor) {
+            super(capacity, loadFactor, false);
+            this.capacity = capacity;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, BlockWrapper> eldest) {
+            return size() > this.capacity;
         }
     }
 }

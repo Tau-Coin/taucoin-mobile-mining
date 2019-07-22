@@ -100,8 +100,9 @@ public class BlockQueueFileSys implements BlockQueue {
                 if(!index.contains(b.getNumber()) &&
                    !numbers.contains(b.getNumber())) {
 
-                    fileBlockStore.put(b.getNumber(), b);
-                    numbers.add(b.getNumber());
+                    if (fileBlockStore.put(b.getNumber(), b)) {
+                        numbers.add(b.getNumber());
+                    }
                 }
             }
 
@@ -127,14 +128,15 @@ public class BlockQueueFileSys implements BlockQueue {
             if (index.contains(block.getNumber())) {
                 return;
             }
-            fileBlockStore.put(block.getNumber(), block);
+            if (fileBlockStore.put(block.getNumber(), block)) {
 
-            takeLock.lock();
-            try {
-                index.add(block.getNumber());
-                notEmpty.signalAll();
-            } finally {
-                takeLock.unlock();
+                takeLock.lock();
+                try {
+                    index.add(block.getNumber());
+                    notEmpty.signalAll();
+                } finally {
+                    takeLock.unlock();
+                }
             }
         }
     }
