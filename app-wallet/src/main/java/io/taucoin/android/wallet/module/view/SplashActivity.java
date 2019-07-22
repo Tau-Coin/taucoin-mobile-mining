@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.BuildConfig;
 import io.taucoin.android.wallet.R;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -33,6 +34,8 @@ public class SplashActivity extends BaseActivity {
 
     @BindView(R.id.app_title)
     TextView appTitle;
+
+    private volatile boolean isAsk = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +86,14 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
-    private void splashJump() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-        Logger.i("Jump to MainActivity");
+    private synchronized void splashJump() {
+        if(!isAsk){
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            Logger.i("Jump to MainActivity");
+        }
+        isAsk = false;
     }
 
     /**
@@ -100,26 +106,43 @@ public class SplashActivity extends BaseActivity {
 
     private void requestWriteLogPermissions() {
         boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
-        if(BuildConfig.DEBUG && !isAndroidQ){
-            String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if(BuildConfig.DEBUG && !isAndroidQ && !EasyPermissions.hasPermissions(this, permission)){
+            isAsk = true;
             EasyPermissions.requestPermissions(this,
                     this.getString(R.string.permission_tip_upgrade_denied),
+                    permissionCallbacks,
                     PermissionUtils.REQUEST_PERMISSIONS_STORAGE, permission);
         }
     }
+
+    private synchronized void handlePermissionsCallBack() {
+        if(!isAsk){
+            splashJump();
+        }
+        isAsk = false;
+    }
+
+    private EasyPermissions.PermissionCallbacks permissionCallbacks = new EasyPermissions.PermissionCallbacks(){
+
+        @Override
+        public void onPermissionsGranted(int requestCode, List<String> granted) {
+
+        }
+
+        @Override
+        public void onPermissionsDenied(int requestCode, List<String> denied) {
+            handlePermissionsCallBack();
+        }
+    };
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PermissionUtils.REQUEST_PERMISSIONS_STORAGE:
-                if (grantResults.length > 0) {
-                    if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                        PermissionUtils.checkUserBanPermission(this, permissions[0], R.string.permission_tip_upgrade_never_ask_again);
-                    }
-                }
+                handlePermissionsCallBack();
                 break;
-
             default:
                 break;
         }
