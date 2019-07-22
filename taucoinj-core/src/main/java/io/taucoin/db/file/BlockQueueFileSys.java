@@ -102,6 +102,8 @@ public class BlockQueueFileSys implements BlockQueue {
 
                     if (fileBlockStore.put(b.getNumber(), b)) {
                         numbers.add(b.getNumber());
+                    } else {
+                        numbers.add(b.getNumber());
                     }
                 }
             }
