@@ -15,6 +15,7 @@ public class AppWifiManger {
         if(mWakeLock == null){
             WifiManager mWifiManager = (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
             mWakeLock = mWifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, applicationContext.getClass().getCanonicalName());
+            mWakeLock.setReferenceCounted(false);
         }
         if(mWakeLock != null && !mWakeLock.isHeld()){
             mWakeLock.acquire();

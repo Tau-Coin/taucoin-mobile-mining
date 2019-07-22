@@ -71,7 +71,7 @@ public class MiningPresenter {
             @Override
             public void handleError(int code, String msg) {
                 if(mHomeView != null){
-                    mHomeView.handleRewardView();
+                    mHomeView.handleMiningView();
                 }
             }
 
@@ -81,7 +81,7 @@ public class MiningPresenter {
                     MyApplication.setKeyValue(keyValue);
                 }
                 if(mHomeView != null){
-                    mHomeView.handleRewardView();
+                    mHomeView.handleMiningView();
                 }
             }
         });

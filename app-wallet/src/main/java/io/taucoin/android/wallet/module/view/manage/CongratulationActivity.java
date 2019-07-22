@@ -61,6 +61,7 @@ public class CongratulationActivity extends BaseActivity{
         String notifyMsg = rewardTitle + " " + rewardMsg;
         NotifyManager.getInstance().sendCongratulationNotify(notifyMsg);
         new CongratulationDialog.Builder(this)
+            .setCanceledOnTouchOutside(false)
             .setMsg(rewardMsg)
             .setPositiveButton(R.string.common_continue, (dialog, which) ->{
                 dialog.cancel();

@@ -289,11 +289,12 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
         logger.info("startSyncAndMining");
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue != null) {
+            startSyncAll();
             boolean isMiningStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
             if(isMiningStart){
-                MyApplication.getRemoteConnector().startBlockForging();
+                startBlockForging();
             }else{
-                MyApplication.getRemoteConnector().stopBlockForging();
+                stopBlockForging();
             }
         }
     }

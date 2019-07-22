@@ -14,6 +14,7 @@ public class AppPowerManger {
         if(mWakeLock == null){
             PowerManager mPowerManager = (PowerManager) applicationContext.getSystemService(Context.POWER_SERVICE);
             mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, applicationContext.getClass().getCanonicalName());
+            mWakeLock.setReferenceCounted(false);
         }
         if(mWakeLock != null && !mWakeLock.isHeld()){
             mWakeLock.acquire();

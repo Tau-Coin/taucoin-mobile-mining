@@ -19,7 +19,6 @@ import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.view.View;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
@@ -209,34 +208,23 @@ public class UserUtil {
     /**
      * set state of mining conditions
      * */
-    public static void setMiningConditions(TextView tvMining, ProgressView ivMining, TextView tvVerify, ProgressView ivVerify, BlockInfo blockInfo) {
+    public static void setMiningConditions(TextView tvVerify, ProgressView ivVerify, BlockInfo blockInfo) {
         try{
-            if(blockInfo != null && isImportKey()){
-                String miningState = MyApplication.getKeyValue().getMiningState();
-                boolean isStart = StringUtil.isSame(miningState, TransmitKey.MiningState.Start);
-                long minedNo = MyApplication.getKeyValue().getMinedNo();
+            if(blockInfo != null){
                 long chainHeight =  blockInfo.getBlockHeight();
                 long syncHeight =  blockInfo.getBlockSync();
+                long downloadHeight =  blockInfo.getBlockDownload();
 
                 double progress = StringUtil.getProgress(syncHeight, chainHeight);
-                double progressMined = StringUtil.getProgress(minedNo, chainHeight);
 
                 String progressUnit = ResourcesUtil.getText(R.string.common_percentage);
                 String progressStr = FmtMicrometer.fmtDecimal(progress) + progressUnit;
                 tvVerify.setText(progressStr);
 
-                if(progress != 100 && isStart){
+                if(syncHeight < downloadHeight && progress != 100){
                     ivVerify.setOn();
                 }else{
                     ivVerify.setOff();
-                }
-
-                String progressMinedStr = FmtMicrometer.fmtDecimal(progressMined) + progressUnit;
-                tvMining.setText(progressMinedStr);
-                if(progress == 100 && isStart){
-                    ivMining.setOn();
-                }else{
-                    ivMining.setOff();
                 }
             }
         }catch (Exception ignore){
@@ -414,36 +402,29 @@ public class UserUtil {
         tvNextBlockNo.setText(nextBlockNoStr);
     }
 
-    public static void setNextBlockReward(RadioButton rbMiner, TextView tvNextBlockReward) {
-        if(tvNextBlockReward == null){
+    public static void setHistoryParticipantReward(TextView tvHistoryMinerReward, TextView tvHistoryTxReward) {
+        if(tvHistoryMinerReward == null || tvHistoryTxReward == null || !isImportKey()){
             return;
         }
-        BlockInfo blockInfo = (BlockInfo) tvNextBlockReward.getTag();
-        setNextBlockReward(rbMiner, tvNextBlockReward, blockInfo);
-    }
-
-    public static void setNextBlockReward(RadioButton rbMiner, TextView tvNextBlockReward, BlockInfo blockInfo) {
-        if(blockInfo == null || rbMiner == null || tvNextBlockReward == null || !isImportKey()){
-            return;
-        }
-        long reward;
-        if(rbMiner.isChecked()){
-            reward = StringUtil.getLongString(blockInfo.getAvgIncome());
-            reward = reward / 3;
-        }else{
-            String nextPart = MyApplication.getKeyValue().getNextPart();
-            nextPart = FmtMicrometer.fmtTxValue(nextPart);
-            reward = StringUtil.getLongString(nextPart);
-        }
-        tvNextBlockReward.setTag(blockInfo);
-        SpannableStringBuilder spannableReward = new SpanUtils()
-                .append(FmtMicrometer.fmtBalance(reward))
+        long minerReward = StringUtil.getLongString(MyApplication.getKeyValue().getMinerReward());
+        SpannableStringBuilder spannableMiner = new SpanUtils()
+                .append(FmtMicrometer.fmtDecimal(minerReward))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
                 .append(" ")
                 .append(ResourcesUtil.getText(R.string.common_balance_unit))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_home_grey_dark))
                 .create();
-        tvNextBlockReward.setText(spannableReward);
+        tvHistoryMinerReward.setText(spannableMiner);
+
+        long partReward = StringUtil.getLongString(MyApplication.getKeyValue().getPartReward());
+        SpannableStringBuilder spannableTx = new SpanUtils()
+                .append(FmtMicrometer.fmtDecimal(partReward))
+                .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(" ")
+                .append(ResourcesUtil.getText(R.string.common_balance_unit))
+                .setForegroundColor(ResourcesUtil.getColor(R.color.color_home_grey_dark))
+                .create();
+        tvHistoryTxReward.setText(spannableTx);
     }
 
     public static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
@@ -487,48 +468,5 @@ public class UserUtil {
                 .create();
             tvCurrentCondition.setText(spannable);
         }
-    }
-
-    public static void setTxParticipantInfo(TextView tvHistoryMiner, TextView tvTxParticipant) {
-        if(tvHistoryMiner == null || tvTxParticipant == null){
-            return;
-        }
-        double historyMiner = 0;
-        double historyTx = 0;
-        if(isImportKey()){
-            String historyMinerStr = MyApplication.getKeyValue().getHistoryMiner();
-            String historyTxStr = MyApplication.getKeyValue().getHistoryTx();
-            historyMiner = StringUtil.getDoubleString(historyMinerStr) * 100;
-            historyTx = StringUtil.getDoubleString(historyTxStr) * 100;
-            historyMiner = Math.abs(historyMiner);
-            historyTx = Math.abs(historyTx);
-
-            String minerType = StringUtil.getPlusOrMinus(historyMinerStr);
-            String txType = StringUtil.getPlusOrMinus(historyTxStr);
-
-            if(StringUtil.isNotEmpty(minerType)){
-                int icon = StringUtil.isSame(minerType, "+") ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
-                DrawablesUtil.setEndDrawable(tvHistoryMiner, icon, 12);
-            }else {
-                DrawablesUtil.clearDrawable(tvHistoryMiner);
-            }
-            if(StringUtil.isNotEmpty(txType)){
-                int icon = StringUtil.isSame(txType, "+") ? R.mipmap.icon_income_up : R.mipmap.icon_rank_down;
-                DrawablesUtil.setEndDrawable(tvTxParticipant, icon, 12);
-            }else {
-                DrawablesUtil.clearDrawable(tvTxParticipant);
-            }
-        }
-        String unit = "%";
-
-        historyMiner = Math.abs(historyMiner);
-        String historyMinerStr = FmtMicrometer.fmtValue(historyMiner);
-        historyMinerStr += unit;
-        tvHistoryMiner.setText(historyMinerStr);
-
-        historyTx = Math.abs(historyTx);
-        String historyTxStr = FmtMicrometer.fmtValue(historyTx);
-        historyTxStr += unit;
-        tvTxParticipant.setText(historyTxStr);
     }
 }

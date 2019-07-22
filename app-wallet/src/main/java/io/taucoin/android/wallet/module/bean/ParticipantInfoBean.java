@@ -4,9 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class ParticipantInfoBean extends BaseBean{
 
-    // Participant rewards TAU
-    @SerializedName(value = "reward")
-    private String reward;
+    // Participant history tx rewards TAU
+    @SerializedName(value = "preward")
+    private String partReward;
+    // Participant history miner rewards TAU
+    @SerializedName(value = "mreward")
+    private String minerReward;
     // History Miner Self Participation: +0.0011, 0 < value < 1;
     @SerializedName(value = "hmsp")
     private double minerPart;
@@ -14,12 +17,20 @@ public class ParticipantInfoBean extends BaseBean{
     @SerializedName(value = "tpsp")
     private double txPart;
 
-    public String getReward() {
-        return reward;
+    public String getPartReward() {
+        return partReward;
     }
 
-    public void setReward(String reward) {
-        this.reward = reward;
+    public void setPartReward(String partReward) {
+        this.partReward = partReward;
+    }
+
+    public String getMinerReward() {
+        return minerReward;
+    }
+
+    public void setMinerReward(String minerReward) {
+        this.minerReward = minerReward;
     }
 
     public double getMinerPart() {

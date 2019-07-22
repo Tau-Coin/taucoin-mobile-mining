@@ -78,10 +78,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvMinersOnlineTitle;
     @BindView(R.id.tv_irreparable_error)
     TextView tvIrreparableError;
-    @BindView(R.id.tv_mining)
-    TextView tvMining;
-    @BindView(R.id.iv_mining)
-    ProgressView ivMining;
     @BindView(R.id.tv_download)
     TextView tvDownload;
     @BindView(R.id.iv_download)
@@ -106,22 +102,16 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvMiningHistory;
     @BindView(R.id.tv_next_block_no)
     TextView tvNextBlockNo;
-    @BindView(R.id.tv_next_block_reward)
-    TextView tvNextBlockReward;
     @BindView(R.id.tv_forged_time)
     LoadingTextView tvForgedTime;
-    @BindView(R.id.ll_forged_time)
-    View llForgedTime;
+    @BindView(R.id.tv_forged_time_title)
+    TextView tvForgedTimeTitle;
     @BindView(R.id.tv_current_condition)
     TextView tvCurrentCondition;
     @BindView(R.id.ll_current_condition)
     View llCurrentCondition;
     @BindView(R.id.rb_miner)
     RadioButton rbMiner;
-    @BindView(R.id.tv_tx_participant)
-    TextView tvTxParticipant;
-    @BindView(R.id.tv_history_miner)
-    TextView tvHistoryMiner;
     @BindView(R.id.part_list_view)
     ScrollDisabledListView partListView;
     @BindView(R.id.miner_list_view)
@@ -132,6 +122,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvMedianFee;
     @BindView(R.id.tv_txs_pool)
     TextView tvTxsPool;
+    @BindView(R.id.tv_history_miner_reward)
+    TextView tvHistoryMinerReward;
+    @BindView(R.id.tv_history_tx_reward)
+    TextView tvHistoryTxReward;
 
     private RewardAdapter minerRewardAdapter;
     private RewardAdapter partRewardAdapter;
@@ -148,6 +142,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         MyApplication.getRemoteConnector().init();
         handleMiningView();
         loadRewardData();
+        refreshNextBlockView(null);
         TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
         TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
         TxService.startTxService(TransmitKey.ServiceType.GET_BLOCK_HEIGHT);
@@ -185,7 +180,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     boolean isMiner = rbMiner.isChecked();
                     llMiner.setVisibility(isMiner ? View.VISIBLE : View.GONE);
                     llParticipant.setVisibility(!isMiner ? View.VISIBLE : View.GONE);
-                    UserUtil.setNextBlockReward(rbMiner, tvNextBlockReward);
                 }
                 break;
             case R.id.tv_mining_history:
@@ -220,7 +214,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
             MyApplication.getRemoteConnector().init();
             MyApplication.getRemoteConnector().startBlockForging();
         }else{
-            refreshNextBlockView(null, false);
+            refreshNextBlockView(null);
             MyApplication.getRemoteConnector().stopBlockForging();
         }
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
@@ -273,7 +267,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 }
                 break;
             case FORGED_POT_DETAIL:
-                refreshNextBlockView(object.getData(), true);
+                refreshNextBlockView(object.getData());
                 break;
             default:
                 break;
@@ -307,14 +301,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }else{
             showMiningView(null);
         }
-    }
-
-    @Override
-    public void handleRewardView(){
-        if(tvHistoryMiner == null || tvTxParticipant == null){
-            return;
-        }
-        UserUtil.setTxParticipantInfo(tvHistoryMiner, tvTxParticipant);
     }
 
     public void loadRewardData(){
@@ -356,7 +342,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
-        UserUtil.setMiningConditions(tvMining, ivMining, tvVerify, ivVerify, blockInfo);
+        UserUtil.setMiningConditions(tvVerify, ivVerify, blockInfo);
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);
         UserUtil.setMinersOnline(tvMinersOnline, tvMinersOnlineTitle, blockInfo);
@@ -373,30 +359,31 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     blockInfo.getBlockHeight() > mBlockInfo.getBlockHeight()){
                 loadRewardData();
             }
-            BlockInfo blockInfoTemp = mBlockInfo;
             mBlockInfo = blockInfo;
-            if(blockInfoTemp == null){
-                handleRewardView();
-            }
-            UserUtil.setNextBlockReward(rbMiner, tvNextBlockReward, blockInfo);
+            UserUtil.setHistoryParticipantReward(tvHistoryMinerReward, tvHistoryTxReward);
             UserUtil.setNextBlockNo(tvNextBlockNo, blockInfo);
         }
     }
 
-    private void refreshNextBlockView(Object data, boolean isShow){
-        if(llForgedTime != null && llCurrentCondition != null){
-            llForgedTime.setVisibility(isShow ? View.VISIBLE : View.INVISIBLE);
-            llCurrentCondition.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    private void refreshNextBlockView(Object data){
+        if(llCurrentCondition != null){
+            llCurrentCondition.setVisibility(data == null ? View.GONE : View.VISIBLE);
         }
-        if(data != null && tvForgedTime != null && tvCurrentCondition != null){
-            NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
-            tvCurrentCondition.setTag(data);
-            long timeInternal = detail.timePoint - detail.previousBlockTime;
-            UserUtil.setCurrentCondition(tvCurrentCondition, timeInternal);
-            tvForgedTime.setCountDown(timeInternal, count -> {
-                count = detail.timePoint - count - detail.previousBlockTime;
-                UserUtil.setCurrentCondition(tvCurrentCondition, count);
-            });
+        if(tvForgedTime != null && tvCurrentCondition != null){
+            tvForgedTimeTitle.setText(data == null ? R.string.home_average_block_time :
+                    R.string.home_estimated_block_time);
+            if(data == null){
+                tvForgedTime.setNormalText(R.string.home_average_block_time_value);
+            }else{
+                NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
+                tvCurrentCondition.setTag(data);
+                long timeInternal = detail.timePoint - detail.previousBlockTime;
+                UserUtil.setCurrentCondition(tvCurrentCondition, timeInternal);
+                tvForgedTime.setCountDown(timeInternal, count -> {
+                    count = detail.timePoint - count - detail.previousBlockTime;
+                    UserUtil.setCurrentCondition(tvCurrentCondition, count);
+                });
+            }
         }
     }
 

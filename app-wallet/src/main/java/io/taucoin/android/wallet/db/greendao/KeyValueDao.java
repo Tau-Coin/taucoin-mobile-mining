@@ -38,9 +38,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property BlocksMined = new Property(11, long.class, "blocksMined", false, "BLOCKS_MINED");
         public final static Property MinedNo = new Property(12, long.class, "MinedNo", false, "MINED_NO");
         public final static Property MiningRank = new Property(13, String.class, "miningRank", false, "MINING_RANK");
-        public final static Property NextPart = new Property(14, String.class, "nextPart", false, "NEXT_PART");
-        public final static Property HistoryMiner = new Property(15, String.class, "historyMiner", false, "HISTORY_MINER");
-        public final static Property HistoryTx = new Property(16, String.class, "historyTx", false, "HISTORY_TX");
+        public final static Property MinerReward = new Property(14, String.class, "minerReward", false, "MINER_REWARD");
+        public final static Property PartReward = new Property(15, String.class, "partReward", false, "PART_REWARD");
     }
 
 
@@ -70,9 +69,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"BLOCKS_MINED\" INTEGER NOT NULL ," + // 11: blocksMined
                 "\"MINED_NO\" INTEGER NOT NULL ," + // 12: MinedNo
                 "\"MINING_RANK\" TEXT," + // 13: miningRank
-                "\"NEXT_PART\" TEXT," + // 14: nextPart
-                "\"HISTORY_MINER\" TEXT," + // 15: historyMiner
-                "\"HISTORY_TX\" TEXT);"); // 16: historyTx
+                "\"MINER_REWARD\" TEXT," + // 14: minerReward
+                "\"PART_REWARD\" TEXT);"); // 15: partReward
     }
 
     /** Drops the underlying database table. */
@@ -131,19 +129,14 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(14, miningRank);
         }
  
-        String nextPart = entity.getNextPart();
-        if (nextPart != null) {
-            stmt.bindString(15, nextPart);
+        String minerReward = entity.getMinerReward();
+        if (minerReward != null) {
+            stmt.bindString(15, minerReward);
         }
  
-        String historyMiner = entity.getHistoryMiner();
-        if (historyMiner != null) {
-            stmt.bindString(16, historyMiner);
-        }
- 
-        String historyTx = entity.getHistoryTx();
-        if (historyTx != null) {
-            stmt.bindString(17, historyTx);
+        String partReward = entity.getPartReward();
+        if (partReward != null) {
+            stmt.bindString(16, partReward);
         }
     }
 
@@ -197,19 +190,14 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             stmt.bindString(14, miningRank);
         }
  
-        String nextPart = entity.getNextPart();
-        if (nextPart != null) {
-            stmt.bindString(15, nextPart);
+        String minerReward = entity.getMinerReward();
+        if (minerReward != null) {
+            stmt.bindString(15, minerReward);
         }
  
-        String historyMiner = entity.getHistoryMiner();
-        if (historyMiner != null) {
-            stmt.bindString(16, historyMiner);
-        }
- 
-        String historyTx = entity.getHistoryTx();
-        if (historyTx != null) {
-            stmt.bindString(17, historyTx);
+        String partReward = entity.getPartReward();
+        if (partReward != null) {
+            stmt.bindString(16, partReward);
         }
     }
 
@@ -235,9 +223,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.getLong(offset + 11), // blocksMined
             cursor.getLong(offset + 12), // MinedNo
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // miningRank
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // nextPart
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // historyMiner
-            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16) // historyTx
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // minerReward
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // partReward
         );
         return entity;
     }
@@ -258,9 +245,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setBlocksMined(cursor.getLong(offset + 11));
         entity.setMinedNo(cursor.getLong(offset + 12));
         entity.setMiningRank(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setNextPart(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setHistoryMiner(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
-        entity.setHistoryTx(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setMinerReward(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setPartReward(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
      }
     
     @Override

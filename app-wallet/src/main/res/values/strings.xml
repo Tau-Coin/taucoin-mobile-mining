@@ -162,9 +162,8 @@
 
     <string name="home_mining_dashboard">Mining Dashboard</string>
     <string name="home_mining_Rank">Mining Rank</string>
-    <string name="home_future_reward">Potential Future Reward Forecast</string>
     <string name="home_wifi_only">Wifi Only</string>
-    <string name="home_Miner">As Miner</string>
+    <string name="home_current_mining">Current Mining</string>
     <string name="home_participant">As TX Participant</string>
     <string name="home_success_requires">Mining Success Requires</string>
     <string name="home_current_condition">Current Condition</string>
@@ -175,6 +174,12 @@
     <string name="home_last_block_hash">Hash</string>
     <string name="home_last_block_income">Income</string>
     <string name="home_mining_history">View your mining history</string>
+    <string name="home_current_block">Current Block</string>
+    <string name="home_average_block_time">Average Block Time</string>
+    <string name="home_average_block_time_value">00:05:00</string>
+    <string name="home_estimated_block_time">Your Estimated Mining Time</string>
+    <string name="home_history_miner_reward">History Miner Reward</string>
+    <string name="home_history_tx_reward">History Tx Reward</string>
 
     <string name="home_participant_history">View your participant history</string>
     <string name="home_role_participant">Participant</string>

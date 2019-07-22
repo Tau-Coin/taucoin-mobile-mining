@@ -27,15 +27,14 @@ public class KeyValue {
     private long blocksMined;
     private long MinedNo;
     private String miningRank;
-    private String nextPart;
-    private String historyMiner;
-    private String historyTx;
-    @Generated(hash = 1896287259)
+    private String minerReward;
+    private String partReward;
+    @Generated(hash = 1367625504)
     public KeyValue(Long id, String pubKey, String priKey, String address,
             String rawAddress, long balance, long power, long miningIncome,
             String nickName, String miningState, long transExpiry, long blocksMined,
-            long MinedNo, String miningRank, String nextPart, String historyMiner,
-            String historyTx) {
+            long MinedNo, String miningRank, String minerReward,
+            String partReward) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -50,9 +49,8 @@ public class KeyValue {
         this.blocksMined = blocksMined;
         this.MinedNo = MinedNo;
         this.miningRank = miningRank;
-        this.nextPart = nextPart;
-        this.historyMiner = historyMiner;
-        this.historyTx = historyTx;
+        this.minerReward = minerReward;
+        this.partReward = partReward;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
@@ -141,22 +139,16 @@ public class KeyValue {
     public void setMiningRank(String miningRank) {
         this.miningRank = miningRank;
     }
-    public String getNextPart() {
-        return this.nextPart;
+    public String getMinerReward() {
+        return this.minerReward;
     }
-    public void setNextPart(String nextPart) {
-        this.nextPart = nextPart;
+    public void setMinerReward(String minerReward) {
+        this.minerReward = minerReward;
     }
-    public String getHistoryMiner() {
-        return this.historyMiner;
+    public String getPartReward() {
+        return this.partReward;
     }
-    public void setHistoryMiner(String historyMiner) {
-        this.historyMiner = historyMiner;
-    }
-    public String getHistoryTx() {
-        return this.historyTx;
-    }
-    public void setHistoryTx(String historyTx) {
-        this.historyTx = historyTx;
+    public void setPartReward(String partReward) {
+        this.partReward = partReward;
     }
 }
