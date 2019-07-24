@@ -206,6 +206,7 @@ public class MiningModel implements IMiningModel{
             if(keyValue != null){
                 keyValue.setPartReward(participantInfo.getPartReward());
                 keyValue.setMinerReward(participantInfo.getMinerReward());
+                KeyValueDaoUtils.getInstance().update(keyValue);
             }
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())

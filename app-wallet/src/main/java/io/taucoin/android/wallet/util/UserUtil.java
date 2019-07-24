@@ -406,7 +406,7 @@ public class UserUtil {
         if(tvHistoryMinerReward == null || tvHistoryTxReward == null || !isImportKey()){
             return;
         }
-        long minerReward = StringUtil.getLongString(MyApplication.getKeyValue().getMinerReward());
+        double minerReward = StringUtil.getDoubleString(MyApplication.getKeyValue().getMinerReward());
         SpannableStringBuilder spannableMiner = new SpanUtils()
                 .append(FmtMicrometer.fmtDecimal(minerReward))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
@@ -416,7 +416,7 @@ public class UserUtil {
                 .create();
         tvHistoryMinerReward.setText(spannableMiner);
 
-        long partReward = StringUtil.getLongString(MyApplication.getKeyValue().getPartReward());
+        double partReward = StringUtil.getDoubleString(MyApplication.getKeyValue().getPartReward());
         SpannableStringBuilder spannableTx = new SpanUtils()
                 .append(FmtMicrometer.fmtDecimal(partReward))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
