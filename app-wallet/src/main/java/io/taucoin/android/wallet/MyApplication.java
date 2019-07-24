@@ -23,6 +23,7 @@ import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
 import io.taucoin.foundation.util.AppUtil;
@@ -148,7 +149,7 @@ public class MyApplication extends MultiDexApplication {
 
             @Override
             public void onActivityDestroyed(Activity activity) {
-
+                FixMemLeak.fixSamSungLeak(activity);
             }
         });
     }

@@ -41,7 +41,7 @@ public class FixMemLeak {
             }
         }
     }
-    private static void fixSamSungLeak(Context context) {
+    public static void fixSamSungLeak(Context context) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.MANUFACTURER.equals("samsung")) {
                 Object systemService = context.getSystemService(Class.forName("com.samsung.android.content.clipboard.SemClipboardManager"));
