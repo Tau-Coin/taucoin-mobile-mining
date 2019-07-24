@@ -261,6 +261,7 @@ public class MiningUtil {
                     if(isSuccess){
                         AppUtil.killProcess(MyApplication.getInstance(), false);
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
+                        EventBusUtil.post(MessageEvent.EventCode.FORGED_POT_DETAIL);
                     }
                     initRemoteConnectorDelay();
                 }

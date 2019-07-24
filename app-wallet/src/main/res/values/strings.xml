@@ -154,7 +154,7 @@
     <string name="home_mining_sync">Synced</string>
     <string name="home_mining">Mining</string>
     <string name="home_download">Download</string>
-    <string name="home_download_data_size">Blockchain&#160;Data:&#160;%sM</string>
+    <string name="home_full_data">Full&#160;Data:&#160;%sM</string>
     <string name="home_verify">Verify</string>
     <string name="home_sync_tip">Synchronizing</string>
     <string name="home_on">On</string>
@@ -164,11 +164,11 @@
     <string name="home_mining_Rank">Mining Rank</string>
     <string name="home_wifi_only">Wifi Only</string>
     <string name="home_current_mining">Current Mining</string>
-    <string name="home_participant">As TX Participant</string>
+    <string name="home_reward_analysis">Reward Analysis</string>
     <string name="home_success_requires">Mining Success Requires</string>
     <string name="home_current_condition">Current Condition</string>
-    <string name="home_last_block">History Mined</string>
-    <string name="home_last_tx">Last Tx</string>
+    <string name="home_mined_history">History Mined</string>
+    <string name="home_reward_history">Reward History</string>
     <string name="home_last_tx_role">Role</string>
     <string name="home_last_block_height">Height</string>
     <string name="home_last_block_hash">Hash</string>
@@ -178,8 +178,8 @@
     <string name="home_average_block_time">Average Block Time</string>
     <string name="home_average_block_time_value">00:05:00</string>
     <string name="home_estimated_block_time">Your Estimated Mining Time</string>
-    <string name="home_history_miner_reward">History Miner Reward</string>
-    <string name="home_history_tx_reward">History Tx Reward</string>
+    <string name="home_history_miner_reward">Potential Former Block Reward</string>
+    <string name="home_history_tx_reward">Potential TX Participant Reward</string>
 
     <string name="home_participant_history">View your participant history</string>
     <string name="home_role_participant">Participant</string>

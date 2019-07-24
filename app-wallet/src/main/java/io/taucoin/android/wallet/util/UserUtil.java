@@ -215,13 +215,10 @@ public class UserUtil {
                 long syncHeight =  blockInfo.getBlockSync();
                 long downloadHeight =  blockInfo.getBlockDownload();
 
-                double progress = StringUtil.getProgress(syncHeight, chainHeight);
-
-                String progressUnit = ResourcesUtil.getText(R.string.common_percentage);
-                String progressStr = FmtMicrometer.fmtDecimal(progress) + progressUnit;
+                String progressStr = FmtMicrometer.fmtPower(syncHeight);
                 tvVerify.setText(progressStr);
 
-                if(syncHeight < downloadHeight && progress != 100){
+                if(syncHeight < downloadHeight && syncHeight < chainHeight){
                     ivVerify.setOn();
                 }else{
                     ivVerify.setOff();
@@ -316,8 +313,8 @@ public class UserUtil {
                 tvDownload.setText(progressStr);
 
                 // 6K / block
-                double data = (double) downloadHeight * 6 / 1024;
-                String dataStr = ResourcesUtil.getText(R.string.home_download_data_size);
+                double data = (double) chainHeight * 6 / 1024;
+                String dataStr = ResourcesUtil.getText(R.string.home_full_data);
                 dataStr = String.format(dataStr, FmtMicrometer.fmtDecimal(data));
                 tvBlockChainData.setText(dataStr);
 

@@ -136,8 +136,8 @@
                             style="@style/style_small_light_grey"
                             android:layout_width="match_parent"
                             android:layout_height="14dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
                             android:includeFontPadding="false"
                             android:paddingStart="2dp"
                             android:paddingEnd="2dp"
@@ -190,13 +190,16 @@
                             android:id="@+id/tv_verify"
                             style="@style/style_middle_blue"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/dimen_size_22"
+                            android:layout_height="26dp"
                             android:includeFontPadding="false"
                             android:layout_marginTop="5dp"
-                            android:text="@string/common_percentage_zero"
+                            android:gravity="center_vertical|center"
                             android:maxLines="1"
-                            android:gravity="center_vertical|center" />
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMaxTextSize="22dp"
+                            app:autoSizeMinTextSize="10dp"
+                            app:autoSizeStepGranularity="@dimen/dimen_size_05"
+                            android:text="@string/common_zero" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
