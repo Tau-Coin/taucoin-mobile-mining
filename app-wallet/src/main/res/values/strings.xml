@@ -176,8 +176,8 @@
     <string name="home_mining_history">View your mining history</string>
     <string name="home_current_block">Current Block</string>
     <string name="home_average_block_time">Average Block Time</string>
-    <string name="home_average_block_time_value">00:05:00</string>
-    <string name="home_estimated_block_time">Your Estimated Mining Time</string>
+    <string name="home_average_block_time_value">05:00:00</string>
+    <string name="home_estimated_block_time">Remaining Mining Time Count-down</string>
     <string name="home_history_miner_reward">Potential Former Block Reward</string>
     <string name="home_history_tx_reward">Potential TX Participant Reward</string>
 
@@ -241,9 +241,9 @@
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
     <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
-    <string name="setting_reset_data">Reset Blockchain Data</string>
+    <string name="setting_reset_data">Restart Verify</string>
     <string name="setting_reset_data_success">Successful</string>
     <string name="setting_reset_data_fail">Failed</string>
-    <string name="setting_reset_data_tips">Resetting the data will restart the latest block without affecting the use of the private key and address.</string>
+    <string name="setting_reset_data_tips">Restarting Verify will not affect private key.</string>
 
 </resources>

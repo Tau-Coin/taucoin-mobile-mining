@@ -228,6 +228,7 @@ public class MiningUtil {
         MyApplication.getRemoteConnector().cancelRemoteConnector();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
+                Thread.sleep(2000);
                 Context context = MyApplication.getInstance();
                 String dataDir =  context.getApplicationInfo().dataDir;
                 Logger.d(dataDir);

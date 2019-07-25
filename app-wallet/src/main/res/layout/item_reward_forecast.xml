@@ -96,7 +96,7 @@
                 android:id="@+id/tv_forged_time_title"
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_size_16"
+                android:layout_height="@dimen/dimen_size_18"
                 android:gravity="bottom"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="5dp"
@@ -119,7 +119,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginEnd="15dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginBottom="5dp"
                 tools:ignore="UseCompoundDrawables">
 
@@ -135,12 +135,12 @@
                     style="@style/style_big_light_grey"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="2dp"
                     android:includeFontPadding="false"
                     android:textColor="@color/color_home_grey_dark"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical|center"
-                    android:text="12323"/>
+                    android:text=""/>
             </LinearLayout>
 
             <View
@@ -276,7 +276,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_size_16"
+                android:layout_height="@dimen/dimen_size_18"
                 android:gravity="bottom"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="5dp"
@@ -318,7 +318,7 @@
             <TextView
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_size_16"
+                android:layout_height="@dimen/dimen_size_18"
                 android:gravity="bottom"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="5dp"

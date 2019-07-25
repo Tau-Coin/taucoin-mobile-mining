@@ -25,35 +25,22 @@
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal|center"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="40dp"
         android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tv_value"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:text=""
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_yellow"
             app:autoSizeTextType="uniform"
-            app:autoSizeMaxTextSize="@dimen/dimen_size_36"
+            app:autoSizeMaxTextSize="50dp"
             app:autoSizeMinTextSize="8dp"
             app:autoSizeStepGranularity="@dimen/dimen_size_05"/>
-
-        <TextView
-            style="@style/style_small_light_grey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/home_mining_rate"/>
-
-        <TextView
-            android:id="@+id/tv_percentage"
-            style="@style/style_small_grey_dark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""/>
 
         <io.taucoin.android.wallet.widget.ProgressView
             android:id="@+id/iv_mining_power"
@@ -61,6 +48,23 @@
             android:layout_height="45dp"
             android:layout_marginTop="5dp"
             app:center_text="@string/home_mining_power" />
+
+
+        <TextView
+            style="@style/style_middle_light_grey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="@string/home_mining_rate"/>
+
+        <TextView
+            android:id="@+id/tv_percentage"
+            style="@style/style_middle_grey_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:layout_marginTop="5dp"
+            android:text=""/>
 
     </LinearLayout>
 </RelativeLayout>

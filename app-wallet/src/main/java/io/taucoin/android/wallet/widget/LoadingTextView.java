@@ -65,7 +65,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
 
     public void setCountDown(long time, CountDownListener countDownListener) {
         this.mCountDownListener = countDownListener;
-        setLoadingText("", time, "");
+        setLoadingText("", time * 10, "");
     }
 
     public synchronized void setLoadingText(String text){
@@ -102,31 +102,35 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
             if(stringBuilder.length() > 0){
                 stringBuilder.append(": ");
             }
-            long hour = pointNum / 60 / 60;
-            long min = pointNum / 60 % 60;
-            long second = pointNum % 60;
-
-            if(hour < 10){
-                stringBuilder.append(0);
-            }
-            stringBuilder.append(hour);
-            stringBuilder.append(":");
+            long min = pointNum / 10 / 60 % 60;
+            long second = pointNum / 10 % 60;
+            long millSecond = pointNum % 10;
 
             if(min < 10){
                 stringBuilder.append(0);
+                stringBuilder.append(min);
+            }else if(min == 10){
+                stringBuilder.append(min);
+            }else{
+                stringBuilder.append("10+");
             }
-            stringBuilder.append(min);
             stringBuilder.append(":");
 
             if(second < 10){
                 stringBuilder.append(0);
             }
             stringBuilder.append(second);
+            stringBuilder.append(":");
+
+            stringBuilder.append(0);
+            stringBuilder.append(millSecond);
 
             setText(stringBuilder.toString(), mBufferType);
         }
-        if(mCountDownListener != null){
-            mCountDownListener.countDown(pointNum);
+        long countDown = pointNum / 10;
+        long countDownOld = (pointNum + 1) / 10;
+        if(mCountDownListener != null && countDown != countDownOld){
+            mCountDownListener.countDown(countDown);
         }
     }
 
@@ -151,7 +155,7 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         ThreadPool.getThreadPool().execute(() -> {
             if(isLoading){
                 try {
-                    int delayTime = isTime ? 1000 : 380;
+                    int delayTime = isTime ? 100 : 380;
                     Thread.sleep(delayTime);
                     if(isTime){
                         pointNum --;
