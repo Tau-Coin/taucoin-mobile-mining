@@ -77,6 +77,8 @@ public class MemoryIndexedBlockStore implements BlockStore {
     private static final Lock r = rwl.readLock();
     private static final Lock w = rwl.writeLock();
 
+    private volatile boolean initDone = false;
+
     @Inject
     public MemoryIndexedBlockStore() {
         init();
@@ -754,6 +756,10 @@ public class MemoryIndexedBlockStore implements BlockStore {
 
     @Override
     public void load() {
+        if (initDone) {
+            return;
+        }
+
         // Load every thing from file system.
         logger.info("load everything from file system");
         long t1 = System.nanoTime();
@@ -761,6 +767,8 @@ public class MemoryIndexedBlockStore implements BlockStore {
         String blockStoreDir = CONFIG.databaseDir() + File.separator + BLOCKSTORE_DIRECTORY;
         File f = new File(blockStoreDir);
         File[] files = f.listFiles();
+
+        w.lock();
 
         try {
             for (int i = 0; i < files.length; i++) {
@@ -783,15 +791,39 @@ public class MemoryIndexedBlockStore implements BlockStore {
                     }
                 }
             }
+
+            // Special case handling: remove isolated block.
+            // Restarting verification should remove all the block store.
+            // But in some conditions, an isolated record happens.
+            // TODO: optimize this logic.
+            if (index.size() == 1 && blocks.size() == 1) {
+                long isolatedNumber = index.firstKey();
+                if (isolatedNumber != 0) {
+                    ArrayList<BlockInfo> infos = index.get(isolatedNumber);
+                    for (BlockInfo info : infos) {
+                        removeBlockFromDisk(info);
+                        removeBlockInfoFromDisk(info);
+                        logger.warn("Remove isolated block number {} hash {}",
+                            info.getNumber(), Hex.toHexString(info.getHash()));
+                    }
+
+                    blocks.clear();
+                    index.clear();
+                }
+            }
+
+            checkSanity();
+
+            initDone = true;
+
+            long t2 = System.nanoTime();
+            logger.info("Load block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
         } catch (Exception e) {
             logger.error("load fatal error {}", e);
             throw new RuntimeException(e.getMessage());
+        } finally {
+            w.unlock();
         }
-
-        checkSanity();
-
-        long t2 = System.nanoTime();
-        logger.info("Load block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
     }
 
     public void setSessionFactory(SessionFactory sessionFactory){
