@@ -767,6 +767,9 @@ public class MemoryIndexedBlockStore implements BlockStore {
         String blockStoreDir = CONFIG.databaseDir() + File.separator + BLOCKSTORE_DIRECTORY;
         File f = new File(blockStoreDir);
         File[] files = f.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
 
         w.lock();
 
@@ -782,11 +785,13 @@ public class MemoryIndexedBlockStore implements BlockStore {
                 if (name.contains("_")) {
                     // block data file
                     Block block = readBlock(name);
-                    blocks.put(new ByteArrayWrapper(block.getHash()), block);
+                    if (block != null) {
+                        blocks.put(new ByteArrayWrapper(block.getHash()), block);
+                    }
                 } else {
                     // block info data file
                     ArrayList<BlockInfo> infoList = readBlockInfoList(name);
-                    if (infoList != null && !infoList.isEmpty()) {
+                    if (infoList != null && infoList.size() > 0) {
                         index.put(infoList.get(0).getNumber(), infoList);
                     }
                 }
@@ -820,7 +825,7 @@ public class MemoryIndexedBlockStore implements BlockStore {
             logger.info("Load block store in: {} ms", ((float)(t2 - t1) / 1_000_000));
         } catch (Exception e) {
             logger.error("load fatal error {}", e);
-            throw new RuntimeException(e.getMessage());
+            //throw new RuntimeException(e.getMessage());
         } finally {
             w.unlock();
         }
@@ -950,7 +955,9 @@ public class MemoryIndexedBlockStore implements BlockStore {
             }
         
             byte[] bytes = bf.array();
-            block = new Block(bytes);
+            if (bytes != null || bytes.length > 0) {
+                block = new Block(bytes);
+            }
         } catch(IOException e) {
             logger.error("Read {} exception: {}", fileName, e);
             throw e;
