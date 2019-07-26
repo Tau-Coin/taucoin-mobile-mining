@@ -47,7 +47,7 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_import)
     public void onBtnImportClicked() {
-        String privateKey = etPrivateKey.getText().toString();
+        String privateKey = etPrivateKey.getText().toString().trim();
         if(StringUtil.isEmpty(privateKey)){
             ToastUtils.showShortToast(R.string.keys_private_invalid);
             return;

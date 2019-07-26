@@ -227,10 +227,11 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="100dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="3dp"
                         android:layout_gravity="center_horizontal"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
                         android:orientation="vertical">
 
                         <Switch
@@ -263,7 +264,6 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginStart="2dp"
                             android:layout_marginTop="5dp"
                             android:layout_gravity="center_horizontal"
                             android:layout_height="wrap_content">
