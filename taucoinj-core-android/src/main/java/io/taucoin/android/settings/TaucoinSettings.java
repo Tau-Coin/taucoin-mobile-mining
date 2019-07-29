@@ -83,6 +83,7 @@ public class TaucoinSettings {
             return;
         }
 
+        /**
         // Register network state listener
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -91,6 +92,7 @@ public class TaucoinSettings {
         // Register sharedPreferences changed listener.
         sharedPreferences.registerOnSharedPreferenceChangeListener(
                 sharedPreferencesListener);
+        */
 
         started = true;
     }
@@ -100,9 +102,11 @@ public class TaucoinSettings {
             return;
         }
 
+        /**
         context.unregisterReceiver(networkStateListener);
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(
                 sharedPreferencesListener);
+        */
 
         started = false;
     }
