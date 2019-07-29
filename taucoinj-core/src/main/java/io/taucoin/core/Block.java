@@ -597,7 +597,10 @@ public class Block {
         if (!parsed) parseRLP();
 
         byte[] number = RLP.encodeBigInteger(BigInteger.valueOf(this.number));
-        byte[] baseTarget = RLP.encodeBigInteger(this.baseTarget == null ? BigInteger.valueOf(0x0ffffffff): this.baseTarget);
+        if (this.baseTarget == null) {
+            throw new IllegalArgumentException("baseTarget is null when encode");
+        }
+        byte[] baseTarget = RLP.encodeBigInteger(this.baseTarget);
         byte[] generationSignature = RLP.encodeElement(this.generationSignature);
         byte[] cumulativeDifficulty = RLP.encodeBigInteger(this.cumulativeDifficulty == null ? BigInteger.valueOf(0xffffff):this.cumulativeDifficulty);
         byte[] cumulativeFee = RLP.encodeBigInteger(this.cumulativeFee == null ? BigInteger.ZERO: this.cumulativeFee);

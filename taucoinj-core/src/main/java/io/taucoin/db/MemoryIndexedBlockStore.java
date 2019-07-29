@@ -915,6 +915,13 @@ public class MemoryIndexedBlockStore implements BlockStore {
 
         FileChannel writeFileChan = new RandomAccessFile(filePath, "rw").getChannel();
         byte[] bytes = block.getEncoded();
+
+        if (bytes == null) {
+            logger.error("try to save a null block");
+            writeFileChan.close();
+            return;
+        }
+
         ByteBuffer bf = ByteBuffer.wrap(bytes);
         FileLock fileLock = null;
 
@@ -948,18 +955,18 @@ public class MemoryIndexedBlockStore implements BlockStore {
             ByteBuffer bf = ByteBuffer.allocate((int)readFileChan.size());
             int readSize = readFileChan.read(bf, 0L);
 
-            if (readSize != (int)readFileChan.size()) {
+            if (readSize != (int)readFileChan.size() || readSize == 0) {
                 throw new IOException(String.format(
                         "Can't read full file %s: read %d bytes, file size %d",
                         fileName, readSize, readFileChan.size()));
             }
         
             byte[] bytes = bf.array();
-            if (bytes != null || bytes.length > 0) {
+            if (bytes != null && bytes.length > 0) {
                 block = new Block(bytes);
             }
         } catch(IOException e) {
-            logger.error("Read {} exception: {}", fileName, e);
+            logger.error("Read {} exception: {}", fileName, e.getMessage());
             throw e;
         } finally {
             if (fileLock != null) {
