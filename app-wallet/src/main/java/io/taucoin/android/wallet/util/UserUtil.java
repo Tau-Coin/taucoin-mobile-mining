@@ -397,6 +397,7 @@ public class UserUtil {
         long nextBlockNo = blockInfo.getBlockHeight() + 1;
         nextBlockNoStr = String.format(nextBlockNoStr, FmtMicrometer.fmtPower(nextBlockNo));
         tvNextBlockNo.setText(nextBlockNoStr);
+        tvNextBlockNo.setTag(blockInfo.getBlockHeight());
     }
 
     public static void setHistoryParticipantReward(TextView tvHistoryMinerReward, TextView tvHistoryTxReward) {

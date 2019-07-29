@@ -144,14 +144,18 @@ public class AppUtil {
         if (StringUtil.isEmpty(serviceName)){
             return false;
         }
-        ActivityManager myManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
-                .getRunningServices(200);
-        for (int i = 0; i < runningService.size(); i++) {
-            String className = runningService.get(i).service.getClassName();
-            if (StringUtil.isSame(className, serviceName)) {
-                return true;
+        try{
+            ActivityManager myManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+                    .getRunningServices(200);
+            for (int i = 0; i < runningService.size(); i++) {
+                String className = runningService.get(i).service.getClassName();
+                if (StringUtil.isSame(className, serviceName)) {
+                    return true;
+                }
             }
+        }catch (Exception ignore){
+
         }
         return false;
     }

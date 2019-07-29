@@ -131,7 +131,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private RewardAdapter partRewardAdapter;
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
-    private BlockInfo mBlockInfo = null;
 
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -245,8 +244,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 handleMiningView();
                 break;
             case MINING_REWARD:
-                mBlockInfo = null;
-                loadRewardData();
+                if(tvNextBlockNo != null){
+                    tvNextBlockNo.setTag(0);
+                    loadRewardData();
+                }
                 break;
             case MINING_NOTIFY:
                 if(ivMiningSwitch != null && object.getData() != null){
@@ -355,11 +356,10 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
 
         if(blockInfo != null){
-            if(mBlockInfo != null && mBlockInfo.getBlockHeight() != 0 &&
-                    blockInfo.getBlockHeight() > mBlockInfo.getBlockHeight()){
+            long blockHeight = StringUtil.getIntTag(tvNextBlockNo);
+            if(blockHeight != 0 && blockInfo.getBlockHeight() > blockHeight){
                 loadRewardData();
             }
-            mBlockInfo = blockInfo;
             UserUtil.setHistoryParticipantReward(tvHistoryMinerReward, tvHistoryTxReward);
             UserUtil.setNextBlockNo(tvNextBlockNo, blockInfo);
         }

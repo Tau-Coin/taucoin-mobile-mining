@@ -80,9 +80,9 @@ public class RewardAdapter extends BaseAdapter {
             }else{
                 ParticipantListBean.ParticipantBean partBean = (ParticipantListBean.ParticipantBean) bean;
                 if(partBean.getRole() == 1){
-                    left = ResourcesUtil.getText(R.string.home_history_miner);
+                    left = ResourcesUtil.getText(R.string.home_role_former_miner);
                 }else{
-                    left = ResourcesUtil.getText(R.string.home_role_participant);
+                    left = ResourcesUtil.getText(R.string.home_role_tx_participant);
                 }
                 middle = partBean.getTxHash();
                 incomeStr = partBean.getIncome();

@@ -182,10 +182,8 @@
     <string name="home_history_tx_reward">Potential TX Participant Reward</string>
 
     <string name="home_participant_history">View your participant history</string>
-    <string name="home_role_participant">Participant</string>
-    <string name="home_history_miner">History Miner</string>
-    <string name="home_self_participant">Self Participation</string>
-    <string name="home_tx_participant">TX Participant</string>
+    <string name="home_role_tx_participant">TX Participant</string>
+    <string name="home_role_former_miner">Former Miner</string>
 
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Historical Mining Rewards</string>

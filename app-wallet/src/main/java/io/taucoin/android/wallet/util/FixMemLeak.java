@@ -49,7 +49,7 @@ public class FixMemLeak {
                 mContext.setAccessible(true);
                 mContext.set(systemService, null);
             }
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException ignore) {
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | NullPointerException ignored) {
         }
     }
 }
