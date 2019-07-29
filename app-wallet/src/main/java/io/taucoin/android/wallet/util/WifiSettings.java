@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
+import io.taucoin.foundation.util.StringUtil;
 
 public class WifiSettings {
 
@@ -28,7 +29,7 @@ public class WifiSettings {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction()) && isMiningOn()) {
                 NetworkInfo info = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
                 if (info != null) {
                     if (info.getType() == ConnectivityManager.TYPE_WIFI
@@ -43,9 +44,17 @@ public class WifiSettings {
         }
     };
 
+    private boolean isMiningOn(){
+        if(UserUtil.isImportKey()){
+            String miningState = MyApplication.getKeyValue().getMiningState();
+            return StringUtil.isSame(miningState, TransmitKey.MiningState.Start);
+        }
+        return false;
+    }
+
     private OnSharedPreferenceChangeListener sharedPreferencesListener
         = (sharedPreferences, key) -> {
-            if (TransmitKey.FORGING_WIFI_ONLY.equals(key)) {
+            if (TransmitKey.FORGING_WIFI_ONLY.equals(key) && isMiningOn()) {
                 onForgingWifiOnlySettingChanged();
             }
         };
