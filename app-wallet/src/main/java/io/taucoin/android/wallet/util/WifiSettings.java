@@ -38,6 +38,9 @@ public class WifiSettings {
                     } else if (info.getType() == ConnectivityManager.TYPE_MOBILE
                             && info.isConnected()) {
                         onMobileConnected();
+                    }else if(!isHaveNetwork()){
+                        logger.info("Do not have network connected, stop downloading");
+                        stopDownload();
                     }
                 }
             }
@@ -92,16 +95,12 @@ public class WifiSettings {
         started = false;
     }
 
-    public synchronized boolean isSyncDownloadDisabled() {
-        return getForgingWifiOnlyValue() && isMobileConnected();
-    }
-
-    private boolean getForgingWifiOnlyValue() {
+    private boolean isForgingWifiOnly() {
         return SharedPreferencesHelper.getInstance().getBoolean(TransmitKey.FORGING_WIFI_ONLY, false);
     }
 
     private void onWifiConnected() {
-        if (!started || !getForgingWifiOnlyValue()) {
+        if (!started) {
             return;
         }
 
@@ -110,12 +109,16 @@ public class WifiSettings {
     }
 
     private void onMobileConnected() {
-        if (!started || !getForgingWifiOnlyValue()) {
+        if (!started) {
             return;
         }
-
-        logger.info("Mobile connected, try to stop downloading");
-        stopDownload();
+        if(isForgingWifiOnly()){
+            logger.info("Mobile connected, try to stop downloading");
+            stopDownload();
+        }else{
+            logger.info("Mobile connected, try to start downloading");
+            startDownload();
+        }
     }
 
     public synchronized void onForgingWifiOnlySettingChanged() {
@@ -123,7 +126,7 @@ public class WifiSettings {
             return;
         }
 
-        boolean value = getForgingWifiOnlyValue();
+        boolean value = isForgingWifiOnly();
         logger.info("Forging wifi only value changed {}", value);
         if (value) {
             if (isMobileConnected()) {
@@ -131,8 +134,10 @@ public class WifiSettings {
                 stopDownload();
             }
         } else {
-            logger.info("try to restart downloading");
-            startDownload();
+            if(isHaveNetwork()){
+                logger.info("try to restart downloading");
+                startDownload();
+            }
         }
     }
 
@@ -142,6 +147,10 @@ public class WifiSettings {
 
     private synchronized void stopDownload(){
         MyApplication.getRemoteConnector().stopDownload();
+    }
+
+    private boolean isHaveNetwork() {
+        return isWifiConnected() || isMobileConnected();
     }
 
     private boolean isWifiConnected() {
