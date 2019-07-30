@@ -14,6 +14,8 @@ public class IncomeBean {
     private String totalPower;
     @SerializedName(value = "txsno")
     private String txsPool;
+    @SerializedName(value = "circulation")
+    private String circulation;
 
     public String getAvgIncome() {
         return avgIncome;
@@ -53,5 +55,13 @@ public class IncomeBean {
 
     public void setTxsPool(String txsPool) {
         this.txsPool = txsPool;
+    }
+
+    public String getCirculation() {
+        return circulation;
+    }
+
+    public void setCirculation(String circulation) {
+        this.circulation = circulation;
     }
 }

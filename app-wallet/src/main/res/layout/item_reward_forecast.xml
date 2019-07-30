@@ -51,6 +51,7 @@
         android:layout_height="40dp">
 
         <TextView
+            android:id="@+id/tv_next_block_no_title"
             style="@style/style_middle_light_grey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,11 +90,11 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
+            android:id="@+id/rl_avg_time"
             android:layout_width="match_parent"
             android:layout_height="40dp">
 
             <TextView
-                android:id="@+id/tv_forged_time_title"
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_size_18"
@@ -103,15 +104,11 @@
                 android:layout_marginStart="15dp"
                 android:maxLines="1"
                 android:includeFontPadding="false"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMaxTextSize="14dp"
-                app:autoSizeMinTextSize="8dp"
-                app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                android:layout_toStartOf="@+id/ll_forged_time"
+                android:layout_toStartOf="@+id/ll_avg_time"
                 android:text="@string/home_average_block_time" />
 
             <LinearLayout
-                android:id="@+id/ll_forged_time"
+                android:id="@+id/ll_avg_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -121,6 +118,67 @@
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginBottom="5dp"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_countdown"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="18dp" />
+
+                <TextView
+                    style="@style/style_big_light_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/color_home_grey_dark"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical|center"
+                    android:text="@string/home_average_block_time_value"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:background="@color/color_main_line"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="2dp"
+                android:layout_height="1dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:visibility="gone"
+            android:id="@+id/rl_mining_time"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/tv_forged_time_title"
+                style="@style/style_middle_light_grey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginStart="15dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@+id/ll_forged_time"
+                android:text="@string/home_estimated_block_time" />
+
+            <LinearLayout
+                android:layout_above="@+id/tv_avg_tip"
+                android:id="@+id/ll_forged_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="5dp"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -141,7 +199,21 @@
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical|center"
                     android:text=""/>
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_avg_tip"
+                style="@style/style_normal_light_grey"
+                android:layout_width="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="5dp"
+                android:includeFontPadding="false"
+                android:layout_marginBottom="5dp"
+                android:text="@string/home_avg_time_tip"/>
 
             <View
                 android:layout_width="match_parent"
@@ -164,6 +236,16 @@
         <TextView
             style="@style/style_small_light_grey"
             android:id="@+id/tv_success_requires"
+            android:layout_marginTop="5dp"
+            android:includeFontPadding="false"
+            android:layout_width="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/style_litter_small_light_grey"
+            android:id="@+id/tv_hit_tip"
             android:layout_marginTop="5dp"
             android:includeFontPadding="false"
             android:layout_width="match_parent"
@@ -274,6 +356,7 @@
             android:layout_height="40dp">
 
             <TextView
+                android:id="@+id/tv_history_miner_reward_title"
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_size_18"
@@ -316,6 +399,7 @@
             android:layout_height="40dp">
 
             <TextView
+                android:id="@+id/tv_history_tx_reward_title"
                 style="@style/style_middle_light_grey"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_size_18"

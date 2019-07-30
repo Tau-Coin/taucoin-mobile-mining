@@ -139,6 +139,11 @@
         <item name="android:textColor">@color/color_blue</item>
     </style>
 
+    <style name="style_small_blue">
+        <item name="android:textSize">@dimen/dimen_size_12</item>
+        <item name="android:textColor">@color/color_blue</item>
+    </style>
+
     <style name="style_normal_blue">
         <item name="android:textSize">@dimen/dimen_size_16</item>
         <item name="android:textColor">@color/color_blue</item>
@@ -169,6 +174,11 @@
         <item name="android:textColor">@color/color_grey_light</item>
     </style>
 
+    <style name="style_litter_small_light_grey">
+        <item name="android:textSize">@dimen/dimen_size_10</item>
+        <item name="android:textColor">@color/color_grey_light</item>
+    </style>
+
     <style name="style_small_light_grey">
         <item name="android:textSize">@dimen/dimen_size_12</item>
         <item name="android:textColor">@color/color_grey_light</item>
@@ -188,6 +198,12 @@
         <item name="android:textSize">@dimen/dimen_size_12</item>
         <item name="android:textColor">@color/color_grey_dark</item>
     </style>
+
+    <style name="style_litter_small_grey_light">
+        <item name="android:textSize">@dimen/dimen_size_10</item>
+        <item name="android:textColor">@color/color_grey_light</item>
+    </style>
+
     <style name="style_small_grey_light">
         <item name="android:textSize">@dimen/dimen_size_12</item>
         <item name="android:textColor">@color/color_grey_light</item>

@@ -608,6 +608,7 @@ public class TxModel implements ITxModel {
                         blockInfo.setMedianFee(incomeBean.getMedianFee());
                         blockInfo.setTotalPower(incomeBean.getTotalPower());
                         blockInfo.setTxsPool(incomeBean.getTxsPool());
+                        blockInfo.setCirculation(incomeBean.getCirculation());
 
 //                        JsonObject jsonObject = incomeBean.getMinerInfo();
 //                        String minerInfo = null;

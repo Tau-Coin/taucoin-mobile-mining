@@ -49,10 +49,12 @@ public class MiningPresenter {
     }
 
     public void updateMiningState(String miningState) {
-        mMiningModel.updateMiningState(miningState, new LogicObserver<Boolean>() {
+        mMiningModel.updateMiningState(miningState, new LogicObserver<KeyValue>() {
             @Override
-            public void handleData(Boolean isSuccess) {
+            public void handleData(KeyValue keyValue) {
+                MyApplication.setKeyValue(keyValue);
                 mHomeView.handleMiningView();
+                mHomeView.handleMiningSwitch();
             }
         });
     }

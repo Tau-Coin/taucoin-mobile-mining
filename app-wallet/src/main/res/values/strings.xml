@@ -161,7 +161,7 @@
     <string name="home_off">Off</string>
 
     <string name="home_mining_dashboard">Mining Dashboard</string>
-    <string name="home_mining_Rank">Mining Rank</string>
+    <string name="home_mining_rank">Mining Rank</string>
     <string name="home_wifi_only">Wifi Only</string>
     <string name="home_current_mining">Current Mining</string>
     <string name="home_reward_analysis">Reward Analysis</string>
@@ -176,10 +176,15 @@
     <string name="home_mining_history">View your mining history</string>
     <string name="home_current_block">Current Block</string>
     <string name="home_average_block_time">Average Block Time</string>
+    <string name="home_average_block_time_tip">The block is currently competed by miners for packaging.</string>
     <string name="home_average_block_time_value">05:00:00</string>
-    <string name="home_estimated_block_time">Mining time count-down to win the block</string>
+    <string name="home_estimated_block_time">Count-down competition on your address (%s) to win the block</string>
+    <string name="home_hit_tip">(Hit: Address %s network random number)</string>
+    <string name="home_avg_time_tip">(a.v 5 min)</string>
     <string name="home_history_miner_reward">Potential Former Block Reward</string>
+    <string name="home_history_miner_reward_tip">Once your mined block transactions receivers make transaction in the future, you will get one third of that future transaction.</string>
     <string name="home_history_tx_reward">Potential TX Participant Reward</string>
+    <string name="home_history_tx_reward_tip">Once your history transactions receivers make transaction in the future, you will get one third of that future tx fee. </string>
 
     <string name="home_participant_history">View your participant history</string>
     <string name="home_role_tx_participant">TX Participant</string>
@@ -189,18 +194,22 @@
     <string name="home_mining_income">Historical Mining Rewards</string>
     <string name="home_power">Mining&#160;Power</string>
     <string name="home_miners_default_title">0.5/3/24</string>
+    <string name="home_miners_title_value">(%sh)</string>
     <string name="home_miners_default_value">0/0/0</string>
-    <string name="home_miners_title">Miners&#160;Online(%sh)</string>
+    <string name="home_miners_title">Miners&#160;Online</string>
     <string name="home_synchronized">Latest&#160;Block</string>
     <string name="home_mined">Mined&#160;&#38;&#160;Participated</string>
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
+    <string name="home_storage">Storage&#160;(M)</string>
+    <string name="home_circulation">Circulation&#160;(TAU)</string>
     <string name="home_txs_in_pool">Txs&#160;In&#160;Pool</string>
     <string name="home_median_fee">Median&#160;Tx&#160;Fee</string>
     <string name="home_data_storage">Daily&#160;Data&#160;(M)</string>
     <string name="home_mining_transaction">Your&#160;phone&#160;has&#160;verified&#160;following&#160;transactions</string>
     <string name="home_no_turn_on">Please turn on the mining function.</string>
     <string name="home_chain_height">Blockchain Height</string>
+    <string name="home_what_is_power">Power is your total transaction history. The more transactions, the higher power is.</string>
 
     <string name="home_mining_hash">TX hash</string>
     <string name="home_mining_fee">TX Fee</string>

@@ -5,8 +5,8 @@
 
     <io.taucoin.android.wallet.widget.DashboardView
         android:id="@+id/dashboard_view"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
         android:layout_centerHorizontal="true"
         app:antiAlias="true"
         app:arcWidth="6dp"
@@ -21,11 +21,11 @@
         app:sweepAngle="292"/>
 
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="140dp"
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal|center"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="36dp"
         android:layout_height="wrap_content">
 
         <TextView
@@ -44,9 +44,10 @@
 
         <io.taucoin.android.wallet.widget.ProgressView
             android:id="@+id/iv_mining_power"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="5dp"
+            app:center_textSize="10"
             app:center_text="@string/home_mining_power" />
 
 

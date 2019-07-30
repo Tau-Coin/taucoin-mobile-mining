@@ -15,6 +15,7 @@
  */
 package io.taucoin.android.wallet.module.service;
 
+import android.content.Context;
 import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageStats;
 import android.os.Bundle;
@@ -25,6 +26,9 @@ import android.support.annotation.NonNull;
 
 import com.github.naturs.logger.Logger;
 
+import java.math.BigInteger;
+
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseHandler;
 import io.taucoin.android.wallet.util.SysUtil;
 import io.taucoin.foundation.util.ThreadPool;
@@ -71,7 +75,9 @@ class ResManager implements BaseHandler.HandleCallBack{
              case 3:
                  PackageStats newPs = msg.getData().getParcelable("data");
                  if (newPs != null) {
-                     long dataSize = newPs.dataSize + newPs.cacheSize;
+                     long dataSize = newPs.dataSize + newPs.cacheSize + newPs.codeSize;
+                     dataSize += newPs.externalCacheSize + newPs.externalCodeSize + newPs.externalDataSize;
+                     dataSize += newPs.externalMediaSize + newPs.externalObbSize;
                      String dataInfo = SysUtil.formatFileSizeMb(dataSize);
                      if(mResCallBack != null){
                          mResCallBack.updateDataSize(dataInfo);
@@ -105,8 +111,8 @@ class ResManager implements BaseHandler.HandleCallBack{
          ThreadPool.getThreadPool().execute(() -> {
              try {
                  if(isRunning){
-//                     Context context = MyApplication.getInstance();
-//                     mSysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
+                     Context context = MyApplication.getInstance();
+                     mSysUtil.getPkgInfo(context.getPackageName(), packageStatsObserver);
 
                      SysUtil.MemoryInfo info =  mSysUtil.loadAppProcess();
                      Bundle bundle = new Bundle();

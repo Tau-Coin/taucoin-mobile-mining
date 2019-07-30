@@ -132,6 +132,9 @@ public class WifiSettings {
             if (isMobileConnected()) {
                 logger.info("Now mobile connected, stop downloading");
                 stopDownload();
+            }else if(isWifiConnected()){
+                logger.info("Now wifi connected, start downloading");
+                startDownload();
             }
         } else {
             if(isHaveNetwork()){

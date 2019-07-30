@@ -16,6 +16,7 @@
 package io.taucoin.android.wallet.module.model;
 
 import io.reactivex.Scheduler;
+import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 
 import java.util.HashMap;
@@ -60,16 +61,15 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void updateMiningState(String miningState, LogicObserver<Boolean> observer) {
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+    public void updateMiningState(String miningState, LogicObserver<KeyValue> observer) {
+        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
             String pubicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
             KeyValue entry = KeyValueDaoUtils.getInstance().queryByPubicKey(pubicKey);
-            boolean isSuccess = false;
             if(entry != null){
                 entry.setMiningState(miningState);
-                isSuccess = KeyValueDaoUtils.getInstance().updateMiningState(entry);
+                KeyValueDaoUtils.getInstance().updateMiningState(entry);
             }
-            emitter.onNext(isSuccess);
+            emitter.onNext(entry);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(scheduler)
                 .unsubscribeOn(scheduler)

@@ -3,6 +3,7 @@ package io.taucoin.android.wallet.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.taucoin.android.wallet.R;
+import io.taucoin.foundation.util.DimensionsUtil;
 import io.taucoin.foundation.util.StringUtil;
 
 /**
@@ -38,7 +40,7 @@ public class ProgressView extends RelativeLayout {
     private void initView(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ProgressView);
         String centerText = a.getString(R.styleable.ProgressView_center_text);
-        float centerTextSize = a.getDimension(R.styleable.ProgressView_center_textSize, -1);
+        float centerTextSize = a.getFloat(R.styleable.ProgressView_center_textSize, -1);
         centerImage = a.getResourceId(R.styleable.ProgressView_center_image, -1);
         a.recycle();
 
@@ -55,7 +57,7 @@ public class ProgressView extends RelativeLayout {
             mViewHolder.text.setText(centerText);
         }
         if(centerTextSize != -1){
-            mViewHolder.text.setTextSize(centerTextSize);
+            mViewHolder.text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, centerTextSize);
         }
         setOff();
     }

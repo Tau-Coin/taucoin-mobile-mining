@@ -20,10 +20,11 @@ public class BlockInfo {
     private String minerInfo;
     private String totalPower;
     private String txsPool;
-    @Generated(hash = 1642090662)
+    private String circulation;
+    @Generated(hash = 997107451)
     public BlockInfo(Long id, int blockHeight, int blockSync, int blockDownload,
             String avgIncome, String medianFee, String minerInfo, String totalPower,
-            String txsPool) {
+            String txsPool, String circulation) {
         this.id = id;
         this.blockHeight = blockHeight;
         this.blockSync = blockSync;
@@ -33,6 +34,7 @@ public class BlockInfo {
         this.minerInfo = minerInfo;
         this.totalPower = totalPower;
         this.txsPool = txsPool;
+        this.circulation = circulation;
     }
     @Generated(hash = 1647740766)
     public BlockInfo() {
@@ -90,5 +92,11 @@ public class BlockInfo {
     }
     public void setTxsPool(String txsPool) {
         this.txsPool = txsPool;
+    }
+    public String getCirculation() {
+        return this.circulation;
+    }
+    public void setCirculation(String circulation) {
+        this.circulation = circulation;
     }
 }

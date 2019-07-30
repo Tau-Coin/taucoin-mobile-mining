@@ -183,7 +183,7 @@ public class UserUtil {
         return String.valueOf(blocks * 5);
     }
 
-    public static void setApplicationInfo(TextView tvCPU, TextView tvMemory, TextView tvDataStorage, Object data) {
+    public static void setApplicationInfo(TextView tvCPU, TextView tvMemory, TextView tvDataStorage, TextView tvStorage, Object data) {
         try{
             if(data != null){
                 NotifyManager.NotifyData notifyData = (NotifyManager.NotifyData)data;
@@ -198,6 +198,10 @@ public class UserUtil {
                 if(StringUtil.isNotEmpty(notifyData.netDataSize)){
                     String dataSize = notifyData.netDataSize.substring(0, notifyData.netDataSize.length() - 1);
                     tvDataStorage.setText(dataSize);
+                }
+                if(StringUtil.isNotEmpty(notifyData.dataSize)){
+                    String dataSize = notifyData.dataSize.substring(0, notifyData.dataSize.length() - 1);
+                    tvStorage.setText(dataSize);
                 }
             }
         }catch (Exception ignore){
@@ -266,7 +270,7 @@ public class UserUtil {
                 minersTitle.append(ResourcesUtil.getText(R.string.home_miners_default_title));
                 minersValue.append(ResourcesUtil.getText(R.string.home_miners_default_value));
             }
-            String minersTitleRes = ResourcesUtil.getText(R.string.home_miners_title);
+            String minersTitleRes = ResourcesUtil.getText(R.string.home_miners_title_value);
             minersTitleRes = String.format(minersTitleRes, minersTitle.toString());
             tvMinersOnline.setText(minersValue);
             tvMinersOnlineTitle.setText(minersTitleRes);
@@ -329,8 +333,8 @@ public class UserUtil {
         }
     }
 
-    public static void setMiningRankAndOther(TextView tvMiningRank, TextView tvTxsPool, TextView tvMedianFee, BlockInfo blockInfo) {
-        if(tvMiningRank == null || tvTxsPool == null || tvMedianFee == null || blockInfo == null){
+    public static void setMiningRankAndOther(TextView tvMiningRank, TextView tvTxsPool, TextView tvMedianFee, TextView tvCirculation, BlockInfo blockInfo) {
+        if(tvMiningRank == null || tvTxsPool == null || tvMedianFee == null || blockInfo == null || tvCirculation == null){
             return;
         }
         long miningRank = 0L;
@@ -342,7 +346,7 @@ public class UserUtil {
             miningRank = Math.abs(miningRank);
             if(StringUtil.isNotEmpty(miningRankType)){
                 int resId = StringUtil.isSame(miningRankType, "+") ? R.mipmap.icon_rank_up : R.mipmap.icon_rank_down;
-                drawable = DrawablesUtil.getDrawable(tvMiningRank.getContext(), resId, 12, 12);
+                drawable = DrawablesUtil.getDrawable(tvMiningRank.getContext(), resId, 10, 10);
             }
         }
         String miningRankStr = ResourcesUtil.getText(R.string.home_no_point);
@@ -357,6 +361,16 @@ public class UserUtil {
 
         tvTxsPool.setText(FmtMicrometer.fmtPower(blockInfo.getTxsPool()));
         tvMedianFee.setText(FmtMicrometer.fmtFeeValue(blockInfo.getMedianFee()));
+
+        double circulation =  StringUtil.getDoubleString(blockInfo.getCirculation());
+        double million =  circulation / 100_0000;
+        String circulationStr;
+        if(million > 0){
+            circulationStr = FmtMicrometer.fmtPower(String.valueOf(million)) + " M";
+        }else {
+            circulationStr = FmtMicrometer.fmtPower(String.valueOf(circulation));
+        }
+        tvCirculation.setText(circulationStr);
     }
 
     public static void initSuccessRequires(TextView tvSuccessRequires) {
@@ -466,5 +480,25 @@ public class UserUtil {
                 .create();
             tvCurrentCondition.setText(spannable);
         }
+    }
+
+    public static String getLastThreeAddress() {
+        String address = "";
+        if(isImportKey()){
+            address = MyApplication.getKeyValue().getAddress();
+            if(address.length() > 3){
+                address = address.substring(address.length() - 3);
+            }
+        }
+        return address;
+    }
+
+    public static void setHitTip(TextView tvHitTip) {
+        if(tvHitTip == null){
+            return;
+        }
+        String title = ResourcesUtil.getText(R.string.home_hit_tip);
+        title = String.format(title, UserUtil.getLastThreeAddress());
+        tvHitTip.setText(title);
     }
 }

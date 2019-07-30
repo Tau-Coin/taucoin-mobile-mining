@@ -50,7 +50,7 @@
     <declare-styleable name="ProgressView">
         <attr name="center_text" format="string" />
         <attr name="center_image" format="string" />
-        <attr name="center_textSize" format="dimension" />
+        <attr name="center_textSize" format="float" />
     </declare-styleable>
 
     <declare-styleable name="DashboardView">

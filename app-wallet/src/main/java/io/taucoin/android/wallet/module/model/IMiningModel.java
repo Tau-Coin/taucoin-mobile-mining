@@ -13,7 +13,7 @@ public interface IMiningModel {
     /** Get mining information */
     void getMiningInfo(LogicObserver<BlockInfo> observer);
     /** update or save mining state */
-    void updateMiningState(String miningState, LogicObserver<Boolean> observer);
+    void updateMiningState(String miningState, LogicObserver<KeyValue> observer);
 //    /** update or save sync state */
 //    void updateSyncState(String syncState, LogicObserver<Boolean> observer);
     /** update or save current synchronized block */

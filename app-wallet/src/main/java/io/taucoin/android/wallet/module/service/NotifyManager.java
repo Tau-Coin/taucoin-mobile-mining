@@ -343,15 +343,16 @@ public class NotifyManager {
         isOn = !isOn;
         String miningState = isOn ? TransmitKey.MiningState.Start : TransmitKey.MiningState.Stop;
         sendNotify(miningState);
-        new MiningModel().updateMiningState(miningState, new LogicObserver<Boolean>() {
+        new MiningModel().updateMiningState(miningState, new LogicObserver<KeyValue>() {
             @Override
-            public void handleData(Boolean aBoolean) {
+            public void handleData(KeyValue keyValue) {
+                MyApplication.setKeyValue(keyValue);
                 boolean isStart = false;
-                KeyValue keyValue = MyApplication.getKeyValue();
                 if (keyValue != null) {
                     isStart = StringUtil.isSame(keyValue.getMiningState(), TransmitKey.MiningState.Start);
                 }
                 if(isStart){
+                    MyApplication.getRemoteConnector().init();
                     MyApplication.getRemoteConnector().startBlockForging();
                 }else{
                     MyApplication.getRemoteConnector().stopBlockForging();

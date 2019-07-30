@@ -31,7 +31,6 @@ import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 import com.jaredrummler.android.processes.models.Stat;
 import com.jaredrummler.android.processes.models.Statm;
-import com.jaredrummler.android.processes.models.Status;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -118,7 +117,7 @@ public class SysUtil {
                 PackageStats info = new PackageStats(pkg);
                 info.cacheSize = storageStats.getCacheBytes();
                 info.dataSize = storageStats.getDataBytes();
-                info.codeSize = storageStats.getDataBytes();
+                info.codeSize = storageStats.getAppBytes();
                 packageStatsStub.onGetStatsCompleted(info, true);
             }else {
                 Method getPackageSizeInfo = pm.getClass().getMethod(
@@ -156,10 +155,11 @@ public class SysUtil {
                 long totalSizeOfProcess = statm.getSize();
                 long residentSetSize = statm.getResidentSetSize();
                 memoryInfo.maxMemory += totalSizeOfProcess;
-                memoryInfo.totalMemory += residentSetSize;
+                memoryInfo.totalMemory += residentSetSize * 4;
 
                 Stat stat = process.stat();
-                double cpu = sampleCPU(stat, processName.equals(context.getPackageName()));
+                boolean isMain = StringUtil.isSame(processName, context.getPackageName());
+                double cpu = sampleCPU(stat, isMain);
                 memoryInfo.cpuUsageRate += cpu;
             }
             if(memoryInfo.cpuUsageRate < 0){
