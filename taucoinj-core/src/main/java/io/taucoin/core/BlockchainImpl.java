@@ -471,10 +471,12 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         }
         */
 
+        /**
         if (!isValidBlock(block, repository)) {
             logger.error("Invalid block with number: {}", block.getNumber());
             return false;
         }
+         */
 
         /**
         if (block.getNumber() >= config.traceStartBlock() && config.traceStartBlock() != -1) {
