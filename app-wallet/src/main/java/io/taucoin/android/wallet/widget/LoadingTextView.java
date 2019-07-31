@@ -182,6 +182,10 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         setNormalText(getResources().getString(reid));
     }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
     public void closeLoading() {
         isLoading = false;
     }
