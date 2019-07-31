@@ -131,6 +131,14 @@ public class TransactionExecutor {
     }
 
     /**
+     * when process block all txs from block are valid.
+     * @return
+     */
+    public boolean chainInit(){
+        return true;
+    }
+
+    /**
      * Do the executation
      * 1. add balance to received address 
      * 2. add transaction fee to actually miner 

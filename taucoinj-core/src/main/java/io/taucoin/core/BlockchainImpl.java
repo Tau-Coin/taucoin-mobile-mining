@@ -842,7 +842,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             executor.setAssociatedByself(isAssociatedSelf);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
-            if (!executor.init()) {
+            if (!executor.chainInit()) {
                 isValid = false;
                 cacheTrack.rollback();
                 logger.error("Transaction {} is invalid.", Hex.toHexString(tx.getHash()));
