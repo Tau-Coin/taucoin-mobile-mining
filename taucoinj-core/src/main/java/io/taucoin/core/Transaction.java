@@ -84,6 +84,14 @@ public class Transaction {
     private ArrayList<byte[]> senderAssociatedAddress = new ArrayList<>();
     private ArrayList<byte[]> receiverAssociatedAddress = new ArrayList<>();
 
+    /**
+     *property of genesisTransaction
+     *coinName that is new chain name property 32 bytes.
+     *coinTotalAmount that is total supply of new block chain 5 bytes.
+     */
+    private byte[] coinName = null;
+    private byte[] coinTotalAmount = null;
+
     public static final int TTIME = 144;
     public static final int HASH_LENGTH = 32;
     public static final int ADDRESS_LENGTH = 20;
@@ -119,7 +127,8 @@ public class Transaction {
         parsed = false;
     }
 
-    /* creation tx
+    /**
+     * creation tx that contains expire time but without tx signature.
      * [ version, option, timeStamp, toAddress, amount, fee, expireTime, signature(v, r, s) ]
      */
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime) {
@@ -138,7 +147,46 @@ public class Transaction {
         parsed = true;
     }
 
-    /* this expire time is default 144*5*60*/
+    /**
+     * creation genesis tx that contains expire time but without tx signature.
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param expireTime
+     * @param coinName
+     * @param coinTotalAmount
+     */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime,byte[] coinName,byte[] coinTotalAmount) {
+        this.version = version;
+        this.option = option;
+        this.timeStamp = timeStamp;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.fee = fee;
+        this.expireTime = expireTime;
+        this.coinName = coinName;
+        this.coinTotalAmount = coinTotalAmount;
+
+        if (toAddress == null) {
+            //burn some money
+            this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
+        }
+        parsed = true;
+    }
+
+    /**
+     * creation tx that contains default expire time(144 block). this expire time is default 144*5*60.
+     * without tx signature.
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     */
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee) {
         this.version = version;
         this.option = option;
@@ -156,6 +204,48 @@ public class Transaction {
         parsed = true;
     }
 
+    /**
+     * creation genesis tx that contains default expire time(144 block),this expire time is default 144*5*60
+     * without tx signature.
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param coinName
+     * @param coinTotalAmount
+     */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] coinName,byte[] coinTotalAmount) {
+        this.version = version;
+        this.option = option;
+        this.timeStamp = timeStamp;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.fee = fee;
+        this.expireTime = shortToBytes((short)TTIME);
+
+        if (toAddress == null) {
+            //burn some money
+            this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
+        }
+
+        parsed = true;
+    }
+
+    /**
+     * creation tx that contains tx signature and expire time
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param expireTime
+     * @param r
+     * @param s
+     * @param v
+     */
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime, byte[] r, byte[] s, byte v) {
         this(version, option, timeStamp, toAddress, amount, fee,expireTime);
         ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
@@ -163,9 +253,63 @@ public class Transaction {
         this.signature = signature;
     }
 
+    /**
+     * creation genesis tx that contains tx signature and expire time
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param expireTime
+     * @param coinName
+     * @param coinTotalAmount
+     * @param r
+     * @param s
+     * @param v
+     */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] expireTime,byte[] coinName,byte[] coinTotalAmount, byte[] r, byte[] s, byte v) {
+        this(version, option, timeStamp, toAddress, amount, fee,expireTime,coinName,coinTotalAmount);
+        ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
+        signature.v = v;
+        this.signature = signature;
+    }
+
+    /**
+     * creation tx that contains tx signature and default expire time(144 blocks count)
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param r
+     * @param s
+     * @param v
+     */
     public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee, byte[] r, byte[] s, byte v) {
         this(version, option, timeStamp, toAddress, amount, fee);
+        ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
+        signature.v = v;
+        this.signature = signature;
+    }
 
+    /**
+     * creation genesis tx that contains tx signature and default expire time(144 blocks count)
+     * @param version
+     * @param option
+     * @param timeStamp
+     * @param toAddress
+     * @param amount
+     * @param fee
+     * @param coinName
+     * @param coinTotalAmount
+     * @param r
+     * @param s
+     * @param v
+     */
+    public Transaction(byte version, byte option, byte[] timeStamp, byte[] toAddress, byte[] amount, byte[] fee,byte[] coinName,byte[] coinTotalAmount, byte[] r, byte[] s, byte v) {
+        this(version, option, timeStamp, toAddress, amount, fee,coinName,coinTotalAmount);
         ECDSASignature signature = new ECDSASignature(new BigInteger(r), new BigInteger(s));
         signature.v = v;
         this.signature = signature;
