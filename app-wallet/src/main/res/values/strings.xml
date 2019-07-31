@@ -202,7 +202,7 @@
     <string name="home_cpu">CPU&#160;(%)</string>
     <string name="home_memory">Memory&#160;(M)</string>
     <string name="home_storage">Storage&#160;(M)</string>
-    <string name="home_circulation">Circulation&#160;(TAU)</string>
+    <string name="home_circulation">Circulation</string>
     <string name="home_txs_in_pool">Txs&#160;In&#160;Pool</string>
     <string name="home_median_fee">Median&#160;Tx&#160;Fee</string>
     <string name="home_data_storage">Daily&#160;Data&#160;(M)</string>

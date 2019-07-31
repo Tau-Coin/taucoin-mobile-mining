@@ -377,6 +377,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
         UserUtil.setMiningConditions(tvVerify, ivVerify, blockInfo);
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
+        UserUtil.setCurrentCondition(tvCurrentCondition, tvForgedTime);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);
         UserUtil.setMinersOnline(tvMinersOnline, tvMinersOnlineTitle, blockInfo);
         UserUtil.setMiningRankAndOther(tvMiningRank, tvTxsPool, tvMedianFee, tvCirculation, blockInfo);
@@ -409,14 +410,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 title = String.format(title, UserUtil.getLastThreeAddress());
                 tvForgedTimeTitle.setText(title);
 
-                NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
-                tvCurrentCondition.setTag(data);
-                long timeInternal = detail.timePoint - detail.previousBlockTime;
-                UserUtil.setCurrentCondition(tvCurrentCondition, timeInternal);
-                tvForgedTime.setCountDown(timeInternal, count -> {
-                    count = detail.timePoint - count - detail.previousBlockTime;
-                    UserUtil.setCurrentCondition(tvCurrentCondition, count);
-                });
+                UserUtil.setCountDown(tvCurrentCondition, tvForgedTime, data);
+            }else {
+                tvForgedTime.closeLoading();
             }
         }
     }

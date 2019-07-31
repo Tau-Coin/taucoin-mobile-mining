@@ -41,7 +41,9 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.DashboardLayout;
+import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
+import io.taucoin.core.ProofOfTransaction;
 import io.taucoin.foundation.util.DimensionsUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
 import io.taucoin.foundation.util.StringUtil;
@@ -439,7 +441,42 @@ public class UserUtil {
         tvHistoryTxReward.setText(spannableTx);
     }
 
-    public static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
+    public static void setCountDown(TextView tvCurrentCondition, LoadingTextView tvForgedTime, Object data) {
+        if(tvCurrentCondition == null || tvForgedTime == null || data == null || !isImportKey()){
+            return;
+        }
+        NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
+        tvCurrentCondition.setTag(data);
+        long timeInternal = detail.timeInternal;
+
+        long localPower = MyApplication.getKeyValue().getPower();
+        if(detail.forgingPower.longValue() < localPower){
+            BigInteger bigIntegerLocalPower =  new BigInteger(String.valueOf(localPower));
+            timeInternal = ProofOfTransaction.calculateForgingTimeInterval(detail.hitValue, detail.baseTarget, bigIntegerLocalPower);
+        }
+        long timeInternalPot = timeInternal;
+        UserUtil.setCurrentCondition(tvCurrentCondition, timeInternalPot);
+        tvForgedTime.setCountDown(timeInternalPot, count -> {
+            count = timeInternalPot - count;
+            UserUtil.setCurrentCondition(tvCurrentCondition, count);
+        });
+    }
+
+    public static void setCurrentCondition(TextView tvCurrentCondition, LoadingTextView tvForgedTime) {
+        if(tvCurrentCondition == null || tvForgedTime == null || !isImportKey()){
+            return;
+        }
+        Object data = tvCurrentCondition.getTag();
+        NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
+        if(detail != null && tvForgedTime.isLoading()){
+            long localPower = MyApplication.getKeyValue().getPower();
+            if(detail.forgingPower.longValue() < localPower){
+                setCountDown(tvCurrentCondition, tvForgedTime, detail);
+            }
+        }
+    }
+
+    private static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
         if(tvCurrentCondition == null){
             return;
         }
