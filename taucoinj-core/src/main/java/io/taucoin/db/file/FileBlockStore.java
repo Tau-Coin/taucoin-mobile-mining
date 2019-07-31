@@ -37,7 +37,7 @@ public class FileBlockStore {
     private long maxNumber;
 
     private LRUCache blocksCache
-            = new LRUCache(CONFIG.blockStoreCapability() / 2, 0.75f);
+            = new LRUCache(10, 0.75f);
 
     @Inject
     public FileBlockStore() {

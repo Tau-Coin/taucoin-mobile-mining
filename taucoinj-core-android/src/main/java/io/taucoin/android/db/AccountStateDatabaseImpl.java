@@ -17,7 +17,7 @@ public class AccountStateDatabaseImpl implements KeyValueDataSource {
 
     private static final Logger logger = LoggerFactory.getLogger("accountdb");
 
-    private static final int MAX_CACHE_SIZE = 10000;
+    private static final int MAX_CACHE_SIZE = 1000;
 
     KeyValueDataSource dbImpl;
 

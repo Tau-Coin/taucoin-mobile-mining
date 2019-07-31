@@ -56,7 +56,7 @@ public class HttpClient {
     private AtomicBoolean isConnected = new AtomicBoolean(false);
     private AtomicBoolean isConnecting = new AtomicBoolean(false);
 
-    private static EventLoopGroup workerGroup = new NioEventLoopGroup(0, new ThreadFactory() {
+    private static EventLoopGroup workerGroup = new NioEventLoopGroup(1, new ThreadFactory() {
         AtomicInteger cnt = new AtomicInteger(0);
         @Override
         public Thread newThread(Runnable r) {

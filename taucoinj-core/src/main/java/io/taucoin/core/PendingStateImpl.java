@@ -44,7 +44,7 @@ public class PendingStateImpl implements PendingState {
     @Resource
     private final PriorityQueue<MemoryPoolEntry> wireTransactions = new PriorityQueue<MemoryPoolEntry>(1,new MemoryPoolPolicy());
 
-    private final Map<String, BigInteger> expendList = new LRUMap<String, BigInteger>(500000);
+    private final Map<String, BigInteger> expendList = new LRUMap<String, BigInteger>(50000);
 
     private final Map<String, HashSet<Long>> particleTx = new HashMap<>(50);
 
