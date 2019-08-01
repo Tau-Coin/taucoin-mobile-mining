@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.BigIntegers;
 import org.spongycastle.util.encoders.Hex;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SignatureException;
 import java.util.ArrayList;
@@ -95,6 +96,8 @@ public class Transaction {
     public static final int TTIME = 144;
     public static final int HASH_LENGTH = 32;
     public static final int ADDRESS_LENGTH = 20;
+    public static final byte tflag = 0;
+    public static final byte xflag = 1;
 
     /* Tx in encoded form */
     protected byte[] rlpEncoded;
@@ -409,34 +412,71 @@ public class Transaction {
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
             this.option = transaction.get(1).getRLPData() == null ? (byte) 0 : transaction.get(1).getRLPData()[0];
-            this.timeStamp = transaction.get(2).getRLPData();
-            //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
-            this.toAddress = transaction.get(3).getRLPData();
-            this.amount = transaction.get(4).getRLPData();
-            this.fee = transaction.get(5).getRLPData();
-            this.expireTime = transaction.get(6).getRLPData();
+            if (this.version == tflag && this.option == tflag) {
+                this.timeStamp = transaction.get(2).getRLPData();
+                //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
+                this.toAddress = transaction.get(3).getRLPData();
+                this.amount = transaction.get(4).getRLPData();
+                this.fee = transaction.get(5).getRLPData();
+                this.expireTime = transaction.get(6).getRLPData();
 
-            // only parse signature in case tx is signed
-            if (transaction.get(7).getRLPData() != null) {
-                byte v = transaction.get(7).getRLPData()[0];
-                byte[] r = transaction.get(8).getRLPData();
-                byte[] s = transaction.get(9).getRLPData();
-                this.signature = ECDSASignature.fromComponents(r, s, v);
-            } else {
-                logger.debug("RLP encoded tx is not signed!");
+                // only parse signature in case tx is signed
+                if (transaction.get(7).getRLPData() != null) {
+                     byte v = transaction.get(7).getRLPData()[0];
+                     byte[] r = transaction.get(8).getRLPData();
+                     byte[] s = transaction.get(9).getRLPData();
+                     this.signature = ECDSASignature.fromComponents(r, s, v);
+                } else {
+                     logger.debug("RLP encoded tx is not signed!");
+                }
+
+                /**
+                * a<item></>
+                * transaction from memory pool hasn't contained sendAddress
+                * transaction from block synced has contained sendAddress.
+                * e<item></>
+                * transaction from block mined by self hasn't contained senderAddress
+                */
+                if (transaction.size() > 10) {
+                     this.sendAddress = transaction.get(10).getRLPData();
+                }
+            } else if (this.version == xflag && this.option == xflag) {
+                this.timeStamp = transaction.get(2).getRLPData();
+                //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
+                this.toAddress = transaction.get(3).getRLPData();
+                this.amount = transaction.get(4).getRLPData();
+                this.fee = transaction.get(5).getRLPData();
+                this.expireTime = transaction.get(6).getRLPData();
+                this.coinName = transaction.get(7).getRLPData();
+                if (this.coinName.length > 32) {
+                    throw new IllegalArgumentException("x chain name too long");
+                }
+                this.coinTotalAmount = transaction.get(8).getRLPData();
+                if (this.coinTotalAmount.length > 5) {
+                    throw new IllegalArgumentException("x chain total supply is too much");
+                }
+
+                // only parse signature in case tx is signed
+                if (transaction.get(9).getRLPData() != null) {
+                    byte v = transaction.get(9).getRLPData()[0];
+                    byte[] r = transaction.get(10).getRLPData();
+                    byte[] s = transaction.get(11).getRLPData();
+                    this.signature = ECDSASignature.fromComponents(r, s, v);
+                } else {
+                    logger.debug("RLP encoded tx is not signed!");
+                }
+
+                /**
+                 * a<item></>
+                 * transaction from memory pool hasn't contained sendAddress
+                 * transaction from block synced has contained sendAddress.
+                 * e<item></>
+                 * transaction from block mined by self hasn't contained senderAddress
+                 */
+                if (transaction.size() > 12) {
+                    this.sendAddress = transaction.get(12).getRLPData();
+                }
             }
-
-            /**
-             * a<item></>
-             * transaction from memory pool hasn't contained sendAddress
-             * transaction from block synced has contained sendAddress.
-             * e<item></>
-             * transaction from block mined by self hasn't contained senderAddress
-             */
-            if (transaction.size() > 10) {
-                this.sendAddress = transaction.get(10).getRLPData();
-            }
-
         } else {
             RLPList decodedTxList = RLP.decode2(rlpEncodedComposite);
             RLPList transaction = (RLPList) decodedTxList.get(0);
@@ -445,47 +485,100 @@ public class Transaction {
             //logger.info("item version is {}",(int)this.version);
             //logger.info("item option size is {}",transaction.get(1) == null ? 0 : transaction.get(1).getRLPData().length);
             this.option = transaction.get(1).getRLPData() == null ? (byte) 0 : transaction.get(1).getRLPData()[0];
-            this.timeStamp = transaction.get(2).getRLPData();
-            //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
-            this.toAddress = transaction.get(3).getRLPData();
-            this.amount = transaction.get(4).getRLPData();
-            this.fee = transaction.get(5).getRLPData();
-            this.expireTime = transaction.get(6).getRLPData();
-            this.senderWitnessAddress = transaction.get(7).getRLPData();
-            this.receiverWitnessAddress = transaction.get(8).getRLPData();
+            if (this.version == tflag && this.option == tflag) {
+                this.timeStamp = transaction.get(2).getRLPData();
+                //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
+                this.toAddress = transaction.get(3).getRLPData();
+                this.amount = transaction.get(4).getRLPData();
+                this.fee = transaction.get(5).getRLPData();
+                this.expireTime = transaction.get(6).getRLPData();
+                this.senderWitnessAddress = transaction.get(7).getRLPData();
+                this.receiverWitnessAddress = transaction.get(8).getRLPData();
 
-            RLPList senderList = (RLPList) transaction.get(9);
-            if (senderList != null) {
-                for (RLPElement senderAssociate : senderList) {
-                    this.senderAssociatedAddress.add(senderAssociate.getRLPData());
+                RLPList senderList = (RLPList) transaction.get(9);
+                if (senderList != null) {
+                    for (RLPElement senderAssociate : senderList) {
+                        this.senderAssociatedAddress.add(senderAssociate.getRLPData());
+                    }
                 }
-            }
 
-            RLPList receiverList = (RLPList) transaction.get(10);
-            if (receiverList != null) {
-                for (RLPElement receiverAssociate : receiverList) {
-                    this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
+                RLPList receiverList = (RLPList) transaction.get(10);
+                if (receiverList != null) {
+                    for (RLPElement receiverAssociate : receiverList) {
+                        this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
+                    }
                 }
-            }
 
-            // only parse signature in case tx is signed
-            if (transaction.get(11).getRLPData() != null) {
-                byte v = transaction.get(11).getRLPData()[0];
-                byte[] r = transaction.get(12).getRLPData();
-                byte[] s = transaction.get(13).getRLPData();
-                this.signature = ECDSASignature.fromComponents(r, s, v);
-            } else {
-                logger.debug("RLP encoded tx is not signed!");
-            }
+                // only parse signature in case tx is signed
+                if (transaction.get(11).getRLPData() != null) {
+                    byte v = transaction.get(11).getRLPData()[0];
+                    byte[] r = transaction.get(12).getRLPData();
+                    byte[] s = transaction.get(13).getRLPData();
+                    this.signature = ECDSASignature.fromComponents(r, s, v);
+                } else {
+                    logger.debug("RLP encoded tx is not signed!");
+                }
 
-            /**
-             * b<item></>
-             * transaction from block stored local disk
-             *   1,up to now this hasn't contained senderAddress.
-             *   2,current this has contained senderAddress.
-             */
-            if (transaction.size() > 14) {
-                this.sendAddress = transaction.get(14).getRLPData();
+                /**
+                 * b<item></>
+                 * transaction from block stored local disk
+                 *   1,up to now this hasn't contained senderAddress.
+                 *   2,current this has contained senderAddress.
+                */
+                if (transaction.size() > 14) {
+                    this.sendAddress = transaction.get(14).getRLPData();
+                }
+            } else if (this.version == xflag && this.option == xflag){
+                this.timeStamp = transaction.get(2).getRLPData();
+                //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
+                this.toAddress = transaction.get(3).getRLPData();
+                this.amount = transaction.get(4).getRLPData();
+                this.fee = transaction.get(5).getRLPData();
+                this.expireTime = transaction.get(6).getRLPData();
+                this.coinName = transaction.get(7).getRLPData();
+                if (coinName.length > 32) {
+                    throw new IllegalArgumentException("x chain name too long");
+                }
+                this.coinTotalAmount = transaction.get(8).getRLPData();
+                if (coinTotalAmount.length > 5) {
+                    throw new IllegalArgumentException("x chain total supply too much");
+                }
+                this.senderWitnessAddress = transaction.get(9).getRLPData();
+                this.receiverWitnessAddress = transaction.get(10).getRLPData();
+
+                RLPList senderList = (RLPList) transaction.get(11);
+                if (senderList != null) {
+                    for (RLPElement senderAssociate : senderList) {
+                        this.senderAssociatedAddress.add(senderAssociate.getRLPData());
+                    }
+                }
+
+                RLPList receiverList = (RLPList) transaction.get(12);
+                if (receiverList != null) {
+                    for (RLPElement receiverAssociate : receiverList) {
+                        this.receiverAssociatedAddress.add(receiverAssociate.getRLPData());
+                    }
+                }
+
+                // only parse signature in case tx is signed
+                if (transaction.get(13).getRLPData() != null) {
+                    byte v = transaction.get(13).getRLPData()[0];
+                    byte[] r = transaction.get(14).getRLPData();
+                    byte[] s = transaction.get(15).getRLPData();
+                    this.signature = ECDSASignature.fromComponents(r, s, v);
+                } else {
+                    logger.debug("RLP encoded tx is not signed!");
+                }
+
+                /**
+                 * b<item></>
+                 * transaction from block stored local disk
+                 *   1,up to now this hasn't contained senderAddress.
+                 *   2,current this has contained senderAddress.
+                 */
+                if (transaction.size() > 16) {
+                    this.sendAddress = transaction.get(16).getRLPData();
+                }
             }
         }
         this.parsed = true;
@@ -632,9 +725,9 @@ public class Transaction {
     /**
      * For signatures you have to keep also
      * RLP of the transaction without any signature data
+     * if tx version and option is 1 sign genesis tx.
      */
     public byte[] getEncodedRaw() {
-
         if (!parsed) rlpParse();
         if (rlpRaw != null) return rlpRaw;
         byte[] version = RLP.encodeByte(this.version);
@@ -644,9 +737,16 @@ public class Transaction {
         byte[] amount = RLP.encodeElement(this.amount);
         byte[] fee = RLP.encodeElement(this.fee);
         byte[] expireTime = RLP.encodeElement(this.expireTime);
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
+            rlpRaw = RLP.encodeList(version, option, timeStamp, toAddress,
+                    amount, fee, expireTime,coinName,coinTotalAmount);
+        } else {
 
-        rlpRaw = RLP.encodeList(version, option, timeStamp, toAddress,
-                amount, fee,expireTime);
+            rlpRaw = RLP.encodeList(version, option, timeStamp, toAddress,
+                    amount, fee, expireTime);
+        }
         return rlpRaw;
     }
 
@@ -654,6 +754,7 @@ public class Transaction {
      * this method encode transaction used to transfer this to peer
      * and get hash of it also used to encode tx in block will be
      * sent to peer.
+     * if version and option equals xflag means genesis tx drawed up by node.
      * @return
      */
     public byte[] getEncoded() {
@@ -679,19 +780,28 @@ public class Transaction {
             r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
         }
-
         /**
          * c<item></>
          * transaction that is built local node hasn't contained senderAddress
          * transaction that included in block forged by self hasn't contained
          * senderAddress,so nothing to do...
          */
-        this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee, expireTime, v, r, s);
-
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
+            this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
+                   toAddress, amount, fee, expireTime, coinName, coinTotalAmount, v, r, s);
+        } else {
+            this.rlpEncoded = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, v, r, s);
+        }
         return rlpEncoded;
     }
 
+    /**
+     * encode used when block downloaded was cached in BlockQueueFileSys
+     * @return
+     */
     public byte[] getEncodedForCache() {
         if (!parsed) rlpParse();
         if (rlpEncodedCache != null) return rlpEncodedCache;
@@ -718,16 +828,31 @@ public class Transaction {
         /**
          * because this cache is turboing ,it should be saved in block
          */
-        if (sendAddress == null) {
-            this.sendAddress = getSender();
-        }
-        byte[] sendAddress = RLP.encodeElement(this.sendAddress);
-        this.rlpEncodedCache = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee, expireTime, v, r, s,sendAddress);
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
 
+            if (sendAddress == null) {
+                this.sendAddress = getSender();
+            }
+            byte[] sendAddress = RLP.encodeElement(this.sendAddress);
+            this.rlpEncodedCache = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, coinName, coinTotalAmount, v, r, s, sendAddress);
+        } else {
+            if (sendAddress == null) {
+                this.sendAddress = getSender();
+            }
+            byte[] sendAddress = RLP.encodeElement(this.sendAddress);
+            this.rlpEncodedCache = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, v, r, s, sendAddress);
+        }
         return rlpEncodedCache;
     }
 
+    /**
+     * Encoded used when block was signed.
+     * @return
+     */
     public byte[] getEncodeForSig() {
         if (!parsed) rlpParse();
         if (rlpEncodedSig != null) return rlpEncodedSig;
@@ -752,9 +877,15 @@ public class Transaction {
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
         }
 
-        this.rlpEncodedSig = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee, expireTime, v, r, s);
-
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
+            this.rlpEncodedSig = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, coinName, coinTotalAmount, v, r, s);
+        } else {
+            this.rlpEncodedSig = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, v, r, s);
+        }
         return rlpEncodedSig;
     }
 
@@ -782,13 +913,21 @@ public class Transaction {
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
         }
 
-        this.rlpEncodedHash = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee, expireTime, v, r, s);
-
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
+            this.rlpEncodedHash = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, coinName, coinTotalAmount, v, r, s);
+        } else {
+            this.rlpEncodedHash = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, v, r, s);
+        }
         return rlpEncodedHash;
     }
 
-    //encode transaction used to disk.
+    /**
+     * encode transaction used to disk.
+     */
     public byte[] getEncodedComposite() {
         if (!parsed) rlpParse();
         if (rlpEncodedComposite != null) return rlpEncodedComposite;
@@ -837,9 +976,20 @@ public class Transaction {
         }
 
         byte[] sendAddress = RLP.encodeElement(this.sendAddress);
-        this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
-                toAddress, amount, fee,expireTime, senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,v, r, s,sendAddress);
 
+        if (this.version == xflag && this.option == xflag) {
+            byte[] coinName = RLP.encodeElement(this.coinName);
+            byte[] coinTotalAmount = RLP.encodeElement(this.coinTotalAmount);
+
+            this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, coinName, coinTotalAmount,
+                    senderWitnessAddress, receiverWitnessAddress, senderAssociatedAddress, receiverAssociatedAddress,
+                    v, r, s, sendAddress);
+        } else {
+            this.rlpEncodedComposite = RLP.encodeList(version, option, timeStamp,
+                    toAddress, amount, fee, expireTime, senderWitnessAddress, receiverWitnessAddress,
+                    senderAssociatedAddress, receiverAssociatedAddress, v, r, s, sendAddress);
+        }
         return rlpEncodedComposite;
     }
 
@@ -877,5 +1027,21 @@ public class Transaction {
     public byte[] getExpireTime() {
         if (!parsed) rlpParse();
         return expireTime;
+    }
+
+    public byte[] getCoinName() throws IOException {
+        if (!parsed) rlpParse();
+        if (this.version != xflag || this.option != xflag) {
+            throw new IOException("nugenesis transaction has no coin name");
+        }
+        return coinName;
+    }
+
+    public byte[] getCoinTotalAmount() throws IOException {
+        if (!parsed) rlpParse();
+        if (this.version != xflag || this.option != xflag) {
+            throw new IOException("ungenesis transaction without this property");
+        }
+        return coinTotalAmount;
     }
 }
