@@ -455,9 +455,12 @@ public class UserUtil {
             timeInternal = ProofOfTransaction.calculateForgingTimeInterval(detail.hitValue, detail.baseTarget, bigIntegerLocalPower);
         }
         long timeInternalPot = timeInternal;
-        UserUtil.setCurrentCondition(tvCurrentCondition, timeInternalPot);
+        long initStartTime  = detail.timePoint - detail.previousBlockTime - timeInternalPot;
+        initStartTime = initStartTime >= 0 ? initStartTime : 0;
+        long startCountTime = initStartTime;
+        UserUtil.setCurrentCondition(tvCurrentCondition, startCountTime);
         tvForgedTime.setCountDown(timeInternalPot, count -> {
-            count = timeInternalPot - count;
+            count = startCountTime + timeInternalPot - count;
             UserUtil.setCurrentCondition(tvCurrentCondition, count);
         });
     }
