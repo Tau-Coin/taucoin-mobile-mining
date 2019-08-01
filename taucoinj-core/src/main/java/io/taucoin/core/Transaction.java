@@ -227,7 +227,9 @@ public class Transaction {
         this.amount = amount;
         this.fee = fee;
         this.expireTime = shortToBytes((short)TTIME);
-
+        this.coinName = coinName;
+        this.coinTotalAmount = coinTotalAmount;
+        
         if (toAddress == null) {
             //burn some money
             this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
