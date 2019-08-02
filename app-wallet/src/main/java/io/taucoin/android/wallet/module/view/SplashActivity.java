@@ -61,7 +61,6 @@ public class SplashActivity extends BaseActivity {
 
             Logger.i("SplashActivity onCreate");
 
-            MiningUtil.handleUpgradeCompatibility();
             requestWriteLogPermissions();
 
             // delay 3 seconds jump

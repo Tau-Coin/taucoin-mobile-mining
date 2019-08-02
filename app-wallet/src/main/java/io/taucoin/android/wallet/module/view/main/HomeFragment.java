@@ -377,7 +377,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
         UserUtil.setMiningConditions(tvVerify, ivVerify, blockInfo);
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
-        UserUtil.setCurrentCondition(tvCurrentCondition, tvForgedTime);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);
         UserUtil.setMinersOnline(tvMinersOnline, tvMinersOnlineTitle, blockInfo);
         UserUtil.setMiningRankAndOther(tvMiningRank, tvTxsPool, tvMedianFee, tvCirculation, blockInfo);
