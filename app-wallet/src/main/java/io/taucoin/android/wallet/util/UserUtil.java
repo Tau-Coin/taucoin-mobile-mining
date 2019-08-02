@@ -453,7 +453,9 @@ public class UserUtil {
         if(detail.forgingPower.longValue() < localPower){
             BigInteger bigIntegerLocalPower =  new BigInteger(String.valueOf(localPower));
             timeInternal = ProofOfTransaction.calculateForgingTimeInterval(detail.hitValue, detail.baseTarget, bigIntegerLocalPower);
+            detail.forgingPower = bigIntegerLocalPower;
         }
+        tvCurrentCondition.setTag(detail);
         long timeInternalPot = timeInternal;
         long initStartTime  = detail.timePoint - detail.previousBlockTime - timeInternalPot;
         initStartTime = initStartTime >= 0 ? initStartTime : 0;
