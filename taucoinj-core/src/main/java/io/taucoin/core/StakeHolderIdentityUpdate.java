@@ -11,11 +11,24 @@ public class StakeHolderIdentityUpdate {
     private byte[] forgeAddress;
     private long blockNumber;
 
-    public StakeHolderIdentityUpdate(Transaction tx, Repository track,byte[] forgeAddress,long blockNumber){
+    public StakeHolderIdentityUpdate() {
+    }
+
+    public StakeHolderIdentityUpdate(Transaction tx, Repository track, byte[] forgeAddress, long blockNumber){
        this.tx = tx;
        this.track = track;
        this.forgeAddress = forgeAddress;
        this.blockNumber = blockNumber;
+    }
+
+    public void init(Repository track, byte[] forgeAddress, long blockNumber) {
+       this.track = track;
+       this.forgeAddress = forgeAddress;
+       this.blockNumber = blockNumber;
+    }
+
+    public void setTransaction(Transaction tx) {
+        this.tx = tx;
     }
 
     public AssociatedAccount updateStakeHolderIdentity(){
