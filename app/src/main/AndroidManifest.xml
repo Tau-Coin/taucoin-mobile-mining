@@ -1,42 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.taucoin.android_app" >
+          package="io.taucoin.android_app">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
-        android:name=".TaucoinApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:largeHeap="true"
-        android:theme="@style/AppTheme">
+            android:name=".TaucoinApplication"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:largeHeap="true"
+            android:theme="@style/AppTheme">
         <activity
-            android:name=".RemoteMainActivity"
-            android:label="@string/app_name">
+                android:name=".RemoteMainActivity"
+                android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <service
-            android:name=".TaucoinRemoteService"
-            android:enabled="true"
-            android:process=":taucoin_service" />
+                android:name=".TaucoinRemoteService"
+                android:enabled="true"
+                android:process=":taucoin_service"/>
 
-        <activity android:name=".KeyActivity" />
+        <activity android:name=".KeyActivity"/>
         <activity android:name=".SendActivity"/>
         <activity android:name=".MiningActivity"/>
         <activity android:name=".BlockHashActivity"/>
         <activity android:name=".PoolTxsActivity"/>
-　　　　<activity android:name=".AccountStateActivity"/>
+
+        　　　　
+        <activity android:name=".AccountStateActivity"/>
         <activity android:name=".LoopSendActivity"/>
+        <activity android:name=".activity_create_chain">
+        </activity>
     </application>
 
 </manifest>

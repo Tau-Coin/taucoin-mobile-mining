@@ -117,5 +117,14 @@
             android:textSize="12sp" />
 
     </LinearLayout>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="51dp">
+        <Button
+                android:text="@string/btn_createChain"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" android:id="@+id/createChain" android:layout_weight="1"/>
+    </LinearLayout>
 
 </LinearLayout>

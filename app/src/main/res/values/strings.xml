@@ -18,5 +18,6 @@
     <string name="btn_send">send</string>
     <string name="btn_mining_start">start mining</string>
     <string name="btn_mining_end">end mining</string>
+    <string name="btn_createChain">createChain</string>
 
 </resources>

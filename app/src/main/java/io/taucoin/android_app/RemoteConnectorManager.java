@@ -286,6 +286,24 @@ public class RemoteConnectorManager implements ConnectorHandler {
         mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
     }
 
+    public void submitGenesisTransaction(String senderPrivateKey, String coinName, String coinTotalAmount, String txFee){
+        long timeStamp = (new Date().getTime())/1000;
+        byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(senderPrivateKey);
+        byte[] toAddress = null;
+        byte[] amount = (BigInteger.valueOf(1)).toByteArray();
+        byte[] cName = Utils.parseAsHexOrBase58(coinName);
+        byte[] totalAmount = (new BigInteger(coinTotalAmount)).toByteArray();
+        byte[] fee = (new BigInteger(txFee)).toByteArray();
+
+        //System.out.println("cName is "+ ByteUtil.toHexString(cName) +" "+ coinName);
+        //System.out.println("total amount is "+ ByteUtil.toHexString(totalAmount));
+        Transaction transaction = new Transaction(TransactionVersion.V02.getCode(),
+                TransactionOptions.GENESIS_TRANSACTION_OPTION, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee,cName,totalAmount);
+        transaction.sign(privateKey);
+        io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
+        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+    }
+
     public void startBlockForging(){
         startBlockForging(-1);
     }

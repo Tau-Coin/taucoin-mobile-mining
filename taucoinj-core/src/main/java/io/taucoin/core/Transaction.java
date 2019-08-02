@@ -229,7 +229,7 @@ public class Transaction {
         this.expireTime = shortToBytes((short)TTIME);
         this.coinName = coinName;
         this.coinTotalAmount = coinTotalAmount;
-        
+
         if (toAddress == null) {
             //burn some money
             this.toAddress = ByteUtil.EMPTY_BYTE_ARRAY;
@@ -395,7 +395,14 @@ public class Transaction {
         return receiverAssociatedAddress;
     }
 
-    //NowTime - TransactionTime < 1440s;
+    /**
+     * if NowTime - TransactionTime < 144 blocks means tx is valid.
+     * in other words
+     * if transaction time less than benchTime (144 blocks before) means
+     * tx is invalid.
+     * @param benchBlock
+     * @return
+     */
     public synchronized boolean checkTime(Block benchBlock) {
         //get current unix time
         long benchTime = byteArrayToLong(benchBlock.getTimestamp());
@@ -444,12 +451,14 @@ public class Transaction {
                 }
             } else if (this.version == xflag && this.option == xflag) {
                 this.timeStamp = transaction.get(2).getRLPData();
-                //logger.info("item timestamp is {}",ByteUtil.byteArrayToLong(this.timeStamp));
                 this.toAddress = transaction.get(3).getRLPData();
+                //logger.info("item toAddress is {}",ByteUtil.toHexString(this.toAddress));
                 this.amount = transaction.get(4).getRLPData();
                 this.fee = transaction.get(5).getRLPData();
+                //logger.info("item fee is {}",ByteUtil.byteArrayToLong(this.fee));
                 this.expireTime = transaction.get(6).getRLPData();
                 this.coinName = transaction.get(7).getRLPData();
+                //logger.info("item coin name is {}",ByteUtil.toHexString(this.coinName));
                 if (this.coinName.length > 32) {
                     throw new IllegalArgumentException("x chain name too long");
                 }
@@ -1034,7 +1043,7 @@ public class Transaction {
     public byte[] getCoinName() throws IOException {
         if (!parsed) rlpParse();
         if (this.version != xflag || this.option != xflag) {
-            throw new IOException("nugenesis transaction has no coin name");
+            throw new IOException("normal transaction without coin name");
         }
         return coinName;
     }
@@ -1042,7 +1051,7 @@ public class Transaction {
     public byte[] getCoinTotalAmount() throws IOException {
         if (!parsed) rlpParse();
         if (this.version != xflag || this.option != xflag) {
-            throw new IOException("ungenesis transaction without this property");
+            throw new IOException("normal transaction without this property");
         }
         return coinTotalAmount;
     }
