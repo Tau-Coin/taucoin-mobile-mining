@@ -53,6 +53,16 @@ public class TransactionExecutor {
         this.listener = listener;
     }
 
+    public TransactionExecutor(Blockchain blockchain, TaucoinListener listener) {
+        this.blockchain = blockchain;
+        this.listener = listener;
+    }
+
+    public void init(Transaction tx, Repository track) {
+        this.tx= tx;
+        this.track= track;
+    }
+
     /**
      * Do all the basic validation
      */

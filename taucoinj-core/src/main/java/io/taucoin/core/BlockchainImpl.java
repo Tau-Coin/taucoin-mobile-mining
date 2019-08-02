@@ -86,6 +86,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private FileBlockStore fileBlockStore;
 
+    private TransactionExecutor executor;
+
+    private StakeHolderIdentityUpdate stakeHolderIdentityUpdate;
+
     SystemProperties config = SystemProperties.CONFIG;
 
     private Object lock = new Object();
@@ -115,6 +119,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         this.chainInfoManager = chainInfoManager;
         this.fileBlockStore = fileBlockStore;
         this.refWatcher = refWatcher;
+        this.executor = new TransactionExecutor(this, listener);
+        this.stakeHolderIdentityUpdate = new StakeHolderIdentityUpdate();
     }
 
     @Override
@@ -497,7 +503,9 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         //if (needFlush(block)) {
             repository.flush(block.getNumber());
             blockStore.flush();
-            System.gc();
+            if (block.getNumber() % 10 == 0) {
+                System.gc();
+            }
         //}
 
         listener.onBlock(block);
@@ -840,7 +848,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
 
             cacheTrack = repo.startTracking();
-            TransactionExecutor executor = new TransactionExecutor(tx, cacheTrack,this,listener);
+            executor.init(tx, cacheTrack);
             executor.setAssociatedByself(isAssociatedSelf);
 
             //ECKey key = ECKey.fromPublicOnly(block.getGeneratorPublicKey());
@@ -865,16 +873,18 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
+        stakeHolderIdentityUpdate.init(repo, block.getForgerAddress(), block.getNumber());
         for (Transaction tx : block.getTransactionsList()) {
-            StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
-                    new StakeHolderIdentityUpdate(tx, repo, block.getForgerAddress(), block.getNumber());
+            stakeHolderIdentityUpdate.setTransaction(tx);
             stakeHolderIdentityUpdate.updateStakeHolderIdentity();
         }
 
         updateTotalDifficulty(block);
 
+        cacheTrack = null;
+
         long totalTime = System.nanoTime() - saveTime;
-        logger.info("block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
+        logger.debug("apply block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
 
         return true;
     }
