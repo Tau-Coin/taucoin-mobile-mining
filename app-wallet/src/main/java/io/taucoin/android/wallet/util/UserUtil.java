@@ -367,7 +367,7 @@ public class UserUtil {
         double circulation =  StringUtil.getDoubleString(blockInfo.getCirculation());
         double million =  circulation / 100_0000;
         String circulationStr;
-        if(million > 0){
+        if(million >= 1){
             circulationStr = FmtMicrometer.fmtPower(String.valueOf(million)) + " M";
         }else {
             circulationStr = FmtMicrometer.fmtPower(String.valueOf(circulation));
@@ -449,34 +449,14 @@ public class UserUtil {
         tvCurrentCondition.setTag(data);
         long timeInternal = detail.timeInternal;
 
-        long localPower = MyApplication.getKeyValue().getPower();
-        if(detail.forgingPower.longValue() < localPower){
-            BigInteger bigIntegerLocalPower =  new BigInteger(String.valueOf(localPower));
-            timeInternal = ProofOfTransaction.calculateForgingTimeInterval(detail.hitValue, detail.baseTarget, bigIntegerLocalPower);
-        }
-        long timeInternalPot = timeInternal;
-        long initStartTime  = detail.timePoint - detail.previousBlockTime - timeInternalPot;
+        long initStartTime  = detail.timePoint - detail.previousBlockTime - timeInternal;
         initStartTime = initStartTime >= 0 ? initStartTime : 0;
         long startCountTime = initStartTime;
         UserUtil.setCurrentCondition(tvCurrentCondition, startCountTime);
-        tvForgedTime.setCountDown(timeInternalPot, count -> {
-            count = startCountTime + timeInternalPot - count;
+        tvForgedTime.setCountDown(timeInternal, count -> {
+            count = startCountTime + timeInternal - count;
             UserUtil.setCurrentCondition(tvCurrentCondition, count);
         });
-    }
-
-    public static void setCurrentCondition(TextView tvCurrentCondition, LoadingTextView tvForgedTime) {
-        if(tvCurrentCondition == null || tvForgedTime == null || !isImportKey()){
-            return;
-        }
-        Object data = tvCurrentCondition.getTag();
-        NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
-        if(detail != null && tvForgedTime.isLoading()){
-            long localPower = MyApplication.getKeyValue().getPower();
-            if(detail.forgingPower.longValue() < localPower){
-                setCountDown(tvCurrentCondition, tvForgedTime, detail);
-            }
-        }
     }
 
     private static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
@@ -486,8 +466,14 @@ public class UserUtil {
         Object data = tvCurrentCondition.getTag();
         NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
         if(detail != null){
+            BigInteger forgingPower = detail.forgingPower;
+            long localPower = MyApplication.getKeyValue().getPower();
+            if(forgingPower.longValue() < localPower){
+                forgingPower = new BigInteger(String.valueOf(localPower));
+            }
+            tvCurrentCondition.setTag(detail);
             BigInteger leftValue = detail.hitValue;
-            BigInteger rightValue = detail.baseTarget.multiply(detail.forgingPower);
+            BigInteger rightValue = detail.baseTarget.multiply(forgingPower);
             rightValue = rightValue.multiply(new BigInteger(String.valueOf(timeInternal)));
             int result = leftValue.compareTo(rightValue);
             String resultStr;
@@ -511,7 +497,7 @@ public class UserUtil {
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
                 .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
-                .append(FmtMicrometer.fmtPower(detail.forgingPower.longValue()))
+                .append(FmtMicrometer.fmtPower(forgingPower.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
                 .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))

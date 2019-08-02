@@ -209,6 +209,7 @@ public class MiningUtil {
 
     /**
      * handle upgrade compatibility
+     * only version 1.9.0.3
      * */
     public static void handleUpgradeCompatibility() {
         boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(TransmitKey.FORGING_RELOAD, false);
