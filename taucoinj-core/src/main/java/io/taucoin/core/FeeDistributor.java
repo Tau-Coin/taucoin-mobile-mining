@@ -13,7 +13,14 @@ public class FeeDistributor {
     private long currentWitFee = 0;
     private long lastAssociFee = 0;
 
+    public FeeDistributor() {
+    }
+
     public FeeDistributor(long txFee) {
+        this.txFee = txFee;
+    }
+
+    public void setTxFee(long txFee) {
         this.txFee = txFee;
     }
 

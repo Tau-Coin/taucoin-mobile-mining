@@ -7,7 +7,15 @@ public class AssociatedFeeDistributor {
     private long averageShare = 0;
     private long lastShare = 0;
 
+    public AssociatedFeeDistributor() {
+    }
+
     public AssociatedFeeDistributor(int assCount, long assTxFee) {
+        this.assCount = assCount;
+        this.assTxFee = assTxFee;
+    }
+
+    public void init(int assCount, long assTxFee) {
         this.assCount = assCount;
         this.assTxFee = assTxFee;
     }

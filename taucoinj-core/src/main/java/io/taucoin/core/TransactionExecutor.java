@@ -28,6 +28,13 @@ public class TransactionExecutor {
     private Blockchain blockchain;
     private TaucoinListener listener;
 
+    private TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
+    private FeeDistributor feeDistributor = new FeeDistributor();
+    private AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor();
+
+    private HashMap<byte[],Long> currentWitness = new HashMap<>();
+    private HashMap<byte[],Long> lastWitness = new HashMap<>();
+
     // indicate that this is witness by self to show mining income asap.
     private boolean isAssociatedByself = false;
     /**
@@ -154,8 +161,6 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
-
-        TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
         outcome.setBlockHash(blockhash);
         logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
@@ -174,7 +179,8 @@ public class TransactionExecutor {
             track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         }
 
-        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+        feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
+
         logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
         //lookup sender account state.
         AccountState senderAccountState = track.getAccountState(tx.getSender());
@@ -184,11 +190,12 @@ public class TransactionExecutor {
             if (!coinbaseHexAddress.equals(Constants.BURN_COIN_ADDR)) {
                 track.addBalance(coinbase, toBI(feeDistributor.getCurrentWitFee()));
             }
-            HashMap<byte[],Long> currentWintess = new HashMap<>();
-            currentWintess.put(coinbase,feeDistributor.getCurrentWitFee());
+
+            currentWitness.clear();
+            currentWitness.put(coinbase,feeDistributor.getCurrentWitFee());
             logger.debug("in executation current wit {} fee is {}", coinbaseHexAddress,
                     feeDistributor.getCurrentWitFee());
-            outcome.setCurrentWintess(currentWintess);
+            outcome.setCurrentWintess(currentWitness);
 
             // Transfer fees to receiver
             //track.addBalance(tx.getReceiveAddress(), toBI(feeDistributor.getReceiveFee()));
@@ -198,19 +205,18 @@ public class TransactionExecutor {
                 if (!witnessHexAddress.equals(Constants.BURN_COIN_ADDR)) {
                     track.addBalance(senderAccountState.getWitnessAddress(), toBI(feeDistributor.getLastWitFee()));
                 }
-                HashMap<byte[],Long> lastWintess = new HashMap<>();
-                lastWintess.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
+
+                lastWitness.clear();
+                lastWitness.put(senderAccountState.getWitnessAddress(), feeDistributor.getLastWitFee());
                 logger.debug("in executation last wit {} fee is {}", witnessHexAddress,
                         feeDistributor.getLastWitFee());
-                outcome.setLastWintess(lastWintess);
+                outcome.setLastWintess(lastWitness);
             }
 
             int senderAssSize = senderAccountState.getAssociatedAddress().size();
             if (senderAssSize != 0) {
                 // Transfer fees to last associate
-                AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
-                        senderAssSize,
-                        feeDistributor.getLastAssociFee());
+                assDistributor.init(senderAssSize, feeDistributor.getLastAssociFee());
 
                 if (assDistributor.assDistributeFee()) {
                     ArrayList<byte[]> senderAssAddress = senderAccountState.getAssociatedAddress();
@@ -303,7 +309,7 @@ public class TransactionExecutor {
             track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
         }
 
-        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+        feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
 
         AccountState senderAccountState = track.getAccountState(tx.getSender());
 
@@ -326,8 +332,7 @@ public class TransactionExecutor {
             int size = senderAccountState.getAssociatedAddress().size();
             if (size != 0) {
                 // Transfer fees to last associate
-                AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor(
-                        size, feeDistributor.getLastAssociFee());
+                assDistributor.init(size, feeDistributor.getLastAssociFee());
 
                 if (assDistributor.assDistributeFee()) {
                     for (int i = 0; i < size; ++i) {
