@@ -581,31 +581,44 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     /**
-     * verify transaction version
+     * verify transaction version,currently version as follows:
+     * 0x00
+     * 0x01
      * @param tx
      * @return
      */
     private boolean verifyTransactionVersion(Transaction tx) {
-        if (tx.getVersion() != TransactionVersion.V01.getCode()) {
-            logger.error("Tx [{}] version [{}] is mismatch!", Hex.toHexString(tx.getHash()),
-                    tx.getVersion());
-            return false;
+        if (tx.getVersion() == TransactionVersion.V01.getCode()) {
+            return true;
         }
-        return true;
+
+        if (tx.getVersion() == TransactionVersion.V02.getCode()) {
+            return true;
+        }
+
+        logger.error("Tx [{}] version [{}] is mismatch!", Hex.toHexString(tx.getHash()),
+                tx.getVersion());
+        return false;
     }
 
     /**
-     * verify transaction option
+     * verify transaction option,currently option as follows:
+     * 0x00
+     * 0x01
      * @param tx
      * @return
      */
     private boolean verifyTransactionOption(Transaction tx) {
-        if (tx.getOption() != TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
-            logger.error("Tx [{}] option [{}] is mismatch!", Hex.toHexString(tx.getHash()),
-                    tx.getOption());
-            return false;
+        if (tx.getOption() == TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
+            return true;
         }
-        return true;
+
+        if (tx.getOption() == TransactionOptions.GENESIS_TRANSACTION_OPTION) {
+            return true;
+        }
+        logger.error("Tx [{}] option [{}] is mismatch!", Hex.toHexString(tx.getHash()),
+                tx.getOption());
+        return false;
     }
 
     /**
