@@ -5,29 +5,30 @@
 
     <property name="LOG_DIR" value="/sdcard/tau-mobile/logs" />
 
+    <timestamp datePattern="yyyyMMdd" key="today"/>
+
     <!-- Create a file appender for DEBUG-level messages -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
 
-        <file>${LOG_DIR}/tau.log</file>
+        <file>${LOG_DIR}/tau.${today}.log</file>
         <append>true</append>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/tau.%d{yyyy-MM-dd}.log</fileNamePattern>  
-            <maxHistory>2</maxHistory>
-            <totalSizeCap>200MB</totalSizeCap>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>50MB</maxFileSize>
-        </triggeringPolicy>
 
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/tau.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>4</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="io.taucoin.android.util.LogbackSizeBasedTriggeringPolicy">
+            <maxFileSize>50MB</maxFileSize>
+        </triggeringPolicy>
     </appender>
 
     <logger name="core" level="INFO">
