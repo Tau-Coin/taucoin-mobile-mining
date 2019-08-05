@@ -112,7 +112,7 @@ dependencies {
     compile "com.madgag.spongycastle:core:${scastleVersion}" // for SHA3 and SECP256K1
     compile "com.madgag.spongycastle:prov:${scastleVersion}" // for SHA3 and SECP256K1
 
-    compile "org.rocksdb:rocksdbjni:5.11.3"
+//    compile "org.rocksdb:rocksdbjni:5.11.3"
     //compile "org.ethereum:rocksdbjni:5.9.2"
 
     compile "org.iq80.leveldb:leveldb-api:${leveldbVersion}"

@@ -3,7 +3,7 @@ package io.taucoin.android.di.modules;
 import android.content.Context;
 
 import io.taucoin.android.datasource.LevelDbDataSource;
-import io.taucoin.android.datasource.RocksDbDataSource;
+//import io.taucoin.android.datasource.RocksDbDataSource;
 import io.taucoin.android.db.AccountStateDatabaseImpl;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.android.manager.BlockLoader;
