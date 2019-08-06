@@ -1,5 +1,7 @@
 package io.taucoin.core;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class FeeDistributor {
 
     public static int lastWitShare = 1;
@@ -12,6 +14,7 @@ public class FeeDistributor {
     private long lastWitFee = 0;
     private long currentWitFee = 0;
     private long lastAssociFee = 0;
+    private volatile boolean isDistribute = true;
 
     public FeeDistributor(long txFee) {
         this.txFee = txFee;
@@ -22,14 +25,24 @@ public class FeeDistributor {
             return false;
         }
 
-        long residual = txFee % integrityShare;
-        long stakeShare = txFee / integrityShare;
-        this.lastWitFee = stakeShare * lastWitShare;
-        this.currentWitFee = stakeShare * currentWitShare + residual;
-        this.lastAssociFee = stakeShare * lastAssShare;
+        //before special height 21000, fee is distributed.
+        //but after this height ,fee will not be distributed
+        //because of system pressure from android.
 
-        if (lastWitFee + currentWitFee + lastAssociFee != txFee) {
-            return false;
+        if (isDistribute) {
+            long residual = txFee % integrityShare;
+            long stakeShare = txFee / integrityShare;
+            this.lastWitFee = stakeShare * lastWitShare;
+            this.currentWitFee = stakeShare * currentWitShare + residual;
+            this.lastAssociFee = stakeShare * lastAssShare;
+        } else {
+            this.currentWitFee = txFee;
+        }
+
+        if (isDistribute) {
+            if (lastWitFee + currentWitFee + lastAssociFee != txFee) {
+                return false;
+            }
         }
         return true;
     }
@@ -44,5 +57,9 @@ public class FeeDistributor {
 
     public long getLastAssociFee() {
         return lastAssociFee;
+    }
+
+    public void setDistribute(boolean judge) {
+        this.isDistribute = judge;
     }
 }

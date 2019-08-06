@@ -789,38 +789,38 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
     private void wrapBlockTransactions(Block block, Repository repo) {
         long saveTime = System.nanoTime();
-        for (Transaction tx : block.getTransactionsList()) {
+        if (block.getNumber() < Constants.FEE_TERMINATE_HEIGHT) {
+            for (Transaction tx : block.getTransactionsList()) {
+                tx.setIsCompositeTx(false);
+                byte[] txSenderAdd = tx.getSender();
+                byte[] txReceiverAdd = tx.getReceiveAddress();
+                AccountState txSenderAccount = repo.getAccountState(txSenderAdd);
+                AccountState txReceiverAccount = repo.getAccountState(txReceiverAdd);
 
-            tx.setIsCompositeTx(false);
+                if (txSenderAdd != null) {
+                    byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
+                    ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
+                    byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
+                    ArrayList<byte[]> receiverAssociateAddress = txReceiverAccount.getAssociatedAddress();
 
-            byte[] txSenderAdd= tx.getSender();
-            byte[] txReceiverAdd= tx.getReceiveAddress();
-            AccountState txSenderAccount= repo.getAccountState(txSenderAdd);
-            AccountState txReceiverAccount= repo.getAccountState(txReceiverAdd);
+                    if (senderWitnessAddress != null) {
+                        tx.setSenderWitnessAddress(senderWitnessAddress);
+                    }
 
-            if(txSenderAdd != null) {
-                byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
-                ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
-                byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
-                ArrayList<byte[]> receiverAssociateAddress = txReceiverAccount.getAssociatedAddress();
+                    if (receiverWitnessAddress != null) {
+                        tx.setReceiverWitnessAddress(receiverWitnessAddress);
+                    }
 
-                if (senderWitnessAddress != null) {
-                    tx.setSenderWitnessAddress(senderWitnessAddress);
+                    if (senderAssociateAddress != null && senderAssociateAddress.size() > 0) {
+                        tx.setSenderAssociatedAddress(senderAssociateAddress);
+                    }
+
+                    if (receiverAssociateAddress != null && receiverAssociateAddress.size() > 0) {
+                        tx.setReceiverAssociatedAddress(receiverAssociateAddress);
+                    }
+
+                    tx.setIsCompositeTx(true);
                 }
-
-                if (receiverWitnessAddress != null) {
-                    tx.setReceiverWitnessAddress(receiverWitnessAddress);
-                }
-
-                if (senderAssociateAddress != null && senderAssociateAddress.size() > 0) {
-                    tx.setSenderAssociatedAddress(senderAssociateAddress);
-                }
-
-                if (receiverAssociateAddress != null && receiverAssociateAddress.size() > 0) {
-                    tx.setReceiverAssociatedAddress(receiverAssociateAddress);
-                }
-
-                tx.setIsCompositeTx(true);
             }
         }
         long totalTime = System.nanoTime() - saveTime;
