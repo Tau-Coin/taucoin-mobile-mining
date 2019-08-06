@@ -2,6 +2,7 @@ package io.taucoin.sync2;
 
 import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
+import io.taucoin.datasource.DBCorruptionException;
 import io.taucoin.datasource.mapdb.MapDBFactory;
 import io.taucoin.db.*;
 import io.taucoin.db.file.BlockQueueFileSys;
@@ -12,6 +13,7 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.nio.channels.OverlappingFileLockException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.*;
 
@@ -306,6 +308,21 @@ public class SyncQueue {
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
+
+                // Temp solution. Fix memory leak ASAP.
+                if (e instanceof OutOfMemoryError) {
+                    logger.error("OOM fatal error:{}", e);
+                    System.exit(-1);
+                }
+
+                if (e instanceof DBCorruptionException) {
+                    Exception internalException = ((DBCorruptionException)e).getException();
+                    if (internalException != null
+                            && internalException instanceof OverlappingFileLockException) {
+                        logger.error("Leveldb fatal error:{}", internalException);
+                        System.exit(-2);
+                    }
+                }
 
                 // If request close, break loop asap.
                 if (isRequestClose.get() || wrapper == null) {

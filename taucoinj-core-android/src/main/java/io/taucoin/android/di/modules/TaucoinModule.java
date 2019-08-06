@@ -170,8 +170,8 @@ public class TaucoinModule {
     Repository provideRepository() {
         LevelDbDataSource stateDS = new LevelDbDataSource();
         //RocksDbDataSource stateDS = new RocksDbDataSource();
-        AccountStateDatabaseImpl accountStateDb = new AccountStateDatabaseImpl(stateDS);
-        return new RepositoryImpl(accountStateDb);
+        //AccountStateDatabaseImpl accountStateDb = new AccountStateDatabaseImpl(stateDS);
+        return new RepositoryImpl(stateDS);
     }
 
     @Provides

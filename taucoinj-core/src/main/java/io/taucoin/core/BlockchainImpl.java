@@ -503,9 +503,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         //if (needFlush(block)) {
             repository.flush(block.getNumber());
             blockStore.flush();
-            if (block.getNumber() % 10 == 0) {
-                System.gc();
-            }
+            System.gc();
         //}
 
         listener.onBlock(block);

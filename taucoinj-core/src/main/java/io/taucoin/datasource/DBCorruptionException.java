@@ -12,6 +12,10 @@ public class DBCorruptionException extends RuntimeException {
         this.exception = new RuntimeException(message);
     }
 
+    public Exception getException() {
+        return exception;
+    }
+
     @Override
     public String getMessage() {
         return exception.getMessage();
