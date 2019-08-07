@@ -155,20 +155,24 @@ public class BlockQueueFileSys implements BlockQueue {
     public void addOrReplace(BlockWrapper block) {
     }
 
-    public void reloadBlock(long number) {
+    public boolean reloadBlock(long number) {
         awaitInit();
         synchronized (writeMutex) {
             if (index.contains(number)) {
-                return;
+                logger.warn("Reload block has existed {}", number);
+                return false;
             }
 
             takeLock.lock();
             try {
                 index.add(number);
+                logger.info("Reload block {}", number);
                 notEmpty.signalAll();
             } finally {
                 takeLock.unlock();
             }
+
+            return true;
         }
     }
 

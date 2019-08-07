@@ -301,7 +301,14 @@ public class SyncQueue {
                     // know its block number. This node will request block headers
                     // and block bodies ASAP.
                     blockQueue.add(wrapper);
-                    tryGapRecovery(wrapper);
+                    boolean recoveryResult = tryGapRecovery(wrapper);
+                    logger.info("Recovery block result {}", recoveryResult);
+
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ie) {
+                        logger.error("Sync queue wait recovery interrupted {}", ie);
+                    }
                     noParent.set(true);
 
                     // If 'blockQueue' implementation is BlockQueueMem or BlockQueueImpl, it takes several
@@ -394,20 +401,17 @@ public class SyncQueue {
         }
     }
 
-    private void tryGapRecovery(BlockWrapper wrapper) {
+    private boolean tryGapRecovery(BlockWrapper wrapper) {
         long bestBlockNumber = blockchain.getBestBlock().getNumber();
         long expectedEndNumber = wrapper.getNumber() - 1;
 
         logger.warn("Try gap recovery from {} end {}", bestBlockNumber + 1, expectedEndNumber);
 
-        // Very arguly solution. TODO: gracefully recover blocks.
-        if (blockQueue instanceof BlockQueueMem || blockQueue instanceof BlockQueueImpl) {
-            addBlockNumbers(bestBlockNumber + 1, expectedEndNumber);
-        } else if (blockQueue instanceof BlockQueueFileSys) {
-            if (expectedEndNumber > bestBlockNumber) {
-                ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
-            }
+        if (expectedEndNumber > bestBlockNumber) {
+            return ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
         }
+
+        return false;
     }
 
     public boolean isImportingBlocksFinished() {
