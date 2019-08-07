@@ -76,6 +76,12 @@ public class SyncQueue {
 
     SystemProperties config = SystemProperties.CONFIG;
 
+    private static final long HIBERNATION_CYCLE
+            = SystemProperties.CONFIG.hibernationCycle();
+
+    private static final long HIBERNATION_DURATION
+            = SystemProperties.CONFIG.hibernationDuration();
+
     private Blockchain blockchain;
 
     private SyncManager syncManager;
@@ -346,6 +352,19 @@ public class SyncQueue {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
                     logger.error("Sync queue interrupted {}", ie);
+                }
+            } finally {
+                if (wrapper != null && wrapper.getNumber() != 0 &&
+                        wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
+                    logger.warn("Hibernation starts at block {}", wrapper.getNumber());
+                    syncManager.notifyHibernation(wrapper.getNumber());
+                    syncManager.stopSyncWithPeer();
+                    try {
+                        Thread.sleep(HIBERNATION_DURATION);
+                    } catch (InterruptedException ie) {
+                        logger.error("Sync queue hibernation interrupted {}", ie);
+                    }
+                    System.exit(0);
                 }
             }
         }

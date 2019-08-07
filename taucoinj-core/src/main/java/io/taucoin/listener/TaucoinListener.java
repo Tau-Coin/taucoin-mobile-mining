@@ -58,4 +58,6 @@ public interface TaucoinListener {
 
     void onBlocksDownloaded(long from, long end);
 
+    void onSyncHibernation(long number);
+
 }
