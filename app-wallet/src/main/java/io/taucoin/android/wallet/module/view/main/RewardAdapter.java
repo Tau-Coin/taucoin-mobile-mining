@@ -14,26 +14,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.module.bean.MinerListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantListBean;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SpanUtils;
-import io.taucoin.foundation.util.StringUtil;
 
 public class RewardAdapter extends BaseAdapter {
 
     private List<Object> list = new ArrayList<>();
-    private int type = 0;
 
     void setMinerListData(List<MinerListBean.MinerBean> list) {
-        this.type = 1;
-        this.list.clear();
-        this.list.addAll(list);
-        notifyDataSetChanged();
-    }
-
-    void setPartListData(List<ParticipantListBean.ParticipantBean> list) {
-        this.type = 0;
         this.list.clear();
         this.list.addAll(list);
         notifyDataSetChanged();
@@ -58,7 +47,7 @@ public class RewardAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            int layout = type == 1 ? R.layout.item_home_reward : R.layout.item_home_reward_part;
+            int layout = R.layout.item_home_reward;
             convertView = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
@@ -70,23 +59,12 @@ public class RewardAdapter extends BaseAdapter {
         String incomeStr = "";
         if(position < list.size()){
             Object bean = list.get(position);
-            if(type == 1){
-                MinerListBean.MinerBean minerBean = (MinerListBean.MinerBean) bean;
-                String lastBlockNoStr = ResourcesUtil.getText(R.string.home_no_point);
-                long nextBlockNo = minerBean.getBlockHeight();
-                left = String.format(lastBlockNoStr, FmtMicrometer.fmtPower(nextBlockNo));
-                middle = minerBean.getBlockHash();
-                incomeStr = minerBean.getIncome();
-            }else{
-                ParticipantListBean.ParticipantBean partBean = (ParticipantListBean.ParticipantBean) bean;
-                if(partBean.getRole() == 1){
-                    left = ResourcesUtil.getText(R.string.home_role_former_miner);
-                }else{
-                    left = ResourcesUtil.getText(R.string.home_role_tx_participant);
-                }
-                middle = partBean.getTxHash();
-                incomeStr = partBean.getIncome();
-            }
+            MinerListBean.MinerBean minerBean = (MinerListBean.MinerBean) bean;
+            String lastBlockNoStr = ResourcesUtil.getText(R.string.home_no_point);
+            long nextBlockNo = minerBean.getBlockHeight();
+            left = String.format(lastBlockNoStr, FmtMicrometer.fmtPower(nextBlockNo));
+            middle = minerBean.getBlockHash();
+            incomeStr = minerBean.getIncome();
         }
         String right = FmtMicrometer.fmtDecimal(incomeStr);
         SpannableStringBuilder spannable = new SpanUtils()
@@ -109,13 +87,6 @@ public class RewardAdapter extends BaseAdapter {
         TextView tvMiddle;
         @BindView(R.id.tv_right)
         TextView tvRight;
-
-//        @OnLongClick({R.id.tv_middle})
-//        boolean copyData(View view) {
-//            CopyManager.copyText(StringUtil.getTag(view));
-//            ToastUtils.showShortToast(R.string.tx_id_copy);
-//            return false;
-//        }
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

@@ -5,7 +5,6 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.MinerListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantListBean;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
@@ -25,9 +24,5 @@ public interface IMiningModel {
     /** update blocks downloaded data*/
     void updateBlocksDownloaded(long blockDownloaded, LogicObserver<Boolean> observer);
 
-    void getParticipantInfo(LogicObserver<KeyValue> observer);
-
     void getMinerHistory(TxObserver<MinerListBean> observer);
-
-    void getParticipantHistory(TxObserver<ParticipantListBean> observer);
 }

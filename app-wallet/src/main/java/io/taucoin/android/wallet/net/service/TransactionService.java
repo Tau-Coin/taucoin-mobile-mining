@@ -27,8 +27,6 @@ import io.taucoin.android.wallet.module.bean.MinerListBean;
 import io.taucoin.android.wallet.module.bean.MinerInfoBean;
 import io.taucoin.android.wallet.module.bean.RankInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
-import io.taucoin.android.wallet.module.bean.ParticipantListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantInfoBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
@@ -64,14 +62,8 @@ public interface TransactionService {
     @POST("getrankinfo")
     Observable<RankInfoBean> getRankInfo(@Body Map<String,String> address);
 
-    @POST("getppinfo")
-    Observable<ParticipantInfoBean> getParticipantInfo(@Body Map<String,String> address);
-
     @POST("getminerhistory")
     Observable<MinerListBean> getMinerHistory(@Body Map<String,String> address);
-
-    @POST("getpphistory")
-    Observable<ParticipantListBean> getParticipantHistory(@Body Map<String,String> address);
 
     @POST("getrewardinfo")
     Observable<RewardInfoBean> getRewardInfo(@Body Map<String,String> address);
