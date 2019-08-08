@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(project(':lib_foundation'))
     implementation(project(':taucoinj-core-android')) {
         exclude group: "org.hibernate", module: "hibernate-core"
         exclude group: 'com.google.android'

@@ -15,12 +15,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.service.ConnectorHandler;
 import io.taucoin.android.service.TaucoinClientMessage;
 import io.taucoin.android.service.TaucoinConnector;
@@ -33,11 +37,16 @@ import io.taucoin.android.service.events.PendingTransactionsEventData;
 import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
 
+import io.taucoin.android_app.net.MainObserver;
+import io.taucoin.android_app.net.NetWorkManager;
+import io.taucoin.android_app.net.NewTxBean;
+import io.taucoin.android_app.net.TransactionService;
 import io.taucoin.core.Base58;
 import io.taucoin.core.Transaction;
 import io.taucoin.core.Utils;
 import io.taucoin.core.transaction.TransactionOptions;
 import io.taucoin.core.transaction.TransactionVersion;
+import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.net.p2p.HelloMessage;
 import io.taucoin.util.ByteUtil;
 
@@ -301,7 +310,27 @@ public class RemoteConnectorManager implements ConnectorHandler {
                 TransactionOptions.GENESIS_TRANSACTION_OPTION, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee,cName,totalAmount);
         transaction.sign(privateKey);
         io.taucoin.android.interop.Transaction interT = new io.taucoin.android.interop.Transaction(transaction);
-        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+
+//        mTaucoinConnector.submitTransaction(mHandlerIdentifier, interT);
+
+        String txHash = Hex.toHexString(interT.getEncoded());
+        Map<String,String> map = new HashMap<>();
+        map.put("transaction", txHash);
+        NetWorkManager.createMainApiService(TransactionService.class)
+                .sendRawTransaction(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new MainObserver<NewTxBean>() {
+                    @Override
+                    public void handleError(String msg, int msgCode) {
+                        Toast.makeText(TaucoinApplication.getInstance(), msg, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void handleData(NewTxBean accountBean) {
+                        Toast.makeText(TaucoinApplication.getInstance(), accountBean.getStatus() + ",\t" +accountBean.getMessage() , Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void startBlockForging(){
