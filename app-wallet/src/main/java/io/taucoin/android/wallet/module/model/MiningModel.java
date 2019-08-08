@@ -16,7 +16,6 @@
 package io.taucoin.android.wallet.module.model;
 
 import io.reactivex.Scheduler;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 
 import java.util.HashMap;
@@ -34,8 +33,6 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.module.bean.MinerListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantInfoBean;
 import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
@@ -172,69 +169,12 @@ public class MiningModel implements IMiningModel{
     }
 
     @Override
-    public void getParticipantInfo(LogicObserver<KeyValue> observer) {
-        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
-        map.put("address",  address);
-        NetWorkManager.createMysqlApiService(TransactionService.class)
-            .getParticipantInfo(map)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .subscribe(new TxObserver<ParticipantInfoBean>() {
-                @Override
-                public void handleError(String msg, int msgCode) {
-                    observer.handleError(msgCode, msg);
-                }
-
-                @Override
-                public void handleData(ParticipantInfoBean participantInfo) {
-                    if(participantInfo != null && participantInfo.getStatus() == 200){
-                        saveParticipantInfo(participantInfo, observer);
-                    }else{
-                        observer.onError();
-                    }
-                }
-            });
-    }
-
-    private void saveParticipantInfo(ParticipantInfoBean participantInfo, LogicObserver<KeyValue> observer) {
-        Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
-            String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(publicKey);
-
-            if(keyValue != null){
-                keyValue.setPartReward(participantInfo.getPartReward());
-                keyValue.setMinerReward(participantInfo.getMinerReward());
-                KeyValueDaoUtils.getInstance().update(keyValue);
-            }
-            emitter.onNext(keyValue);
-        }).observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .subscribe(observer);
-    }
-
-    @Override
     public void getMinerHistory(TxObserver<MinerListBean> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         Map<String,String> map = new HashMap<>();
         map.put("address",  address);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getMinerHistory(map)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(scheduler)
-            .unsubscribeOn(scheduler)
-            .subscribe(observer);
-    }
-
-    @Override
-    public void getParticipantHistory(TxObserver<ParticipantListBean> observer) {
-        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
-        map.put("address",  address);
-        NetWorkManager.createMysqlApiService(TransactionService.class)
-            .getParticipantHistory(map)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)

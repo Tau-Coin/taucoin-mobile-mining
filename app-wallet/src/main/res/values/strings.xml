@@ -77,8 +77,8 @@
     <string name="send_tx_success">Transaction sent</string>
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
-    <string name="send_tx_increase_tip">Transactions to foundation coin sending address will increase power and participation reward.</string>
-    <string name="send_tx_increase_address" formatted="false"><Data><![CDATA[To:&nbsp;%s&nbsp;<font color="#f19322">(&nbsp;Foundation&nbsp;coin&nbsp;sending&nbsp;address&nbsp;)</font>]]> </Data></string>
+    <string name="send_tx_increase_tip">Transactions will increase mining power.</string>
+    <string name="send_tx_increase_address" formatted="false"><Data><![CDATA[To:&nbsp;%s&nbsp;<font color="#f19322">(&nbsp;Foundation&nbsp;Address&nbsp;)</font>]]> </Data></string>
 
     <string name="send_tx_small_fee">0.01</string>
     <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
@@ -168,7 +168,6 @@
     <string name="home_success_requires">Mining Success Requires</string>
     <string name="home_current_condition">Current Condition</string>
     <string name="home_mined_history">History Mined</string>
-    <string name="home_reward_history">Reward History</string>
     <string name="home_last_tx_role">Role</string>
     <string name="home_last_block_height">Height</string>
     <string name="home_last_block_hash">Hash</string>
@@ -179,16 +178,8 @@
     <string name="home_average_block_time_tip">The block is currently competed by miners for packaging.</string>
     <string name="home_average_block_time_value">05:00:00</string>
     <string name="home_estimated_block_time">Count-down competition on your address (%s) to win the block</string>
-    <string name="home_hit_tip">(Hit: Address %s network random number)</string>
-    <string name="home_avg_time_tip">(a.v 5 min)</string>
-    <string name="home_history_miner_reward">Potential Former Block Reward</string>
-    <string name="home_history_miner_reward_tip">Once your mined block transactions receivers make transaction in the future, you will get one third of that future transaction.</string>
-    <string name="home_history_tx_reward">Potential TX Participant Reward</string>
-    <string name="home_history_tx_reward_tip">Once your history transactions receivers make transaction in the future, you will get one third of that future tx fee. </string>
-
-    <string name="home_participant_history">View your participant history</string>
-    <string name="home_role_tx_participant">TX Participant</string>
-    <string name="home_role_former_miner">Former Miner</string>
+    <string name="home_hit_tip">(Hit: Address \"%s\" network random number)</string>
+    <string name="home_avg_time_tip">(A.V 5 min)</string>
 
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Historical Mining Rewards</string>
@@ -242,7 +233,6 @@
     <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
     <string name="mining_sync_complete">Latest block need to be synced.</string>
-    <!--<string name="mining_need_sync_open">Please turn on the synchronization switch first!</string>-->
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>

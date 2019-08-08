@@ -76,6 +76,12 @@ public class SyncQueue {
 
     SystemProperties config = SystemProperties.CONFIG;
 
+    private static final long HIBERNATION_CYCLE
+            = SystemProperties.CONFIG.hibernationCycle();
+
+    private static final long HIBERNATION_DURATION
+            = SystemProperties.CONFIG.hibernationDuration();
+
     private Blockchain blockchain;
 
     private SyncManager syncManager;
@@ -295,7 +301,14 @@ public class SyncQueue {
                     // know its block number. This node will request block headers
                     // and block bodies ASAP.
                     blockQueue.add(wrapper);
-                    tryGapRecovery(wrapper);
+                    boolean recoveryResult = tryGapRecovery(wrapper);
+                    logger.info("Recovery block result {}", recoveryResult);
+
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ie) {
+                        logger.error("Sync queue wait recovery interrupted {}", ie);
+                    }
                     noParent.set(true);
 
                     // If 'blockQueue' implementation is BlockQueueMem or BlockQueueImpl, it takes several
@@ -347,6 +360,19 @@ public class SyncQueue {
                 } catch (InterruptedException ie) {
                     logger.error("Sync queue interrupted {}", ie);
                 }
+            } finally {
+                if (wrapper != null && wrapper.getNumber() != 0 &&
+                        wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
+                    logger.warn("Hibernation starts at block {}", wrapper.getNumber());
+                    syncManager.notifyHibernation(wrapper.getNumber());
+                    syncManager.stopSyncWithPeer();
+                    try {
+                        Thread.sleep(HIBERNATION_DURATION);
+                    } catch (InterruptedException ie) {
+                        logger.error("Sync queue hibernation interrupted {}", ie);
+                    }
+                    System.exit(0);
+                }
             }
         }
 
@@ -375,20 +401,17 @@ public class SyncQueue {
         }
     }
 
-    private void tryGapRecovery(BlockWrapper wrapper) {
+    private boolean tryGapRecovery(BlockWrapper wrapper) {
         long bestBlockNumber = blockchain.getBestBlock().getNumber();
         long expectedEndNumber = wrapper.getNumber() - 1;
 
         logger.warn("Try gap recovery from {} end {}", bestBlockNumber + 1, expectedEndNumber);
 
-        // Very arguly solution. TODO: gracefully recover blocks.
-        if (blockQueue instanceof BlockQueueMem || blockQueue instanceof BlockQueueImpl) {
-            addBlockNumbers(bestBlockNumber + 1, expectedEndNumber);
-        } else if (blockQueue instanceof BlockQueueFileSys) {
-            if (expectedEndNumber > bestBlockNumber) {
-                ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
-            }
+        if (expectedEndNumber > bestBlockNumber) {
+            return ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
         }
+
+        return false;
     }
 
     public boolean isImportingBlocksFinished() {

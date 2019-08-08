@@ -25,7 +25,6 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.BaseFragment;
@@ -34,7 +33,6 @@ import io.taucoin.android.wallet.db.entity.BlockInfo;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.bean.MinerListBean;
-import io.taucoin.android.wallet.module.bean.ParticipantListBean;
 import io.taucoin.android.wallet.module.presenter.MiningPresenter;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.TxService;
@@ -94,14 +92,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvMiningRank;
     @BindView(R.id.cb_wifi_only)
     CheckBox cbWifiOnly;
-    @BindView(R.id.ll_miner)
-    View llMiner;
-    @BindView(R.id.ll_participant)
-    View llParticipant;
     @BindView(R.id.tv_success_requires)
     TextView tvSuccessRequires;
-    @BindView(R.id.tv_participant_history)
-    TextView tvParticipantHistory;
     @BindView(R.id.tv_mining_history)
     TextView tvMiningHistory;
     @BindView(R.id.tv_next_block_no)
@@ -114,10 +106,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvCurrentCondition;
     @BindView(R.id.ll_current_condition)
     View llCurrentCondition;
-    @BindView(R.id.rb_miner)
-    RadioButton rbMiner;
-    @BindView(R.id.part_list_view)
-    ScrollDisabledListView partListView;
     @BindView(R.id.miner_list_view)
     ScrollDisabledListView minerListView;
     @BindView(R.id.tv_block_chain_data)
@@ -128,10 +116,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvTxsPool;
     @BindView(R.id.tv_circulation)
     TextView tvCirculation;
-    @BindView(R.id.tv_history_miner_reward)
-    TextView tvHistoryMinerReward;
-    @BindView(R.id.tv_history_tx_reward)
-    TextView tvHistoryTxReward;
     @BindView(R.id.rl_mining_time)
     View rlMiningTime;
     @BindView(R.id.rl_avg_time)
@@ -140,7 +124,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     TextView tvHitTip;
 
     private RewardAdapter minerRewardAdapter;
-    private RewardAdapter partRewardAdapter;
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
 
@@ -160,9 +143,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         return view;
     }
 
-    @OnClick({R.id.iv_mining_switch, R.id.cb_wifi_only, R.id.iv_right, R.id.rb_miner, R.id.rb_participant,
-            R.id.tv_participant_history, R.id.tv_mining_history, R.id.tv_next_block_no_title,
-            R.id.tv_history_tx_reward_title, R.id.tv_history_miner_reward_title,})
+    @OnClick({R.id.iv_mining_switch, R.id.cb_wifi_only, R.id.iv_right,
+            R.id.tv_mining_history, R.id.tv_next_block_no_title})
     public void onClick(View view) {
         if (!UserUtil.isImportKey() && view.getId() != R.id.cb_wifi_only) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -186,14 +168,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 mIsToast = true;
                 onRefresh(null);
                 break;
-            case R.id.rb_miner:
-            case R.id.rb_participant:
-                if(rbMiner != null){
-                    boolean isMiner = rbMiner.isChecked();
-                    llMiner.setVisibility(isMiner ? View.VISIBLE : View.GONE);
-                    llParticipant.setVisibility(!isMiner ? View.VISIBLE : View.GONE);
-                }
-                break;
             case R.id.tv_mining_history:
                 if(UserUtil.isImportKey()){
                     String address = MyApplication.getKeyValue().getAddress();
@@ -203,23 +177,8 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
                 break;
-            case R.id.tv_participant_history:
-                if(UserUtil.isImportKey()){
-                    String address = MyApplication.getKeyValue().getAddress();
-                    String uriStr = TransmitKey.ExternalUrl.PARTICIPANT_HISTORY + address;
-                    ActivityUtil.openUri(getActivity(), uriStr);
-                }else{
-                    ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
-                }
-                break;
             case R.id.tv_next_block_no_title:
                 DialogManager.showTipDialog(getActivity(), R.string.home_average_block_time_tip);
-                break;
-            case R.id.tv_history_miner_reward_title:
-                DialogManager.showTipDialog(getActivity(), R.string.home_history_miner_reward_tip);
-                break;
-            case R.id.tv_history_tx_reward_title:
-                DialogManager.showTipDialog(getActivity(), R.string.home_history_tx_reward_tip);
                 break;
             default:
                 break;
@@ -315,12 +274,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         initMiningSwitch();
         UserUtil.initSuccessRequires(tvSuccessRequires);
         UserUtil.setHitTip(tvHitTip);
-        DrawablesUtil.setUnderLine(tvParticipantHistory);
         DrawablesUtil.setUnderLine(tvMiningHistory);
         minerRewardAdapter = new RewardAdapter();
-        partRewardAdapter = new RewardAdapter();
         minerListView.setAdapter(minerRewardAdapter);
-        partListView.setAdapter(partRewardAdapter);
     }
 
     public synchronized void handleMiningView() {
@@ -337,20 +293,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     public void loadRewardData(){
-        miningPresenter.getParticipantInfo();
         miningPresenter.getMinerHistory(new LogicObserver<List<MinerListBean.MinerBean>>(){
             @Override
             public void handleData(List<MinerListBean.MinerBean> data) {
                 if(minerRewardAdapter != null && data != null){
                     minerRewardAdapter.setMinerListData(data);
-                }
-            }
-        });
-        miningPresenter.getParticipantHistory(new LogicObserver<List<ParticipantListBean.ParticipantBean>>(){
-            @Override
-            public void handleData(List<ParticipantListBean.ParticipantBean> data) {
-                if(partRewardAdapter != null && data != null){
-                    partRewardAdapter.setPartListData(data);
                 }
             }
         });
@@ -388,11 +335,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
 
         if(blockInfo != null){
+            if(blockInfo.getBlockSync() != blockInfo.getBlockHeight()){
+                refreshNextBlockView(null);
+            }
             long blockHeight = StringUtil.getIntTag(tvNextBlockNo);
             if(blockHeight != 0 && blockInfo.getBlockHeight() > blockHeight){
                 loadRewardData();
             }
-            UserUtil.setHistoryParticipantReward(tvHistoryMinerReward, tvHistoryTxReward);
             UserUtil.setNextBlockNo(tvNextBlockNo, blockInfo);
         }
     }

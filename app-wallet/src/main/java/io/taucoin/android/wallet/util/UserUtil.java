@@ -43,7 +43,6 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.widget.DashboardLayout;
 import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
-import io.taucoin.core.ProofOfTransaction;
 import io.taucoin.foundation.util.DimensionsUtil;
 import io.taucoin.foundation.util.DrawablesUtil;
 import io.taucoin.foundation.util.StringUtil;
@@ -519,12 +518,25 @@ public class UserUtil {
         return address;
     }
 
+    private static String getEllipsisAddress() {
+        String address = "";
+        if(isImportKey()){
+            address = MyApplication.getKeyValue().getAddress();
+            if(address.length() >= 4){
+                address = address.substring(0, 1);
+                address += "......";
+                address += getLastThreeAddress();
+            }
+        }
+        return address;
+    }
+
     public static void setHitTip(TextView tvHitTip) {
         if(tvHitTip == null){
             return;
         }
         String title = ResourcesUtil.getText(R.string.home_hit_tip);
-        title = String.format(title, UserUtil.getLastThreeAddress());
+        title = String.format(title, UserUtil.getEllipsisAddress());
         tvHitTip.setText(title);
     }
 }

@@ -107,4 +107,7 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     public void onBlocksDownloaded(long from, long end) {
     }
 
+    @Override
+    public void onSyncHibernation(long number) {
+    }
 }

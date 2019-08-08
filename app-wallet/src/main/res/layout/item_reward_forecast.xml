@@ -1,50 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/color_white"
     android:orientation="vertical">
-
-    <RadioGroup
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:padding="1dp"
-        android:layout_height="40dp">
-
-        <RadioButton
-            android:id="@+id/rb_miner"
-            style="@style/style_middle_light_grey"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|center"
-            android:background="@drawable/selector_reward_forecast_bg"
-            android:textColor="@drawable/reward_tab_color"
-            android:button="@null"
-            android:clickable="true"
-            android:checked="true"
-            android:focusable="true"
-            android:singleLine="true"
-            android:text="@string/home_current_mining" />
-
-        <RadioButton
-            android:id="@+id/rb_participant"
-            style="@style/style_middle_light_grey"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|center"
-            android:background="@drawable/selector_reward_forecast_bg"
-            android:textColor="@drawable/reward_tab_color"
-            android:button="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:singleLine="true"
-            android:text="@string/home_reward_analysis" />
-
-    </RadioGroup>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -148,79 +108,88 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:visibility="gone"
             android:id="@+id/rl_mining_time"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <TextView
-                android:id="@+id/tv_forged_time_title"
-                style="@style/style_middle_light_grey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginStart="15dp"
-                android:includeFontPadding="false"
-                android:layout_alignParentBottom="true"
-                android:layout_toStartOf="@+id/ll_forged_time"
-                android:text="@string/home_estimated_block_time" />
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:layout_above="@+id/tv_avg_tip"
-                android:id="@+id/ll_forged_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="end"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="15dp"
-                android:layout_marginStart="5dp"
-                tools:ignore="UseCompoundDrawables">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_countdown"
+                <TextView
+                    android:id="@+id/tv_forged_time_title"
+                    style="@style/style_middle_light_grey"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:layout_height="18dp" />
-
-                <io.taucoin.android.wallet.widget.LoadingTextView
-                    android:id="@+id/tv_forged_time"
-                    style="@style/style_big_light_grey"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginStart="15dp"
                     android:includeFontPadding="false"
-                    android:textColor="@color/color_home_grey_dark"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical|center"
-                    android:text=""/>
+                    android:text="@string/home_estimated_block_time" />
 
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_gravity="bottom"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="5dp"
+                        tools:ignore="UseCompoundDrawables">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_countdown"
+                            android:layout_gravity="center_vertical"
+                            android:layout_height="18dp" />
+
+                        <io.taucoin.android.wallet.widget.LoadingTextView
+                            android:id="@+id/tv_forged_time"
+                            style="@style/style_big_light_grey"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:includeFontPadding="false"
+                            android:textColor="@color/color_home_grey_dark"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical|center"
+                            android:text="00:00:00"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_avg_tip"
+                        style="@style/style_normal_light_grey"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="5dp"
+                        android:includeFontPadding="false"
+                        android:layout_gravity="end"
+                        android:layout_marginBottom="5dp"
+                        android:text="@string/home_avg_time_tip"/>
+                </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_avg_tip"
-                style="@style/style_normal_light_grey"
-                android:layout_width="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="15dp"
-                android:layout_marginStart="5dp"
-                android:includeFontPadding="false"
-                android:layout_marginBottom="5dp"
-                android:text="@string/home_avg_time_tip"/>
 
             <View
                 android:layout_width="match_parent"
                 android:background="@color/color_main_line"
-                android:layout_alignParentBottom="true"
                 android:layout_marginTop="2dp"
                 android:layout_height="1dp"/>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <TextView
             style="@style/style_middle_light_grey"
@@ -340,166 +309,6 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="15dp"
             android:text="@string/home_mining_history"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/ll_participant"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
-            <TextView
-                android:id="@+id/tv_history_miner_reward_title"
-                style="@style/style_middle_light_grey"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_size_18"
-                android:gravity="bottom"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="15dp"
-                android:maxLines="1"
-                android:includeFontPadding="false"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMaxTextSize="14dp"
-                app:autoSizeMinTextSize="8dp"
-                app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                android:layout_toStartOf="@+id/tv_history_miner_reward"
-                android:text="@string/home_history_miner_reward" />
-
-            <TextView
-                style="@style/style_big_blue"
-                android:id="@+id/tv_history_miner_reward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:includeFontPadding="false"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="5dp"
-                android:text=""/>
-
-            <View
-                android:layout_width="match_parent"
-                android:background="@color/color_main_line"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="2dp"
-                android:layout_height="1dp"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
-            <TextView
-                android:id="@+id/tv_history_tx_reward_title"
-                style="@style/style_middle_light_grey"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_size_18"
-                android:gravity="bottom"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="15dp"
-                android:maxLines="1"
-                android:includeFontPadding="false"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMaxTextSize="14dp"
-                app:autoSizeMinTextSize="8dp"
-                app:autoSizeStepGranularity="@dimen/dimen_size_05"
-                android:layout_toStartOf="@+id/tv_history_tx_reward"
-                android:text="@string/home_history_tx_reward" />
-
-            <TextView
-                style="@style/style_big_blue"
-                android:id="@+id/tv_history_tx_reward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:includeFontPadding="false"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="5dp"
-                android:text=""/>
-
-            <View
-                android:layout_width="match_parent"
-                android:background="@color/color_main_line"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="2dp"
-                android:layout_height="1dp"/>
-
-        </RelativeLayout>
-
-        <TextView
-            style="@style/style_middle_light_grey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="15dp"
-            android:text="@string/home_reward_history"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_height="wrap_content">
-
-            <TextView
-                style="@style/style_middle_light_grey"
-                android:layout_width="0dp"
-                android:layout_weight="1.1"
-                android:gravity="start"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="7dp"
-                android:text="@string/home_last_tx_role"/>
-
-            <TextView
-                style="@style/style_middle_light_grey"
-                android:layout_width="0dp"
-                android:layout_weight="1.6"
-                android:layout_marginStart="7dp"
-                android:layout_marginEnd="7dp"
-                android:gravity="start"
-                android:layout_height="wrap_content"
-                android:text="@string/home_last_block_hash"/>
-
-            <TextView
-                style="@style/style_middle_light_grey"
-                android:layout_width="0dp"
-                android:layout_weight="1.2"
-                android:layout_marginStart="7dp"
-                android:gravity="start"
-                android:layout_height="wrap_content"
-                android:text="@string/home_last_block_income"/>
-
-        </LinearLayout>
-
-        <io.taucoin.android.wallet.widget.ScrollDisabledListView
-            android:id="@+id/part_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:scrollbars="none"/>
-
-        <TextView
-            android:id="@+id/tv_participant_history"
-            style="@style/style_middle_blue"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="15dp"
-            android:text="@string/home_participant_history"/>
-
     </LinearLayout>
 
 </LinearLayout>

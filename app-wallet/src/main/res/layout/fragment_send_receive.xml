@@ -50,7 +50,7 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btn_increase"
+            android:id="@+id/btn_send"
             style="@style/style_big_white"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -58,11 +58,11 @@
             android:includeFontPadding="false"
             android:layout_marginEnd="2.5dp"
             android:background="@drawable/yellow_rect_small_round_bg"
-            android:text="@string/tx_increase"
+            android:text="@string/tx_send"
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/btn_send"
+            android:id="@+id/btn_increase"
             style="@style/style_big_white"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -70,7 +70,7 @@
             android:includeFontPadding="false"
             android:layout_marginStart="2.5dp"
             android:background="@drawable/yellow_rect_small_round_bg"
-            android:text="@string/tx_send"
+            android:text="@string/tx_increase"
             android:textAllCaps="false" />
     </LinearLayout>
 

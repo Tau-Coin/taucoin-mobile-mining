@@ -250,4 +250,8 @@ public class SyncManager {
 
         return 0;
     }
+
+    public void notifyHibernation(long number) {
+        taucoinListener.onSyncHibernation(number);
+    }
 }

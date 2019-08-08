@@ -819,6 +819,17 @@ public class SystemProperties {
         return (int)config.getInt("blockstore.capability");
     }
 
+    @ValidateMe
+    public long hibernationCycle() {
+        return config.getInt("sync2.hibernation.cycle");
+    }
+
+    @ValidateMe
+    public long hibernationDuration() {
+        return config.getInt("sync2.hibernation.duration");
+    }
+
+
     public String dump() {
         return config.root().render(ConfigRenderOptions.defaults().setComments(false));
     }

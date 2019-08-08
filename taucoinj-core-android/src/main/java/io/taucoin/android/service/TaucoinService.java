@@ -278,5 +278,10 @@ public class TaucoinService extends Service {
         public void onBlocksDownloaded(long from, long end) {
             broadcastEvent(EventFlag.EVENT_BLOCKS_DOWNLOADED, new BlocksDownloadedData(from, end));
         }
+
+        @Override
+        public void onSyncHibernation(long number) {
+            // TODO: broadcast this event
+        }
     }
 }

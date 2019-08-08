@@ -170,4 +170,11 @@ public class CompositeTaucoinListener implements TaucoinListener {
             listener.onBlocksDownloaded(from, end);
         }
     }
+
+    @Override
+    public void onSyncHibernation(long number) {
+        for (TaucoinListener listener : listeners) {
+            listener.onSyncHibernation(number);
+        }
+    }
 }

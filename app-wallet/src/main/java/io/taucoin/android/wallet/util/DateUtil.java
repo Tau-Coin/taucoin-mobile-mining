@@ -223,9 +223,10 @@ public class DateUtil {
 
     public static String formatUTCTime(String formerTime) {
         try {
-            format.applyPattern(pattern6);
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = format.parse(formerTime);
+            SimpleDateFormat temFormat = (SimpleDateFormat) format.clone();
+            temFormat.applyPattern(pattern6);
+            temFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date date = temFormat.parse(formerTime);
             long time = date.getTime();
             time = time / 1000;
             return String.valueOf(time);
