@@ -20,19 +20,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:text="chain name"
+                android:hint="chain name"
                 android:ems="10"
                 android:id="@+id/chainnameET"/>
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="total amount"
+                android:hint="total amount"
                 android:ems="10"
                 android:id="@+id/totalamountET" android:inputType="numberDecimal"/>
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="fee"
+                android:hint="fee"
                 android:ems="10"
                 android:id="@+id/createfeeET" android:inputType="numberDecimal"/>
         <Button
