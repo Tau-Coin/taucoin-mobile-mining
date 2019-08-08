@@ -536,14 +536,14 @@ public class TxModel implements ITxModel {
                             tx = new TransactionHistory();
                             tx.setFromAddress(bean.getSender());
                             tx.setToAddress(bean.getReceiver());
-                            // createTime and blockTime need set value here!
-                            tx.setCreateTime(DateUtil.formatUTCTime(bean.getTxTime()));
 
                             tx.setTxId(bean.getTxId());
                             tx.setAmount(FmtMicrometer.fmtTxValue(bean.getAmount()));
                             tx.setFee(FmtMicrometer.fmtTxValue(bean.getFee()));
                             tx.setTransExpiry(bean.getExpiredHeight());
                         }
+                        // createTime and blockTime need set value here!
+                        tx.setCreateTime(DateUtil.formatUTCTime(bean.getTxTime()));
                         tx.setTimeBasis(1);
                         tx.setBlockHeight(bean.getBlockHeight());
                         tx.setResult(TransmitKey.TxResult.SUCCESSFUL);
