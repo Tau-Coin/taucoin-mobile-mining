@@ -16,6 +16,7 @@
 package io.taucoin.android.wallet.util;
 
 import android.content.Context;
+import android.os.Environment;
 import android.widget.TextView;
 
 import com.github.naturs.logger.Logger;
@@ -219,6 +220,18 @@ public class MiningUtil {
         }
     }
 
+    /**
+     * handle logs compatibility
+     * only version 1.9.0.4
+     * */
+    public static void handleLogCompatibility() {
+        boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(TransmitKey.FORGING_LOG, false);
+        if(!isReload){
+            MiningUtil.clearLogDirectory();
+            SharedPreferencesHelper.getInstance().putBoolean(TransmitKey.FORGING_LOG, true);
+        }
+    }
+
     public static void clearAndReloadBlocks() {
         clearAndReloadBlocks(null);
     }
@@ -281,5 +294,27 @@ public class MiningUtil {
                     MyApplication.getRemoteConnector().init();
                 }
             });
+    }
+
+    private static void clearLogDirectory() {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                Logger.d(sdPath);
+                String logsDir = sdPath + File.separator + "tau-mobile" + File.separator + "logs";
+                FileUtil.deleteFile(new File(logsDir));
+                emitter.onNext(true);
+            }catch (Exception ex){
+                emitter.onNext(false);
+                Logger.e(ex, "clearLogDirectory is error");
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new LogicObserver<Boolean>() {
+                    @Override
+                    public void handleData(Boolean isSuccess) {
+                        Logger.d("MiningUtil.clearLogDirectory=" + isSuccess);
+                    }
+                });
     }
 }

@@ -167,7 +167,7 @@ public class LevelDbDataSource implements KeyValueDataSource {
             } catch (Exception re) {
                 re.printStackTrace();
                 logger.error(re.getMessage(), re);
-                throw new RuntimeException("Can't recover database");
+                throw new DBCorruptionException(re);
             }
 
             // try one more time

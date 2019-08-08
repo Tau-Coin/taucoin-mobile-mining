@@ -17,7 +17,7 @@ public class AccountStateDatabaseImpl implements KeyValueDataSource {
 
     private static final Logger logger = LoggerFactory.getLogger("accountdb");
 
-    private static final int MAX_CACHE_SIZE = 5000;
+    private static final int MAX_CACHE_SIZE = 1000;
 
     KeyValueDataSource dbImpl;
 
@@ -65,11 +65,14 @@ public class AccountStateDatabaseImpl implements KeyValueDataSource {
 
     @Override
     public byte[] get(byte[] key) {
-        byte[] value = accountsCache.get(key);
-        if (value == null) {
-            value = dbImpl.get(key);
-            if (value != null) {
-                accountsCache.put(key, value);
+        byte[] value = null;
+        synchronized(accountsCache) {
+            value = accountsCache.get(key);
+            if (value == null) {
+                value = dbImpl.get(key);
+                if (value != null) {
+                    accountsCache.put(key, value);
+                }
             }
         }
 
@@ -79,14 +82,18 @@ public class AccountStateDatabaseImpl implements KeyValueDataSource {
     @Override
     public byte[] put(byte[] key, byte[] value) {
         dbImpl.put(key, value);
-        accountsCache.put(key, value);
+        synchronized(accountsCache) {
+            accountsCache.put(key, value);
+        }
         return value;
     }
 
     @Override
     public void delete(byte[] key) {
         dbImpl.delete(key);
-        accountsCache.remove(key);
+        synchronized(accountsCache) {
+            accountsCache.remove(key);
+        }
     }
 
     @Override
@@ -104,12 +111,16 @@ public class AccountStateDatabaseImpl implements KeyValueDataSource {
     @Override
     public void updateBatch(Map<byte[], byte[]> rows) {
         dbImpl.updateBatch(rows);
-        accountsCache.putAll(rows);
+        synchronized(accountsCache) {
+            accountsCache.putAll(rows);
+        }
     }
 
     @Override
     public void close() {
         dbImpl.close();
-        accountsCache.clear();
+        synchronized(accountsCache) {
+            accountsCache.clear();
+        }
     }
 }

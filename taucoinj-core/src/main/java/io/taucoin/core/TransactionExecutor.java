@@ -28,6 +28,13 @@ public class TransactionExecutor {
     private Blockchain blockchain;
     private TaucoinListener listener;
 
+    private TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
+    private FeeDistributor feeDistributor = new FeeDistributor();
+    private AssociatedFeeDistributor assDistributor = new AssociatedFeeDistributor();
+
+    private HashMap<byte[],Long> currentWitness = new HashMap<>();
+    private HashMap<byte[],Long> lastWitness = new HashMap<>();
+
     // indicate that this is witness by self to show mining income asap.
     private boolean isAssociatedByself = false;
     /**
@@ -154,8 +161,6 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
-
-        TransactionExecuatedOutcome outcome = new TransactionExecuatedOutcome();
         outcome.setBlockHash(blockhash);
         logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
@@ -174,11 +179,12 @@ public class TransactionExecutor {
             track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()));
         }
 
-        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+        feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
+
         logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
         //lookup sender account state.
         AccountState senderAccountState = track.getAccountState(tx.getSender());
-        if (blockchain.getSize() < Constants.FEE_TERMINATE_HEIGHT -1) {
+        if (blockchain.getSize() < Constants.FEE_TERMINATE_HEIGHT + 1) {
             if (feeDistributor.distributeFee()) {
                 // Transfer fees to forger
                 String coinbaseHexAddress = Hex.toHexString(coinbase);
@@ -322,7 +328,7 @@ public class TransactionExecutor {
             track.addBalance(tx.getReceiveAddress(), toBI(tx.getAmount()).negate());
         }
 
-        FeeDistributor feeDistributor = new FeeDistributor(ByteUtil.byteArrayToLong(tx.transactionCost()));
+        feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
 
         AccountState senderAccountState = track.getAccountState(tx.getSender());
 

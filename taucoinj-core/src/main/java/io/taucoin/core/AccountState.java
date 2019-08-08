@@ -1,5 +1,6 @@
 package io.taucoin.core;
 
+import io.taucoin.config.Constants;
 import io.taucoin.util.ByteUtil;
 import io.taucoin.util.RLP;
 import io.taucoin.util.RLPList;
@@ -114,7 +115,11 @@ public class AccountState implements Serializable {
 
     public void setWitnessAddress(byte[] witnessAddress) {
         rlpEncoded = null;
-        this.witnessAddress = witnessAddress;
+        if (this.stateHeight < Constants.FEE_TERMINATE_HEIGHT) {
+            this.witnessAddress = witnessAddress;
+        } else {
+            //nothing to do!
+        }
     }
 
     public byte[] getWitnessAddress() {
@@ -123,20 +128,28 @@ public class AccountState implements Serializable {
 
     public void updateAssociatedAddress(byte[] associatedAddress,long stateHeight) {
         rlpEncoded = null;
-        if (this.stateHeight == stateHeight) {
-            this.associatedAddress.add(associatedAddress);
+        if (stateHeight < Constants.FEE_TERMINATE_HEIGHT) {
+            if (this.stateHeight == stateHeight) {
+                this.associatedAddress.add(associatedAddress);
+            } else {
+                this.associatedAddress.clear();
+                this.associatedAddress.add(associatedAddress);
+                this.stateHeight = stateHeight;
+            }
         } else {
             this.associatedAddress.clear();
-            this.associatedAddress.add(associatedAddress);
-            this.stateHeight = stateHeight;
         }
     }
 
     public void updateAssociatedAddress(List<byte[]> associatedAddressList,long stateHeight) {
         rlpEncoded = null;
-        this.stateHeight = stateHeight;
-        this.associatedAddress.clear();
-        this.associatedAddress.addAll(associatedAddressList);
+        if (stateHeight < Constants.FEE_TERMINATE_HEIGHT) {
+            this.stateHeight = stateHeight;
+            this.associatedAddress.clear();
+            this.associatedAddress.addAll(associatedAddressList);
+        } else {
+            this.associatedAddress.clear();
+        }
     }
 
     public void setAssociatedAddress(ArrayList<byte[]> associatedAddress) {

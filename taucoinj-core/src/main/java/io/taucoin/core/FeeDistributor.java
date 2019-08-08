@@ -16,7 +16,14 @@ public class FeeDistributor {
     private long lastAssociFee = 0;
     private volatile boolean isDistribute = true;
 
+    public FeeDistributor() {
+    }
+
     public FeeDistributor(long txFee) {
+        this.txFee = txFee;
+    }
+
+    public void setTxFee(long txFee) {
         this.txFee = txFee;
     }
 

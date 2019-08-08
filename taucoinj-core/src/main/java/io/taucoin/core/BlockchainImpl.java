@@ -503,9 +503,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         //if (needFlush(block)) {
             repository.flush(block.getNumber());
             blockStore.flush();
-            if (block.getNumber() % 10 == 0) {
-                System.gc();
-            }
+            System.gc();
         //}
 
         listener.onBlock(block);
@@ -822,6 +820,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     tx.setIsCompositeTx(true);
                 }
             }
+        } else {
+            //I think nothing need to do!
         }
         long totalTime = System.nanoTime() - saveTime;
         logger.debug("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
