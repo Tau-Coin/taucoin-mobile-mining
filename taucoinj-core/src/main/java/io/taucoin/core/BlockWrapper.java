@@ -17,7 +17,7 @@ import static io.taucoin.util.TimeUtils.secondsToMillis;
  * @author Mikhail Kalinin
  * @since 24.07.2015
  */
-public class BlockWrapper {
+public class BlockWrapper implements Comparable<BlockWrapper> {
 
     private static final long SOLID_BLOCK_DURATION_THRESHOLD = secondsToMillis(60);
 
@@ -170,5 +170,10 @@ public class BlockWrapper {
         BlockWrapper wrapper = (BlockWrapper) o;
 
         return block.isEqual(wrapper.block);
+    }
+
+    @Override
+    public int compareTo(BlockWrapper other) {
+        return (int)(getNumber() - other.getNumber());
     }
 }

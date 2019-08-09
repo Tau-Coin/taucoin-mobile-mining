@@ -297,12 +297,12 @@ public class SyncQueue {
                 if (importResult == NO_PARENT) {
                     logger.info("No parent on the chain for block.number: {} block.hash: {}", wrapper.getNumber(), wrapper.getBlock().getShortHash());
                     wrapper.importFailed();
-                    // Here not add this block into block queue, because we don't
-                    // know its block number. This node will request block headers
-                    // and block bodies ASAP.
+
+                    // Add this block into block queue, and try to add his parent
                     blockQueue.add(wrapper);
-                    boolean recoveryResult = tryGapRecovery(wrapper);
-                    logger.info("Recovery block result {}", recoveryResult);
+                    if (!tryGapRecoveryAndVerify(wrapper)) {
+                        rollbackBlockQueue();
+                    }
 
                     try {
                         Thread.sleep(2000);
@@ -322,18 +322,22 @@ public class SyncQueue {
             } catch (Throwable e) {
                 e.printStackTrace();
 
-                // Temp solution. Fix memory leak ASAP.
+                // Note: for the application with the version V1.9.0.3, OOM usually happens.
+                // For the version V1.9.0.4, there is no OOM. But for special case, taucoin
+                // service exists and wallet will start it again.
                 if (e instanceof OutOfMemoryError) {
                     logger.error("OOM fatal error:{}", e);
-                    System.exit(-1);
+                    System.exit(1);
                 }
 
+                // Leveldb sometimes throw exceptions which we don't know how to handle.
+                // So restart taucoin service again.
                 if (e instanceof DBCorruptionException) {
                     Exception internalException = ((DBCorruptionException)e).getException();
                     if (internalException != null
                             && internalException instanceof OverlappingFileLockException) {
                         logger.error("Leveldb fatal error:{}", internalException);
-                        System.exit(-2);
+                        System.exit(2);
                     }
                 }
 
@@ -361,6 +365,10 @@ public class SyncQueue {
                     logger.error("Sync queue interrupted {}", ie);
                 }
             } finally {
+                // Note: this is just the test feature.
+                // It shows that android system is under bigger memory pressure with
+                // more and more blocks connected. This blockchain service exists periodly.
+                // The wallet will start it again.
                 if (wrapper != null && wrapper.getNumber() != 0 &&
                         wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
                     logger.warn("Hibernation starts at block {}", wrapper.getNumber());
@@ -371,7 +379,7 @@ public class SyncQueue {
                     } catch (InterruptedException ie) {
                         logger.error("Sync queue hibernation interrupted {}", ie);
                     }
-                    System.exit(0);
+                    System.exit(3);
                 }
             }
         }
@@ -412,6 +420,48 @@ public class SyncQueue {
         }
 
         return false;
+    }
+
+    /**
+     * For BlockQueueFileSys, if some blocks is lost, download them again.
+     */
+    private boolean tryGapRecoveryAndVerify(BlockWrapper wrapper) {
+        long bestBlockNumber = blockchain.getBestBlock().getNumber();
+        long expectedEndNumber = wrapper.getNumber() - 1;
+
+        logger.warn("Try gap recovery from {} end {}", bestBlockNumber + 1, expectedEndNumber);
+
+        if (expectedEndNumber > bestBlockNumber) {
+            ((BlockQueueFileSys)blockQueue).reloadBlock(expectedEndNumber);
+        }
+
+        // Try to peek and verify.
+        BlockWrapper expectedBlockWrapper = blockQueue.peek();
+        if (expectedBlockWrapper != null
+                && expectedBlockWrapper.getNumber() == expectedEndNumber) {
+            return true;
+        }
+
+        logger.error("file system fatal error: block {} lost, got {}",
+                expectedEndNumber, expectedBlockWrapper.getNumber());
+        return false;
+    }
+
+    private void rollbackBlockQueue() {
+        syncManager.stopSyncWithPeer();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+            logger.error("Wait for shutdown interrupted {}", ie);
+        }
+
+        long bestNumber = blockchain.getBestBlock().getNumber();
+        ((BlockQueueFileSys)blockQueue).rollbackTo(bestNumber);
+        syncManager.notifyBlockQueueRollback(bestNumber);
+
+        // This block chain service exists and start again.
+        logger.error("File block queue roll back to block {}", bestNumber);
+        System.exit(4);
     }
 
     public boolean isImportingBlocksFinished() {

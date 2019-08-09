@@ -713,7 +713,7 @@ public class MemoryIndexedBlockStore implements BlockStore {
 
         Long number = getMaxNumber();
 
-        for (long i = 0; i < number; ++i){
+        for (long i = 0; i <= number; ++i){
             List<BlockInfo> levelInfos = index.get(i);
 
             if (levelInfos != null) {

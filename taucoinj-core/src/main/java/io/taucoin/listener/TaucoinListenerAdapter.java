@@ -110,4 +110,8 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     @Override
     public void onSyncHibernation(long number) {
     }
+
+    @Override
+    public void onBlockQueueRollback(long number) {
+    }
 }

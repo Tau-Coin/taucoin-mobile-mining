@@ -353,6 +353,79 @@ class LargeFileStoreGroup {
         }
     }
 
+    // Roll back to OpFilePosition filePos and the data behind 'filePos'
+    // will be deleted.
+    public void rollbackTo(OpFilePosition filePos) throws Exception {
+        if (filePos == null || !fileSet.contains(new Integer(filePos.file))
+            || filePos.position < 0) {
+            throw new IllegalArgumentException("Invalid truncate file pos");
+        }
+
+        logger.warn("Roll back to the file {}", filePos);
+
+        int maxFile = writeFile;
+
+        synchronized(lock) {
+            // First of all, close read channel.
+            if (readFileChan != null && readMbb != null) {
+                try {
+                    readFileChan.close();
+                } catch(IOException e) {
+                    logger.error("Close read file exception: {}", e);
+                    throw e;
+                }
+            }
+
+            // Choose which files should be removed.
+            if (filePos.file == writeFile && writeFileChan != null) {
+                FileLock fileLock = null;
+                try {
+                    fileLock = writeFileChan.lock();
+                    writeFileChan.truncate((long)(filePos.position + filePos.length));
+                    writeFileChan.force(true);
+                    fileLock.release();
+                } catch (IOException e) {
+                    logger.error("IO exception: {}", e);
+                    throw e;
+                }
+
+                writeFileChan.close();
+            } else if (filePos.file < writeFile && writeFileChan != null) {
+                writeFileChan.close();
+
+                // Remove files [filePos.file + 1, writeFile]
+                for (int index = filePos.file + 1; index <= writeFile; index++) {
+                    String filename = getFileName(index);
+                    File file = new File(filename);
+                    file.delete();
+                    fileSet.remove(new Integer(index));
+                }
+
+                // Truncate filePos.file
+                FileChannel targetFileChan;
+                String targetFilename = getFileName(filePos.file);
+                FileLock fileLock = null;
+                try {
+                    targetFileChan = new RandomAccessFile(targetFilename, "rw").getChannel();
+                    fileLock = targetFileChan.lock();
+                    targetFileChan.truncate((long)(filePos.position + filePos.length));
+                    targetFileChan.force(true);
+                    fileLock.release();
+                    targetFileChan.close();
+                } catch (IOException e) {
+                    logger.error("IO exception: {}", e);
+                    throw e;
+                }
+
+                // Set max file index.
+                maxFile = filePos.file;
+            }
+
+            // Lastly, init everything again.
+            initReadWriteFiles(maxFile);
+        }
+    }
+
     public void close() {
         synchronized(lock) {
             try {

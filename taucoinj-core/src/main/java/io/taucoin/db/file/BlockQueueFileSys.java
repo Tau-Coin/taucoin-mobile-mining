@@ -95,6 +95,7 @@ public class BlockQueueFileSys implements BlockQueue {
     public void addAll(Collection<BlockWrapper> blockList) {
         awaitInit();
         synchronized (writeMutex) {
+            Collections.sort((List<BlockWrapper>)blockList);
             List<Long> numbers = new ArrayList<>(blockList.size());
             for (BlockWrapper b : blockList) {
                 if(!index.contains(b.getNumber()) &&
@@ -304,5 +305,15 @@ public class BlockQueueFileSys implements BlockQueue {
 
     public void setBlockchain(Blockchain blockchain) {
         this.blockchain = blockchain;
+    }
+
+    public void rollbackTo(long number) {
+        logger.warn("Roll back to block {}", number);
+
+        fileBlockStore.rollbackTo(number);
+
+        //Rebuild everything
+        initDone = false;
+        open();
     }
 }
