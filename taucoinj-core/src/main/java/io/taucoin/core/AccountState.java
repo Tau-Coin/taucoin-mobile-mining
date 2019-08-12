@@ -198,7 +198,14 @@ public class AccountState implements Serializable {
     public byte[] getEncoded() {
         if (rlpEncoded == null) {
             byte[][] trHisEncoded = new byte[tranHistory.size() + 5][];
+            if (this.forgePower.compareTo(BigInteger.ZERO) < 0) {
+                throw new IllegalArgumentException("forege power less than 0");
+            }
             byte[] forgePower = RLP.encodeBigInteger(this.forgePower);
+
+            if (this.balance.compareTo(BigInteger.ZERO) < 0) {
+                throw new IllegalArgumentException("encoding error lead to balance less than 0");
+            }
             byte[] balance = RLP.encodeBigInteger(this.balance);
             byte[] witnessAddress = RLP.encodeElement(this.witnessAddress);
             byte[][] tempAssociate = new byte[this.associatedAddress.size()][];

@@ -497,7 +497,20 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        track.commit();
+//        try {
+            track.commit();
+//        }catch (RuntimeException e) {
+//            logger.error("track commit error {}",e.getMessage());
+//            track.rollback();
+
+//            undoBlockTransactionWrap(block);
+//            if (!processBlock(block, track)) {
+//                track.rollback();
+//                return false;
+//            }
+//            track.commit();
+//        }
+
         storeBlock(block);
 
         //if (needFlush(block)) {
@@ -785,6 +798,11 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return true;
     }
 
+    private void undoBlockTransactionWrap(Block block){
+        for (Transaction tx : block.getTransactionsList()) {
+            tx.undoWrap();
+        }
+    }
     private void wrapBlockTransactions(Block block, Repository repo) {
         long saveTime = System.nanoTime();
         if (block.getNumber() < Constants.FEE_TERMINATE_HEIGHT) {
@@ -822,6 +840,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             }
         } else {
             //I think nothing need to do!
+            //although these code is ugly , helpful to locate balance error.
+            for (Transaction tx : block.getTransactionsList()) {
+                byte[] txSenderAdd = tx.getSender();
+                byte[] txReceiverAdd = tx.getReceiveAddress();
+                AccountState txSenderAccount = repo.getAccountState(txSenderAdd);
+                AccountState txReceiverAccount = repo.getAccountState(txReceiverAdd);
+            }
         }
         long totalTime = System.nanoTime() - saveTime;
         logger.debug("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
@@ -831,7 +856,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         if (!block.isGenesis()) {
             wrapBlockTransactions(block, repo);
-
+            /**
+             * maybe i should compare 1 level change and 2 level change in repo.
+             * total 3 levels changes.
+             */
+            logger.debug("=====below operation is level 1 , on level 1 wrap transaction occur =====");
+            repo.showRepositoryChange();
+            logger.debug("=====below operation is level 2 , on level 2 fee distribute occur =====");
             if (!config.blockChainOnly()) {
                 return applyBlock(block, repo);
             }
@@ -859,7 +890,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         for (Transaction tx : block.getTransactionsList()) {
             //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
-
+            /**
+             * repo is level 1 repo track;
+             * cache track is level 2 repo track;
+             */
             cacheTrack = repo.startTracking();
             executor.init(tx, cacheTrack);
             executor.setAssociatedByself(isAssociatedSelf);
@@ -882,6 +916,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             txCount++;
         }
 
+        /**
+         * here will show changes between wrap tx and distribute fee on level 1
+         * lastly level 1 will commit changes to level 0
+         * what more level 0 will save these into disk.
+         * why process do like this is showing illegal balance.
+         */
+        repo.showRepositoryChange();
         if (!isValid) {
             return false;
         }

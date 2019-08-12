@@ -1,8 +1,7 @@
 package io.taucoin.db;
 
-import io.taucoin.core.AccountState;
-import io.taucoin.core.Block;
-import io.taucoin.core.Repository;
+import io.taucoin.config.MainNetParams;
+import io.taucoin.core.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import java.math.BigInteger;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static io.taucoin.crypto.HashUtil.EMPTY_DATA_HASH;
@@ -249,5 +249,13 @@ public class RepositoryTrack implements Repository {
         return (repository instanceof RepositoryTrack)
                 ? ((RepositoryTrack) repository).getOriginRepository()
                 : repository;
+    }
+
+    public void showRepositoryChange() {
+        for (ByteArrayWrapper hash : cacheAccounts.keySet()) {
+            Address temp = new Address(MainNetParams.get(), hash.getData());
+            AccountState account = cacheAccounts.get(hash);
+            logger.debug("address: {} balance {}", temp.toBase58(),account.getBalance());
+        }
     }
 }

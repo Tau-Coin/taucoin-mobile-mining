@@ -1304,6 +1304,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
         logger.info("get account state from taucoin service");
         if (taucoin != null) {
+            System.out.println("=======111111======");
             new GetAccountStateTask(message).execute(taucoin);
         } else {
             logger.warn("Taucoin not connected.");
@@ -1334,6 +1335,7 @@ public class TaucoinRemoteService extends TaucoinService {
 
             Bundle data = message.getData();
             if (data.containsKey("address")) {
+                System.out.println("=======22222======");
                 this.address = data.getString("address");
             }
         }
@@ -1349,14 +1351,19 @@ public class TaucoinRemoteService extends TaucoinService {
             addressBytes = toEncoedAddress.getBytes();
 
             if (taucoin != null && address != null && addressBytes != null) {
+                System.out.println("=======33333======");
                 balance = taucoin.getRepository().getBalance(addressBytes);
                 power = taucoin.getRepository().getforgePower(addressBytes);
                 txHistory = taucoin.getRepository().getAccountState(addressBytes).getTranHistory();
             }
 
             ArrayList<String> retHistory = new ArrayList<>();
+            int txCount = 0;
             if (txHistory != null && txHistory.size() > 10) {
+
                 for (Long index : txHistory.keySet()) {
+                    if (txCount > 10) break;
+                    txCount++;
                     byte[] txid = txHistory.get(index);
                     retHistory.add("time: " + index.toString() + " hash: " + Hex.toHexString(txid).substring(0, 5));
                 }
@@ -1384,7 +1391,9 @@ public class TaucoinRemoteService extends TaucoinService {
             replyMessage.setData(replyData);
 
             try {
+                System.out.println("=======444444======");
                 messenger.send(replyMessage);
+                System.out.println("=======555555======");
                 logger.info("Send account state to app");
             } catch (RemoteException e) {
                 logger.error("Exception sending account state to client: " + e.getMessage());

@@ -218,16 +218,16 @@ public class BlockForger {
         BigInteger cumulativeDifficulty;
 
         bestBlock = blockchain.getBestBlock();
-        if (!Utils.hashEquals(bestBlock.getHash(), chainInfoManager.getCurrentBlockHash())) {
-            try {
-                waitForSyncDone();
-            } catch (InterruptedException e) {
-                logger.warn("Forging task is interrupted when waiting for sync done");
-                isWaitingSyncDone.set(false);
-                return ForgeStatus.FORGE_TASK_INTERRUPTED_NOT_SYNCED;
-            }
-            return ForgeStatus.BLOCK_SYNC_PROCESSING;
-        }
+//        if (!Utils.hashEquals(bestBlock.getHash(), chainInfoManager.getCurrentBlockHash())) {
+//            try {
+//                waitForSyncDone();
+//            } catch (InterruptedException e) {
+//                logger.warn("Forging task is interrupted when waiting for sync done");
+//                isWaitingSyncDone.set(false);
+//                return ForgeStatus.FORGE_TASK_INTERRUPTED_NOT_SYNCED;
+//            }
+//            return ForgeStatus.BLOCK_SYNC_PROCESSING;
+//        }
 
         baseTarget = ProofOfTransaction.calculateRequiredBaseTarget(bestBlock, blockStore);
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
@@ -311,10 +311,10 @@ public class BlockForger {
 
         logger.info("Forging thread wakeup...");
 
-        if (!txsGot) {
-            logger.warn("Pull pool tx timeout, retry again.");
-            return ForgeStatus.PULL_POOL_TX_TIMEOUT;
-        }
+//        if (!txsGot) {
+//            logger.warn("Pull pool tx timeout, retry again.");
+//            return ForgeStatus.PULL_POOL_TX_TIMEOUT;
+//        }
 
         cumulativeDifficulty = ProofOfTransaction.
                 calculateCumulativeDifficulty(bestBlock.getCumulativeDifficulty(), baseTarget);

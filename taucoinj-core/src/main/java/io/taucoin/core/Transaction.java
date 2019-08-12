@@ -395,6 +395,13 @@ public class Transaction {
         return receiverAssociatedAddress;
     }
 
+    public void undoWrap(){
+        this.senderWitnessAddress = null;
+        this.receiverWitnessAddress = null;
+        this.senderAssociatedAddress.clear();
+        this.receiverAssociatedAddress.clear();
+    }
+
     /**
      * if NowTime - TransactionTime < 144 blocks means tx is valid.
      * in other words

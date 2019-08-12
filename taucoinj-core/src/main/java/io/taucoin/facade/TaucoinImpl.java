@@ -230,7 +230,9 @@ public class TaucoinImpl implements Taucoin {
     @Override
     public Transaction submitTransaction(Transaction transaction) {
 
-         // boolean submitResult = pendingState.addWireTransactions(transaction);
+         Set<Transaction> tx = new HashSet<>();
+         tx.add(transaction);
+         pendingState.addWireTransactions(tx);
          boolean submitResult= true;
 
          if (submitResult) {
