@@ -254,4 +254,8 @@ public class SyncManager {
     public void notifyHibernation(long number) {
         taucoinListener.onSyncHibernation(number);
     }
+
+    public void notifyBlockQueueRollback(long number) {
+        taucoinListener.onBlockQueueRollback(number);
+    }
 }

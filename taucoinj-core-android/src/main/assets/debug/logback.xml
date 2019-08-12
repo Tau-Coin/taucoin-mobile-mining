@@ -23,7 +23,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>${LOG_DIR}/tau.%i.log.zip</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>4</maxIndex>
+            <maxIndex>100</maxIndex>
         </rollingPolicy>
 
         <triggeringPolicy class="io.taucoin.android.util.LogbackSizeBasedTriggeringPolicy">

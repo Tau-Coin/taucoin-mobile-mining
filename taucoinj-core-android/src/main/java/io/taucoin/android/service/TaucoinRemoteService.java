@@ -20,6 +20,7 @@ import io.taucoin.android.di.modules.TaucoinModule;
 import io.taucoin.android.interop.BlockTxReindex;
 import io.taucoin.android.service.events.*;
 import io.taucoin.android.settings.TaucoinSettings;
+import io.taucoin.android.util.LoggerManager;
 import io.taucoin.config.MainNetParams;
 import io.taucoin.core.*;
 import io.taucoin.crypto.ECKey;
@@ -364,6 +365,8 @@ public class TaucoinRemoteService extends TaucoinService {
 
         System.setProperty("sun.arch.data.model", "32");
         System.setProperty("leveldb.mmap", "false");
+
+        LoggerManager.removeOldLogFiles();
 
         // Import private key
         CONFIG.importForgerPrikey(TextUtils.isEmpty(privateKey) ?

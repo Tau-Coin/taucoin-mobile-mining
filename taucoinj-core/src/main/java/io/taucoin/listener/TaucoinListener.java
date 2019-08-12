@@ -60,4 +60,6 @@ public interface TaucoinListener {
 
     void onSyncHibernation(long number);
 
+    void onBlockQueueRollback(long number);
+
 }
