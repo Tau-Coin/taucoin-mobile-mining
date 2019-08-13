@@ -415,7 +415,7 @@
                                 android:includeFontPadding="false"
                                 app:autoSizeTextType="uniform"
                                 app:autoSizeMaxTextSize="16dp"
-                                app:autoSizeMinTextSize="12dp"
+                                app:autoSizeMinTextSize="6dp"
                                 app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                 android:text="@string/common_zero"/>
 
@@ -445,7 +445,7 @@
                                 android:includeFontPadding="false"
                                 app:autoSizeTextType="uniform"
                                 app:autoSizeMaxTextSize="16dp"
-                                app:autoSizeMinTextSize="12dp"
+                                app:autoSizeMinTextSize="6dp"
                                 app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                 android:text="@string/common_zero"/>
 
@@ -548,7 +548,7 @@
                                 android:includeFontPadding="false"
                                 app:autoSizeTextType="uniform"
                                 app:autoSizeMaxTextSize="16dp"
-                                app:autoSizeMinTextSize="12dp"
+                                app:autoSizeMinTextSize="6dp"
                                 app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                 android:text="@string/common_zero"/>
 
@@ -617,7 +617,7 @@
                                         android:includeFontPadding="false"
                                         app:autoSizeTextType="uniform"
                                         app:autoSizeMaxTextSize="16dp"
-                                        app:autoSizeMinTextSize="12dp"
+                                        app:autoSizeMinTextSize="6dp"
                                         app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                         android:text="@string/common_zero"/>
 
@@ -632,7 +632,7 @@
                                         android:includeFontPadding="false"
                                         app:autoSizeTextType="uniform"
                                         app:autoSizeMaxTextSize="16dp"
-                                        app:autoSizeMinTextSize="12dp"
+                                        app:autoSizeMinTextSize="6dp"
                                         app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                         android:text="@string/common_zero"/>
 
@@ -679,7 +679,7 @@
                                     android:includeFontPadding="false"
                                     app:autoSizeTextType="uniform"
                                     app:autoSizeMaxTextSize="16dp"
-                                    app:autoSizeMinTextSize="12dp"
+                                    app:autoSizeMinTextSize="4dp"
                                     app:autoSizeStepGranularity="@dimen/dimen_size_05"
                                     android:text="@string/common_zero"/>
                             </LinearLayout>
