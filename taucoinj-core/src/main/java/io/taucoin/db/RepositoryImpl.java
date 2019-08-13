@@ -100,7 +100,12 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
             } else {
                 //updateAccountState(hash.getData(), accountState);
-                updateAccountStateBatch(hash.getData(), accountState);
+                try {
+                    updateAccountStateBatch(hash.getData(), accountState);
+                }catch (RuntimeException e) {
+                    logger.error("update accountState error {}",e.getMessage());
+                    throw new IllegalArgumentException(e.getMessage());
+                }
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("update: [{}],forgePower: [{}] balance: [{}] \n",
@@ -297,5 +302,10 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
         ByteArrayWrapper wrappedAddress = wrap(addr);
         cacheAccounts.put(wrappedAddress, account);
+    }
+
+    @Override
+    public void showRepositoryChange() {
+
     }
 }

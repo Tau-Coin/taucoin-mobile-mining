@@ -221,7 +221,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 Repository cacheTrack = track.startTracking();
                 logger.info("Try to disconnect block, block number: {}, hash: {}",
                         undoBlock.getNumber(), Hex.toHexString(undoBlock.getHash()));
-
+                logger.debug("before roll back.....");
+                cacheTrack.showRepositoryChange();
                 //roll back
                 List<Transaction> txs = undoBlock.getTransactionsList();
                 int size = txs.size();
@@ -237,6 +238,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     executor.setCoinbase(undoBlock.getForgerAddress());
                     executor.undoTransaction();
                 }
+                logger.debug("after roll back.....");
+                cacheTrack.showRepositoryChange();
                 cacheTrack.commit();
 
                 if(Hex.toHexString(undoBlock.getForgerAddress()).equals("847ca210e2b61e9722d1584fcc0daea4c3639b09")){
@@ -497,7 +500,20 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             return false;
         }
 
-        track.commit();
+//        try {
+            track.commit();
+//        }catch (RuntimeException e) {
+//            logger.error("track commit error {}",e.getMessage());
+//            track.rollback();
+
+//            undoBlockTransactionWrap(block);
+//            if (!processBlock(block, track)) {
+//                track.rollback();
+//                return false;
+//            }
+//            track.commit();
+//        }
+
         storeBlock(block);
 
         //if (needFlush(block)) {
@@ -579,31 +595,37 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
     }
 
     /**
-     * verify transaction version
+     * verify transaction version,currently version as follows:
+     * 0x00
+     * 0x01
      * @param tx
      * @return
      */
     private boolean verifyTransactionVersion(Transaction tx) {
-        if (tx.getVersion() != TransactionVersion.V01.getCode()) {
-            logger.error("Tx [{}] version [{}] is mismatch!", Hex.toHexString(tx.getHash()),
-                    tx.getVersion());
-            return false;
+        if (tx.getVersion() == TransactionVersion.V01.getCode()) {
+            return true;
         }
-        return true;
+
+        logger.error("Tx [{}] version [{}] is mismatch!", Hex.toHexString(tx.getHash()),
+                tx.getVersion());
+        return false;
     }
 
     /**
-     * verify transaction option
+     * verify transaction option,currently option as follows:
+     * 0x00
+     * 0x01
      * @param tx
      * @return
      */
     private boolean verifyTransactionOption(Transaction tx) {
-        if (tx.getOption() != TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
-            logger.error("Tx [{}] option [{}] is mismatch!", Hex.toHexString(tx.getHash()),
-                    tx.getOption());
-            return false;
+        if (tx.getOption() == TransactionOptions.TRANSACTION_OPTION_DEFAULT) {
+            return true;
         }
-        return true;
+
+        logger.error("Tx [{}] option [{}] is mismatch!", Hex.toHexString(tx.getHash()),
+                tx.getOption());
+        return false;
     }
 
     /**
@@ -772,40 +794,54 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         return true;
     }
 
-    private void wrapBlockTransactions(Block block, Repository repo) {
-        long saveTime = System.nanoTime();
+    private void undoBlockTransactionWrap(Block block){
         for (Transaction tx : block.getTransactionsList()) {
 
-            tx.setIsCompositeTx(false);
+        }
+    }
+    private void wrapBlockTransactions(Block block, Repository repo) {
+        long saveTime = System.nanoTime();
+        if (block.getNumber() < Constants.FEE_TERMINATE_HEIGHT) {
+            for (Transaction tx : block.getTransactionsList()) {
+                tx.setIsCompositeTx(false);
+                byte[] txSenderAdd = tx.getSender();
+                byte[] txReceiverAdd = tx.getReceiveAddress();
+                AccountState txSenderAccount = repo.getAccountState(txSenderAdd);
+                AccountState txReceiverAccount = repo.getAccountState(txReceiverAdd);
 
-            byte[] txSenderAdd= tx.getSender();
-            byte[] txReceiverAdd= tx.getReceiveAddress();
-            AccountState txSenderAccount= repo.getAccountState(txSenderAdd);
-            AccountState txReceiverAccount= repo.getAccountState(txReceiverAdd);
+                if (txSenderAdd != null) {
+                    byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
+                    ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
+                    byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
+                    ArrayList<byte[]> receiverAssociateAddress = txReceiverAccount.getAssociatedAddress();
 
-            if(txSenderAdd != null) {
-                byte[] senderWitnessAddress = txSenderAccount.getWitnessAddress();
-                ArrayList<byte[]> senderAssociateAddress = txSenderAccount.getAssociatedAddress();
-                byte[] receiverWitnessAddress = txReceiverAccount.getWitnessAddress();
-                ArrayList<byte[]> receiverAssociateAddress = txReceiverAccount.getAssociatedAddress();
+                    if (senderWitnessAddress != null) {
+                        tx.setSenderWitnessAddress(senderWitnessAddress);
+                    }
 
-                if (senderWitnessAddress != null) {
-                    tx.setSenderWitnessAddress(senderWitnessAddress);
+                    if (receiverWitnessAddress != null) {
+                        tx.setReceiverWitnessAddress(receiverWitnessAddress);
+                    }
+
+                    if (senderAssociateAddress != null && senderAssociateAddress.size() > 0) {
+                        tx.setSenderAssociatedAddress(senderAssociateAddress);
+                    }
+
+                    if (receiverAssociateAddress != null && receiverAssociateAddress.size() > 0) {
+                        tx.setReceiverAssociatedAddress(receiverAssociateAddress);
+                    }
+
+                    tx.setIsCompositeTx(true);
                 }
-
-                if (receiverWitnessAddress != null) {
-                    tx.setReceiverWitnessAddress(receiverWitnessAddress);
-                }
-
-                if (senderAssociateAddress != null && senderAssociateAddress.size() > 0) {
-                    tx.setSenderAssociatedAddress(senderAssociateAddress);
-                }
-
-                if (receiverAssociateAddress != null && receiverAssociateAddress.size() > 0) {
-                    tx.setReceiverAssociatedAddress(receiverAssociateAddress);
-                }
-
-                tx.setIsCompositeTx(true);
+            }
+        } else {
+            //I think nothing need to do!
+            //although these code is ugly , helpful to locate balance error.
+            for (Transaction tx : block.getTransactionsList()) {
+                byte[] txSenderAdd = tx.getSender();
+                byte[] txReceiverAdd = tx.getReceiveAddress();
+                AccountState txSenderAccount = repo.getAccountState(txSenderAdd);
+                AccountState txReceiverAccount = repo.getAccountState(txReceiverAdd);
             }
         }
         long totalTime = System.nanoTime() - saveTime;
@@ -816,7 +852,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         if (!block.isGenesis()) {
             wrapBlockTransactions(block, repo);
-
+            /**
+             * maybe i should compare 1 level change and 2 level change in repo.
+             * total 3 levels changes.
+             */
+            logger.debug("=====below operation is level 1 , on level 1 wrap transaction occur =====");
+            repo.showRepositoryChange();
+            logger.debug("=====below operation is level 2 , on level 2 fee distribute occur =====");
             if (!config.blockChainOnly()) {
                 return applyBlock(block, repo);
             }
@@ -844,7 +886,10 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
         for (Transaction tx : block.getTransactionsList()) {
             //logger.info("apply block: [{}] tx: [{}] ", block.getNumber(), tx.toString());
-
+            /**
+             * repo is level 1 repo track;
+             * cache track is level 2 repo track;
+             */
             cacheTrack = repo.startTracking();
             executor.init(tx, cacheTrack);
             executor.setAssociatedByself(isAssociatedSelf);
@@ -867,6 +912,13 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             txCount++;
         }
 
+        /**
+         * here will show changes between wrap tx and distribute fee on level 1
+         * lastly level 1 will commit changes to level 0
+         * what more level 0 will save these into disk.
+         * why process do like this is showing illegal balance.
+         */
+        repo.showRepositoryChange();
         if (!isValid) {
             return false;
         }

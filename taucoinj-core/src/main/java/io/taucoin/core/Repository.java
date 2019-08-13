@@ -136,4 +136,6 @@ public interface Repository {
     void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates);
 
     void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts);
+
+    void showRepositoryChange();
 }
