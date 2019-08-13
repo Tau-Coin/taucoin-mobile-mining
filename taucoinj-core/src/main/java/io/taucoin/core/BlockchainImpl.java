@@ -221,7 +221,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                 Repository cacheTrack = track.startTracking();
                 logger.info("Try to disconnect block, block number: {}, hash: {}",
                         undoBlock.getNumber(), Hex.toHexString(undoBlock.getHash()));
-
+                logger.debug("before roll back.....");
+                cacheTrack.showRepositoryChange();
                 //roll back
                 List<Transaction> txs = undoBlock.getTransactionsList();
                 int size = txs.size();
@@ -237,6 +238,8 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     executor.setCoinbase(undoBlock.getForgerAddress());
                     executor.undoTransaction();
                 }
+                logger.debug("after roll back.....");
+                cacheTrack.showRepositoryChange();
                 cacheTrack.commit();
 
                 if(Hex.toHexString(undoBlock.getForgerAddress()).equals("847ca210e2b61e9722d1584fcc0daea4c3639b09")){
