@@ -177,4 +177,11 @@ public class CompositeTaucoinListener implements TaucoinListener {
             listener.onSyncHibernation(number);
         }
     }
+
+    @Override
+    public void onBlockQueueRollback(long number) {
+        for (TaucoinListener listener : listeners) {
+            listener.onBlockQueueRollback(number);
+        }
+    }
 }

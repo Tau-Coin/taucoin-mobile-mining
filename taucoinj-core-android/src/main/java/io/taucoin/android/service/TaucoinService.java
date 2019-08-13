@@ -283,5 +283,10 @@ public class TaucoinService extends Service {
         public void onSyncHibernation(long number) {
             // TODO: broadcast this event
         }
+
+        @Override
+        public void onBlockQueueRollback(long number) {
+            // TODO: broadcast this event
+        }
     }
 }

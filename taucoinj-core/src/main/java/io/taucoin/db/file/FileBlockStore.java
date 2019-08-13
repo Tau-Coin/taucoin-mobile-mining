@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static io.taucoin.config.SystemProperties.CONFIG;
 
@@ -38,6 +39,10 @@ public class FileBlockStore {
 
     private LRUCache blocksCache
             = new LRUCache(10, 0.75f);
+
+    // Blocks must be stored by continuous number ascending order.
+    private TreeMap<Long, BlockWrapper> discontinuousBlocks
+            = new TreeMap<Long, BlockWrapper>();
 
     @Inject
     public FileBlockStore() {
@@ -88,6 +93,50 @@ public class FileBlockStore {
             return false;
         }
 
+        if (number != maxNumber + 1) {
+            discontinuousBlocks.put(number, block);
+            logger.warn("discontinuous block with number {}, hash {}",
+                    number, Hex.toHexString(block.getHash()));
+            return true;
+        }
+
+        if (putContinuousBlock(number, block)) {
+            checkContinuousBlocks(maxNumber + 1);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void checkContinuousBlocks(long startNumber) {
+        synchronized(discontinuousBlocks) {
+            if (discontinuousBlocks.size() == 0) {
+                return;
+            }
+
+            long firstNumber = discontinuousBlocks.firstKey();
+            long lastNumber = discontinuousBlocks.lastKey();
+            if (startNumber != firstNumber) {
+                logger.info("discontinuous blocks first {} last {}",
+                        firstNumber, lastNumber);
+                return;
+            }
+
+            long currentNumber = firstNumber;
+            while (currentNumber <= lastNumber) {
+                putContinuousBlock(currentNumber, discontinuousBlocks.get(currentNumber));
+                discontinuousBlocks.remove(currentNumber);
+
+                if (discontinuousBlocks.get(currentNumber + 1) == null) {
+                    break;
+                }
+
+                currentNumber++;
+            }
+        }
+    }
+
+    private boolean putContinuousBlock(long number, BlockWrapper block) {
         long startTime = System.nanoTime();
 
         byte[] encoded = block.getBytes();
@@ -129,10 +178,16 @@ public class FileBlockStore {
     }
 
     public synchronized BlockWrapper get(long number) {
-        if (number > maxNumber || number <= 0) {
+        if (number <= 0) {
             logger.error("Block with the number {}/{} hasn't existed.",
                     number, maxNumber);
             return null;
+        }
+
+        if (number > maxNumber) {
+            synchronized(discontinuousBlocks) {
+                return discontinuousBlocks.get(number);
+            }
         }
 
         synchronized(blocksCache) {
@@ -182,6 +237,45 @@ public class FileBlockStore {
 
     public synchronized long getMaxBlockNumber() {
         return maxNumber;
+    }
+
+    public synchronized boolean rollbackTo(long number) {
+        if (number < 0) {
+            logger.error("Invalid block number {}", number);
+            return false;
+        }
+
+        long startTime = System.nanoTime();
+        logger.warn("Rollback blockstore to number {}, now max {}", number, maxNumber);
+
+        OpFilePosition position = BlockIndex.withBlockNumber(number)
+                .getOpFilePosition();
+        BlockIndex index;
+        byte[] indexEncoded;
+
+        try {
+            indexEncoded = indexStore.read(position);
+            index = new BlockIndex(indexEncoded);
+
+            // Rollback block index
+            indexStore.rollbackTo(position);
+
+            // Rollback blocks.
+            blockStore.rollbackTo(index.getOpFilePosition());
+        } catch(Exception e) {
+            logger.error("Rollback block error: {}", e);
+            return false;
+        }
+
+        logger.warn("rollback to block with number {}  cost {}ns, postion {}",
+                number, System.nanoTime() - startTime, position);
+
+        // Reopen
+        indexStore = null;
+        blockStore = null;
+        open();
+
+        return true;
     }
 
     public synchronized void close() {
