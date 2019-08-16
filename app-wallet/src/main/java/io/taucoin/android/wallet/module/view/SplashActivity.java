@@ -23,7 +23,6 @@ import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.module.view.main.MainActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
-import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.PermissionUtils;
 import io.taucoin.foundation.util.AppUtil;
 import io.taucoin.foundation.util.permission.EasyPermissions;
@@ -84,11 +83,6 @@ public class SplashActivity extends BaseActivity {
     };
 
     private synchronized void splashJump() {
-        boolean isAndroidQ = Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
-        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        if(!isAndroidQ && EasyPermissions.hasPermissions(this, permission)){
-            MiningUtil.handleLogCompatibility();
-        }
         if(!isAsk){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
