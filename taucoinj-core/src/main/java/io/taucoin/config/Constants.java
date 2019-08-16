@@ -15,7 +15,7 @@ public class Constants {
     //block time drift
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
     //fee distribute height
-    public static final int FEE_TERMINATE_HEIGHT = 23500;
+    public static final int FEE_TERMINATE_HEIGHT = 23050;
 
     public static final String GENESIS_BLOCK_HASH = "cff5ddb22f7f7f1a251c506ce85585353a99644e";
 
