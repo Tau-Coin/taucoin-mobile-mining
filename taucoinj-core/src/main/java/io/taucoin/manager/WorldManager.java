@@ -220,11 +220,16 @@ public class WorldManager {
             logger.info("Genesis block loaded");
         } else {
 
+            // Note: 'BlockchainImpl' maybe undo transactions which call blockchain.getSize().
+            // So we have to set best block first of all.
+            blockchain.setBestBlock(bestBlock);
+
             // First of all, check database sanity
             if (blockchain.checkSanity()) {
+                // Here best block changed, so set it again.
                 bestBlock = blockStore.getBestBlock();
+                blockchain.setBestBlock(bestBlock);
             }
-            blockchain.setBestBlock(bestBlock);
 
             BigInteger totalDifficulty = blockStore.getTotalDifficulty();
             blockchain.setTotalDifficulty(totalDifficulty);

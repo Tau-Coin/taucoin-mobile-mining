@@ -35,6 +35,10 @@ public class LoggerManager {
         }
 
         File[] files = f.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
             if (file == null || !file.isFile()) {
