@@ -222,6 +222,7 @@ public class UserUtil {
 
                 String progressStr = FmtMicrometer.fmtPower(syncHeight);
                 tvVerify.setText(progressStr);
+                tvVerify.setTag(syncHeight);
 
                 if(syncHeight < downloadHeight && syncHeight < chainHeight){
                     ivVerify.setOn();
