@@ -69,16 +69,15 @@ public class DaemonJobService extends JobService {
             //Combining two-process guardianship
             boolean isLocalRun = AppUtil.isServiceRunning(this, TxService.class.getName());
             boolean isRemoteRun = AppUtil.isServiceRunning(this, RemoteService.class.getName());
-            if (!isLocalRun || !isRemoteRun) {
+            if(!isLocalRun){
                 TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
-
+            }
+            if(!isRemoteRun){
                 Intent intent =  new Intent(this, RemoteService.class);
                 Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
                 intent.putExtra("bean", parcelable);
                 startService(intent);
-                if(!isRemoteRun){
-                    MyApplication.getRemoteConnector().init();
-                }
+                MyApplication.getRemoteConnector().init();
             }
             jobFinished(params, false);
         }) .observeOn(AndroidSchedulers.mainThread())
