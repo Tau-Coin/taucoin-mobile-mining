@@ -178,6 +178,8 @@ public abstract class ConnectorManager implements ConnectorHandler {
                 mTaucoinConnector.removeListener(mHandlerIdentifier);
                 isTaucoinConnected = false;
                 mTaucoinConnector = null;
+                mWifiSettings.destroy();
+                mWifiSettings = null;
                 isInit = -1;
                 isSyncMe = -1;
                 init();

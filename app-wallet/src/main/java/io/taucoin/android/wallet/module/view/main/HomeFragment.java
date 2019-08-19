@@ -347,6 +347,11 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void refreshNextBlockView(Object data){
+        long blockHeight = StringUtil.getIntTag(tvNextBlockNo);
+        long blockSync = StringUtil.getIntTag(tvVerify);
+        if(data != null && blockHeight != blockSync + 1){
+            data = null;
+        }
         if(llCurrentCondition != null){
             llCurrentCondition.setVisibility(data == null ? View.GONE : View.VISIBLE);
         }
