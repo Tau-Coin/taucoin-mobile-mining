@@ -177,9 +177,9 @@
     <string name="home_average_block_time">Average Block Time</string>
     <string name="home_average_block_time_tip">The block is currently competed by miners for packaging.</string>
     <string name="home_average_block_time_value">05:00:00</string>
-    <string name="home_estimated_block_time">Count-down competition on your address (%s) to win the block</string>
+    <string name="home_estimated_block_time">Count-down competition on your address (&#8230;%s) to win the block</string>
     <string name="home_hit_tip">(Hit: Address \"%s\" network random number)</string>
-    <string name="home_avg_time_tip">(A.V 5 min)</string>
+    <string name="home_avg_time_tip">(avg. 5 min)</string>
 
     <string name="home_balance">Total Balance</string>
     <string name="home_mining_income">Historical Mining Rewards</string>

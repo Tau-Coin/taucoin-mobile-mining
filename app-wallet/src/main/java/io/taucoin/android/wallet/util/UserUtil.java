@@ -485,24 +485,33 @@ public class UserUtil {
                 resultStr = "<";
             }
             SpannableStringBuilder spannable = new SpanUtils()
+                .append("Hit(")
                 .append(FmtMicrometer.fmtPower(detail.hitValue.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(")")
                 .append(Html.fromHtml("&nbsp;"))
                 .append(resultStr)
                 .setCenterFontSize(true)
                 .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 22))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
                 .append(Html.fromHtml("&nbsp;"))
+                .append("Target(")
                 .append(FmtMicrometer.fmtPower(detail.baseTarget.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(")")
                 .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                .append("Power(")
                 .append(FmtMicrometer.fmtPower(forgingPower.longValue()))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(")")
                 .append(Html.fromHtml("&nbsp;*&nbsp;"))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                .append("Time(")
                 .append(FmtMicrometer.fmtPower(timeInternal))
+                .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 14))
                 .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                .append(")")
                 .create();
             tvCurrentCondition.setText(spannable);
         }
