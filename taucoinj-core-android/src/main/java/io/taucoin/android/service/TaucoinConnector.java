@@ -559,6 +559,18 @@ public class TaucoinConnector extends ServiceConnector {
         }
     }
 
+    /**
+     * Manual stop of threads
+     */
+    public void stopHandlerThread(){
+        try {
+            if(handlerThread != null && handlerThread.getLooper() != null){
+                handlerThread.getLooper().quit();
+            }
+        } catch (Exception e){
+            logger.error("Manual stop of threads", e);
+        }
+    }
 
     /**
      * Closes ethereum

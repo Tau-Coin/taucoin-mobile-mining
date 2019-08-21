@@ -109,12 +109,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     void cancelLocalConnector(){
         if (mTaucoinConnector != null) {
+            mTaucoinConnector.removeListener(mHandlerIdentifier);
             mTaucoinConnector.removeHandler(this);
             try {
                 mTaucoinConnector.unbindService();
             }catch (Exception e){
                 Logger.e(e, "cancelLocalConnector.unbindService is error!");
             }
+            mTaucoinConnector.stopHandlerThread();
             mTaucoinConnector = null;
         }
         isInit = -1;
@@ -176,7 +178,9 @@ public abstract class ConnectorManager implements ConnectorHandler {
             if (mTaucoinConnector != null) {
                 addLogEntry("Connector Disconnected");
                 mTaucoinConnector.removeListener(mHandlerIdentifier);
+                mTaucoinConnector.removeHandler(this);
                 isTaucoinConnected = false;
+                mTaucoinConnector.stopHandlerThread();
                 mTaucoinConnector = null;
                 mWifiSettings.destroy();
                 mWifiSettings = null;

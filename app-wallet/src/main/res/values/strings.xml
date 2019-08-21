@@ -92,7 +92,7 @@
     <string name="send_fee_too_low">Transaction fee is too low</string>
     <!--<string name="send_fee_too_high">Transaction fee is too high</string>-->
 
-    <string name="send_tx_status_pending">Sending</string>
+    <string name="send_tx_status_pending">In processing, expected to confirm in 5 minutes.</string>
     <string name="send_tx_status_success">Successfully</string>
     <string name="send_tx_status_expired">Failed, transaction expired.</string>
     <string name="send_tx_illegal">Failed, illegal transaction.</string>
