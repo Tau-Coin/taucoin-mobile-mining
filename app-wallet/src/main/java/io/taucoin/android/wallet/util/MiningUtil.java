@@ -48,48 +48,6 @@ import io.taucoin.foundation.util.AppUtil;
 
 public class MiningUtil {
 
-//    public static int parseMinedBlocks(BlockInfo blockInfo) {
-//        if(blockInfo != null){
-//            List<MiningBlock> list= blockInfo.getMiningInfo();
-//            if(list != null){
-//                return list.size();
-//            }
-//        }
-//        return 0;
-//    }
-//
-//    private static String parseMiningIncome(List<MiningReward> rewards) {
-//        BigDecimal number = new BigDecimal("0");
-//        if(rewards != null && rewards.size() > 0){
-//            for (MiningReward bean : rewards) {
-//                try {
-//                    number = number.add(new BigDecimal(bean.getMinerFee()));
-//                    number = number.add(new BigDecimal(bean.getPartFee()));
-//                }catch (Exception ignore){}
-//            }
-//        }
-//        return FmtMicrometer.fmtMiningIncome(number.longValue());
-//    }
-//
-//    public static RewardBean parseMiningReward(List<MiningReward> rewards) {
-//        RewardBean reward = new RewardBean();
-//        BigDecimal minerReward = new BigDecimal("0");
-//        BigDecimal partReward = new BigDecimal("0");
-//        if(rewards != null && rewards.size() > 0){
-//            for (MiningReward bean : rewards) {
-//                try {
-//                    partReward = partReward.add(new BigDecimal(bean.getPartFee()));
-//                    minerReward = minerReward.add(new BigDecimal(bean.getMinerFee()));
-//                }catch (Exception ignore){}
-//            }
-//            long totalReward = partReward.add(minerReward).longValue();
-//            reward.setTotalReward(totalReward);
-//            reward.setMinerReward(minerReward.longValue());
-//            reward.setPartReward(partReward.longValue());
-//        }
-//        return reward;
-//    }
-
     public static void setBlockHeight(TextView textView) {
         if(textView == null){
             return;
@@ -149,42 +107,6 @@ public class MiningUtil {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 
-//    public static long pendingAmount() {
-//        String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-//        List<TransactionHistory> txPendingList = TransactionHistoryDaoUtils.getInstance().getPendingAmountList(address);
-//        BigInteger pendingAmount = new BigInteger("0");
-//        if(txPendingList != null && txPendingList.size() > 0){
-//            for (TransactionHistory transaction : txPendingList) {
-//                BigInteger amount = new BigInteger(transaction.getAmount());
-//                pendingAmount = pendingAmount.add(amount);
-//                BigInteger fee = new BigInteger(transaction.getFee());
-//                pendingAmount = pendingAmount.add(fee);
-//            }
-//        }
-//        return pendingAmount.longValue();
-//    }
-//
-//    public static void setMiningIncome(TextView tvMiningIncome) {
-//        Observable.create((ObservableOnSubscribe<List<MiningReward>>) emitter -> {
-//            String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
-//            List<MiningReward> miningRewards = MiningRewardDaoUtils.getInstance().queryData(rawAddress);
-//            emitter.onNext(miningRewards);
-//        }).observeOn(AndroidSchedulers.mainThread())
-//            .subscribeOn(Schedulers.io())
-//            .subscribe(new LogicObserver<List<MiningReward>>() {
-//                @Override
-//                public void handleData(List<MiningReward> miningRewards) {
-//                    if(tvMiningIncome != null){
-//                        String miningIncomeText = ResourcesUtil.getText(R.string.common_balance);
-//                        String miningIncome = MiningUtil.parseMiningIncome(miningRewards);
-//                        miningIncomeText = String.format(miningIncomeText, miningIncome);
-//                        tvMiningIncome.setText(Html.fromHtml(miningIncomeText));
-//                        Logger.d("MiningUtil.setMiningIncome=" + miningIncomeText);
-//                    }
-//                }
-//            });
-//    }
-
     public static void initSenderTxFee(EditInput textView) {
         if(textView == null){
             return;
@@ -210,13 +132,15 @@ public class MiningUtil {
 
     /**
      * handle upgrade compatibility
-     * only version 1.9.0.3
+     * only version 1.9.0.3、1.9.0.6
      * */
     public static void handleUpgradeCompatibility() {
-        boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(TransmitKey.FORGING_RELOAD, false);
+        Context context = MyApplication.getInstance();
+        String forgingReloadKey = TransmitKey.FORGING_RELOAD + AppUtil.getVersionCode(context);
+        boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(forgingReloadKey, false);
         if(!isReload){
-            MiningUtil.clearAndReloadBlocks();
-            SharedPreferencesHelper.getInstance().putBoolean(TransmitKey.FORGING_RELOAD, true);
+            MiningUtil.clearAndReloadBlocks(null, false);
+            SharedPreferencesHelper.getInstance().putBoolean(forgingReloadKey, true);
         }
     }
 
@@ -237,12 +161,18 @@ public class MiningUtil {
     }
 
     public static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver) {
+        clearAndReloadBlocks(logicObserver, true);
+    }
+
+    private static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver, boolean isSleep) {
         MyApplication.getRemoteConnector().stopSyncAll();
         MyApplication.getRemoteConnector().stopBlockForging();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
-                Thread.sleep(2000);
+                if(isSleep){
+                    Thread.sleep(2000);
+                }
                 Context context = MyApplication.getInstance();
                 String dataDir =  context.getApplicationInfo().dataDir;
                 Logger.d(dataDir);
