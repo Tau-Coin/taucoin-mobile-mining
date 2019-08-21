@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_main_bg"
+    android:orientation="vertical">
+
+    <io.taucoin.android.wallet.widget.ToolbarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leftBackImage="@mipmap/icon_close"
+        app:leftImagePadding="0dp"
+        app:titleText="@string/main_de_fi" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginEnd="10dp"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_de_fi"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="30dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_de_fi_top"/>
+
+                <TextView
+                    android:layout_toEndOf="@+id/iv_de_fi"
+                    android:id="@+id/tv_coming_soon"
+                    style="@style/style_big_yellow"
+                    android:textSize="@dimen/dimen_size_28"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="50dp"
+                    android:text="@string/de_fi_coming_soon"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_toEndOf="@+id/iv_de_fi"
+                    android:layout_below="@+id/tv_coming_soon"
+                    android:textSize="@dimen/dimen_size_20"
+                    style="@style/style_tau_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dimen_size_10"
+                    android:text="@string/de_fi_long_crypto"
+                    android:gravity="center_horizontal" />
+
+            </RelativeLayout>
+
+            <TextView
+                style="@style/style_normal_grey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/de_fi_content"/>
+
+            <TextView
+                style="@style/style_middle_grey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/de_fi_range"/>
+
+            <TextView
+                android:id="@+id/tv_telegram_group"
+                style="@style/style_normal_blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="20dp"
+                android:text="@string/de_fi_telegram_group"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

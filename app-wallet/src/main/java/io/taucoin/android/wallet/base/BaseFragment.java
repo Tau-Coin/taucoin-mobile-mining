@@ -16,6 +16,7 @@
 package io.taucoin.android.wallet.base;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -28,20 +29,27 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.util.EventBusUtil;
 
 public abstract class BaseFragment extends Fragment implements OnRefreshListener, OnLoadmoreListener {
     private View mRootView;
+    private Unbinder mUnBinder;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    protected void butterKnifeBinder(BaseFragment fragment, View view){
+        mUnBinder =  ButterKnife.bind(fragment, view);
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (!EventBusUtil.isRegistered(this)) {
             EventBusUtil.register(this);
         }
@@ -68,6 +76,9 @@ public abstract class BaseFragment extends Fragment implements OnRefreshListener
         super.onDestroyView();
         if (EventBusUtil.isRegistered(this)) {
             EventBusUtil.unregister(this);
+        }
+        if(mUnBinder != null){
+            mUnBinder.unbind();
         }
     }
 

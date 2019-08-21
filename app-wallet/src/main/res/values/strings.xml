@@ -243,4 +243,18 @@
     <string name="setting_reset_data_fail">Failed</string>
     <string name="setting_reset_data_tips">Restarting Verify will not affect private key.</string>
 
+    <string name="main_de_fi">DeFi</string>
+    <string name="de_fi_coming_soon">Coming Soon</string>
+    <string name="de_fi_long_crypto">Project Long Crypto</string>
+    <string name="de_fi_content">As a coin project, making wealth for community is essential. Therefore,
+        just like famous project DAI, we will enable TAU community to be a decentral autonomous organization(DAO)
+        managing a DeFi(decentral finance) project, called “Long Crypto”. Through open and on-chain smart contracts
+        and transparent data, Long Crypto will borrow stable coins from general public. We use stable coins like USDT
+        to buy and hold ETH to achieve long term asset growth. The supplier interests will automatically adjust from 10%
+        - 99% annually. They can withdraw investments at any moment when liquidity allowes. In long term, stable coin suppliers
+        will always make money. As DAO member, TAU coin holder will get the profit from smart contract and vote key decisions proportionally.
+        TAU team is a group of programmers, who want to combine technology and finance together to serve TAU community.</string>
+    <string name="de_fi_range">* Citizens and Residents of United States, European Union and China shall not invest Long Crypto project.</string>
+    <string name="de_fi_telegram_group">Long Crypto Telegram Group</string>
+
 </resources>

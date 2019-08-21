@@ -44,10 +44,12 @@ public class MainActivity extends BaseActivity implements IMainView {
     RadioButton rbHome;
     @BindView(R.id.rb_send_receive)
     RadioButton rbSendReceive;
+    @BindView(R.id.rb_de_fi)
+    RadioButton rbDeFi;
     @BindView(R.id.rb_manager)
     RadioButton rbManager;
 
-    private Fragment[] mFragments = new Fragment[3];
+    private Fragment[] mFragments = new Fragment[4];
     private Subject<Integer> mBackClick = PublishSubject.create();
 
     @Override
@@ -70,6 +72,7 @@ public class MainActivity extends BaseActivity implements IMainView {
         DrawablesUtil.setTopDrawable(rbHome, R.drawable.selector_tab_home,24);
         DrawablesUtil.setTopDrawable(rbSendReceive, R.drawable.selector_tab_send, 24);
         DrawablesUtil.setTopDrawable(rbManager, R.drawable.selector_tab_manage, 24);
+        DrawablesUtil.setTopDrawable(rbDeFi, R.drawable.selector_tab_de_fi, 24);
     }
 
     @Override
@@ -82,6 +85,8 @@ public class MainActivity extends BaseActivity implements IMainView {
             }else if(tabIndex == 1){
                 fragment = new SendReceiveFragment();
             }else if(tabIndex == 2){
+                fragment = new DeFiFragment();
+            }else if(tabIndex == 3){
                 fragment = new ManageFragment();
             }
             if(fragment != null){
@@ -106,8 +111,8 @@ public class MainActivity extends BaseActivity implements IMainView {
         }
     }
 
-    @OnCheckedChanged({R.id.rb_home, R.id.rb_manager, R.id.rb_send_receive})
-    public void onRadioCheck(CompoundButton view, boolean isChanged) {
+    @OnCheckedChanged({R.id.rb_home, R.id.rb_manager, R.id.rb_send_receive, R.id.rb_de_fi})
+    void onRadioCheck(CompoundButton view, boolean isChanged) {
         switch (view.getId()) {
             case R.id.rb_home:
                 if (isChanged) {
@@ -119,9 +124,14 @@ public class MainActivity extends BaseActivity implements IMainView {
                     changeTab(1);
                 }
                 break;
-            case R.id.rb_manager:
+            case R.id.rb_de_fi:
                 if (isChanged) {
                     changeTab(2);
+                }
+                break;
+            case R.id.rb_manager:
+                if (isChanged) {
+                    changeTab(3);
                 }
                 break;
 

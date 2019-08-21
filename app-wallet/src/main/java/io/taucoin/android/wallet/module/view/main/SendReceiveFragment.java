@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.BaseFragment;
@@ -80,7 +79,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_send_receive, container, false);
-        ButterKnife.bind(this, view);
+        butterKnifeBinder(this, view);
         initView();
         initListener();
         mTxPresenter = new TxPresenter(this);
