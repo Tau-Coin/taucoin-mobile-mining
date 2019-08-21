@@ -86,7 +86,7 @@ class IPFSManager(private var service: Service) {
 
         }
 
-        service.exec("daemon").apply {
+        service.exec("daemon --enable-pubsub-experiment").apply {
             daemon = this
             read{
                 Log.d(tag, "daemon=$it")
