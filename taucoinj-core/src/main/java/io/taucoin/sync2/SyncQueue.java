@@ -326,7 +326,10 @@ public class SyncQueue {
                 // For the version V1.9.0.4, there is no OOM. But for special case, taucoin
                 // service exists and wallet will start it again.
                 if (e instanceof OutOfMemoryError) {
-                    logger.error("OOM fatal error:{}", e);
+                    logger.error("OOM fatal error: free {}, used {}, max {}, err:{}",
+                            Runtime.getRuntime().freeMemory(),
+                            Runtime.getRuntime().totalMemory(),
+                            Runtime.getRuntime().maxMemory(), e);
                     System.exit(1);
                 }
 
