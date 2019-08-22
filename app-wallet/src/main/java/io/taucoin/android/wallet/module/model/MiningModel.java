@@ -41,7 +41,7 @@ import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class MiningModel implements IMiningModel{
-    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(30));
+    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(50));
     @Override
     public void getMiningInfo(LogicObserver<BlockInfo> observer) {
         Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {
