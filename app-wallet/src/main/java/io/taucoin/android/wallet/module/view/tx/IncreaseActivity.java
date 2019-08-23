@@ -28,7 +28,7 @@ import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.core.Wallet;
-import io.taucoin.android.wallet.db.entity.TransactionHistory;
+import io.taucoin.android.wallet.db.entity.IncreasePower;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.service.TxService;
@@ -40,6 +40,8 @@ import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
 import io.taucoin.android.wallet.util.ProgressManager;
+import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.EditInput;
@@ -64,7 +66,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
 
     private TxPresenter mTxPresenter;
     private ViewHolder mViewHolder;
-    private String mAddress = "TJYtAAMGNjavURygAUw5jBhSZBEmf43pny";
+    private String mAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
     }
 
     private void initView() {
+        mAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
         String address = getText(R.string.send_tx_increase_address).toString();
         address = String.format(address, mAddress);
         tvAddress.setText(Html.fromHtml(address));
@@ -118,16 +121,10 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
     @OnTextChanged({R.id.et_amount, R.id.et_input})
     void onTextChanged(CharSequence text){
         String amount = etAmount.getText().toString().trim();
-        String fee = etFee.getText().trim();
-
-        if(StringUtil.isEmpty(fee)){
-            fee = BigInteger.ZERO.toString();
-        }
-        String total = FmtMicrometer.fmtFormatAdd(amount, fee);
         if(StringUtil.isNotEmpty(amount) ){
             String totalAmount = getText(R.string.send_tx_total_amount).toString();
-            totalAmount = String.format(totalAmount, total);
-            tvTotalAmount.setText(totalAmount);
+            totalAmount = String.format(totalAmount, amount);
+            tvTotalAmount.setText(Html.fromHtml(totalAmount));
             tvTotalAmount.setVisibility(View.VISIBLE);
         }else{
             tvTotalAmount.setVisibility(View.GONE);
@@ -156,32 +153,32 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
     public void checkForm() {
         String address = mAddress;
         String amount = etAmount.getText().toString().trim();
-        String memo = "";
         String fee = etFee.getText().trim();
 
-        TransactionHistory tx = new TransactionHistory();
-        tx.setToAddress(address);
-        tx.setMemo(memo);
-        tx.setAmount(amount);
-        tx.setFee(fee);
+        IncreasePower budget = new IncreasePower();
+        budget.setAddress(address);
+        budget.setBudget(amount);
+        budget.setFee(amount);
+        budget.setFee(fee);
 
-        Wallet.validateTxParameter(tx, new LogicObserver<Boolean>() {
+        Wallet.validateTxBudget(budget, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 if(isSuccess){
-                    showSureDialog(tx);
+                    showSureDialog(budget);
                 }
             }
         });
     }
 
-    private void showSureDialog(TransactionHistory tx) {
+    private void showSureDialog(IncreasePower budget) {
         String amount = etAmount.getText().toString().trim();
         View view = LinearLayout.inflate(this, R.layout.view_dialog_send, null);
         mViewHolder = new ViewHolder(view);
-        mViewHolder.tvToAddress.setText(tx.getToAddress());
+        mViewHolder.tvToAddress.setText(budget.getAddress());
         mViewHolder.tvToAmount.setText(amount);
-        mViewHolder.tvToMemo.setText(tx.getMemo());
+        mViewHolder.tvToAmountTitle.setText(R.string.send_budget);
+        mViewHolder.tvToMemo.setText(R.string.tx_increase);
         loadTransExpiryView();
         new CommonDialog.Builder(this)
                 .setContentView(view)
@@ -192,7 +189,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
                 .setPositiveButton(R.string.send_dialog_yes, (dialog, which) -> {
                     dialog.cancel();
                     mViewHolder = null;
-                    handleSendTransaction(tx);
+                    handleSendBudget(budget);
                 })
                 .create().show();
 
@@ -212,15 +209,15 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
         public void handleData(Boolean isSuccess) {
             ProgressManager.closeProgressDialog();
             if(isSuccess){
+                ToastUtils.showShortToast(R.string.send_txs_sending);
                 // clear all editText data
                 clearAllForm();
             }
         }
     };
 
-    private void handleSendTransaction(TransactionHistory tx) {
-        ProgressManager.showProgressDialog(this);
-        mTxPresenter.handleSendTransaction(tx, sendLogicObserver);
+    private void handleSendBudget(IncreasePower budget) {
+        mTxPresenter.handleSendBudget(budget, sendLogicObserver);
     }
     @Override
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -236,7 +233,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
     }
 
     private void clearAllForm() {
-        etAmount.setText(R.string.send_tx_small_fee);
+        etAmount.getText().clear();
         MiningUtil.initSenderTxFee(etFee);
     }
 
@@ -262,6 +259,8 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
         TextView tvToAddress;
         @BindView(R.id.tv_to_amount)
         TextView tvToAmount;
+        @BindView(R.id.tv_to_amount_title)
+        TextView tvToAmountTitle;
         @BindView(R.id.tv_to_Memo)
         TextView tvToMemo;
         @BindView(R.id.tv_trans_expiry)

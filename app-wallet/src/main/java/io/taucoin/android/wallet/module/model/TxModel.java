@@ -22,6 +22,7 @@ import io.taucoin.android.wallet.R;
 
 import org.spongycastle.util.encoders.Hex;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +38,11 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.BlockInfo;
+import io.taucoin.android.wallet.db.entity.IncreasePower;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
+import io.taucoin.android.wallet.db.util.IncreasePowerDaoUtils;
 import io.taucoin.android.wallet.db.util.KeyValueDaoUtils;
 import io.taucoin.android.wallet.db.util.TransactionHistoryDaoUtils;
 import io.taucoin.android.wallet.module.bean.AccountBean;
@@ -76,6 +79,7 @@ import io.taucoin.foundation.net.callback.NetResultCode;
 import io.taucoin.foundation.net.exception.CodeException;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.util.ByteUtil;
+import retrofit2.Response;
 
 public class TxModel implements ITxModel {
 
@@ -353,41 +357,46 @@ public class TxModel implements ITxModel {
                 emitter.onError(CodeException.getError());
                 return;
             }
-            long timeStamp = (new Date().getTime())/1000;
-            byte[] amount = (new BigInteger(txHistory.getAmount())).toByteArray();
-            byte[] fee = (new BigInteger(txHistory.getFee())).toByteArray();
-
-            byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(keyValue.getPriKey());
-            byte[] toAddress;
-            String txToAddress = txHistory.getToAddress();
-            if(txToAddress.startsWith("T")) {
-                toAddress = (new io.taucoin.core.VersionedChecksummedBytes(txToAddress)).getBytes();
-            }else{
-                toAddress = Utils.parseAsHexOrBase58(txToAddress);
-            }
-            long expiryBlock = UserUtil.getTransExpiryBlock();
-            byte[] expireTimeByte = ByteUtil.longToBytes(expiryBlock);
-            io.taucoin.core.Transaction transaction = new io.taucoin.core.Transaction(TransactionVersion.V01.getCode(),
-                    TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee, expireTimeByte);
-            transaction.sign(privateKey);
-
-            Logger.i("Create tx success");
-            Logger.i(transaction.toString());
-            txHistory.setTxId(transaction.getTxid());
-            txHistory.setResult(TransmitKey.TxResult.BROADCASTING);
-            txHistory.setFromAddress(keyValue.getAddress());
-            txHistory.setCreateTime(String.valueOf(timeStamp));
-            txHistory.setTransExpiry(expiryBlock);
-
-//            insertTransactionHistory(txHistory);
-            TransactionBean transactionBean = new TransactionBean();
-            transactionBean.setLocalData(txHistory);
-            transactionBean.setRawData(transaction);
+            TransactionBean transactionBean = createTransaction(txHistory, keyValue.getPriKey(), keyValue.getAddress());
             emitter.onNext(transactionBean);
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(scheduler)
                 .unsubscribeOn(scheduler)
                 .subscribe(observer);
+    }
+
+    private TransactionBean createTransaction(TransactionHistory txHistory, String priKey, String fromAddress) {
+        long timeStamp = (new Date().getTime())/1000;
+        byte[] amount = (new BigInteger(txHistory.getAmount())).toByteArray();
+        byte[] fee = (new BigInteger(txHistory.getFee())).toByteArray();
+
+        byte[] privateKey = io.taucoin.util.Utils.getRawPrivateKeyString(priKey);
+        byte[] toAddress;
+        String txToAddress = txHistory.getToAddress();
+        if(txToAddress.startsWith("T")) {
+            toAddress = (new io.taucoin.core.VersionedChecksummedBytes(txToAddress)).getBytes();
+        }else{
+            toAddress = Utils.parseAsHexOrBase58(txToAddress);
+        }
+        long expiryBlock = UserUtil.getTransExpiryBlock();
+        byte[] expireTimeByte = ByteUtil.longToBytes(expiryBlock);
+        io.taucoin.core.Transaction transaction = new io.taucoin.core.Transaction(TransactionVersion.V01.getCode(),
+                TransactionOptions.TRANSACTION_OPTION_DEFAULT, ByteUtil.longToBytes(timeStamp), toAddress, amount, fee, expireTimeByte);
+        transaction.sign(privateKey);
+
+        Logger.i("Create tx success");
+        Logger.i(transaction.toString());
+        txHistory.setTxId(transaction.getTxid());
+        txHistory.setResult(TransmitKey.TxResult.BROADCASTING);
+        txHistory.setFromAddress(fromAddress);
+        txHistory.setCreateTime(String.valueOf(timeStamp));
+        txHistory.setTransExpiry(expiryBlock);
+
+//            insertTransactionHistory(txHistory);
+        TransactionBean transactionBean = new TransactionBean();
+        transactionBean.setLocalData(txHistory);
+        transactionBean.setRawData(transaction);
+        return transactionBean;
     }
 
     @Override
@@ -667,5 +676,107 @@ public class TxModel implements ITxModel {
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
             .subscribe(observer);
+    }
+
+    @Override
+    public void handleSendBudget(IncreasePower entry, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                if(entry != null){
+                    long budget = new BigInteger(entry.getBudget()).longValue();
+                    long fee = new BigInteger(entry.getFee()).longValue();
+                    entry.setCount(budget / (fee + 1));
+                    IncreasePowerDaoUtils.getInstance().update(entry);
+                    MiningUtil.sendingBudgetTransaction();
+                    emitter.onNext(true);
+                    return;
+                }
+            }catch (Exception ignore){}
+            emitter.onNext(false);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
+    }
+
+    @Override
+    public void sendBudgetTx(LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                while (true){
+                    String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
+                    List<IncreasePower> list = IncreasePowerDaoUtils.getInstance().queryPoolByAddress(address);
+                    if(list != null && list.size() > 0 ){
+                        for (IncreasePower entry : list) {
+                            long fee = new BigInteger(entry.getFee()).longValue();
+                            long count = entry.getCount();
+                            while (count > 0){
+                                int isSuccess = sendBudgetTx(entry);
+                                if(isSuccess == 1){
+                                    count -= 1;
+                                    entry.setCount(count);
+                                    long consume = entry.getConsume() + fee + 1;
+                                    entry.setConsume(consume);
+                                    IncreasePowerDaoUtils.getInstance().update(entry);
+                                    Thread.sleep(100);
+                                }else if(isSuccess == 0){
+                                    Thread.sleep(5 * 1000);
+                                }else{
+                                   break;
+                                }
+                            }
+                        }
+                    }else{
+                        break;
+                    }
+                }
+            }catch (Exception ignore){}
+            emitter.onNext(false);
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
+            .subscribe(observer);
+    }
+
+    private int sendBudgetTx(IncreasePower entry) {
+
+        int isSuccess = 0;
+        KeyValue keyValue = MyApplication.getKeyValue();
+        if(keyValue == null || StringUtil.isEmpty(keyValue.getPriKey()) ||
+                StringUtil.isNotSame(keyValue.getAddress(), entry.getAddress())){
+            return -1;
+        }
+        TransactionHistory txHistory = new TransactionHistory();
+        txHistory.setToAddress(entry.getAddress());
+        txHistory.setAmount("1");
+        txHistory.setFee(entry.getFee());
+        txHistory.setMemo(ResourcesUtil.getText(R.string.tx_increase));
+
+        TransactionBean transactionBean = createTransaction(txHistory, keyValue.getPriKey(), entry.getAddress());
+        Transaction transaction = transactionBean.getRawData();
+        TransactionHistory transactionHistory = transactionBean.getLocalData();
+        String txHash = Hex.toHexString(transaction.getEncoded());
+        String txId = transaction.getTxid();
+        Logger.d("txId=" + txId  + "\ttxHash=" + txHash);
+        Map<String,String> map = new HashMap<>();
+        map.put("transaction", txHash);
+        try {
+            Response response = NetWorkManager
+                    .createMainApiService(TransactionService.class)
+                    .sendBudgetTransaction(map)
+                    .execute();
+            if(response.isSuccessful() && response.code() == 200){
+                insertTransactionHistory(transactionHistory, new LogicObserver<Boolean>() {
+                    @Override
+                    public void handleData(Boolean aBoolean) {
+                        EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
+                        MiningUtil.checkRawTransaction();
+                    }});
+                isSuccess = 1;
+            }
+        } catch (IOException e) {
+            Logger.e("sendBudgetTx error", e);
+        }
+        return isSuccess;
     }
 }

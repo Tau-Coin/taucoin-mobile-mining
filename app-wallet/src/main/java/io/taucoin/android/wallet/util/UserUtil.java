@@ -409,7 +409,7 @@ public class UserUtil {
         if(blockInfo == null || tvNextBlockNo == null){
             return;
         }
-        String nextBlockNoStr = ResourcesUtil.getText(R.string.home_no_point);
+        String nextBlockNoStr = ResourcesUtil.getText(R.string.home_total_blocks);
         long nextBlockNo = blockInfo.getBlockHeight() + 1;
         nextBlockNoStr = String.format(nextBlockNoStr, FmtMicrometer.fmtPower(nextBlockNo));
         tvNextBlockNo.setText(nextBlockNoStr);

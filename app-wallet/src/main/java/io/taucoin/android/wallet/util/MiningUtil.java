@@ -107,6 +107,10 @@ public class MiningUtil {
         TxService.startTxService(TransmitKey.ServiceType.GET_RAW_TX);
     }
 
+    public static void sendingBudgetTransaction() {
+        TxService.startTxService(TransmitKey.ServiceType.SEND_BUDGET_TX);
+    }
+
     public static void initSenderTxFee(EditInput textView) {
         if(textView == null){
             return;

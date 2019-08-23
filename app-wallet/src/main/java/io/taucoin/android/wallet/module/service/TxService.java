@@ -60,6 +60,7 @@ public class TxService extends Service {
     private boolean mIsChecked;
     private boolean mIsGetBalance;
     private boolean mIsGetBlockHeight;
+    private boolean mIsSending;
 
     public TxService() {
     }
@@ -77,6 +78,7 @@ public class TxService extends Service {
         mIsChecked = false;
         mIsGetBalance = false;
         mIsGetBlockHeight = false;
+        mIsSending = false;
         NotifyManager.getInstance().initNotificationManager(this);
         NotifyManager.getInstance().initNotify();
         Logger.i("TxService onCreate");
@@ -107,6 +109,9 @@ public class TxService extends Service {
                     if(!mIsChecked){
                         checkRawTransaction();
                     }
+                    if(!mIsSending){
+                        sendBudgetTx();
+                    }
                     break;
                 case TransmitKey.ServiceType.GET_SEND_DATA:
                     getBalance(serviceType);
@@ -129,6 +134,11 @@ public class TxService extends Service {
                     break;
                 case TransmitKey.ServiceType.GET_REWARD_INFO:
                     getRewardInfo();
+                    break;
+                case TransmitKey.ServiceType.SEND_BUDGET_TX:
+                    if(!mIsSending){
+                        sendBudgetTx();
+                    }
                     break;
                 default:
                     break;
@@ -369,6 +379,19 @@ public class TxService extends Service {
                     Intent intent = new Intent(context, CongratulationActivity.class);
                     intent.putExtra(TransmitKey.BEAN, rewardInfo);
                     context.startActivity(intent);
+                }
+            }
+        });
+    }
+
+    private void sendBudgetTx() {
+        mIsSending = true;
+        mTxModel.sendBudgetTx(new LogicObserver<Boolean>(){
+
+            @Override
+            public void handleData(Boolean aBoolean) {
+                if(!aBoolean ){
+                    mIsSending = false;
                 }
             }
         });

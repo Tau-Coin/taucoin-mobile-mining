@@ -60,15 +60,15 @@
 
         <EditText
             android:id="@+id/et_amount"
-            style="@style/style_normal_black"
+            style="@style/style_normal_yellow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/send_amount"
+            android:hint="@string/send_budget"
             android:inputType="numberDecimal|number"
             android:gravity="center_horizontal"
             android:layout_marginStart="10dp"
             android:singleLine="true"
-            android:text="@string/send_tx_small_fee"
+            android:text=""
             android:textColorHint="@color/color_grey" />
     </LinearLayout>
 
@@ -141,7 +141,7 @@
         android:layout_marginTop="35dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/yellow_rect_round_bg"
-        android:text="@string/tx_send"
+        android:text="@string/tx_increase"
         android:textAllCaps="false" />
 
 </LinearLayout>

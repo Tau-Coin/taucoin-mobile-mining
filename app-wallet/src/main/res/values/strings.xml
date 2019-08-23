@@ -20,6 +20,7 @@
     <string name="common_see_more">Click to see more</string>
     <string name="common_install_browser">Please install mobile browser first!</string>
     <string name="home_no_point">No.%s</string>
+    <string name="home_total_blocks">Total blocks %s</string>
 
     <string name="splash_title">TAU mWallet %s</string>
     <string name="splash_subheading">Mobile Mining Wallet</string>
@@ -66,7 +67,8 @@
 
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
-    <string name="send_amount_increase">Amount:</string>
+    <string name="send_budget">Budget</string>
+    <string name="send_amount_increase">Budget:</string>
     <string name="send_memo">Memo</string>
     <string name="send_status">Status</string>
     <string name="send_tx_fee_tip">The higher fee, the faster trx processing.</string>
@@ -75,22 +77,28 @@
     <string name="send_dialog_yes">Proceed</string>
     <string name="send_dialog_no">Back</string>
     <string name="send_tx_success">Transaction sent</string>
+    <string name="send_txs_sending">Transaction in progress</string>
     <string name="send_tx_network_error">Error in network, send failed</string>
     <string name="send_tx_address">Receiver&#160;Address:&#160;%s</string>
-    <string name="send_tx_increase_tip">Transactions will increase mining power.</string>
-    <string name="send_tx_increase_address" formatted="false"><Data><![CDATA[To:&nbsp;%s&nbsp;<font color="#f19322">(&nbsp;Foundation&nbsp;Address&nbsp;)</font>]]> </Data></string>
+    <string name="send_tx_increase_tip">Get more transaction number and mining power. Wallet automatically makes transaction under your Budget.</string>
+    <string name="send_tx_increase_address">To:&#160;%s</string>
 
     <string name="send_tx_small_fee">0.01</string>
-    <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
+    <string name="send_tx_total_amount" formatted="false"><Data><![CDATA[Total:&nbsp;<font color="#f19322">%s</font>&nbsp;(Including each transaction fee)]]></Data></string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>
+    <string name="send_tx_invalid_budget">Invalid Budget</string>
+    <string name="send_tx_invalid_budget_no_enough">Invalid Budget :\nBudget &#060; Transaction Fee</string>
     <string name="send_tx_invalid_fee">Invalid Transaction Fee</string>
     <string name="send_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee >= Balance</string>
+    <string name="send_no_enough_coins_budget">Insufficient Balance :\nBudget > Balance</string>
     <string name="send_amount_too_low">Transaction amount is too low</string>
+    <string name="send_budget_too_low">Transaction budget is too low</string>
     <!--<string name="send_amount_too_high">Transaction amount is too high</string>-->
     <string name="send_fee_too_low">Transaction fee is too low</string>
     <!--<string name="send_fee_too_high">Transaction fee is too high</string>-->
+    <string name="send_budget_in_pool">TAU kindly remind you. There already has an increase power transaction in the pool. Sending frequently may increase the failure rate of the transaction.</string>
 
     <string name="send_tx_status_pending">In processing, expected to confirm in 5 minutes.</string>
     <string name="send_tx_status_success">Successfully</string>
@@ -175,7 +183,7 @@
     <string name="home_mining_history">View your mining history</string>
     <string name="home_current_block">Current Block</string>
     <string name="home_average_block_time">Average Block Time</string>
-    <string name="home_average_block_time_tip">The block is currently competed by miners for packaging.</string>
+    <!--<string name="home_average_block_time_tip">The block is currently competed by miners for packaging.</string>-->
     <string name="home_average_block_time_value">05:00:00</string>
     <string name="home_estimated_block_time">Count-down competition on your address (&#8230;%s) to win the block</string>
     <string name="home_hit_tip">(Hit: Address \"%s\" network random number)</string>

@@ -30,6 +30,8 @@ import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.RewardInfoBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -46,6 +48,9 @@ public interface TransactionService {
 
     @POST("newtransaction")
     Observable<NewTxBean> sendRawTransaction(@Body Map<String,String> tx_hex);
+
+    @POST("newtransaction")
+    Call<ResponseBody> sendBudgetTransaction(@Body Map<String,String> tx_hex);
 
     @POST("gettxsrecords")
     Observable<RawTxList> getTxRecords(@Body Map<String,String> address);

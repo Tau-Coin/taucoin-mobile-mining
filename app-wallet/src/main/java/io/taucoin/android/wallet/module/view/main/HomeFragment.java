@@ -142,7 +142,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     @OnClick({R.id.iv_mining_switch, R.id.cb_wifi_only, R.id.iv_right,
-            R.id.tv_mining_history, R.id.tv_next_block_no_title})
+            R.id.tv_mining_history})
     public void onClick(View view) {
         if (!UserUtil.isImportKey() && view.getId() != R.id.cb_wifi_only) {
             Intent intent = new Intent(getActivity(), ImportKeyActivity.class);
@@ -174,9 +174,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 }else{
                     ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
                 }
-                break;
-            case R.id.tv_next_block_no_title:
-                DialogManager.showTipDialog(getActivity(), R.string.home_average_block_time_tip);
                 break;
             default:
                 break;

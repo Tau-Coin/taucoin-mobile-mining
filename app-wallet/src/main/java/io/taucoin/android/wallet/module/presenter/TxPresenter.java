@@ -19,6 +19,7 @@ import com.github.naturs.logger.Logger;
 
 import java.util.List;
 
+import io.taucoin.android.wallet.db.entity.IncreasePower;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.TransactionBean;
@@ -102,5 +103,9 @@ public class TxPresenter {
 
     public void sendRawTransaction(TransactionBean transaction, LogicObserver<Boolean> observer){
         mTxModel.sendRawTransaction(transaction, observer);
+    }
+
+    public void handleSendBudget(IncreasePower budget, LogicObserver<Boolean> sendLogicObserver) {
+        mTxModel.handleSendBudget(budget, sendLogicObserver);
     }
 }

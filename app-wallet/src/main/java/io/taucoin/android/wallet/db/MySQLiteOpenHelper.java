@@ -10,6 +10,7 @@ import org.greenrobot.greendao.database.Database;
 
 import io.taucoin.android.wallet.db.greendao.BlockInfoDao;
 import io.taucoin.android.wallet.db.greendao.DaoMaster;
+import io.taucoin.android.wallet.db.greendao.IncreasePowerDao;
 import io.taucoin.android.wallet.db.greendao.KeyValueDao;
 import io.taucoin.android.wallet.db.greendao.TransactionHistoryDao;
 import io.taucoin.android.wallet.db.util.MigrationHelper;
@@ -50,6 +51,6 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
                 sql = "DROP TABLE " + (ifExists ? "IF EXISTS " : "") + "\"MINING_REWARD\"";
                 db.execSQL(sql);
             }
-        }, KeyValueDao.class, TransactionHistoryDao.class, BlockInfoDao.class);
+        }, KeyValueDao.class, TransactionHistoryDao.class, BlockInfoDao.class, IncreasePowerDao.class);
     }
 }
