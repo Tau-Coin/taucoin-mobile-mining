@@ -718,7 +718,7 @@ public class TxModel implements ITxModel {
                                     long consume = entry.getConsume() + fee + 1;
                                     entry.setConsume(consume);
                                     IncreasePowerDaoUtils.getInstance().update(entry);
-                                    Thread.sleep(100);
+                                    Thread.sleep(1000);
                                 }else if(isSuccess == 0){
                                     Thread.sleep(5 * 1000);
                                 }else{
