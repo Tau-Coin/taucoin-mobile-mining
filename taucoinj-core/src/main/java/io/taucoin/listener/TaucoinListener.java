@@ -62,4 +62,8 @@ public interface TaucoinListener {
 
     void onBlockQueueRollback(long number);
 
+    void onStatesLoaded(long hasLoaded, long total);
+
+    void onStatesLoadedCompleted();
+
 }

@@ -114,4 +114,12 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     @Override
     public void onBlockQueueRollback(long number) {
     }
+
+    @Override
+    public void onStatesLoaded(long hasLoaded, long total) {
+    }
+
+    @Override
+    public void onStatesLoadedCompleted() {
+    }
 }

@@ -4,6 +4,7 @@ import io.taucoin.config.SystemProperties;
 import io.taucoin.core.*;
 import io.taucoin.db.BlockStore;
 import io.taucoin.db.ByteArrayWrapper;
+import io.taucoin.db.state.StateLoader;
 import io.taucoin.debug.RefWatcher;
 import io.taucoin.http.RequestManager;
 import io.taucoin.listener.CompositeTaucoinListener;
@@ -51,6 +52,8 @@ public class WorldManager {
 
     private PoolSynchronizer poolSynchronizer;
 
+    private StateLoader stateLoader;
+
     private RefWatcher refWatcher;
 
     private volatile boolean isSyncRunning = false;
@@ -63,7 +66,8 @@ public class WorldManager {
     public WorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository
                         , BlockStore blockStore, SyncManager syncManager
                         , PendingState pendingState, RequestManager requestManager
-                        ,PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
+                        , PoolSynchronizer poolSynchronizer, StateLoader stateLoader
+                        , RefWatcher refWatcher) {
         logger.info("World manager instantiated");
         this.listener = listener;
         this.blockchain = blockchain;
@@ -73,6 +77,7 @@ public class WorldManager {
         this.pendingState = pendingState;
         this.requestManager = requestManager;
         this.poolSynchronizer = poolSynchronizer;
+        this.stateLoader = stateLoader;
         this.refWatcher = refWatcher;
         this.syncManager.setRequestManager(requestManager);
         this.poolSynchronizer.setRequestManager(requestManager);

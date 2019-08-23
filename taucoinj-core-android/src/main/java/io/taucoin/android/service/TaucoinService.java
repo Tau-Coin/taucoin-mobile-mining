@@ -288,5 +288,15 @@ public class TaucoinService extends Service {
         public void onBlockQueueRollback(long number) {
             // TODO: broadcast this event
         }
+
+        @Override
+        public void onStatesLoaded(long hasLoaded, long total) {
+            broadcastEvent(EventFlag.EVENT_STATES_LOADED, new StatesLoadedData(hasLoaded, total));
+        }
+
+        @Override
+        public void onStatesLoadedCompleted() {
+            broadcastEvent(EventFlag.EVENT_STATES_LOADED_COMPLETED, new EventData());
+        }
     }
 }

@@ -140,6 +140,16 @@ public enum EventFlag {
     /**
      * Stop downloading blocks evnet.
      */
-    EVENT_STOP_DOWNLOAD
+    EVENT_STOP_DOWNLOAD,
+
+    /**
+     * States loading progress.
+     */
+    EVENT_STATES_LOADED,
+
+    /**
+     * States loaded successfully.
+     */
+    EVENT_STATES_LOADED_COMPLETED
 
 }

@@ -1,6 +1,7 @@
 package io.taucoin.db.file;
 
 import io.taucoin.core.BlockWrapper;
+import io.taucoin.core.Utils;
 import io.taucoin.db.file.LargeFileStoreGroup.OpFilePosition;
 
 import org.slf4j.Logger;
@@ -10,7 +11,12 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,8 +29,10 @@ public class FileBlockStore {
     private static final Logger logger = LoggerFactory.getLogger("fileblockqueue");
 
     private static final String BACKEND_DIRECTORY = "store-backend";
-    private static final String BLOCKS_STORE_DIRECTORY = BACKEND_DIRECTORY + "/" + "blocks";
-    private static final String BLOCKS_INDEX_DIRECTORY = BACKEND_DIRECTORY + "/" + "index";
+    private static final String BLOCKS_STORE_DIRECTORY = BACKEND_DIRECTORY + File.separator + "blocks";
+    private static final String BLOCKS_INDEX_DIRECTORY = BACKEND_DIRECTORY + File.separator + "index";
+
+    private static final String START_NUMBER_FILE = BACKEND_DIRECTORY + File.separator + "startno";
 
     private static final String BLOCKS_STORE_PREFIX = "blk";
     private static final String BLOCKS_STORE_SUFFIX = "dat";
@@ -36,6 +44,8 @@ public class FileBlockStore {
     private LargeFileStoreGroup indexStore;
 
     private long maxNumber;
+
+    private long startNumber;
 
     private LRUCache blocksCache
             = new LRUCache(10, 0.75f);
@@ -58,16 +68,20 @@ public class FileBlockStore {
         // Create file block store and index store.
         int blocksMaxFile = detectFileAmount(BLOCKS_STORE_DIRECTORY, BLOCKS_STORE_PREFIX);
         blockStore = new LargeFileStoreGroup(
-                CONFIG.databaseDir() + "/" + BLOCKS_STORE_DIRECTORY,
+                CONFIG.databaseDir() + File.separator + BLOCKS_STORE_DIRECTORY,
                 BLOCKS_STORE_PREFIX, BLOCKS_STORE_SUFFIX,
                 blocksMaxFile, CONFIG.blockStoreFileMaxSize());
 
         int indexMaxFile = detectFileAmount(BLOCKS_INDEX_DIRECTORY, INDEX_STORE_PREFIX);
         indexStore = new LargeFileStoreGroup(
-                CONFIG.databaseDir() + "/" + BLOCKS_INDEX_DIRECTORY,
+                CONFIG.databaseDir() + File.separator + BLOCKS_INDEX_DIRECTORY,
                 INDEX_STORE_PREFIX, INDEX_STORE_SUFFIX,
                 indexMaxFile,
                 CONFIG.indexStoreFileMetaMaxAmount() * BlockIndex.ENCODED_SIZE);
+
+        // Read start number and set start number for 'BlockIndex'.
+        startNumber = readStartNumber();
+        BlockIndex.setStartNumber(startNumber);
 
         // Get max block number.
         long lastIndexFileSize = 0;
@@ -79,10 +93,11 @@ public class FileBlockStore {
         }
 
         maxNumber = (long)indexMaxFile * (long)CONFIG.indexStoreFileMetaMaxAmount()
-                + lastIndexFileSize / (long)BlockIndex.ENCODED_SIZE;
+                + lastIndexFileSize / (long)BlockIndex.ENCODED_SIZE
+                + (startNumber - 1);
 
         logger.info("max block file {}, max index file {}", blocksMaxFile, indexMaxFile);
-        logger.info("File block queue blocks amount {}", maxNumber);
+        logger.info("File block queue blocks amount {}, start {}", maxNumber, startNumber);
 
         checkSanity();
     }
@@ -278,13 +293,19 @@ public class FileBlockStore {
         return true;
     }
 
+    public synchronized void setStartNumber(long startNumber) {
+        this.startNumber = startNumber;
+        maxNumber = startNumber - 1;
+        writeStartNumber(startNumber);
+    }
+
     public synchronized void close() {
         blockStore.close();
         indexStore.close();
     }
 
     private void initDirectory(String dir) {
-        String absolutePath = CONFIG.databaseDir() + "/" + dir;
+        String absolutePath = CONFIG.databaseDir() + File.separator + dir;
         File f = new File(absolutePath);
 
         if (f.exists()) {
@@ -297,7 +318,7 @@ public class FileBlockStore {
     }
 
     private static int detectFileAmount(String dir, String prefix) {
-        File f = new File(CONFIG.databaseDir() + "/" + dir);
+        File f = new File(CONFIG.databaseDir() + File.separator + dir);
         int amount = 0;
 
         if (!f.exists() || !f.isDirectory()) {
@@ -327,7 +348,7 @@ public class FileBlockStore {
     }
 
     private void checkSanity() {
-        if (maxNumber <= 0) {
+        if (maxNumber < startNumber) {
             return;
         }
 
@@ -361,6 +382,70 @@ public class FileBlockStore {
             logger.error(errorMessage);
             //throw new RuntimeException(errorMessage);
         }
+    }
+
+    private long readStartNumber() {
+        if (!checkFile(START_NUMBER_FILE)) {
+            return 1L;
+        }
+
+        InputStream in = null;
+        byte[] startNumberBytes = new byte[8];
+
+        try {
+            in = new FileInputStream(CONFIG.databaseDir() + File.separator
+                + START_NUMBER_FILE);
+            in.read(startNumberBytes, 0, 8);
+            in.close();
+        } catch (FileNotFoundException e) {
+            // This should never happen.
+            logger.error("read start number fatal err:{}", e);
+            return 0;
+        } catch (IOException e) {
+            logger.error("read start number fatal err:{}", e);
+            return 0;
+        }
+
+        long startNo = Utils.readInt64(startNumberBytes, 0);
+        return startNo;
+    }
+
+    private void writeStartNumber(long startNumber) {
+        checkFile(START_NUMBER_FILE);
+
+        OutputStream out = null;
+        byte[] startNumberBytes = new byte[8];
+
+        Utils.uint64ToByteArrayLE(startNumber, startNumberBytes, 0);
+        try {
+            out = new FileOutputStream(CONFIG.databaseDir() + File.separator
+                + START_NUMBER_FILE);
+            out.write(startNumberBytes, 0 ,8);
+            out.close();
+        } catch (FileNotFoundException e) {
+            // This should never happen.
+            logger.error("write start number fatal err:{}", e);
+        } catch (IOException e) {
+            logger.error("write start number fatal err:{}", e);
+        }
+    }
+
+    // If not exist, create file.
+    // Return false if not exist. Else return true;
+    private static boolean checkFile(String file) {
+        String absoluteFile = CONFIG.databaseDir() + "/" + file;
+        File f = new File(absoluteFile);
+
+        try {
+            if (!f.exists()) {
+               f.createNewFile();
+               return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
     private static class LRUCache extends LinkedHashMap<Long, BlockWrapper> {

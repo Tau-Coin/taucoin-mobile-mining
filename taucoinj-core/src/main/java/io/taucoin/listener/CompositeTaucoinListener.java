@@ -184,4 +184,18 @@ public class CompositeTaucoinListener implements TaucoinListener {
             listener.onBlockQueueRollback(number);
         }
     }
+
+    @Override
+    public void onStatesLoaded(long hasLoaded, long total) {
+        for (TaucoinListener listener : listeners) {
+            listener.onStatesLoaded(hasLoaded, total);
+        }
+    }
+
+    @Override
+    public void onStatesLoadedCompleted() {
+        for (TaucoinListener listener : listeners) {
+            listener.onStatesLoadedCompleted();
+        }
+    }
 }

@@ -19,6 +19,8 @@ class BlockIndex {
     // Sizeof(file) + Sizeof(position) + Sizeof(length)
     public static final int ENCODED_SIZE = 12;
 
+    private static long startNumber = 0;
+
     private int file;
     private int position;
     private int length;
@@ -39,9 +41,17 @@ class BlockIndex {
         parse(bytes);
     }
 
+    public static void setStartNumber(long startNo) {
+        startNumber = startNo;
+    }
+
+    public static long getStartNumber() {
+        return startNumber;
+    }
+
     public static BlockIndex withBlockNumber(long blockNumber) {
-        long file = blockNumber / CONFIG.indexStoreFileMetaMaxAmount();
-        long position = (blockNumber % CONFIG.indexStoreFileMetaMaxAmount() - 1)
+        long file = (blockNumber - startNumber) / CONFIG.indexStoreFileMetaMaxAmount();
+        long position = ((blockNumber - startNumber) % CONFIG.indexStoreFileMetaMaxAmount())
                 * (long)ENCODED_SIZE;
 
         return new BlockIndex((int)file, (int)position, ENCODED_SIZE);

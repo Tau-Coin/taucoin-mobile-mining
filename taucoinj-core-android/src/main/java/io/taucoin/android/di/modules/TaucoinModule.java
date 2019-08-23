@@ -24,6 +24,7 @@ import io.taucoin.db.file.FileBlockStore;
 import io.taucoin.db.IndexedBlockStore;
 import io.taucoin.db.MemoryIndexedBlockStore;
 import io.taucoin.db.RepositoryImpl;
+import io.taucoin.db.state.StateLoader;
 import io.taucoin.debug.RefWatcher;
 import io.taucoin.facade.Taucoin;
 import io.taucoin.forge.BlockForger;
@@ -90,10 +91,11 @@ public class TaucoinModule {
     @Singleton
     WorldManager provideWorldManager(TaucoinListener listener, Blockchain blockchain, Repository repository,
             BlockStore blockStore, SyncManager syncManager, PendingState pendingState,
-            RequestManager requestManager, PoolSynchronizer poolSynchronizer, RefWatcher refWatcher) {
+            RequestManager requestManager, PoolSynchronizer poolSynchronizer, StateLoader stateLoader,
+            RefWatcher refWatcher) {
 
         return new WorldManager(listener, blockchain, repository, blockStore, syncManager,
-                pendingState, requestManager, poolSynchronizer, refWatcher);
+                pendingState, requestManager, poolSynchronizer, stateLoader, refWatcher);
     }
 
     @Provides
@@ -164,6 +166,14 @@ public class TaucoinModule {
     FileBlockStore provideFileBlockStore() {
         return new FileBlockStore();
     }
+
+    @Provides
+    @Singleton
+    StateLoader proviStateLoader(BlockStore blockStore, Repository repository,
+            FileBlockStore fileBlockStore, TaucoinListener listener) {
+        return new StateLoader(blockStore, repository, fileBlockStore, listener);
+    }
+
 
     @Provides
     @Singleton
