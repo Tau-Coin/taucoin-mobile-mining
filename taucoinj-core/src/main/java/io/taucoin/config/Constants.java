@@ -16,12 +16,7 @@ public class Constants {
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
     //fee distribute height
     //current chain should distribute fee from num 0 to turbo block data sync.
-    public static final int FEE_TERMINATE_HEIGHT = 0;
-
-    //when block num height is more than this num, verify must be checked.
-    //bcs we think after this height new account state has online , old
-    //memory pool has been exhausted.
-    public static final int VERIFY_BLOCK_HEIGHT = 24576;
+    public static final int FEE_TERMINATE_HEIGHT = 23050;
 
     public static final String GENESIS_BLOCK_HASH = "cff5ddb22f7f7f1a251c506ce85585353a99644e";
 

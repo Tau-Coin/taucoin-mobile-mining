@@ -204,12 +204,9 @@ public class AccountState implements Serializable {
             byte[] forgePower = RLP.encodeBigInteger(this.forgePower);
 
             if (this.balance.compareTo(BigInteger.ZERO) < 0) {
-                if (stateHeight > Constants.VERIFY_BLOCK_HEIGHT) {
-                    throw new IllegalArgumentException("unknown error lead to balance less than 0");
-                } else {
-                    this.balance = BigInteger.ZERO;
-                }
+                throw new IllegalArgumentException("unknown error lead to balance less than 0");
             }
+            
             byte[] balance = RLP.encodeBigInteger(this.balance);
             byte[] witnessAddress = RLP.encodeElement(this.witnessAddress);
             byte[][] tempAssociate = new byte[this.associatedAddress.size()][];
