@@ -286,6 +286,7 @@ public class BlockForger {
 
             synchronized (blockchain.getLockObject()) {
                 try {
+                    resetPullTxPoolFlag();
                     blockchain.getLockObject().wait(sleepTime * 1000);
                 } catch (InterruptedException e) {
                     logger.warn("Forging task is interrupted");
@@ -294,6 +295,7 @@ public class BlockForger {
             }
         } else {
             logger.info("Forged time has lapsed");
+            resetPullTxPoolFlag();
             fireNextBlockForgedInternal(0);
         }
 
@@ -302,18 +304,22 @@ public class BlockForger {
             return ForgeStatus.FORGE_NORMAL_EXIT;
         }
 
+        /*
         try {
             waitForPullTxPool();
         } catch (InterruptedException e) {
             logger.warn("Forging task is interrupted");
             return ForgeStatus.FORGE_TASK_INTERRUPTED;
         }
+         **/
 
         logger.info("Forging thread wakeup...");
 
-        if (!txsGot) {
-            logger.warn("Pull pool tx timeout, retry again.");
-            return ForgeStatus.PULL_POOL_TX_TIMEOUT;
+        synchronized(pullTxPoolLock) {
+            if (!txsGot) {
+                logger.warn("Pull pool tx timeout, retry again.");
+                return ForgeStatus.PULL_POOL_TX_TIMEOUT;
+            }
         }
 
         cumulativeDifficulty = ProofOfTransaction.
@@ -409,11 +415,17 @@ public class BlockForger {
         }
     }
 
+    private void resetPullTxPoolFlag() {
+        synchronized(pullTxPoolLock) {
+            txsGot = false;
+        }
+    }
+
     private void waitForPullTxPool() throws InterruptedException {
         logger.info("Wait for pulling pool txs");
         synchronized(pullTxPoolLock) {
             txsGot = false;
-            pullTxPoolLock.wait(PULL_TX_POOL_TIMEOUT);
+            //pullTxPoolLock.wait(PULL_TX_POOL_TIMEOUT);
         }
     }
 
@@ -421,7 +433,7 @@ public class BlockForger {
         logger.info("Pulling pool txs finished");
         synchronized(pullTxPoolLock) {
             txsGot = true;
-            pullTxPoolLock.notify();
+            //pullTxPoolLock.notify();
         }
     }
 
