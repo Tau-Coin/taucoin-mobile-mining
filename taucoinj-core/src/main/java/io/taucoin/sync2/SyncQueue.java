@@ -344,6 +344,19 @@ public class SyncQueue {
                     }
                 }
 
+                // Temp solution: OOM causes rlp decoding error.
+                if (e instanceof RuntimeException) {
+                    String message = e.getMessage();
+                    if (message != null && (message.contains("RLP wrong encoding")
+                            || message.contains("Invalid RLP (excessive mem allocation while parsing)"))) {
+                        logger.error("OOM fatal error: free {}, used {}, max {}, err:{}",
+                            Runtime.getRuntime().freeMemory(),
+                            Runtime.getRuntime().totalMemory(),
+                            Runtime.getRuntime().maxMemory(), e);
+                        System.exit(5);
+                    }
+                }
+
                 // If request close, break loop asap.
                 if (isRequestClose.get() || wrapper == null) {
                     logger.warn("Sync worker quits");
