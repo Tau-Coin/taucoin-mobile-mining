@@ -99,20 +99,19 @@ public class TransactionHistoryDaoUtils {
         return db.list();
     }
 
-    /** It's your latest time to accept your address here.*/
-    public String getNewestTxTime(String address) {
-        // default 2019-05-25
-        String time = "1554048000";
+    /** It's your latest block height to accept your address here.*/
+    public long getNewestBlockHeight(String address) {
+        long blockHeight = 0;
         QueryBuilder<TransactionHistory> db = getTransactionHistoryDao().queryBuilder();
         db.where(TransactionHistoryDao.Properties.TimeBasis.eq(1),
             db.or(TransactionHistoryDao.Properties.FromAddress.eq(address),
                 TransactionHistoryDao.Properties.ToAddress.eq(address))
         )
-        .orderDesc(TransactionHistoryDao.Properties.CreateTime);
+        .orderDesc(TransactionHistoryDao.Properties.BlockHeight);
         List<TransactionHistory> list = db.list();
         if(list.size() > 0){
-            time = list.get(0).getCreateTime();
+            blockHeight = list.get(0).getBlockHeight();
         }
-        return time;
+        return blockHeight;
     }
 }

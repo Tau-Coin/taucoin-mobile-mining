@@ -506,22 +506,18 @@ public class TxModel implements ITxModel {
             return;
         }
         String address = keyValue.getAddress();
-        Observable.create((ObservableOnSubscribe<String>) emitter -> {
-            String time = TransactionHistoryDaoUtils.getInstance().getNewestTxTime(address);
-            if(StringUtil.isNotEmpty(time)){
-                emitter.onNext(time);
-            }else {
-                observer.onError();
-            }
+        Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+            long blockHeight = TransactionHistoryDaoUtils.getInstance().getNewestBlockHeight(address);
+            emitter.onNext(blockHeight);
         }).observeOn(Schedulers.io())
             .subscribeOn(Schedulers.io())
-            .subscribe(new LogicObserver<String>() {
+            .subscribe(new LogicObserver<Long>() {
                 @Override
-                public void handleData(String time) {
+                public void handleData(Long blockHeight) {
 
                     Map<String,String> map = new HashMap<>();
                     map.put("address", address);
-                    map.put("time", time);
+                    map.put("blockheight", blockHeight.toString());
                     NetWorkManager.createMysqlApiService(TransactionService.class)
                         .getTxRecords(map)
                         .observeOn(AndroidSchedulers.mainThread())
