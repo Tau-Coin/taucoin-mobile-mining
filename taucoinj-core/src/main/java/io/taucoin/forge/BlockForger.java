@@ -295,8 +295,16 @@ public class BlockForger {
             }
         } else {
             logger.info("Forged time has lapsed");
-            resetPullTxPoolFlag();
             fireNextBlockForgedInternal(0);
+            synchronized (blockchain.getLockObject()) {
+                try {
+                    resetPullTxPoolFlag();
+                    blockchain.getLockObject().wait(10 * 1000);
+                } catch (InterruptedException e) {
+                    logger.warn("Forging task is interrupted");
+                    return ForgeStatus.FORGE_TASK_INTERRUPTED;
+                }
+            }
         }
 
         if (stopForge) {
