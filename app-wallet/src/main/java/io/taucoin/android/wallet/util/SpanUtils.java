@@ -91,6 +91,7 @@ public final class SpanUtils {
     private int bulletRadius;
     private int bulletGapWidth;
     private int fontSize;
+    private float paddingSize;
     private boolean fontAlignCenter;
     private boolean fontSizeIsDp;
     private float proportion;
@@ -148,6 +149,7 @@ public final class SpanUtils {
         first = -1;
         bulletColor = COLOR_DEFAULT;
         fontSize = -1;
+        paddingSize = 0;
         fontAlignCenter = false;
         proportion = -1;
         xProportion = -1;
@@ -329,6 +331,12 @@ public final class SpanUtils {
 
     public SpanUtils setCenterFontSize(boolean fontAlignCenter) {
         this.fontAlignCenter = fontAlignCenter;
+        return this;
+    }
+
+    public SpanUtils setCenterFontSize(boolean fontAlignCenter, float paddingSize) {
+        this.fontAlignCenter = fontAlignCenter;
+        this.paddingSize = paddingSize;
         return this;
     }
 
@@ -841,7 +849,7 @@ public final class SpanUtils {
 //        }
         if (fontSize != -1) {
             if(fontAlignCenter){
-                mBuilder.setSpan(new CustomVerticalCenterSpan(fontSize, fontSizeIsDp, foregroundColor), start, end, flag);
+                mBuilder.setSpan(new CustomVerticalCenterSpan(fontSize, fontSizeIsDp, foregroundColor, paddingSize), start, end, flag);
             }else{
                 mBuilder.setSpan(new AbsoluteSizeSpan(fontSize, fontSizeIsDp), start, end, flag);
             }
@@ -1355,6 +1363,7 @@ public final class SpanUtils {
     }
     public class CustomVerticalCenterSpan extends ReplacementSpan {
         private int fontSizeSp;
+        private float paddingSizeSp;
         private boolean isSp;
         private int foregroundColor;
 
@@ -1367,8 +1376,9 @@ public final class SpanUtils {
             this.isSp = isSp;
         }
 
-        public CustomVerticalCenterSpan(int fontSize, boolean fontSizeIsDp, int foregroundColor) {
+        public CustomVerticalCenterSpan(int fontSize, boolean fontSizeIsDp, int foregroundColor, float padding) {
             this.fontSizeSp = fontSize;
+            this.paddingSizeSp = padding;
             this.isSp = fontSizeIsDp;
             this.foregroundColor = foregroundColor;
         }
@@ -1388,7 +1398,8 @@ public final class SpanUtils {
             if (foregroundColor != COLOR_DEFAULT) {
                 p.setColor(foregroundColor);
             }
-            canvas.drawText(text.toString(), x, y - ((y + fm.descent + y + fm.ascent) / 2 - (bottom + top) / 2), p);
+            int paddingSize = DimensionsUtil.dip2px(MyApplication.getInstance(), paddingSizeSp);
+            canvas.drawText(text.toString(), x, y - ((y + fm.descent + y + fm.ascent) / 2 - (bottom + top) / 2 - paddingSize), p);
         }
 
         private TextPaint getCustomTextPaint(Paint srcPaint) {

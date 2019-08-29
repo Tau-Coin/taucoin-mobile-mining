@@ -25,6 +25,7 @@ import com.github.naturs.logger.Logger;
 
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -386,7 +387,7 @@ public class UserUtil {
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
             .append("<")
             .setCenterFontSize(true)
-            .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 22))
+            .setFontSize(DimensionsUtil.dip2px(tvSuccessRequires.getContext(), 20))
             .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
             .append(Html.fromHtml("&nbsp;"))
             .append("T")
@@ -459,6 +460,7 @@ public class UserUtil {
         });
     }
 
+    private static final int digit = 13;
     private static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
         if(tvCurrentCondition == null){
             return;
@@ -484,23 +486,94 @@ public class UserUtil {
             }else {
                 resultStr = "<";
             }
-            SpannableStringBuilder spannable = new SpanUtils()
-                .append("Hit(")
-                .append(FmtMicrometer.fmtPower(detail.hitValue.longValue()))
-                .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-                .append(")")
-                .append(Html.fromHtml("&nbsp;"))
-                .append(resultStr)
-                .setCenterFontSize(true)
-                .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 22))
-                .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
-                .append(Html.fromHtml("&nbsp;Target*Power*Time("))
-                .append(FmtMicrometer.fmtPower(rightValue.longValue()))
-                .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
-                .append(")")
-                .create();
-            tvCurrentCondition.setText(spannable);
+            String leftStr = FmtMicrometer.fmtPower(leftValue.longValue());
+            String rightStr = FmtMicrometer.fmtPower(rightValue.longValue());
+            boolean isSciCounting = isNeedSciCounting(leftStr, rightStr);
+            if(isSciCounting){
+                leftStr = handleDigit(leftValue.longValue());
+                rightStr = handleDigit(rightValue.longValue());
+            }
+            SpanUtils spanUtils = new SpanUtils()
+                    .append("Hit(")
+                    .append(leftStr)
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue));
+            if(isSciCounting){
+                spanUtils.append(Html.fromHtml("*10"))
+                        .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                        .append(String.valueOf(digit))
+                        .setSuperscript()
+                        .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                        .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 10));
+            }
+            spanUtils.append(")")
+                    .append(Html.fromHtml("&nbsp;"))
+                    .append(resultStr)
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                    .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 16))
+                    .append(Html.fromHtml("&nbsp;"))
+                    .append("Target(")
+                    .append(FmtMicrometer.fmtPower(detail.baseTarget.longValue()))
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                    .append(")")
+                    .append(Html.fromHtml("*"))
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                    .append("Power(")
+                    .append(FmtMicrometer.fmtPower(forgingPower.longValue()))
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                    .append(")")
+                    .append(Html.fromHtml("*"))
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_grey_light))
+                    .append("Time(")
+                    .append(FmtMicrometer.fmtPower(timeInternal))
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                    .append(Html.fromHtml(")"))
+                    .append(Html.fromHtml("="))
+                    .append(Html.fromHtml("("))
+                    .append(rightStr)
+                    .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue));
+            if(isSciCounting){
+                spanUtils.append(Html.fromHtml("*10"))
+                        .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                        .append(String.valueOf(digit))
+                        .setSuperscript()
+                        .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
+                        .setFontSize(DimensionsUtil.dip2px(tvCurrentCondition.getContext(), 10));
+            }
+            spanUtils.append(")");
+            tvCurrentCondition.setText(spanUtils.create());
         }
+    }
+
+    private static String handleDigit(long num) {
+        double result = num / Math.pow(10, digit - 1);
+        BigDecimal bigDecimal = new BigDecimal(result);
+        String resultStr = bigDecimal.toPlainString();
+        System.out.println(resultStr);
+        int pos = resultStr.indexOf(".");
+        if(pos > 0){
+            char[] chars = resultStr.toCharArray();
+            for (int i = pos + 1; i < chars.length; i++) {
+                if(chars[i] != '0' && i < chars.length -1){
+                    resultStr = resultStr.substring(0, i + 1);
+                    break;
+                }
+            }
+        }
+        return resultStr;
+    }
+
+    private static boolean isNeedSciCounting(String left, String right) {
+        boolean isNeed = true;
+        try {
+            if(left.length() == right.length() &&
+                    StringUtil.isSame(left.substring(0, 1), right.substring(0, 1))){
+                isNeed =  false;
+            }
+        }catch (Exception e){
+            isNeed =  false;
+            Logger.e("isNeedSciCounting is error", e);
+        }
+        return isNeed;
     }
 
     public static String getLastThreeAddress() {
