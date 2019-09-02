@@ -545,15 +545,14 @@ public class UserUtil {
     }
 
     private static String handleDigit(long num) {
-        double result = num / Math.pow(10, digit - 1);
+        double result = num / Math.pow(10, digit);
         BigDecimal bigDecimal = new BigDecimal(result);
         String resultStr = bigDecimal.toPlainString();
-        System.out.println(resultStr);
         int pos = resultStr.indexOf(".");
         if(pos > 0){
             char[] chars = resultStr.toCharArray();
             for (int i = pos + 1; i < chars.length; i++) {
-                if(chars[i] != '0' && i < chars.length -1){
+                if((chars[i] != '0' && i < chars.length -1 && result < 1 ) || result > 1){
                     resultStr = resultStr.substring(0, i + 1);
                     break;
                 }
