@@ -43,6 +43,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
+
     lintOptions {
         abortOnError false
     }
@@ -89,4 +95,6 @@ dependencies {
 
     api group: "com.thetransactioncompany", name: "jsonrpc2-server", version: "1.11"
     api group: "com.thetransactioncompany", name: "jsonrpc2-client", version: "1.15"
+
+    implementation 'com.tencent:mmkv:1.0.22'
 }

@@ -34,11 +34,12 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
     }
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    
+
     // TODO remove this
     lintOptions {
         abortOnError false
