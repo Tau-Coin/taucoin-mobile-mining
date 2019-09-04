@@ -83,12 +83,7 @@ public class MmkvDataSource implements KeyValueDataSource {
 
     @Override
     public byte[] get(byte[] key) {
-        long t1 = System.nanoTime();
-
         byte[] value = db.decodeBytes(toHexString(key));
-
-        long t2 = System.nanoTime();
-        logger.info("Mmkv read in: {} ms", ((float)(t2 - t1) / 1_000_000));
 
         return value;
     }
@@ -119,12 +114,7 @@ public class MmkvDataSource implements KeyValueDataSource {
 
     @Override
     public void updateBatch(Map<byte[], byte[]> rows) {
-        long t1 = System.nanoTime();
-
         updateBatchInternal(rows);
-
-        long t2 = System.nanoTime();
-        logger.info("Mmkv update batch in: {} ms", ((float)(t2 - t1) / 1_000_000));
     }
 
     @Override
