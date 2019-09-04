@@ -29,7 +29,7 @@ public class RepositoryTrack implements Repository {
 
     private static final Logger logger = LoggerFactory.getLogger("repository");
 
-    HashMap<ByteArrayWrapper, AccountState> cacheAccounts = new HashMap<>();
+    Map<ByteArrayWrapper, AccountState> cacheAccounts = new HashMap<>();
 
     Repository repository;
 
@@ -79,7 +79,7 @@ public class RepositoryTrack implements Repository {
     }
 
     @Override
-    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts) {
+    public void loadAccount(byte[] addr, Map<ByteArrayWrapper, AccountState> cacheAccounts) {
 
         AccountState accountState = this.cacheAccounts.get(wrap(addr));
 
@@ -164,7 +164,6 @@ public class RepositoryTrack implements Repository {
 
     @Override
     public BigInteger addBalance(byte[] addr, BigInteger value) {
-
         AccountState accountState = getAccountState(addr);
         if (accountState == null) {
             accountState = createAccount(addr);
@@ -223,11 +222,8 @@ public class RepositoryTrack implements Repository {
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates) {
-
-        for (ByteArrayWrapper hash : accountStates.keySet()) {
-            cacheAccounts.put(hash, accountStates.get(hash));
-        }
+    public void updateBatch(Map<ByteArrayWrapper, AccountState> accountStates) {
+        cacheAccounts.putAll(accountStates);
     }
 
     @Override

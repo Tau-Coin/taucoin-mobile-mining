@@ -3,7 +3,7 @@ package io.taucoin.core;
 import io.taucoin.db.ByteArrayWrapper;
 
 import java.math.BigInteger;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Roman Mandeleil
@@ -133,9 +133,9 @@ public interface Repository {
      */
     void reset();
 
-    void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates);
+    void updateBatch(Map<ByteArrayWrapper, AccountState> accountStates);
 
-    void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts);
+    void loadAccount(byte[] addr, Map<ByteArrayWrapper, AccountState> cacheAccounts);
 
     void showRepositoryChange();
 }

@@ -48,7 +48,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     private static final Logger logger = LoggerFactory.getLogger("repository");
     private static final Logger gLogger = LoggerFactory.getLogger("general");
 
-    HashMap<byte[], byte[]> writeBatch = new HashMap<>();
+    Map<byte[], byte[]> writeBatch = new HashMap<>();
 
     private static final String MAX_NUMBER_KEY_STR = "REPO_LATEST_NUMBER";
     private static final byte[] MAX_NUMBER_KEY = MAX_NUMBER_KEY_STR.getBytes();
@@ -84,20 +84,22 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> stateCache) {
+    public void updateBatch(Map<ByteArrayWrapper, AccountState> stateCache) {
 
         logger.debug("updatingBatch: stateCache.size: {}", stateCache.size());
         clearAccountStateBatch();
 
-        for (ByteArrayWrapper hash : stateCache.keySet()) {
+        ByteArrayWrapper hash;
+        AccountState accountState;
 
-            AccountState accountState = stateCache.get(hash);
+        for (Map.Entry<ByteArrayWrapper, AccountState> entry : stateCache.entrySet()) {
+            hash = entry.getKey();
+            accountState = entry.getValue();
 
             if (accountState.isDeleted()) {
                 delete(hash.getData());
                 logger.debug("delete: [{}]",
                         Hex.toHexString(hash.getData()));
-
             } else {
                 //updateAccountState(hash.getData(), accountState);
                 try {
@@ -115,7 +117,6 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
                 }
             }
         }
-
 
         logger.debug("updated: stateCache.size: {}", stateCache.size());
 
@@ -264,8 +265,9 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
         AccountState result = null;
         byte[] accountData = stateDB.get(addr);
 
-        if (accountData != null)
+        if (accountData != null) {
             result = new AccountState(accountData);
+        }
 
         return result;
     }
@@ -294,8 +296,7 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
 
     @Override
     public void loadAccount(byte[] addr,
-                            HashMap<ByteArrayWrapper, AccountState> cacheAccounts) {
-
+                            Map<ByteArrayWrapper, AccountState> cacheAccounts) {
         AccountState account = getAccountState(addr);
 
         account = (account == null) ? new AccountState() : account.clone();

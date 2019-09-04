@@ -834,15 +834,6 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
                     tx.setIsCompositeTx(true);
                 }
             }
-        } else {
-            //I think nothing need to do!
-            //although these code is ugly , helpful to locate balance error.
-            for (Transaction tx : block.getTransactionsList()) {
-                byte[] txSenderAdd = tx.getSender();
-                byte[] txReceiverAdd = tx.getReceiveAddress();
-                AccountState txSenderAccount = repo.getAccountState(txSenderAdd);
-                AccountState txReceiverAccount = repo.getAccountState(txReceiverAdd);
-            }
         }
         long totalTime = System.nanoTime() - saveTime;
         logger.debug("wrap block: num: [{}] hash: [{}], executed after: [{}]nano", block.getNumber(), block.getShortHash(), totalTime);
