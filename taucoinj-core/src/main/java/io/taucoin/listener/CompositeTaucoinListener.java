@@ -193,9 +193,16 @@ public class CompositeTaucoinListener implements TaucoinListener {
     }
 
     @Override
-    public void onStatesLoadedCompleted() {
+    public void onStatesLoadedCompleted(long tagHeight) {
         for (TaucoinListener listener : listeners) {
-            listener.onStatesLoadedCompleted();
+            listener.onStatesLoadedCompleted(tagHeight);
+        }
+    }
+
+    @Override
+    public void onStatesLoadedFailed(long tagHeight) {
+        for (TaucoinListener listener : listeners) {
+            listener.onStatesLoadedFailed(tagHeight);
         }
     }
 }

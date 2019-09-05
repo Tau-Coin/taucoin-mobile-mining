@@ -120,6 +120,10 @@ public class TaucoinListenerAdapter implements TaucoinListener {
     }
 
     @Override
-    public void onStatesLoadedCompleted() {
+    public void onStatesLoadedCompleted(long tagHeight) {
+    }
+
+    @Override
+    public void onStatesLoadedFailed(long tagHeight) {
     }
 }

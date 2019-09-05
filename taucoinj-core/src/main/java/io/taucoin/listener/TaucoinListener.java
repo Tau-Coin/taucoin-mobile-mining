@@ -64,6 +64,7 @@ public interface TaucoinListener {
 
     void onStatesLoaded(long hasLoaded, long total);
 
-    void onStatesLoadedCompleted();
+    void onStatesLoadedCompleted(long tagHeight);
 
+    void onStatesLoadedFailed(long tagHeight);
 }

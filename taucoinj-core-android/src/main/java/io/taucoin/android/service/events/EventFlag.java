@@ -150,6 +150,10 @@ public enum EventFlag {
     /**
      * States loaded successfully.
      */
-    EVENT_STATES_LOADED_COMPLETED
+    EVENT_STATES_LOADED_COMPLETED,
 
+    /**
+     * States loaded successfully.
+     */
+    EVENT_STATES_LOADED_FAILED
 }

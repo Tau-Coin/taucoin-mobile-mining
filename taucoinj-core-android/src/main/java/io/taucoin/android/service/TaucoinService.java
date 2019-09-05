@@ -295,8 +295,15 @@ public class TaucoinService extends Service {
         }
 
         @Override
-        public void onStatesLoadedCompleted() {
-            broadcastEvent(EventFlag.EVENT_STATES_LOADED_COMPLETED, new EventData());
+        public void onStatesLoadedCompleted(long tagHeight) {
+            broadcastEvent(EventFlag.EVENT_STATES_LOADED_COMPLETED,
+                    new StatesLoadedResult(true, tagHeight));
+        }
+
+        @Override
+        public void onStatesLoadedFailed(long tagHeight) {
+            broadcastEvent(EventFlag.EVENT_STATES_LOADED_FAILED,
+                    new StatesLoadedResult(false, tagHeight));
         }
     }
 }

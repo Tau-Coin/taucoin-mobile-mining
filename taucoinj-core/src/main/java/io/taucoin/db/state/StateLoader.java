@@ -60,10 +60,10 @@ public class StateLoader {
         this.listener = listener;
     }
 
-    public synchronized void loadStatesTag() {
+    public synchronized boolean loadStatesTag() {
         if (!stateTagExist()) {
             logger.error("States tag doesn't exist");
-            return;
+            return false;
         }
 
         // 1. Set start number for file block store
@@ -80,8 +80,24 @@ public class StateLoader {
         // 3. Load states db into repository.
         loadStates();
 
-        // Lastly, broadcase the event of loading successfully.
-        listener.onStatesLoadedCompleted();
+        // Lastly, broadcast the event of loading successfully.
+        Block bestBlock = blockStore.getBestBlock();
+        long bestNumber = bestBlock != null ? bestBlock.getNumber() : 0;
+
+        if ((accountsLoaded == accountAmount)
+                && (bestNumber != 0 && bestNumber == tagNumber)) {
+            listener.onBlockConnected(bestBlock);
+            listener.onStatesLoadedCompleted(tagNumber);
+            logger.info("States loaded successfully: {}/{}",
+                accountsLoaded, accountAmount);
+
+            return true;
+        } else {
+            listener.onStatesLoadedFailed(tagNumber);
+            logger.error("States loaded error: {}/{}",
+                    accountsLoaded, accountAmount);
+            return false;
+        }
     }
 
     private void setupFileBlockStore() {
@@ -192,6 +208,8 @@ public class StateLoader {
 
                     if (accountsLoaded % STATES_BATCH_SIZE == 0) {
                         flushStates();
+                        logger.info("states loading progress {}/{}",
+                                accountsLoaded, accountAmount);
                         listener.onStatesLoaded(accountsLoaded, accountAmount);
                     }
                 } else {
@@ -201,6 +219,8 @@ public class StateLoader {
 
             if (stateBatch.size() > 0) {
                 flushStates();
+                logger.info("states loading progress {}/{}", accountsLoaded,
+                        accountAmount);
                 listener.onStatesLoaded(accountsLoaded, accountAmount);
             }
         } catch (FileNotFoundException e) {
