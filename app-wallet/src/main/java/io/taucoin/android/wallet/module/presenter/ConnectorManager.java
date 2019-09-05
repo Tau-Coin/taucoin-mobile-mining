@@ -403,11 +403,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
         Logger.d("init");
         if(UserUtil.isImportKey()){
             if(isTaucoinConnected){
-                if(!isInit() && StateTagManager.isStateTagNotLoaded()){
+                if(!isInit() && !StateTagManager.isStateTagLoading()){
                     TxService.startTxService(TransmitKey.ServiceType.DOWNLOAD_STATE_TAG);
                 }
             }else{
-                if(!StateTagManager.isStateTagLoadedFinished()){
+                if(StateTagManager.isStateTagLoading()){
                     StateTagManager.reLoadStateTags();
                 }
                 createRemoteConnector();
@@ -416,12 +416,14 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     public void initBlockChain(){
-        String privateKey = MyApplication.getKeyValue().getPriKey();
-        // import privateKey and init
-        if(isInit()){
-            importForgerPrivkey(privateKey);
-        }else{
-            importPrivkeyAndInit(privateKey);
+        if(UserUtil.isImportKey()){
+            String privateKey = MyApplication.getKeyValue().getPriKey();
+            // import privateKey and init
+            if(isInit()){
+                importForgerPrivkey(privateKey);
+            }else{
+                importPrivkeyAndInit(privateKey);
+            }
         }
     }
 

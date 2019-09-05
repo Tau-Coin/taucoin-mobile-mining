@@ -63,7 +63,7 @@ public class StateTagManager {
         mRetrofitBuilder = NetWorkManager.getRetrofit().newBuilder();
         mRetrofitBuilder.client(initOkHttpClient());
         mMapResult.clear();
-        destFileDir =  service.getApplicationInfo().dataDir + File.separator + destFileDir;
+        destFileDir =  service.getApplicationInfo().dataDir + File.separator;
         destFileDir += tagFileDirName;
 
         checkStateTag(true);
@@ -110,20 +110,19 @@ public class StateTagManager {
             StatesTagBean.TagsBean tags = result.getTags();
             if(tags != null && tags.getStartNo() - syncBlockHeight >= mNeedDownloadTagsSize){
                 mStatus = Status.PROGRESS;
-                isDirectlyInit = false;
                 setStatesTagStartNo(tags.getStartNo());
                 if(!isDownloaded(tags.getStartNo())){
+                    isDirectlyInit = false;
                     setDownloaded(tags.getStartNo(), false);
                     reLoadStateTags();
                     FileUtil.deleteFile(destFileDir);
                     Logger.d("delete states-tag file dir");
                     startDownload(tags.getStartNo(), tags.getStates());
                     startDownload(tags.getStartNo(), tags.getBlocks());
-                }else{
+                }else if(isStateTagLoadedFailed()){
                     // Whether or not the end of chain loading
-                    if(isStateTagLoadedFinished()){
-                        initBlockChain(true);
-                    }
+                    isDirectlyInit = false;
+                    initBlockChain(true);
                 }
             }
         }
@@ -300,18 +299,18 @@ public class StateTagManager {
         }
     }
 
-    public static boolean isStateTagLoadedFinished(){
+    private static boolean isStateTagLoadedFailed(){
         String key = TransmitKey.STATES_TAG_LOADED + "_" + getStatesTagStartNo();
         int statesTagLoaded = SharedPreferencesHelper.getInstance()
                 .getInt(key, -1);
-        return statesTagLoaded == 1 || statesTagLoaded == 2;
+        return statesTagLoaded == 2;
     }
 
-    public static boolean isStateTagNotLoaded(){
+    public static boolean isStateTagLoading(){
         String key = TransmitKey.STATES_TAG_LOADED + "_" + getStatesTagStartNo();
         int statesTagLoaded = SharedPreferencesHelper.getInstance()
                 .getInt(key, -1);
-        return statesTagLoaded == -1;
+        return statesTagLoaded == 0;
     }
 
     /**
