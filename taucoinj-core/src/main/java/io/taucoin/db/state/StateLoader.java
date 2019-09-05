@@ -203,6 +203,7 @@ public class StateLoader {
                 StateRecord state = new StateRecord(strLine);
 
                 if (state.isValid()) {
+                    logger.info("state record: {}", state);
                     stateBatch.put(state.getAddress(), state.getAccountState());
                     accountsLoaded++;
 
@@ -300,6 +301,9 @@ public class StateLoader {
             }
         }
 
+    }
+
+    private void resetChainData() {
     }
 
     private boolean stateTagExist() {

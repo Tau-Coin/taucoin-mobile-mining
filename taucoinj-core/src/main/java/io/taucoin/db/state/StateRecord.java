@@ -35,4 +35,17 @@ public class StateRecord {
     public boolean isValid() {
         return address != null && state != null;
     }
+
+    @Override
+    public String toString() {
+        String str;
+
+        if (!isValid()) {
+            str = "[null]";
+        } else {
+            str = "[" + Hex.toHexString(address.getData()) + ":" + state.toString() + "]";
+        }
+
+        return str;
+    }
 }
