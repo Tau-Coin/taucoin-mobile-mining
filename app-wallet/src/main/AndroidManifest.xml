@@ -154,6 +154,9 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/transparent"/>
 
+        <activity android:name="io.taucoin.android.wallet.module.view.manage.AddressBookActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
     </application>
 
 </manifest>

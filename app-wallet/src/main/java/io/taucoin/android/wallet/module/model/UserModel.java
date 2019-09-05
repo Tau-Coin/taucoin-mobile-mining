@@ -15,8 +15,14 @@
  */
 package io.taucoin.android.wallet.module.model;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Executors;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
@@ -30,6 +36,7 @@ import io.taucoin.platform.adress.Key;
 import io.taucoin.platform.adress.KeyManager;
 
 public class UserModel implements IUserModel{
+    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(20));
     @Override
     public void saveKeyAndAddress(final KeyValue keyValue, LogicObserver<KeyValue> observer) {
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
@@ -48,25 +55,25 @@ public class UserModel implements IUserModel{
                     return;
                 }
             }
+            kv.setLastUseTime(System.currentTimeMillis());
             KeyValue result = KeyValueDaoUtils.getInstance().insertOrReplace(kv);
             emitter.onNext(result);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
     @Override
-    public void saveName(String name, LogicObserver<KeyValue> observer) {
-        KeyValue keyValue = MyApplication.getKeyValue();
-        if(keyValue == null || StringUtil.isEmpty(keyValue.getAddress())){
-            return;
-        }
+    public void saveName(String pubKey, String name, LogicObserver<KeyValue> observer) {
         Observable.create((ObservableOnSubscribe<KeyValue>) emitter -> {
+            KeyValue keyValue = KeyValueDaoUtils.getInstance().queryByPubicKey(pubKey);
             keyValue.setNickName(name);
             KeyValueDaoUtils.getInstance().update(keyValue);
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -89,7 +96,8 @@ public class UserModel implements IUserModel{
                 saveKeyAndAddress(null, observer);
             }
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 
@@ -102,7 +110,31 @@ public class UserModel implements IUserModel{
             KeyValueDaoUtils.getInstance().update(keyValue);
             emitter.onNext(keyValue);
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(observer);
+    }
+
+    @Override
+    public void getAddressList(String key, LogicObserver<List<KeyValue>> observer) {
+        Observable.create((ObservableOnSubscribe<List<KeyValue>>) emitter -> {
+            List<KeyValue> keyValues = KeyValueDaoUtils.getInstance().querySearch(key);
+            Collections.sort(keyValues, (o1, o2) -> Long.compare(o2.getLastUseTime(), o1.getLastUseTime()));
+            emitter.onNext(keyValues);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(observer);
+    }
+
+    @Override
+    public void deleteAddress(String pubKey, LogicObserver<Boolean> observer) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            KeyValueDaoUtils.getInstance().deleteByPubKey(pubKey);
+            emitter.onNext(true);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
                 .subscribe(observer);
     }
 }

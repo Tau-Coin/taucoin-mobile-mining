@@ -46,6 +46,7 @@ public class DateUtil {
     public static final String pattern7 = "yyyy-MM-dd\'T\'HH:mm:ss";
     public static final String pattern8 = "yyyy-MM-dd\'T\'HH:mm:ss.SS SZ";
     public static final String pattern9 = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String pattern10 = "HH:mm:ss\nyyyy-MM-dd";
 
     @SuppressWarnings("CanBeFinal")
     private static SimpleDateFormat format;

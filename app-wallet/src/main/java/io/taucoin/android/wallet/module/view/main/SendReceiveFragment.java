@@ -31,6 +31,7 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
+import io.taucoin.android.wallet.module.presenter.UserPresenter;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.ISendReceiveView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
@@ -46,14 +47,13 @@ import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.EmptyLayout;
+import io.taucoin.android.wallet.widget.banner.BannerLayout;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DimensionsUtil;
-import io.taucoin.foundation.util.DrawablesUtil;
+import io.taucoin.foundation.util.StringUtil;
 
 public class SendReceiveFragment extends BaseFragment implements ISendReceiveView {
 
-    @BindView(R.id.balance_text)
-    TextView balanceText;
     @BindView(R.id.btn_send)
     Button btnSend;
     @BindView(R.id.iv_tx_log_tips)
@@ -66,12 +66,14 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.ll_tip)
     LinearLayout llTip;
-    @BindView(R.id.tv_address)
-    TextView tvAddress;
+    @BindView(R.id.banner_layout)
+    BannerLayout bannerLayout;
     View seeMoreView;
 
     private TxPresenter mTxPresenter;
     private HistoryExpandableListAdapter mAdapter;
+    private WebBannerAdapter mBannerAdapter;
+    private UserPresenter mUserPresenter;
     private int mPageNo = 1;
     private String mTime;
     private boolean mIsToast = false;
@@ -80,9 +82,10 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_send_receive, container, false);
         butterKnifeBinder(this, view);
+        mUserPresenter = new UserPresenter();
+        mTxPresenter = new TxPresenter(this);
         initView();
         initListener();
-        mTxPresenter = new TxPresenter(this);
         initData();
         return view;
     }
@@ -90,13 +93,13 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        UserUtil.setAddress(tvAddress);
+        loadTopThreeAddressView();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        UserUtil.setAddress(tvAddress);
+        loadTopThreeAddressView();
     }
 
     @Override
@@ -115,7 +118,20 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setEnableAutoLoadmore(false);
         refreshLayout.setEnableLoadmoreWhenContentNotFull(true);
-        DrawablesUtil.setEndDrawable(tvAddress, R.mipmap.icon_copy, 22);
+
+        mBannerAdapter = new WebBannerAdapter();
+        mBannerAdapter.setOnBannerItemClickListener(position -> {
+            KeyValue[] list = mBannerAdapter.getDataList();
+            int pos = position % list.length;
+            KeyValue keyValue = list[pos];
+            if(keyValue == null){
+                ActivityUtil.startActivity(getActivity(), ImportKeyActivity.class);
+            }else{
+                copyData(keyValue);
+            }
+        });
+        bannerLayout.setAdapter(mBannerAdapter);
+        loadTopThreeAddressView();
 
         seeMoreView = LinearLayout.inflate(getActivity(), R.layout.list_view_footer, null);
         listViewLog.addFooterView(seeMoreView);
@@ -127,7 +143,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         });
     }
 
-    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.tv_address, R.id.iv_right, R.id.btn_increase})
+    @OnClick({R.id.btn_send, R.id.iv_tx_log_tips, R.id.iv_right, R.id.btn_increase})
     void onClick(View view) {
         KeyValue keyValue = MyApplication.getKeyValue();
         if (keyValue == null && view.getId() != R.id.iv_tx_log_tips) {
@@ -147,9 +163,6 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             case R.id.iv_tx_log_tips:
                 DialogManager.showTipDialog(getActivity(), R.string.tx_log_tips);
                 break;
-            case R.id.tv_address:
-                copyData();
-                break;
             case R.id.iv_right:
                 mIsToast = true;
                 ProgressManager.showProgressDialog(getActivity());
@@ -161,8 +174,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
 
     }
 
-    private void copyData() {
-        KeyValue keyValue = MyApplication.getKeyValue();
+    private void copyData(KeyValue keyValue) {
         if(keyValue != null){
             CopyManager.copyText(keyValue.getAddress());
             ToastUtils.showShortToast(R.string.keys_address_copy);
@@ -223,7 +235,7 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         switch (object.getCode()){
             case ALL:
             case BALANCE:
-                UserUtil.setBalance(balanceText);
+                loadTopThreeAddressView();
                 break;
             case TRANSACTION:
                 startRefresh();
@@ -245,6 +257,23 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         if(mTxPresenter != null){
             mTxPresenter.queryTransactionHistory(mPageNo, mTime);
         }
+    }
+
+    private void loadTopThreeAddressView() {
+        mUserPresenter.getAddressList("", new LogicObserver<List<KeyValue>>(){
+            @Override
+            public void handleData(List<KeyValue> keyValues) {
+                if(bannerLayout == null || mBannerAdapter == null){
+                    return;
+                }
+                mBannerAdapter.setDataList(keyValues);
+                int isFirst = StringUtil.getIntTag(bannerLayout);
+                if(isFirst == 0){
+                    bannerLayout.setTag(1);
+                    bannerLayout.setStartPosition(1);
+                }
+            }
+        });
     }
 
     @Override

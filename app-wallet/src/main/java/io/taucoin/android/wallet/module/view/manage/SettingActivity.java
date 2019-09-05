@@ -19,6 +19,7 @@ import io.taucoin.android.wallet.base.BaseActivity;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.ActivityUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ToastUtils;
@@ -51,7 +52,7 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.tv_trans_expiry,  R.id.tv_reset_data})
+    @OnClick({R.id.tv_trans_expiry,  R.id.tv_reset_data,  R.id.tv_address_book})
     void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_trans_expiry:
@@ -59,6 +60,9 @@ public class SettingActivity extends BaseActivity {
                 break;
             case R.id.tv_reset_data:
                 resetData();
+                break;
+            case R.id.tv_address_book:
+                ActivityUtil.startActivity(this, AddressBookActivity.class);
                 break;
             default:
                 break;

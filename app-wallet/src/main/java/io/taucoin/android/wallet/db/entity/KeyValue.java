@@ -29,12 +29,13 @@ public class KeyValue {
     private String miningRank;
     private String minerReward;
     private String partReward;
-    @Generated(hash = 1367625504)
+    private long lastUseTime;
+    @Generated(hash = 259628921)
     public KeyValue(Long id, String pubKey, String priKey, String address,
             String rawAddress, long balance, long power, long miningIncome,
             String nickName, String miningState, long transExpiry, long blocksMined,
-            long MinedNo, String miningRank, String minerReward,
-            String partReward) {
+            long MinedNo, String miningRank, String minerReward, String partReward,
+            long lastUseTime) {
         this.id = id;
         this.pubKey = pubKey;
         this.priKey = priKey;
@@ -51,6 +52,7 @@ public class KeyValue {
         this.miningRank = miningRank;
         this.minerReward = minerReward;
         this.partReward = partReward;
+        this.lastUseTime = lastUseTime;
     }
     @Generated(hash = 92014137)
     public KeyValue() {
@@ -150,5 +152,11 @@ public class KeyValue {
     }
     public void setPartReward(String partReward) {
         this.partReward = partReward;
+    }
+    public long getLastUseTime() {
+        return this.lastUseTime;
+    }
+    public void setLastUseTime(long lastUseTime) {
+        this.lastUseTime = lastUseTime;
     }
 }

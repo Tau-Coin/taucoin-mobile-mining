@@ -94,9 +94,6 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
-        groupViewHolder.viewLineBottom.setVisibility(isExpanded ? View.INVISIBLE : View.VISIBLE);
-        groupViewHolder.viewLineTop.setVisibility(groupPosition != 0 ? View.INVISIBLE : View.VISIBLE);
-        groupViewHolder.ivRight.setImageResource(isExpanded ? R.mipmap.icon_up : R.mipmap.icon_down);
 
         boolean isReceiver = isReceiver(tx);
         String total = FmtMicrometer.fmtFormatAdd(tx.getAmount(), tx.getFee());
@@ -105,7 +102,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         amount = isReceiver ? "+" + amount : "-" + total;
         groupViewHolder.tvAmount.setText(amount);
 
-        String time = DateUtil.formatTime(tx.getCreateTime(), DateUtil.pattern6);
+        String time = DateUtil.formatTime(tx.getCreateTime(), DateUtil.pattern10);
         groupViewHolder.tvTime.setText(time);
         // The user is the sender
         int color = R.color.color_red;
@@ -198,12 +195,6 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         TextView tvAmount;
         @BindView(R.id.tv_time)
         TextView tvTime;
-        @BindView(R.id.iv_right)
-        ImageView ivRight;
-        @BindView(R.id.view_line_top)
-        View viewLineTop;
-        @BindView(R.id.view_line_bottom)
-        View viewLineBottom;
 
         GroupViewHolder(View view) {
             ButterKnife.bind(this, view);

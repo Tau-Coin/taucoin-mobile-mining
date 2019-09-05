@@ -15,6 +15,8 @@
  */
 package io.taucoin.android.wallet.db.util;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
 import io.taucoin.android.wallet.db.GreenDaoManager;
@@ -104,5 +106,27 @@ public class KeyValueDaoUtils {
     public boolean updateMiningState(KeyValue keyValue) {
         long result = getKeyValueDao().insertOrReplace(keyValue);
         return result > -1;
+    }
+
+    public List<KeyValue> querySearch(String key) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("%");
+        stringBuilder.append(key);
+        stringBuilder.append("%");
+        QueryBuilder<KeyValue> queryBuilder = getKeyValueDao().queryBuilder();
+        if(StringUtil.isNotEmpty(key)){
+            queryBuilder.where(queryBuilder.or(KeyValueDao.Properties.NickName.like(stringBuilder.toString()),
+                    KeyValueDao.Properties.Address.like(stringBuilder.toString())));
+        }
+        queryBuilder.orderDesc(KeyValueDao.Properties.LastUseTime);
+        return queryBuilder.list();
+    }
+
+    public void deleteByPubKey(String pubKey) {
+        getKeyValueDao().queryBuilder()
+            .where(KeyValueDao.Properties.PubKey.eq(pubKey))
+            .orderDesc(KeyValueDao.Properties.Id)
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities();
     }
 }

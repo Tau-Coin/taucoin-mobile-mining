@@ -20,6 +20,13 @@
         android:layout_height="wrap_content">
 
         <io.taucoin.android.wallet.widget.ItemTextView
+            android:id="@+id/tv_address_book"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            app:itemLeftText="@string/setting_address_book" />
+
+        <io.taucoin.android.wallet.widget.ItemTextView
             android:id="@+id/tv_trans_expiry"
             android:layout_width="match_parent"
             android:layout_height="50dp"

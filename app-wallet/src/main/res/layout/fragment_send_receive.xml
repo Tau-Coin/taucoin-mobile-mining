@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_main_bg"
+    android:background="@color/color_home_bg"
     android:orientation="vertical">
 
     <io.taucoin.android.wallet.widget.ToolbarView
@@ -15,37 +15,24 @@
         app:leftImagePadding="0dp"
         app:titleText="@string/main_send_receive" />
 
-    <TextView
-        android:layout_below="@+id/toolBar"
-        android:id="@+id/balance_text"
-        style="@style/style_tau_black"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@color/color_white"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center|center_vertical"
-        android:gravity="center_vertical|center" />
 
-    <TextView
-        android:layout_below="@+id/balance_text"
-        style="@style/style_normal_yellow"
-        android:id="@+id/tv_address"
-        android:layout_width="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:drawablePadding="10dp"
-        android:layout_marginStart="15dp"
-        android:text=""
-        android:layout_marginEnd="15dp"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/color_tool_bar"
-        android:layout_height="wrap_content" />
+    <io.taucoin.android.wallet.widget.banner.BannerLayout
+        android:layout_below="@+id/toolBar"
+        android:id="@+id/banner_layout"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        app:autoPlaying="false"
+        app:centerScale="1.3"
+        app:itemSpace="20"
+        app:moveSpeed="1.8"/>
 
     <LinearLayout
         android:id="@+id/ll_send"
-        android:layout_below="@+id/tv_address"
+        android:layout_below="@+id/banner_layout"
         android:orientation="horizontal"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -79,8 +66,8 @@
         android:id="@+id/ll_tip"
         android:layout_below="@+id/ll_send"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/color_white"
+        android:layout_marginTop="5dp"
+        android:layout_height="40dp"
         android:orientation="horizontal">
 
         <TextView
@@ -130,6 +117,8 @@
             android:layout_height="wrap_content"
             android:divider="@null"
             android:groupIndicator="@null"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:dividerHeight="0dp"
             android:scrollbars="none" />
 

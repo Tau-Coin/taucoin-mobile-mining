@@ -37,7 +37,7 @@
     <string name="tx_increase">Increase Power</string>
     <string name="tx_send">Send</string>
     <string name="tx_receive">Receive</string>
-    <string name="tx_log">Transaction log</string>
+    <string name="tx_log">Transactions</string>
     <string name="tx_log_empty">No records</string>
     <string name="tx_to_address">To Address</string>
     <string name="tx_from_address">From Address</string>
@@ -244,6 +244,7 @@
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
+    <string name="setting_address_book">Address Book</string>
     <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
     <string name="setting_reset_data">Restart Verify</string>
@@ -264,5 +265,9 @@
         TAU team is a group of programmers, who want to combine technology and finance together to serve TAU community.</string>
     <string name="de_fi_range">* Citizens and Residents of United States, European Union and China shall not invest Long Crypto project.</string>
     <string name="de_fi_telegram_group">Long Crypto Telegram Group</string>
+
+    <string name="address_book_search_hint">Search Address or Remark Name</string>
+    <string name="address_book_deleted_sure">Are you sure you want to delete this address?</string>
+    <string name="address_book_switch_sure">Are you sure you want to user this address?</string>
 
 </resources>

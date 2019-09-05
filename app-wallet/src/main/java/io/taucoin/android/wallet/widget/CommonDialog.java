@@ -52,6 +52,9 @@ public class CommonDialog extends Dialog {
         private boolean isEnabledNegative = true;
         private boolean isExchange = false;
         private int btnWidth;
+        private int positiveBgResource = -1;
+        private int negativeBgResource = -1;
+        private boolean horizontal = false;
         private OnClickListener positiveButtonClickListener;
         private OnClickListener negativeButtonClickListener;
         private View mContentView;
@@ -124,11 +127,29 @@ public class CommonDialog extends Dialog {
             this.negativeButtonClickListener = listener;
             return this;
         }
+        public Builder setHorizontal() {
+            this.horizontal = true;
+            return this;
+        }
+        public Builder setPositiveBgResource(int positiveBgResource) {
+            this.positiveBgResource = positiveBgResource;
+            return this;
+        }
+
+        public Builder setNegativeBgResource(int negativeBgResource) {
+            this.negativeBgResource = negativeBgResource;
+            return this;
+        }
 
         public CommonDialog create() {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final CommonDialog dialog = new CommonDialog(context, R.style.CommonDialog);
-            ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.dialog_common_layout, null);
+            ViewGroup layout;
+            if(horizontal){
+                layout = (ViewGroup) inflater.inflate(R.layout.dialog_common_layout_hor, null);
+            }else{
+                layout = (ViewGroup) inflater.inflate(R.layout.dialog_common_layout, null);
+            }
             dialog.addContentView(layout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
             if(mContentView != null){
                 layout.addView(mContentView, 0);
@@ -138,6 +159,13 @@ public class CommonDialog extends Dialog {
 
             viewHolder.positiveButton.setEnabled(isEnabledPositive);
             viewHolder.negativeButton.setEnabled(isEnabledNegative);
+
+            if(positiveBgResource != -1){
+                viewHolder.positiveButton.setBackgroundResource(positiveBgResource);
+            }
+            if(negativeBgResource != -1){
+                viewHolder.negativeButton.setBackgroundResource(negativeBgResource);
+            }
 
             if(!isEnabledPositive){
                 viewHolder.positiveButton.setBackgroundResource(R.drawable.grey_rect_round_bg);

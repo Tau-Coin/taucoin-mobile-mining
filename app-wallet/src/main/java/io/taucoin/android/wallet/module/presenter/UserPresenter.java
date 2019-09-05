@@ -19,6 +19,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.util.List;
+
 import io.taucoin.android.wallet.R;
 
 import io.taucoin.android.wallet.MyApplication;
@@ -28,6 +30,7 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IUserModel;
 import io.taucoin.android.wallet.module.model.UserModel;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.module.view.manage.iview.IAddressView;
 import io.taucoin.android.wallet.module.view.manage.iview.IImportKeyView;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
@@ -39,6 +42,7 @@ public class UserPresenter {
 
     private IImportKeyView mIImportKeyView;
     private IUserModel mUserModel;
+    private IAddressView mAddressView;
     private TxPresenter mTxPresenter;
 
     public UserPresenter() {
@@ -47,6 +51,12 @@ public class UserPresenter {
     public UserPresenter(IImportKeyView view) {
         mUserModel = new UserModel();
         mIImportKeyView = view;
+        mTxPresenter = new TxPresenter();
+    }
+
+    public UserPresenter(IAddressView view) {
+        mUserModel = new UserModel();
+        mAddressView = view;
         mTxPresenter = new TxPresenter();
     }
 
@@ -67,7 +77,7 @@ public class UserPresenter {
             .create().show();
     }
 
-    private void saveKeyAndAddress(FragmentActivity context, KeyValue keyValue) {
+    public void saveKeyAndAddress(FragmentActivity context, KeyValue keyValue) {
         ProgressManager.showProgressDialog(context, false);
         saveKeyAndAddress(keyValue);
     }
@@ -102,7 +112,12 @@ public class UserPresenter {
 
     private void gotoKeysActivity() {
         ProgressManager.closeProgressDialog();
-        mIImportKeyView.gotoKeysActivity();
+        if(mIImportKeyView != null){
+            mIImportKeyView.gotoKeysActivity();
+        }
+        if(mAddressView != null){
+            mAddressView.refreshView();
+        }
         EventBusUtil.post(MessageEvent.EventCode.TRANSACTION);
         EventBusUtil.post(MessageEvent.EventCode.MINING_REWARD);
         EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
@@ -119,10 +134,22 @@ public class UserPresenter {
     }
 
     public void saveName(String name) {
-        mUserModel.saveName(name, new LogicObserver<KeyValue>() {
+        String pubKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
+        saveName(pubKey, name, true, null);
+    }
+
+    public void saveName(String pubKey, String name, boolean isSelf, LogicObserver<KeyValue> observer) {
+        mUserModel.saveName(pubKey, name, new LogicObserver<KeyValue>() {
             @Override
             public void handleData(KeyValue keyValue) {
+                if(isSelf){
+                    MyApplication.setKeyValue(keyValue);
+                }
                 EventBusUtil.post(MessageEvent.EventCode.NICKNAME);
+                if(observer != null){
+                    observer.handleData(keyValue);
+                }
+
             }
         });
     }
@@ -143,5 +170,24 @@ public class UserPresenter {
 
     public void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> logicObserver) {
         mUserModel.saveTransExpiry(transExpiry, logicObserver);
+    }
+
+    public void getAddressList(String key, LogicObserver<List<KeyValue>> observer) {
+        mUserModel.getAddressList(key, observer);
+    }
+    public void getAddressList(String key) {
+        mUserModel.getAddressList(key, new LogicObserver<List<KeyValue>>(){
+
+            @Override
+            public void handleData(List<KeyValue> keyValues) {
+                if(mAddressView != null && keyValues != null){
+                    mAddressView.loadData(keyValues);
+                }
+            }
+        });
+    }
+
+    public void deleteAddress(String pubKey, LogicObserver<Boolean> observer) {
+        mUserModel.deleteAddress(pubKey, observer);
     }
 }

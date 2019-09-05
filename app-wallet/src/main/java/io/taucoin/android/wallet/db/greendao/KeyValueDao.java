@@ -40,6 +40,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         public final static Property MiningRank = new Property(13, String.class, "miningRank", false, "MINING_RANK");
         public final static Property MinerReward = new Property(14, String.class, "minerReward", false, "MINER_REWARD");
         public final static Property PartReward = new Property(15, String.class, "partReward", false, "PART_REWARD");
+        public final static Property LastUseTime = new Property(16, long.class, "lastUseTime", false, "LAST_USE_TIME");
     }
 
 
@@ -70,7 +71,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
                 "\"MINED_NO\" INTEGER NOT NULL ," + // 12: MinedNo
                 "\"MINING_RANK\" TEXT," + // 13: miningRank
                 "\"MINER_REWARD\" TEXT," + // 14: minerReward
-                "\"PART_REWARD\" TEXT);"); // 15: partReward
+                "\"PART_REWARD\" TEXT," + // 15: partReward
+                "\"LAST_USE_TIME\" INTEGER NOT NULL );"); // 16: lastUseTime
     }
 
     /** Drops the underlying database table. */
@@ -138,6 +140,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (partReward != null) {
             stmt.bindString(16, partReward);
         }
+        stmt.bindLong(17, entity.getLastUseTime());
     }
 
     @Override
@@ -199,6 +202,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         if (partReward != null) {
             stmt.bindString(16, partReward);
         }
+        stmt.bindLong(17, entity.getLastUseTime());
     }
 
     @Override
@@ -224,7 +228,8 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
             cursor.getLong(offset + 12), // MinedNo
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // miningRank
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // minerReward
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // partReward
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // partReward
+            cursor.getLong(offset + 16) // lastUseTime
         );
         return entity;
     }
@@ -247,6 +252,7 @@ public class KeyValueDao extends AbstractDao<KeyValue, Long> {
         entity.setMiningRank(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setMinerReward(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
         entity.setPartReward(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setLastUseTime(cursor.getLong(offset + 16));
      }
     
     @Override

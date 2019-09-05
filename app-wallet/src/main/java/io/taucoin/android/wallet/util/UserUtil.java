@@ -50,7 +50,7 @@ import io.taucoin.foundation.util.StringUtil;
 
 public class UserUtil {
 
-    private static String parseNickName(KeyValue keyValue) {
+    public static String parseNickName(KeyValue keyValue) {
         String nickName = null;
         if(keyValue != null){
             nickName = keyValue.getNickName();
@@ -144,6 +144,14 @@ public class UserUtil {
     public static boolean isImportKey() {
         KeyValue keyValue = MyApplication.getKeyValue();
         return  keyValue != null;
+    }
+
+    public static boolean isSelf(String address) {
+        if(isImportKey() &&
+                StringUtil.isSame(address, MyApplication.getKeyValue().getAddress())){
+            return true;
+        }
+       return false;
     }
 
     public static void setAddress(TextView tvAddress) {

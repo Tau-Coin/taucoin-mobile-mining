@@ -160,6 +160,7 @@ public class TxModel implements ITxModel {
                     keyValue.setBalance(balance);
                     keyValue.setPower(power);
                     keyValue.setMiningIncome(miningIncome);
+                    keyValue.setLastUseTime(System.currentTimeMillis());
                     KeyValueDaoUtils.getInstance().update(keyValue);
                 }
             }catch (Exception ignore){}

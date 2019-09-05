@@ -15,6 +15,8 @@
  */
 package io.taucoin.android.wallet.module.model;
 
+import java.util.List;
+
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
@@ -24,11 +26,15 @@ public interface IUserModel {
     void saveKeyAndAddress(KeyValue keyValue, LogicObserver<KeyValue> observer);
 
     /** Save user nickname */
-    void saveName(String name, LogicObserver<KeyValue> observer);
+    void saveName(String pubKey, String name, LogicObserver<KeyValue> observer);
 
     /** Get user key and address */
     void getKeyAndAddress(String publicKey, LogicObserver<KeyValue> observer);
 
     /** Save Transaction Expiry in blocks */
     void saveTransExpiry(long transExpiry, LogicObserver<KeyValue> observer);
+
+    void getAddressList(String key, LogicObserver<List<KeyValue>> logicObserver);
+
+    void deleteAddress(String pubKey, LogicObserver<Boolean> observer);
 }
