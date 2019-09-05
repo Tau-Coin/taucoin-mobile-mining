@@ -56,11 +56,12 @@ import io.taucoin.foundation.util.StringUtil;
 public class TxService extends Service {
 
     private ITxModel mTxModel;
-    private IAppModel mAppModel;
+    IAppModel mAppModel;
     private boolean mIsChecked;
     private boolean mIsGetBalance;
     private boolean mIsGetBlockHeight;
     private boolean mIsSending;
+    private StateTagManager mStateTagManager;
 
     public TxService() {
     }
@@ -84,6 +85,7 @@ public class TxService extends Service {
         Logger.i("TxService onCreate");
         AppPowerManger.acquireWakeLock(this);
         AppWifiManger.acquireWakeLock(this);
+        mStateTagManager = new StateTagManager();
     }
 
     @Override
@@ -138,6 +140,12 @@ public class TxService extends Service {
                 case TransmitKey.ServiceType.SEND_BUDGET_TX:
                     if(!mIsSending){
                         sendBudgetTx();
+                    }
+                    break;
+                case TransmitKey.ServiceType.DOWNLOAD_STATE_TAG:
+                    Logger.d("download_state_tag");
+                    if(mStateTagManager != null && !mStateTagManager.isDownloading()){
+                        mStateTagManager.initAndCheckStateTag(this);
                     }
                     break;
                 default:

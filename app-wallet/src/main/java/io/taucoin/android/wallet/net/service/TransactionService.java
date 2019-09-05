@@ -29,6 +29,7 @@ import io.taucoin.android.wallet.module.bean.RankInfoBean;
 import io.taucoin.android.wallet.module.bean.NewTxBean;
 import io.taucoin.android.wallet.module.bean.RawTxList;
 import io.taucoin.android.wallet.module.bean.RewardInfoBean;
+import io.taucoin.android.wallet.module.bean.StatesTagBean;
 import io.taucoin.android.wallet.module.bean.TxDataBean;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -72,4 +73,7 @@ public interface TransactionService {
 
     @POST("getrewardinfo")
     Observable<RewardInfoBean> getRewardInfo(@Body Map<String,String> address);
+
+    @GET("getstatetag")
+    Observable<StatesTagBean> getStatesTag();
 }

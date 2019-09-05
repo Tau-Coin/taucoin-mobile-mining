@@ -17,6 +17,11 @@ package io.taucoin.android.wallet.util;
 
 import android.net.Uri;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import io.taucoin.foundation.util.StringUtil;
 
 public class UriUtil {
@@ -25,20 +30,40 @@ public class UriUtil {
         if(uri != null){
             return uri.getScheme() +
                     "://" +
-                    uri.getAuthority() +
-                    "/";
+                    uri.getAuthority()
+                    + File.separator;
         }
         return "";
     }
 
     public static String getPath(Uri uri) {
+        return getPath(uri, true);
+    }
+
+    public static String getPath(Uri uri, boolean isNeedSeparator) {
         if(uri != null){
             String path = uri.getPath();
-            if(StringUtil.isNotEmpty(uri.getQuery())){
-                path +="?" + uri.getQuery();
+            if(StringUtil.isNotEmpty(path)){
+                if(!isNeedSeparator && path.startsWith("/")){
+                    path = path.substring(1);
+                }
+                return path;
             }
-            return path;
         }
         return "";
+    }
+
+    public static Map<String, String> getQueryMap(Uri uri) {
+        Map<String, String> map = new HashMap<>();
+        if(uri != null){
+            Set<String> names = uri.getQueryParameterNames();
+            for (String name : names) {
+                String value = uri.getQueryParameter(name);
+                if(StringUtil.isNotEmpty(value)){
+                    map.put(name, value);
+                }
+            }
+        }
+        return map;
     }
 }

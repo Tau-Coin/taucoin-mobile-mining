@@ -27,6 +27,7 @@ public class TransmitKey {
         public static final String GET_BLOCK_HEIGHT = "get_block_height";
         public static final String GET_REWARD_INFO = "get_reward_info";
         public static final String SEND_BUDGET_TX = "send_budget_tx";
+        public static final String DOWNLOAD_STATE_TAG = "download_state_tag";
     }
 
     public static final String PUBLIC_KEY = "PubKey";
@@ -87,4 +88,7 @@ public class TransmitKey {
     public static final String FORGING_WIFI_ONLY = "forging_wifi_only";
     public static final String FORGING_RELOAD = "FORGING_RELOAD";
     public static final String FORGING_LOG = "forging_log";
+    public static final String STATES_TAG_LOADED = "states_tag_loaded";
+    public static final String STATES_TAG_DOWNLOAD = "states_tag_download";
+    public static final String STATES_TAG_START_NO = "states_tag_start_no";
 }

@@ -44,6 +44,8 @@ import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.NotifyManager;
+import io.taucoin.android.wallet.module.service.StateTagManager;
+import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
@@ -400,17 +402,26 @@ public abstract class ConnectorManager implements ConnectorHandler {
     public void init(){
         Logger.d("init");
         if(UserUtil.isImportKey()){
-            String privateKey = MyApplication.getKeyValue().getPriKey();
-            // import privateKey and init
             if(isTaucoinConnected){
-                if(isInit()){
-                    importForgerPrivkey(privateKey);
-                }else{
-                    importPrivkeyAndInit(privateKey);
+                if(!isInit() && StateTagManager.isStateTagNotLoaded()){
+                    TxService.startTxService(TransmitKey.ServiceType.DOWNLOAD_STATE_TAG);
                 }
             }else{
+                if(!StateTagManager.isStateTagLoadedFinished()){
+                    StateTagManager.reLoadStateTags();
+                }
                 createRemoteConnector();
             }
+        }
+    }
+
+    public void initBlockChain(){
+        String privateKey = MyApplication.getKeyValue().getPriKey();
+        // import privateKey and init
+        if(isInit()){
+            importForgerPrivkey(privateKey);
+        }else{
+            importPrivkeyAndInit(privateKey);
         }
     }
 

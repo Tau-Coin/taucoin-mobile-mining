@@ -35,6 +35,8 @@ import io.taucoin.android.service.events.NetworkTrafficData;
 import io.taucoin.android.service.events.NextBlockForgedPOTDetail;
 import io.taucoin.android.service.events.PeerDisconnectEventData;
 import io.taucoin.android.service.events.PendingTransactionsEventData;
+import io.taucoin.android.service.events.StatesLoadedData;
+import io.taucoin.android.service.events.StatesLoadedResult;
 import io.taucoin.android.service.events.TraceEventData;
 import io.taucoin.android.service.events.VMTraceCreatedEventData;
 import io.taucoin.android.wallet.MyApplication;
@@ -43,6 +45,7 @@ import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IMiningModel;
 import io.taucoin.android.wallet.module.model.MiningModel;
+import io.taucoin.android.wallet.module.service.StateTagManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.MiningUtil;
@@ -233,6 +236,30 @@ public class RemoteConnectorManager extends ConnectorManager implements Connecto
                         messageEvent.setData(nextBlockForgedPOTDetail);
                         messageEvent.setCode(MessageEvent.EventCode.FORGED_POT_DETAIL);
                         EventBusUtil.post(messageEvent);
+                        break;
+                    case EVENT_STATES_LOADED:
+                        StatesLoadedData statesLoadedData = data.getParcelable("data");
+                        if(statesLoadedData != null){
+                            logMessage = "event states hasLoaded= " + statesLoadedData.hasLoaded +
+                                    " total=" + statesLoadedData.total;
+                            time = statesLoadedData.registeredTime;
+                            addLogEntry(time, logMessage);
+                        }
+                        break;
+                    case EVENT_STATES_LOADED_COMPLETED:
+                    case EVENT_STATES_LOADED_FAILED:
+                        StatesLoadedResult statesLoadedResult = data.getParcelable("data");
+                        if(statesLoadedResult != null){
+                            logMessage = "event states result= " + statesLoadedResult.success +
+                                    " tagHeight=" + statesLoadedResult.tagHeight;
+                            time = statesLoadedResult.registeredTime;
+                            addLogEntry(time, logMessage);
+                            StateTagManager.setStateTagLoaded(statesLoadedResult.tagHeight, statesLoadedResult.success ? 1 : 2);
+                            if(statesLoadedResult.success){
+                                // delete file
+                                MiningUtil.deleteStatesTagFileDir();
+                            }
+                        }
                         break;
                 }
                 break;

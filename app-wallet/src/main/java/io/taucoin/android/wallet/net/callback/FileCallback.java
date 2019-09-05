@@ -45,6 +45,7 @@ public abstract class FileCallback implements Callback<ResponseBody> {
      */
     private String destFileName;
     public long time;
+    protected boolean isDeleteDir = true;
 
     protected FileCallback() {
         EventBus.getDefault().register(this);
@@ -112,7 +113,9 @@ public abstract class FileCallback implements Callback<ResponseBody> {
         if (!dir.exists()) {
             dir.mkdirs();
         }else {
-            deleteFile(dir);
+            if(isDeleteDir){
+                deleteFile(dir);
+            }
         }
         if (null != response.body()) {
             InputStream in = response.body().byteStream();

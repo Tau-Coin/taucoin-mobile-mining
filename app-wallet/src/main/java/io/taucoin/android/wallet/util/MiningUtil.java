@@ -39,6 +39,7 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.BlockInfoDaoUtils;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.TxModel;
+import io.taucoin.android.wallet.module.service.StateTagManager;
 import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.widget.EditInput;
@@ -177,18 +178,7 @@ public class MiningUtil {
                 if(isSleep){
                     Thread.sleep(2000);
                 }
-                Context context = MyApplication.getInstance();
-                String dataDir =  context.getApplicationInfo().dataDir;
-                Logger.d(dataDir);
-                String blocksDir = dataDir + File.separator + "blocks";
-                String stateDir = dataDir + File.separator + "state";
-                String blockQueueDir = dataDir + File.separator + "blockqueue";
-                String blockStoreDir = dataDir + File.separator + "blockstore";
-                FileUtil.deleteFile(new File(blocksDir));
-                FileUtil.deleteFile(new File(stateDir));
-                FileUtil.deleteFile(new File(blockQueueDir));
-                FileUtil.deleteFile(new File(blockStoreDir));
-
+                deleteBlockChainFileDir();
                 int blockSync = BlockInfoDaoUtils.getInstance().reloadBlocks();
                 if(logicObserver == null){
                     EventBusUtil.post(MessageEvent.EventCode.IRREPARABLE_ERROR, blockSync);
@@ -208,11 +198,49 @@ public class MiningUtil {
                         logicObserver.onNext(isSuccess);
                     }
                     if(isSuccess){
+                        StateTagManager.reLoadStateTags();
+                        StateTagManager.reDownLoadStateTags();
                         AppUtil.killProcess(MyApplication.getInstance(), false);
                         EventBusUtil.post(MessageEvent.EventCode.MINING_INFO);
                         EventBusUtil.post(MessageEvent.EventCode.FORGED_POT_DETAIL);
                     }
                     initRemoteConnectorDelay();
+                }
+            });
+    }
+
+    public static void deleteBlockChainFileDir() {
+        Context context = MyApplication.getInstance();
+        String dataDir =  context.getApplicationInfo().dataDir;
+        Logger.d(dataDir);
+        String blocksDir = dataDir + File.separator + "blocks";
+        String stateDir = dataDir + File.separator + "state";
+        String blockQueueDir = dataDir + File.separator + "blockqueue";
+        String blockStoreDir = dataDir + File.separator + "blockstore";
+        FileUtil.deleteFile(new File(blocksDir));
+        FileUtil.deleteFile(new File(stateDir));
+        FileUtil.deleteFile(new File(blockQueueDir));
+        FileUtil.deleteFile(new File(blockStoreDir));
+    }
+
+    public static void deleteStatesTagFileDir() {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                Context context = MyApplication.getInstance();
+                String dataDir =  context.getApplicationInfo().dataDir;
+                String tagFileDir = dataDir + File.separator + StateTagManager.tagFileDirName;
+                deleteBlockChainFileDir();
+                FileUtil.deleteFile(new File(tagFileDir));
+                emitter.onNext(true);
+            }catch (Exception ex){
+                emitter.onNext(false);
+            }
+        }).observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new LogicObserver<Boolean>() {
+                @Override
+                public void handleData(Boolean aBoolean) {
+                    Logger.d("deleteStatesTagFileDir result=%s", aBoolean);
                 }
             });
     }

@@ -16,15 +16,15 @@
 package io.taucoin.android.wallet.module.model;
 
 import com.trello.rxlifecycle2.LifecycleProvider;
-import com.trello.rxlifecycle2.LifecycleTransformer;
 import com.trello.rxlifecycle2.android.ActivityEvent;
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.util.List;
 
 import io.taucoin.android.wallet.module.bean.HelpBean;
+import io.taucoin.android.wallet.module.bean.StatesTagBean;
 import io.taucoin.android.wallet.module.bean.VersionBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.foundation.net.callback.DataResult;
 
 public interface IAppModel {
@@ -37,4 +37,6 @@ public interface IAppModel {
 
     /** Check app version info */
     void checkAppVersion(TAUObserver<DataResult<VersionBean>> observer);
+
+    void checkStateTag(TxObserver<StatesTagBean> observer);
 }

@@ -27,9 +27,12 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.HelpBean;
+import io.taucoin.android.wallet.module.bean.StatesTagBean;
 import io.taucoin.android.wallet.module.bean.VersionBean;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.callback.TxObserver;
 import io.taucoin.android.wallet.net.service.AppService;
+import io.taucoin.android.wallet.net.service.TransactionService;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.DataResult;
@@ -72,6 +75,15 @@ public class AppModel implements IAppModel{
                 .checkAppVersion(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    @Override
+    public void checkStateTag(TxObserver<StatesTagBean> observer) {
+        NetWorkManager.createMysqlApiService(TransactionService.class)
+                .getStatesTag()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .subscribe(observer);
     }
 }

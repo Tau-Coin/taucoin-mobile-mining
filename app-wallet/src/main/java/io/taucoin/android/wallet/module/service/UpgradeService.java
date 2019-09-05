@@ -24,6 +24,7 @@ import io.taucoin.android.wallet.module.view.manage.UpgradeActivity;
 import io.taucoin.android.wallet.net.callback.FileCallback;
 import io.taucoin.android.wallet.net.callback.FileResponseBody;
 import io.taucoin.android.wallet.net.callback.TAUObserver;
+import io.taucoin.android.wallet.net.service.FileLoad;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FileUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
@@ -40,8 +41,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 /**
  * Description:version upgrade service
@@ -73,6 +72,7 @@ public class UpgradeService extends Service {
 
     private UpgradeStatus mStatus;
     private VersionBean mVersionBean;
+    private DownLoadFileCallback mFileCallback;
 
     @Override
     public void onCreate() {
@@ -124,12 +124,12 @@ public class UpgradeService extends Service {
 
             // delete old version install apk
             FileUtil.deleteFile(destFileDir);
-
+            mFileCallback = new DownLoadFileCallback();
             mFileCallback.setFileData(destFileDir, destFileName);
             mCall = mRetrofitBuilder
                 .baseUrl(UriUtil.getBaseUrl(uri))
                 .build()
-                .create(IFileLoad.class)
+                .create(FileLoad.class)
                 .loadFile(UriUtil.getPath(uri));
             startDownload();
         }catch (Exception e){
@@ -149,7 +149,8 @@ public class UpgradeService extends Service {
         }
     }
 
-    private FileCallback mFileCallback = new FileCallback() {
+    class DownLoadFileCallback extends FileCallback {
+
         @Override
         public void onSuccess(File file) {
             Logger.d(time + "\ndownload apk success");
@@ -179,7 +180,7 @@ public class UpgradeService extends Service {
             }
             Logger.d( time + "\ndownload Failure");
         }
-    };
+    }
 
     private OkHttpClient initOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -195,11 +196,6 @@ public class UpgradeService extends Service {
                     .build();
         });
         return builder.build();
-    }
-
-    public interface IFileLoad {
-        @GET("{pathParam}")
-        Call<ResponseBody> loadFile(@Path("pathParam") String pathParam);
     }
 
     private void checkAppVersion(boolean isShowTip) {
