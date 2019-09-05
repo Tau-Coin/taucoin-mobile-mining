@@ -63,7 +63,6 @@ public class FileResponseBody extends ResponseBody {
             public long read(@NonNull Buffer sink, long byteCount) throws IOException {
                 long bytesRead = super.read(sink, byteCount);
                 byteRead += bytesRead == -1 ? 0 : bytesRead;
-                Logger.d("Upgrade.total=" + contentLength() + "progress=" + byteRead);
                 EventBus.getDefault().post(new FileLoadingBean(contentLength(), byteRead, byteCount));
                 return bytesRead;
             }
