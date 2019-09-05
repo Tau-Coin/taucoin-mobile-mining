@@ -10,35 +10,32 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.GZIPInputStream;
 
 public class ZipUtils {
 
     private static final Logger logger = LoggerFactory.getLogger("stateloader");
 
-    public static void unzipFile(File in, String destDir) {
-        if (in == null || destDir == null || destDir.isEmpty()) {
+    public static void unzipFile(File in, String destDir, String destFileName) {
+        if (in == null || destDir == null || destDir.isEmpty()
+                || destFileName == null || destFileName.isEmpty()) {
             return;
         }
 
-        ZipInputStream zis = null;
-        ZipEntry zipEntry = null;
+        GZIPInputStream zis = null;
         File destFile = null;
         FileOutputStream fos = null;
         byte[] buffer = new byte[5 * 1024];
 
         try {
-            zis = new ZipInputStream(new FileInputStream(in));
-            zipEntry = zis.getNextEntry();
+            zis = new GZIPInputStream(new FileInputStream(in));
 
-            if (zipEntry != null) {
-                destFile = new File(destDir, zipEntry.getName());
-                fos = new FileOutputStream(destFile);
+            destFile = new File(destDir, destFileName);
+            fos = new FileOutputStream(destFile);
 
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
             }
         } catch (FileNotFoundException e) {
             // This should never happen.
@@ -48,7 +45,6 @@ public class ZipUtils {
         } finally {
             try {
                 if (zis != null) {
-                    zis.closeEntry();
                     zis.close();
                 }
 

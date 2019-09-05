@@ -166,6 +166,7 @@ public class FileBlockStore {
         }
 
         BlockIndex index = new BlockIndex(position);
+        //logger.info("fileblockstore write number {}, position {}", number, position);
         try {
             indexStore.write(index.getEncoded());
         } catch(Exception e) {
@@ -219,6 +220,7 @@ public class FileBlockStore {
         BlockIndex index;
         byte[] indexEncoded;
 
+        //logger.info("fileblockstore read number {}, postion {}", number, position);
         try {
             indexEncoded = indexStore.read(position);
             index = new BlockIndex(indexEncoded);
@@ -296,6 +298,7 @@ public class FileBlockStore {
     public synchronized void setStartNumber(long startNumber) {
         this.startNumber = startNumber;
         maxNumber = startNumber - 1;
+        BlockIndex.setStartNumber(startNumber);
         writeStartNumber(startNumber);
     }
 

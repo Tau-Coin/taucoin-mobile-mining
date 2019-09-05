@@ -198,31 +198,43 @@ public class WorldManager {
 
         Block bestBlock = blockStore.getBestBlock();
         if (bestBlock == null) {
-            logger.info("DB is empty - adding Genesis");
 
-            Genesis genesis = (Genesis)Genesis.getInstance(config);
-            long startTime0 = System.nanoTime();
-            for (ByteArrayWrapper key : genesis.getPremine().keySet()) {
-                repository.createAccount(key.getData());
-                //System.out.println("consumption in create account "+(System.currentTimeMillis()-starttime));
-                BigInteger power = repository.increaseforgePower(key.getData());
-                logger.info("address : {} forge power : {}",Hex.toHexString(key.getData()),power);
-                repository.addBalance(key.getData(), genesis.getPremine().get(key).getBalance());
+            // Try loading states tag.
+            // If states loaded successfully, set best block again.
+            if (stateLoader.loadStatesTag()) {
+                Block tagBestBlock = blockStore.getBestBlock();
+                if (tagBestBlock != null) {
+                    logger.info("Tag best block {} {}", tagBestBlock.getNumber(),
+                            tagBestBlock.getShortHash());
+                    blockchain.setBestBlock(tagBestBlock);
+                    blockchain.setTotalDifficulty(tagBestBlock.getCumulativeDifficulty());
+                }
+            } else {
+                logger.info("DB is empty - adding Genesis");
+
+                Genesis genesis = (Genesis)Genesis.getInstance(config);
+                long startTime0 = System.nanoTime();
+                for (ByteArrayWrapper key : genesis.getPremine().keySet()) {
+                    repository.createAccount(key.getData());
+                    BigInteger power = repository.increaseforgePower(key.getData());
+                    logger.info("address : {} forge power : {}",Hex.toHexString(key.getData()),power);
+                    repository.addBalance(key.getData(), genesis.getPremine().get(key).getBalance());
+                }
+                long endTime0 = System.nanoTime();
+                logger.info("Import accounts time: {}",((endTime0 - startTime0) / 1000000));
+                logger.info("genesis block hash: {}",Hex.toHexString(Genesis.getInstance(config).getHash()));
+                Object object= blockStore.getClass();
+                logger.info("blockStore class : {}",((Class) object).getName());
+
+                blockStore.saveBlock(Genesis.getInstance(config), Genesis.getInstance(config).getCumulativeDifficulty(), true);
+                blockStore.flush();
+                blockchain.setBestBlock(Genesis.getInstance(config));
+                blockchain.setTotalDifficulty(Genesis.getInstance(config).getCumulativeDifficulty());
+
+                listener.onBlock(Genesis.getInstance(config));
+
+                logger.info("Genesis block loaded");
             }
-            long endTime0 = System.nanoTime();
-            logger.info("Import accounts time: {}",((endTime0 - startTime0) / 1000000));
-            logger.info("genesis block hash: {}",Hex.toHexString(Genesis.getInstance(config).getHash()));
-            Object object= blockStore.getClass();
-            logger.info("blockStore class : {}",((Class) object).getName());
-
-            blockStore.saveBlock(Genesis.getInstance(config), Genesis.getInstance(config).getCumulativeDifficulty(), true);
-            blockStore.flush();
-            blockchain.setBestBlock(Genesis.getInstance(config));
-            blockchain.setTotalDifficulty(Genesis.getInstance(config).getCumulativeDifficulty());
-
-            listener.onBlock(Genesis.getInstance(config));
-
-            logger.info("Genesis block loaded");
         } else {
 
             // Note: 'BlockchainImpl' maybe undo transactions which call blockchain.getSize().

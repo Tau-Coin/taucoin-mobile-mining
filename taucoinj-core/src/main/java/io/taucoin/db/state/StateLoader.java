@@ -294,7 +294,9 @@ public class StateLoader {
 
             String name = files[i].getName();
             if (files[i] != null && name.endsWith("zip")) {
-                ZipUtils.unzipFile(files[i], stateTagDir());
+                logger.info("unzip file {}, dest dir {}", name, stateTagDir());
+                ZipUtils.unzipFile(files[i], stateTagDir(),
+                        name.substring(0, name.indexOf(".zip")));
             }
         }
 
