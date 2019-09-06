@@ -213,14 +213,18 @@ public class MiningUtil {
         Context context = MyApplication.getInstance();
         String dataDir =  context.getApplicationInfo().dataDir;
         Logger.d(dataDir);
+        // Ver1.9.0.6 will discard these two folders later
         String blocksDir = dataDir + File.separator + "blocks";
-        String stateDir = dataDir + File.separator + "state";
         String blockQueueDir = dataDir + File.separator + "blockqueue";
-        String blockStoreDir = dataDir + File.separator + "blockstore";
         FileUtil.deleteFile(new File(blocksDir));
-        FileUtil.deleteFile(new File(stateDir));
         FileUtil.deleteFile(new File(blockQueueDir));
+
+        String stateDir = dataDir + File.separator + "state";
+        String blockStoreDir = dataDir + File.separator + "blockstore";
+        String storeBackend = dataDir + File.separator + "store-backend";
+        FileUtil.deleteFile(new File(stateDir));
         FileUtil.deleteFile(new File(blockStoreDir));
+        FileUtil.deleteFile(new File(storeBackend));
     }
 
     public static void deleteStatesTagFileDir() {
