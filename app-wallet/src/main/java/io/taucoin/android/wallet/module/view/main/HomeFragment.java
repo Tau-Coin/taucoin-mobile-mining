@@ -222,10 +222,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 // If the connection with the mining process is interrupted, restore the connection
                 MyApplication.getRemoteConnector().restoreConnection();
                 break;
-            case BLOCK_HEIGHT:
             case MINING_INFO:
             case MINING_STATE:
                 handleMiningView();
+                break;
+            case BLOCK_HEIGHT:
+            case MINING_SYNC:
+                handleMiningView(1);
                 break;
             case MINING_REWARD:
                 if(tvNextBlockNo != null){
@@ -243,7 +246,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case MINING_INCOME:
                 BlockInfo blockInfo = (BlockInfo) object.getData();
-                showMiningView(blockInfo, false);
+                showMiningViewAndMined(blockInfo);
                 break;
             case IRREPARABLE_ERROR:
                 if(object.getData() != null && tvIrreparableError != null){
@@ -253,7 +256,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case FORGED_POT_DETAIL:
                 refreshNextBlockView(object.getData());
-                handleMiningView();
                 break;
             default:
                 break;
@@ -274,16 +276,21 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         minerListView.setAdapter(minerRewardAdapter);
     }
 
+    @Override
     public synchronized void handleMiningView() {
+        handleMiningView(0);
+    }
+
+    public synchronized void handleMiningView(int handleNextBlock) {
         if (UserUtil.isImportKey()) {
             miningPresenter.getMiningInfo(new LogicObserver<BlockInfo>() {
                 @Override
                 public void handleData(BlockInfo blockInfo) {
-                    showMiningView(blockInfo);
+                    showMiningView(blockInfo, handleNextBlock);
                 }
             });
         }else{
-            showMiningView(null);
+            showMiningView(null, handleNextBlock);
         }
     }
 
@@ -312,11 +319,15 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         cbWifiOnly.setChecked(isWifiOnly);
     }
 
-    public void showMiningView(BlockInfo blockInfo){
-        showMiningView(blockInfo, true);
+    public void showMiningView(BlockInfo blockInfo, int handleNextBlock){
+        showMiningView(blockInfo, true, handleNextBlock);
     }
 
-    public void showMiningView(BlockInfo blockInfo, boolean isRefreshMined){
+    private void showMiningViewAndMined(BlockInfo blockInfo){
+        showMiningView(blockInfo, false, 0);
+    }
+
+    private void showMiningView(BlockInfo blockInfo, boolean isRefreshMined, int handleNextBlock){
         UserUtil.setMiningConditions(tvVerify, ivVerify, blockInfo);
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);
@@ -330,7 +341,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         }
 
         if(blockInfo != null){
-            if(blockInfo.getBlockSync() != blockInfo.getBlockHeight()){
+            if(handleNextBlock == 1 && blockInfo.getBlockSync() != blockInfo.getBlockHeight()){
                 refreshNextBlockView(null);
             }
             long blockHeight = StringUtil.getIntTag(tvNextBlockNo);

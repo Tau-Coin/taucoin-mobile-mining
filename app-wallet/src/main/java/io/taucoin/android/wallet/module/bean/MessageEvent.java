@@ -10,6 +10,7 @@ public class MessageEvent{
         UPGRADE,
         BLOCK_HEIGHT,
         MINING_INFO,
+        MINING_SYNC,
         MINING_REWARD,
         MINING_NOTIFY,
         MINING_STATE,

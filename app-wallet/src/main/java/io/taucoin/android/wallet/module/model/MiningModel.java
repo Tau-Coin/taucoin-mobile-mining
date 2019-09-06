@@ -116,7 +116,7 @@ public class MiningModel implements IMiningModel{
     @Override
     public synchronized void handleSynchronizedBlock(BlockEventData blockEvent, boolean isConnect, LogicObserver<MessageEvent.EventCode> logicObserver) {
         Observable.create((ObservableOnSubscribe<MessageEvent.EventCode>) emitter -> {
-            MessageEvent.EventCode eventCode = MessageEvent.EventCode.MINING_INFO;
+            MessageEvent.EventCode eventCode = MessageEvent.EventCode.MINING_SYNC;
             if(blockEvent != null){
                 Block block = blockEvent.block;
                 if(block != null){
