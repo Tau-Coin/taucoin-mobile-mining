@@ -861,4 +861,7 @@ public class IndexedBlockStore implements BlockStore {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void reset(){
+    }
 }

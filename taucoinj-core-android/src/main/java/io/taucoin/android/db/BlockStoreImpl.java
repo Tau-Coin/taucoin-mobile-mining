@@ -152,6 +152,7 @@ public class BlockStoreImpl implements BlockStore {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void reset() {
 
         database.reset();

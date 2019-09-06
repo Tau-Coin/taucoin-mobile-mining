@@ -58,4 +58,6 @@ public interface BlockStore {
     long getBlockTimeByNumber(long blockNumber);
 
     void close();
+
+    void reset();
 }

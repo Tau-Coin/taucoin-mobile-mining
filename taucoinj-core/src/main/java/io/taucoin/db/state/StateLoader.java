@@ -86,6 +86,7 @@ public class StateLoader {
 
         if ((accountsLoaded == accountAmount)
                 && (bestNumber != 0 && bestNumber == tagNumber)) {
+            listener.onBlocksDownloaded(1L, tagNumber);
             listener.onBlockConnected(bestBlock);
             listener.onStatesLoadedCompleted(tagNumber);
             logger.info("States loaded successfully: {}/{}",
@@ -93,6 +94,7 @@ public class StateLoader {
 
             return true;
         } else {
+            resetChainData();
             listener.onStatesLoadedFailed(tagNumber);
             logger.error("States loaded error: {}/{}",
                     accountsLoaded, accountAmount);
@@ -304,6 +306,10 @@ public class StateLoader {
     }
 
     private void resetChainData() {
+        logger.warn("reset block chain data: blockstore & repository");
+        repository.reset();
+        blockStore.reset();
+        fileBlockStore.setStartNumber(1L);
     }
 
     private boolean stateTagExist() {

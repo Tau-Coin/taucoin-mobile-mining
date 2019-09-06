@@ -247,6 +247,7 @@ public class OrmLiteBlockStoreDatabase extends OrmLiteSqliteOpenHelper implement
         return blocks;
     }
 
+    @Override
     public void reset() {
 
         deleteBlocksSince(Long.valueOf(0));

@@ -35,6 +35,8 @@ import static io.taucoin.crypto.SHA3Helper.sha3;
 import static io.taucoin.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static io.taucoin.util.ByteUtil.wrap;
 
+import static io.taucoin.config.SystemProperties.CONFIG;
+
 /**
  * @author Roman Mandeleil
  * @since 17.11.2014
@@ -68,6 +70,9 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     @Override
     public synchronized void reset() {
         close();
+
+        // Clear stateDB data.
+        clearStateDB();
         stateDB.init();
     }
 
@@ -308,5 +313,17 @@ public class RepositoryImpl implements io.taucoin.facade.Repository{
     @Override
     public void showRepositoryChange() {
 
+    }
+
+    private void clearStateDB() {
+        String dbDir = CONFIG.databaseDir() + File.separator + STATE_DB;
+
+        logger.warn("Clear state db: {}", dbDir);
+        try {
+            writeBatch.clear();
+            FileUtils.deleteDirectory(new File(dbDir));
+        } catch (IOException e) {
+            logger.error("Clear statedb error:{}", e);
+        }
     }
 }

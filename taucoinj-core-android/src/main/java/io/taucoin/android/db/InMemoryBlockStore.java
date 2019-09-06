@@ -256,4 +256,8 @@ public class InMemoryBlockStore implements BlockStore {
     public void close(){
 
     }
+
+    @Override
+    public void reset(){
+    }
 }

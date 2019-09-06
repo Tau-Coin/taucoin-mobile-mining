@@ -3,6 +3,7 @@ package io.taucoin.db;
 import io.taucoin.core.Block;
 import io.taucoin.util.ByteUtil;
 
+import org.apache.commons.io.FileUtils;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,16 @@ public class MemoryIndexedBlockStore implements BlockStore {
     @Override
     public void close(){
         logger.info("close block store data base...");
+    }
+
+    @Override
+    public void reset(){
+        close();
+        clearBlockStore();
+        initDone = false;
+
+        // init everything
+        init();
     }
 
     public Block getBestBlock(){
@@ -847,6 +858,25 @@ public class MemoryIndexedBlockStore implements BlockStore {
             f.mkdir();
         }
     }
+
+    private void clearBlockStore() {
+        String absolutePath = CONFIG.databaseDir() + File.separator + BLOCKSTORE_DIRECTORY;
+
+        logger.warn("Clear block store: {}", absolutePath);
+        try {
+            // Clear cache
+            blocks.clear();
+            index.clear();
+            blocksCache.clear();
+            indexCache.clear();
+            sBlockTimeCache.clear();
+
+            FileUtils.deleteDirectory(new File(absolutePath));
+        } catch (IOException e) {
+            logger.error("Clear block store error:{}", e);
+        }
+    }
+
 
     private void saveBlockIntoDisk(Block block) {
         try {
