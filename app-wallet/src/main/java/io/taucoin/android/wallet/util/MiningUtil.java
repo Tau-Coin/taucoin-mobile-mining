@@ -233,7 +233,6 @@ public class MiningUtil {
                 Context context = MyApplication.getInstance();
                 String dataDir =  context.getApplicationInfo().dataDir;
                 String tagFileDir = dataDir + File.separator + StateTagManager.tagFileDirName;
-                deleteBlockChainFileDir();
                 FileUtil.deleteFile(new File(tagFileDir));
                 emitter.onNext(true);
             }catch (Exception ex){
