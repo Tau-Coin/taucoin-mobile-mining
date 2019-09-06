@@ -84,7 +84,8 @@
     <string name="send_tx_increase_address">To:&#160;%s</string>
 
     <string name="send_tx_small_fee">0.01</string>
-    <string name="send_tx_total_amount" formatted="false"><Data><![CDATA[Total:&nbsp;<font color="#f19322">%s</font>&nbsp;(Including each transaction fee)]]></Data></string>
+    <string name="send_tx_total_amount">Total:&#160;%s&#160;TAU</string>
+    <string name="send_tx_budget_amount" formatted="false"><Data><![CDATA[Total:&nbsp;<font color="#f19322">%s</font>&nbsp;(Including each transaction fee)]]></Data></string>
 
     <string name="send_tx_invalid_address">Invalid Address</string>
     <string name="send_tx_invalid_amount">Invalid Amount</string>

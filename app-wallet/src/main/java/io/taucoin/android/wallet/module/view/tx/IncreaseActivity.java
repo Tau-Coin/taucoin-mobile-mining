@@ -122,7 +122,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
     void onTextChanged(CharSequence text){
         String amount = etAmount.getText().toString().trim();
         if(StringUtil.isNotEmpty(amount) ){
-            String totalAmount = getText(R.string.send_tx_total_amount).toString();
+            String totalAmount = getText(R.string.send_tx_budget_amount).toString();
             totalAmount = String.format(totalAmount, amount);
             tvTotalAmount.setText(Html.fromHtml(totalAmount));
             tvTotalAmount.setVisibility(View.VISIBLE);
