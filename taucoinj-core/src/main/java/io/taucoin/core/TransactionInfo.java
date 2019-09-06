@@ -52,29 +52,26 @@ public class TransactionInfo implements Serializable {
         if(rlpEncoded != null) {
             RLPList decodedTxList = RLP.decode2(rlpEncoded);
             RLPList transaction = (RLPList) decodedTxList.get(0);
-            byte[] trTime = transaction.get(0).getRLPData();
+
+            this.trHash = transaction.get(0).getRLPData();
+            byte[] trTime = transaction.get(1).getRLPData();
             //considering concurrency situation ,a list may be need.
-            if (transaction.size() > 1) {
-                byte[] trHashcode = transaction.get(1).getRLPData();
-                this.trHash = trHashcode;
-            }
             this.trTime = ByteUtil.byteArrayToLong(trTime);
             this.parsed = true;
         }
         rlpEncoded = null;
-     }
+    }
 
     public byte[] getEncoded() {
-         if (!parsed) rlpParse();
-         if (rlpEncoded != null) return rlpEncoded;
+        if (!parsed) rlpParse();
+        if (rlpEncoded != null) return rlpEncoded;
 
-         byte[] trTime = RLP.encodeBigInteger(BigInteger.valueOf(this.trTime));
-         //byte[] trHashcode = RLP.encodeElement(this.trHash);
+        byte[] trHashcode = RLP.encodeElement(null);
+        byte[] trTime = RLP.encodeBigInteger(BigInteger.valueOf(this.trTime));
 
- 
-         this.rlpEncoded = RLP.encodeList(trTime/*trHashcode*/);
- 
-         return rlpEncoded;
-     }
+        this.rlpEncoded = RLP.encodeList(trHashcode,trTime);
+
+        return rlpEncoded;
+    }
 
 }
