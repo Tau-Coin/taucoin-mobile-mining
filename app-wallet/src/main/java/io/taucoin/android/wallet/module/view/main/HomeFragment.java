@@ -38,7 +38,6 @@ import io.taucoin.android.wallet.module.view.main.iview.IHomeView;
 import io.taucoin.android.wallet.module.view.manage.ImportKeyActivity;
 import io.taucoin.android.wallet.net.callback.CommonObserver;
 import io.taucoin.android.wallet.util.ActivityUtil;
-import io.taucoin.android.wallet.util.DialogManager;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ResourcesUtil;
@@ -254,6 +253,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case FORGED_POT_DETAIL:
                 refreshNextBlockView(object.getData());
+                handleMiningView();
                 break;
             default:
                 break;
@@ -342,11 +342,6 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void refreshNextBlockView(Object data){
-        long blockHeight = StringUtil.getIntTag(tvNextBlockNo);
-        long blockSync = StringUtil.getIntTag(tvVerify);
-        if(data != null && blockHeight != blockSync){
-            data = null;
-        }
         if(llCurrentCondition != null){
             llCurrentCondition.setVisibility(data == null ? View.GONE : View.VISIBLE);
         }
