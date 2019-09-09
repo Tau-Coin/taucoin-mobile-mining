@@ -119,7 +119,7 @@ public class TxService extends Service {
                     getBalance(serviceType);
                     break;
                 case TransmitKey.ServiceType.GET_BALANCE:
-                    getBalance(serviceType);
+                    getBalance(serviceType, intent.getBooleanExtra(TransmitKey.DATA, true));
                     getMinerInfo(false);
                     getRankInfo(false);
                     break;
@@ -206,7 +206,7 @@ public class TxService extends Service {
         });
     }
 
-    private void getBalanceDelay(String serviceType) {
+    private void getBalanceDelay(String serviceType, Object data) {
         mIsChecked = true;
         mIsGetBalance = true;
         Observable.timer(30, TimeUnit.SECONDS)
@@ -220,13 +220,17 @@ public class TxService extends Service {
     }
 
     private void getBalance(String serviceType) {
+        getBalance(serviceType, null);
+    }
+
+    private void getBalance(String serviceType, Object data) {
         mIsGetBalance = true;
         getIncomeInfo();
         mTxModel.getBalance(new LogicObserver<KeyValue>() {
 
             @Override
             public void handleError(int msgCode, String msg) {
-                handleBalanceDisplay(serviceType, false);
+                handleBalanceDisplay(serviceType, false, data);
             }
 
             @Override
@@ -234,9 +238,9 @@ public class TxService extends Service {
                 if(entry != null){
                     Logger.i("getBalance success");
                     MyApplication.setKeyValue(entry);
-                    handleBalanceDisplay(serviceType, true);
+                    handleBalanceDisplay(serviceType, true, data);
                 }else{
-                    handleBalanceDisplay(serviceType, false);
+                    handleBalanceDisplay(serviceType, false, data);
                 }
             }
         });
@@ -317,20 +321,26 @@ public class TxService extends Service {
         });
     }
 
-    private void handleBalanceDisplay(String serviceType, boolean isSuccess) {
+    private void handleBalanceDisplay(String serviceType, boolean isSuccess, Object data) {
         ProgressManager.closeProgressDialog();
         if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_HOME_DATA)){
             if(isSuccess){
-                EventBusUtil.post(MessageEvent.EventCode.ALL);
+                MessageEvent messageEvent = new MessageEvent();
+                messageEvent.setCode(MessageEvent.EventCode.ALL);
+                messageEvent.setData(data);
+                EventBusUtil.post(messageEvent);
             }
-            getBalanceDelay(serviceType);
+            getBalanceDelay(serviceType, data);
         }else{
             if(StringUtil.isSame(serviceType, TransmitKey.ServiceType.GET_BALANCE) && !isSuccess
                     && HomeFragment.mIsToast){
                 ToastUtils.showShortToast(R.string.common_refresh_failed);
                 HomeFragment.mIsToast = false;
             }
-            EventBusUtil.post(MessageEvent.EventCode.BALANCE);
+            MessageEvent messageEvent = new MessageEvent();
+            messageEvent.setCode(MessageEvent.EventCode.BALANCE);
+            messageEvent.setData(data);
+            EventBusUtil.post(messageEvent);
         }
     }
 

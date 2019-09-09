@@ -15,9 +15,23 @@
         app:leftImagePadding="0dp"
         app:titleText="@string/main_send_receive" />
 
+    <TextView
+        style="@style/style_normal_light_grey"
+        android:id="@+id/tv_manage_address"
+        android:layout_below="@+id/toolBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:paddingBottom="0dp"
+        android:paddingTop="15dp"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="20dp"
+        android:layout_alignParentEnd="true"
+        android:text="@string/tx_manager_address"/>
+
 
     <io.taucoin.android.wallet.widget.banner.BannerLayout
-        android:layout_below="@+id/toolBar"
+        android:layout_below="@+id/tv_manage_address"
         android:id="@+id/banner_layout"
         android:layout_width="match_parent"
         android:layout_height="170dp"

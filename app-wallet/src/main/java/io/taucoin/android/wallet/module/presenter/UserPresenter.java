@@ -15,9 +15,11 @@
  */
 package io.taucoin.android.wallet.module.presenter;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -35,8 +37,11 @@ import io.taucoin.android.wallet.module.view.manage.iview.IImportKeyView;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
+import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.foundation.net.callback.LogicObserver;
+import io.taucoin.foundation.util.StringUtil;
 
 public class UserPresenter {
 
@@ -47,6 +52,7 @@ public class UserPresenter {
 
     public UserPresenter() {
         mUserModel = new UserModel();
+        mTxPresenter = new TxPresenter();
     }
     public UserPresenter(IImportKeyView view) {
         mUserModel = new UserModel();
@@ -77,7 +83,7 @@ public class UserPresenter {
             .create().show();
     }
 
-    public void saveKeyAndAddress(FragmentActivity context, KeyValue keyValue) {
+    private void saveKeyAndAddress(FragmentActivity context, KeyValue keyValue) {
         ProgressManager.showProgressDialog(context, false);
         saveKeyAndAddress(keyValue);
     }
@@ -93,7 +99,10 @@ public class UserPresenter {
                 SharedPreferencesHelper.getInstance().putString(TransmitKey.RAW_ADDRESS, keyValue.getRawAddress());
                 TxService.startTxService(TransmitKey.ServiceType.GET_HOME_DATA);
                 TxService.startTxService(TransmitKey.ServiceType.GET_INFO);
-                TxService.startTxService(TransmitKey.ServiceType.GET_BALANCE);
+                Intent intent = new Intent();
+                intent.putExtra(TransmitKey.SERVICE_TYPE, TransmitKey.ServiceType.GET_BALANCE);
+                intent.putExtra(TransmitKey.DATA, false);
+                TxService.startTxService(intent);
                 MyApplication.getRemoteConnector().init();
                 if(isGenerateKey){
                     gotoKeysActivity();
@@ -189,5 +198,31 @@ public class UserPresenter {
 
     public void deleteAddress(String pubKey, LogicObserver<Boolean> observer) {
         mUserModel.deleteAddress(pubKey, observer);
+    }
+
+    public void switchAddress(FragmentActivity context, KeyValue keyValue) {
+        if(UserUtil.isImportKey()){
+            String address =  MyApplication.getKeyValue().getAddress();
+            String miningState =  MyApplication.getKeyValue().getMiningState();
+            if(StringUtil.isSame(keyValue.getAddress(), address)){
+                return;
+            }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.Start)){
+                ToastUtils.showShortToast(R.string.mining_import_private_key);
+                return;
+            }
+        }
+        View viewTip = LinearLayout.inflate(context, R.layout.view_dialog_keys, null);
+        TextView tvMsg = viewTip.findViewById(R.id.tv_msg);
+        tvMsg.setText(R.string.address_book_switch_sure);
+        new CommonDialog.Builder(context)
+                .setContentView(viewTip)
+                .setHorizontal()
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.cancel();
+                    saveKeyAndAddress(context, keyValue);
+                })
+                .setNegativeBgResource(R.drawable.grey_rect_round_bg)
+                .setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
+                .create().show();
     }
 }

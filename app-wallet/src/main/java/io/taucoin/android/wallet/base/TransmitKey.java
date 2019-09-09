@@ -59,6 +59,7 @@ public class TransmitKey {
     public static final String UPGRADE = "upgrade";
     public static final String ISSHOWTIP = "isShowTip";
     public static final String ID = "id";
+    public static final String DATA = "data";
 
     public static final String RESULT = "result";
     public static class RemoteResult {

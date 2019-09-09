@@ -16,6 +16,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -222,7 +223,7 @@ public class BannerLayout extends FrameLayout {
         hasInit = false;
         mRecyclerView.setAdapter(adapter);
         bannerSize = adapter.getItemCount();
-        mLayoutManager.setInfinite(bannerSize >= 3);
+        mLayoutManager.setInfinite(bannerSize >= 1);
         setPlaying(true);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -336,15 +337,21 @@ public class BannerLayout extends FrameLayout {
         }
     }
 
-    public void setStartPosition(int position) {
-        if(position > 0 && position < bannerSize){
-            mRecyclerView.scrollToPosition(position);
-            currentIndex = position;
+    public void recoverPosition(int pos) {
+        currentIndex = pos >= 0 ? pos : currentIndex;
+        if(bannerSize > 1) {
+            if(currentIndex < 0){
+                currentIndex = 0;
+            }else if(currentIndex >= bannerSize){
+                currentIndex = bannerSize - 1;
+            }
+            mRecyclerView.scrollToPosition(currentIndex % bannerSize);
             refreshIndicator();
         }
     }
 
     public interface OnBannerItemClickListener {
+        void onViewClick(int position, View view);
         void onItemClick(int position);
     }
 }

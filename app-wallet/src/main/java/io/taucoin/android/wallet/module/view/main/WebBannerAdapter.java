@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,31 +26,30 @@ import io.taucoin.foundation.util.StringUtil;
 
 public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.ViewHolder> {
 
-    private KeyValue[] array = new KeyValue[3];
+    private List<KeyValue> array = new ArrayList<>();
     private BannerLayout.OnBannerItemClickListener onBannerItemClickListener;
     private int windowWidth = -1;
 
     void setDataList(List<KeyValue> list) {
         if(list != null && list.size() > 0){
-            if(list.size() == 1){
-                array[0] = null;
-                array[1] = list.get(0);
-                array[2] = null;
-            }else if(list.size() == 2){
-                array[0] = list.get(1);
-                array[1] = list.get(0);
-                array[2] = null;
+            array.clear();
+            if(list.size() <= 3){
+                array.addAll(list);
             }else{
-                array[0] = list.get(1);
-                array[1] = list.get(0);
-                array[2] = list.get(2);
+                array.add(list.get(0));
+                array.add(list.get(1));
+                array.add(list.get(2));
             }
         }
+        array.add(null);
         notifyDataSetChanged();
     }
 
-    KeyValue[] getDataList() {
-       return array;
+    KeyValue getItemData(int pos) {
+        if(pos >= 0 && pos <= array.size()){
+            return array.get(pos);
+        }
+       return null;
     }
 
 
@@ -75,10 +75,10 @@ public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.View
     }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        if (array == null || array.length == 0)
+        if (array == null || array.size() == 0)
             return;
-        final int pos = position % array.length;
-        KeyValue keyValue = array[pos];
+        final int pos = position % array.size();
+        KeyValue keyValue = array.get(pos);
         if(keyValue != null){
             holder.rlAddress.setVisibility(View.VISIBLE);
             holder.rlAddressAdd.setVisibility(View.GONE);
@@ -90,6 +90,11 @@ public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.View
             DrawablesUtil.setEndDrawable(holder.tvAddress, R.mipmap.icon_copy, 14);
             holder.tvAddress.setOnClickListener(v -> {
                 if (onBannerItemClickListener != null) {
+                    onBannerItemClickListener.onViewClick(pos, v);
+                }
+            });
+            holder.itemView.setOnClickListener(v -> {
+                if (onBannerItemClickListener != null) {
                     onBannerItemClickListener.onItemClick(pos);
                 }
             });
@@ -99,7 +104,7 @@ public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.View
             holder.ivSelected.setVisibility(View.INVISIBLE);
             holder.ivAddressAdd.setOnClickListener(v -> {
                 if (onBannerItemClickListener != null) {
-                    onBannerItemClickListener.onItemClick(pos);
+                    onBannerItemClickListener.onViewClick(pos, v);
                 }
             });
         }
@@ -118,7 +123,7 @@ public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.View
     @Override
     public int getItemCount() {
         if (array != null) {
-            return array.length;
+            return array.size();
         }
         return 0;
     }

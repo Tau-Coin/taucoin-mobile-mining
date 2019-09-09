@@ -34,7 +34,8 @@ import retrofit2.Retrofit;
 
 public class StateTagManager {
 
-    private static final int mRetryTime = 2;
+    private static final int mRetryTime = 5;
+    private static final int mSleepTime = 2 * 1000;
     // Block count for about five days
     private static final int mNeedDownloadTagsSize = 288 * 5;
 
@@ -66,10 +67,10 @@ public class StateTagManager {
         destFileDir =  service.getApplicationInfo().dataDir + File.separator;
         destFileDir += tagFileDirName;
 
-        checkStateTag(true);
+        checkStateTag(mRetryTime);
     }
 
-    private void checkStateTag(boolean isContinue) {
+    private void checkStateTag(int retryTime) {
         if(mService == null){
             return;
         }
@@ -78,13 +79,13 @@ public class StateTagManager {
             @Override
             public void handleError(String msg, int msgCode) {
                 Logger.d("checkStateTag error: code= %s, msg= %s", msgCode, msg);
-                try {
-                    Thread.sleep(2 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if(isContinue){
-                    checkStateTag(false);
+                if(retryTime <= 0){
+                    try {
+                        Thread.sleep(mSleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    checkStateTag(retryTime - 1);
                 }else{
                     handleDownloadFail();
                 }
@@ -251,13 +252,13 @@ public class StateTagManager {
         public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
             super.onFailure(call, t);
             Logger.d("download %s failure: %S", link, t.getMessage());
-            try {
-                Thread.sleep(2 * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             int time = getDownloadTime(link);
             if(time < mRetryTime){
+                try {
+                    Thread.sleep(mSleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 startDownload(startNo, link);
             }else{
                 handleDownloadSuccess(startNo);

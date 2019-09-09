@@ -1,6 +1,7 @@
 package io.taucoin.android.wallet.module.view.manage;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -18,16 +19,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import butterknife.OnTextChanged;
-import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.BaseActivity;
-import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
 import io.taucoin.android.wallet.module.view.manage.iview.IAddressView;
 import io.taucoin.android.wallet.util.ProgressManager;
-import io.taucoin.android.wallet.util.ToastUtils;
-import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.widget.CommonDialog;
 import io.taucoin.android.wallet.widget.InputDialog;
 import io.taucoin.foundation.net.callback.LogicObserver;
@@ -96,29 +93,7 @@ public class AddressBookActivity extends BaseActivity implements IAddressView {
     @OnItemClick(R.id.list_view_help)
     void onItemClick(AdapterView<?> parent, View view, int position, long id){
         KeyValue keyValue = mDataList.get(position);
-        if(UserUtil.isImportKey()){
-            String address =  MyApplication.getKeyValue().getAddress();
-            String miningState =  MyApplication.getKeyValue().getMiningState();
-            if(StringUtil.isSame(keyValue.getAddress(), address)){
-                return;
-            }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
-                return;
-            }
-        }
-        View viewTip = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);
-        TextView tvMsg = viewTip.findViewById(R.id.tv_msg);
-        tvMsg.setText(R.string.address_book_switch_sure);
-        new CommonDialog.Builder(this)
-            .setContentView(viewTip)
-            .setHorizontal()
-            .setPositiveButton(R.string.common_yes, (dialog, which) -> {
-                dialog.cancel();
-                mUserPresenter.saveKeyAndAddress(this, keyValue);
-            })
-            .setNegativeBgResource(R.drawable.grey_rect_round_bg)
-            .setNegativeButton(R.string.common_no, (dialog, which) -> dialog.cancel())
-            .create().show();
+        mUserPresenter.switchAddress(AddressBookActivity.this, keyValue);
     }
 
     public void editName(KeyValue keyValue, boolean isSelf) {
@@ -141,7 +116,8 @@ public class AddressBookActivity extends BaseActivity implements IAddressView {
         }
         View view = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);
         TextView tvMsg = view.findViewById(R.id.tv_msg);
-        tvMsg.setText(R.string.address_book_deleted_sure);
+        String deleteText = getString(R.string.address_book_deleted_sure);
+        tvMsg.setText(Html.fromHtml(deleteText));
         new CommonDialog.Builder(this)
             .setContentView(view)
             .setHorizontal()

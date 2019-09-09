@@ -123,6 +123,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private RewardAdapter minerRewardAdapter;
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
+    private  BlockInfo mBlockInfo;
 
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -219,6 +220,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 UserUtil.setHitTip(tvHitTip);
                 UserUtil.setMiningIncome(tvMiningIncome);
                 UserUtil.setBalance(tvBalance, true);
+                UserUtil.setPowerConditions(dashboardLayout, mBlockInfo, true);
                 // If the connection with the mining process is interrupted, restore the connection
                 MyApplication.getRemoteConnector().restoreConnection();
                 break;
@@ -328,6 +330,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     }
 
     private void showMiningView(BlockInfo blockInfo, boolean isRefreshMined, int handleNextBlock){
+        mBlockInfo = blockInfo;
         UserUtil.setMiningConditions(tvVerify, ivVerify, blockInfo);
         UserUtil.setPowerConditions(dashboardLayout, blockInfo, !isRefreshMined);
         UserUtil.setDownloadConditions(tvDownload, ivDownload, tvBlockChainData, blockInfo);

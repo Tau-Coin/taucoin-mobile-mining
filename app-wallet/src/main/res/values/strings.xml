@@ -36,6 +36,7 @@
 
     <string name="tx_increase">Increase Power</string>
     <string name="tx_send">Send</string>
+    <string name="tx_manager_address">Manage Addresses</string>
     <string name="tx_receive">Receive</string>
     <string name="tx_log">Transactions</string>
     <string name="tx_log_empty">No records</string>
@@ -268,7 +269,7 @@
     <string name="de_fi_telegram_group">Long Crypto Telegram Group</string>
 
     <string name="address_book_search_hint">Search Address or Remark Name</string>
-    <string name="address_book_deleted_sure">Are you sure you want to delete this address?</string>
+    <string name="address_book_deleted_sure" formatted="false"><Data><![CDATA[Are you sure you want to <font color="#fa0105">delete</font> this address?]]></Data></string>
     <string name="address_book_switch_sure">Are you sure you want to user this address?</string>
 
 </resources>

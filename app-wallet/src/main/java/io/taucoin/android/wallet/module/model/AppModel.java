@@ -80,7 +80,7 @@ public class AppModel implements IAppModel{
 
     @Override
     public void checkStateTag(TxObserver<StatesTagBean> observer) {
-        NetWorkManager.createMysqlApiService(TransactionService.class)
+        NetWorkManager.createMainApiService(TransactionService.class)
                 .getStatesTag()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
