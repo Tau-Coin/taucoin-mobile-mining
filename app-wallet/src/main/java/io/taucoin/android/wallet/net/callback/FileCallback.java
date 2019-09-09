@@ -73,7 +73,10 @@ public abstract class FileCallback implements Callback<ResponseBody> {
     @Override
     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
         try {
-            saveFile(response);
+            File file = saveFile(response);
+            if(file == null){
+                onFailure(call, new Throwable("file are empty"));
+            }
         } catch (Exception e) {
             onFailure(call, e.getCause());
             e.printStackTrace();

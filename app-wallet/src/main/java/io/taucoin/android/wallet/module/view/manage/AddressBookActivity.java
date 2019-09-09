@@ -21,6 +21,7 @@ import butterknife.OnTextChanged;
 import io.taucoin.android.wallet.MyApplication;
 import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.BaseActivity;
+import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
 import io.taucoin.android.wallet.module.view.manage.iview.IAddressView;
@@ -95,9 +96,15 @@ public class AddressBookActivity extends BaseActivity implements IAddressView {
     @OnItemClick(R.id.list_view_help)
     void onItemClick(AdapterView<?> parent, View view, int position, long id){
         KeyValue keyValue = mDataList.get(position);
-        if(UserUtil.isImportKey() && StringUtil.isSame(keyValue.getAddress(),
-                MyApplication.getKeyValue().getAddress())){
-           return;
+        if(UserUtil.isImportKey()){
+            String address =  MyApplication.getKeyValue().getAddress();
+            String miningState =  MyApplication.getKeyValue().getMiningState();
+            if(StringUtil.isSame(keyValue.getAddress(), address)){
+                return;
+            }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.Start)){
+                ToastUtils.showShortToast(R.string.mining_import_private_key);
+                return;
+            }
         }
         View viewTip = LinearLayout.inflate(this, R.layout.view_dialog_keys, null);
         TextView tvMsg = viewTip.findViewById(R.id.tv_msg);
