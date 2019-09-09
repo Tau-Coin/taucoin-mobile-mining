@@ -403,9 +403,11 @@ public abstract class ConnectorManager implements ConnectorHandler {
         Logger.d("init");
         if(UserUtil.isImportKey()){
             if(isTaucoinConnected){
-                if(!isInit() && !StateTagManager.isStateTagLoading()){
-                    TxService.startTxService(TransmitKey.ServiceType.DOWNLOAD_STATE_TAG);
-                }
+               // statesTag function enter
+//                if(!isInit() && !StateTagManager.isStateTagLoading()){
+//                    TxService.startTxService(TransmitKey.ServiceType.DOWNLOAD_STATE_TAG);
+//                }
+                initBlockChain();
             }else{
                 if(StateTagManager.isStateTagLoading()){
                     StateTagManager.reLoadStateTags();

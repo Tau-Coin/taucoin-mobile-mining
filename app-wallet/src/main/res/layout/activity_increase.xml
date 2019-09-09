@@ -63,11 +63,10 @@
             style="@style/style_normal_yellow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/send_budget"
+            android:hint="@string/send_budget_hint"
             android:inputType="numberDecimal|number"
             android:gravity="center_horizontal"
             android:layout_marginStart="10dp"
-            android:singleLine="true"
             android:text=""
             android:textColorHint="@color/color_grey" />
     </LinearLayout>

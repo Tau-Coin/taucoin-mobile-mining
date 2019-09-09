@@ -59,7 +59,6 @@
 
     <string name="manager_version">version %s</string>
     <string name="manager_keys">Keys</string>
-    <string name="manager_address_note">Address Note</string>
     <string name="manager_setting">Settings</string>
     <string name="manager_help">Help</string>
     <string name="manager_p2p_exchange">P2P &#38; Non&#045;KYC Exchange</string>
@@ -69,6 +68,7 @@
     <string name="send_receiver_address">Receiver\'s Address</string>
     <string name="send_amount">Amount</string>
     <string name="send_budget">Budget</string>
+    <string name="send_budget_hint">Amount for increasing power</string>
     <string name="send_amount_increase">Budget:</string>
     <string name="send_memo">Memo</string>
     <string name="send_status">Status</string>
@@ -270,6 +270,6 @@
 
     <string name="address_book_search_hint">Search Address or Remark Name</string>
     <string name="address_book_deleted_sure" formatted="false"><Data><![CDATA[Are you sure you want to <font color="#fa0105">delete</font> this address?]]></Data></string>
-    <string name="address_book_switch_sure">Are you sure you want to user this address?</string>
+    <string name="address_book_switch_sure">Confirm to use this address.</string>
 
 </resources>

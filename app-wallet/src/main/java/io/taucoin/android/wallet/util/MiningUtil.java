@@ -221,10 +221,13 @@ public class MiningUtil {
 
         String stateDir = dataDir + File.separator + "state";
         String blockStoreDir = dataDir + File.separator + "blockstore";
-        String storeBackend = dataDir + File.separator + "store-backend";
         FileUtil.deleteFile(new File(stateDir));
         FileUtil.deleteFile(new File(blockStoreDir));
-        FileUtil.deleteFile(new File(storeBackend));
+
+        // block chain block download dir
+//        String storeBackend = dataDir + File.separator + "store-backend";
+//        FileUtil.deleteFile(new File(storeBackend));
+
     }
 
     public static void deleteStatesTagFileDir() {
