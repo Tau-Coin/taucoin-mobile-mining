@@ -61,6 +61,10 @@ public class StateLoader {
     }
 
     public synchronized boolean loadStatesTag() {
+
+        // States-tag is just experimental.
+        return false;
+        /**
         if (!stateTagExist()) {
             logger.error("States tag doesn't exist");
             return false;
@@ -100,6 +104,7 @@ public class StateLoader {
                     accountsLoaded, accountAmount);
             return false;
         }
+        */
     }
 
     private void setupFileBlockStore() {
