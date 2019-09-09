@@ -44,7 +44,9 @@ public class MmkvDataSource implements KeyValueDataSource {
     public void init() {
 
         if (isAlive()) return;
-        if (name == null) throw new NullPointerException("no name set to the db");
+        if (name == null || name.isEmpty()) {
+            throw new NullPointerException("no name set to the db");
+        }
 
         // Check database directory
         String dbDir = CONFIG.databaseDir() + File.separator + name;
@@ -61,7 +63,7 @@ public class MmkvDataSource implements KeyValueDataSource {
 
         String root = MMKV.initialize(dbDir);
         MMKV.registerHandler(new MMKVHandlerImpl());
-        db = MMKV.defaultMMKV(); 
+        db = MMKV.mmkvWithID(name);
         alive = true;
         logger.info("Mmkv is alive with path: {}", root);
     }
