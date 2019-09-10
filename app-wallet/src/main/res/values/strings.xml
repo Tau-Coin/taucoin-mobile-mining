@@ -19,6 +19,7 @@
     <string name="common_refresh_failed">Refresh Failed</string>
     <string name="common_see_more">Click to see more</string>
     <string name="common_install_browser">Please install mobile browser first!</string>
+    <string name="common_wifi_disconnected">WIFI connection time out</string>
     <string name="home_no_point">No.%s</string>
     <string name="home_total_blocks">Total blocks %s</string>
 

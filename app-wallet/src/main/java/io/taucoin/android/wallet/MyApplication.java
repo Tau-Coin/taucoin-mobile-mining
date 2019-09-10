@@ -21,8 +21,10 @@ import android.os.Bundle;
 
 import io.fabric.sdk.android.Fabric;
 import io.taucoin.android.wallet.db.entity.KeyValue;
+import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.presenter.RemoteConnectorManager;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
+import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.FixMemLeak;
 import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.util.ActivityManager;
@@ -119,6 +121,7 @@ public class MyApplication extends MultiDexApplication {
                 mFinalCount++;
                 // back to front
                 if (mFinalCount == 1) {
+                    EventBusUtil.post(MessageEvent.EventCode.APP_BACK_TO_FRONT);
 //                    MyApplication.getRemoteConnector().cancelMiningNotify();
                 }
             }

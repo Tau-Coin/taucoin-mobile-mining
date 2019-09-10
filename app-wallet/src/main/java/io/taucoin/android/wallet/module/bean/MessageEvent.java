@@ -22,7 +22,8 @@ public class MessageEvent{
         FORGED_POT_DETAIL,
         APPLICATION_INFO,
         MINING_INCOME,
-        IRREPARABLE_ERROR
+        IRREPARABLE_ERROR,
+        APP_BACK_TO_FRONT
     }
     private Object data;
 

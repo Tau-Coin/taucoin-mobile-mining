@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.taucoin.android.wallet.MyApplication;
+import io.taucoin.android.wallet.R;
 import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.foundation.util.StringUtil;
 
@@ -140,6 +141,8 @@ public class WifiSettings {
             if(isHaveNetwork()){
                 logger.info("try to restart downloading");
                 startDownload();
+            }else{
+                handleForgingWifiOnlyTip();
             }
         }
     }
@@ -149,7 +152,14 @@ public class WifiSettings {
     }
 
     private synchronized void stopDownload(){
+        handleForgingWifiOnlyTip();
         MyApplication.getRemoteConnector().stopDownload();
+    }
+
+    public void handleForgingWifiOnlyTip() {
+        if(isForgingWifiOnly() && !isWifiConnected()){
+            ToastUtils.showShortToast(R.string.common_wifi_disconnected);
+        }
     }
 
     private boolean isHaveNetwork() {

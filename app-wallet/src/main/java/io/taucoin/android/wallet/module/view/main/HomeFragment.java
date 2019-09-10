@@ -43,6 +43,7 @@ import io.taucoin.android.wallet.util.ProgressManager;
 import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.UserUtil;
+import io.taucoin.android.wallet.util.WifiSettings;
 import io.taucoin.android.wallet.widget.DashboardLayout;
 import io.taucoin.android.wallet.widget.LoadingTextView;
 import io.taucoin.android.wallet.widget.ProgressView;
@@ -123,13 +124,15 @@ public class HomeFragment extends BaseFragment implements IHomeView {
     private RewardAdapter minerRewardAdapter;
     private MiningPresenter miningPresenter;
     public static boolean mIsToast = false;
-    private  BlockInfo mBlockInfo;
+    private BlockInfo mBlockInfo;
+    private WifiSettings mWifiSettings;
 
     @Override
     public View getViewLayout(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         butterKnifeBinder(this, view);
         miningPresenter = new MiningPresenter(this);
+        mWifiSettings = new WifiSettings();
         initView();
         MyApplication.getRemoteConnector().init();
         handleMiningView();
@@ -160,6 +163,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case R.id.cb_wifi_only:
                 SharedPreferencesHelper.getInstance().putBoolean(TransmitKey.FORGING_WIFI_ONLY, cbWifiOnly.isChecked());
+                if(cbWifiOnly.isChecked()){
+                    handleForgingWifiOnlyTip();
+                }
                 break;
             case R.id.iv_right:
                 ProgressManager.showProgressDialog(getActivity());
@@ -258,6 +264,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case FORGED_POT_DETAIL:
                 refreshNextBlockView(object.getData());
+                break;
+            case APP_BACK_TO_FRONT:
+                handleForgingWifiOnlyTip();
                 break;
             default:
                 break;
@@ -397,5 +406,19 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                     view.setEnabled(true);
                 }
             });
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        handleForgingWifiOnlyTip();
+    }
+
+    private void handleForgingWifiOnlyTip() {
+        if(isVisible()){
+            if(mWifiSettings != null){
+                mWifiSettings.handleForgingWifiOnlyTip();
+            }
+        }
     }
 }
