@@ -36,7 +36,6 @@ public class Taucoin extends io.taucoin.facade.TaucoinImpl {
         for (String prikey : privateKeys) {
             ECKey key;
             //String prikey = privateKeys.get(0);
-            log.info("privkey is {}", prikey);
 
             if (prikey.length() == 51 || prikey.length() == 52) {
                 DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(MainNetParams.get(), prikey);
