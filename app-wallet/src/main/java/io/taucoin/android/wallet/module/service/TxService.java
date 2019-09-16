@@ -18,6 +18,7 @@ package io.taucoin.android.wallet.module.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.github.naturs.logger.Logger;
@@ -442,7 +443,15 @@ public class TxService extends Service {
     public static void startTxService(Intent intent){
         Context context = MyApplication.getInstance();
         intent.setClass(context, TxService.class);
-        context.startService(intent);
+        try {
+            context.startService(intent);
+        } catch (IllegalStateException ex) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent);
+            } else {
+                context.startService(intent);
+            }
+        }
     }
 
     public static void stopService() {

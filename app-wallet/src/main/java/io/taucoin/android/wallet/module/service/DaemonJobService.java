@@ -76,7 +76,15 @@ public class DaemonJobService extends JobService {
                 Intent intent =  new Intent(this, RemoteService.class);
                 Parcelable parcelable = NotifyManager.getInstance().getNotifyData();
                 intent.putExtra("bean", parcelable);
-                startService(intent);
+                try {
+                    startService(intent);
+                } catch (IllegalStateException ex) {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(intent);
+                    } else {
+                        startService(intent);
+                    }
+                }
                 MyApplication.getRemoteConnector().init();
             }
             jobFinished(params, false);

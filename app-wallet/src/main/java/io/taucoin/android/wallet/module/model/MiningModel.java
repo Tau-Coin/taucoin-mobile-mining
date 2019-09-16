@@ -20,7 +20,9 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -41,7 +43,9 @@ import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class MiningModel implements IMiningModel{
-    private Scheduler scheduler = Schedulers.from(Executors.newFixedThreadPool(50));
+    private ThreadPoolExecutor pool = new ThreadPoolExecutor(10,100,1,
+            TimeUnit.MINUTES, new LinkedBlockingDeque<>());
+    private Scheduler scheduler = Schedulers.from(pool);
     @Override
     public void getMiningInfo(LogicObserver<BlockInfo> observer) {
         Observable.create((ObservableOnSubscribe<BlockInfo>) emitter -> {

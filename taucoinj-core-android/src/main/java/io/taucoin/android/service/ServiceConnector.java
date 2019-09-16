@@ -5,8 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
-import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -123,7 +122,15 @@ public class ServiceConnector {
         if (serviceConnection != null) {
             Intent intent = new Intent(context, serviceClass);
             intent.putExtra("bean", parcelableData);
-            context.getApplicationContext().startService(intent);
+            try {
+                context.getApplicationContext().startService(intent);
+            } catch (IllegalStateException ex) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.getApplicationContext().startForegroundService(intent);
+                } else {
+                    context.getApplicationContext().startService(intent);
+                }
+            }
             return context.getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         } else {
             return false;
