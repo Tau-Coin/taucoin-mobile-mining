@@ -45,7 +45,6 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.service.NotifyManager;
 import io.taucoin.android.wallet.module.service.StateTagManager;
-import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.util.EventBusUtil;
 import io.taucoin.android.wallet.util.UserUtil;
 import io.taucoin.android.wallet.module.service.RemoteService;
@@ -57,7 +56,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     static final org.slf4j.Logger logger = LoggerFactory.getLogger("ConnectorManager");
     private ScheduledExecutorService initializer = Executors.newSingleThreadScheduledExecutor();
     private TaucoinConnector mTaucoinConnector = null;
-    WifiSettings mWifiSettings = null;
+    private WifiSettings mWifiSettings = null;
 
     @SuppressLint("SimpleDateFormat")
     private DateFormat mDateFormatter = new SimpleDateFormat("HH:mm:ss:SSS");
@@ -74,6 +73,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
     private void createRemoteConnector(){
         if (mTaucoinConnector == null) {
+            if(mWifiSettings != null){
+                mWifiSettings.destroy();
+                mWifiSettings = null;
+            }
             mWifiSettings = new WifiSettings();
             mWifiSettings.init();
             addLogEntry("Create Remote Connector...");

@@ -215,7 +215,8 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
 
     @Override
     public void loadTransactionHistory(List<TransactionHistory> txHistories) {
-        if(mAdapter == null){
+        if(mAdapter == null || emptyLayout == null || refreshLayout == null ||
+                seeMoreView == null || llTip == null ){
             return;
         }
         if(txHistories == null){
