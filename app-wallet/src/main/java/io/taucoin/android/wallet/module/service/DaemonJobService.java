@@ -79,6 +79,7 @@ public class DaemonJobService extends JobService {
                 try {
                     startService(intent);
                 } catch (IllegalStateException ex) {
+                    // High versions are processed in the background
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent);
                     } else {

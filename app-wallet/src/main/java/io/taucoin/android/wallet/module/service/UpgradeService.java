@@ -289,16 +289,19 @@ public class UpgradeService extends Service {
     }
 
     public static void startUpdateService(){
-        Context context = MyApplication.getInstance();
         Intent intent = new Intent();
-        intent.setClass(context, UpgradeService.class);
-        context.startService(intent);
+        startUpdateService(intent);
     }
 
     public static void startUpdateService(Intent intent){
         Context context = MyApplication.getInstance();
         intent.setClass(context, UpgradeService.class);
-        context.startService(intent);
+        try {
+            context.startService(intent);
+        } catch (IllegalStateException ex) {
+            // High versions are not processed in the background
+            Logger.e(ex,"startUpdateService error");
+        }
     }
 
     public static void stopUpdateService() {
