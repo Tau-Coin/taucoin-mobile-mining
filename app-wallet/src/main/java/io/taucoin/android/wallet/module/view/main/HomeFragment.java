@@ -348,7 +348,7 @@ public class HomeFragment extends BaseFragment implements IHomeView {
 
         long blockSync = blockInfo != null ? blockInfo.getBlockSync() : 0;
         int errorBlock = StringUtil.getIntTag(tvIrreparableError);
-        if(blockSync >= errorBlock && tvIrreparableError.getVisibility() != View.GONE){
+        if(blockSync >= errorBlock && tvIrreparableError != null && tvIrreparableError.getVisibility() != View.GONE){
             tvIrreparableError.setVisibility(View.GONE);
         }
 
