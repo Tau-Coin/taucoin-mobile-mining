@@ -124,7 +124,7 @@ public class TransactionExecutor {
                         return false;
                     }
 
-                    if (freshTime > 1 && tranTime < ByteUtil.byteArrayToLong(blockchain.getBlockByNumber(freshTime -1).getTimestamp())) {
+                    if (freshTime > 1 && tranTime < blockchain.getBlockTimeByNumber(freshTime -1)) {
                         logger.error("attacking transaction ,tx is: {}", ByteUtil.toHexString(tx.getHash()));
                         return false;
                     }
