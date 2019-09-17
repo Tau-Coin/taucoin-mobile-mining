@@ -2,11 +2,11 @@ package io.taucoin.android.wallet.module.service;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.ArrayMap;
 
 import com.github.naturs.logger.Logger;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +49,7 @@ public class StateTagManager {
     private volatile Status mStatus;
 
     private Retrofit.Builder mRetrofitBuilder;
-    private Map<String, Integer> mMapResult = new HashMap<>();
+    private Map<String, Integer> mMapResult = new ArrayMap<>();
     public static String tagFileDirName = "states-tag";
     private String destFileDir = "states-tag";
 

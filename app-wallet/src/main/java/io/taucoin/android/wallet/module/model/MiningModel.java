@@ -15,10 +15,11 @@
  */
 package io.taucoin.android.wallet.module.model;
 
+import android.util.ArrayMap;
+
 import io.reactivex.Scheduler;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -175,7 +176,7 @@ public class MiningModel implements IMiningModel{
     @Override
     public void getMinerHistory(TxObserver<MinerListBean> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("address",  address);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getMinerHistory(map)

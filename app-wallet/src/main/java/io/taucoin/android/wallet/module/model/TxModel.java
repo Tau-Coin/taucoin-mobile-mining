@@ -15,6 +15,8 @@
  */
 package io.taucoin.android.wallet.module.model;
 
+import android.util.ArrayMap;
+
 import com.github.naturs.logger.Logger;
 
 import io.reactivex.Scheduler;
@@ -26,7 +28,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -88,7 +89,7 @@ public class TxModel implements ITxModel {
     @Override
     public void getBalance(LogicObserver<KeyValue> observer) {
         String rawAddress = SharedPreferencesHelper.getInstance().getString(TransmitKey.RAW_ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("address",  rawAddress);
         NetWorkManager.createMainApiService(TransactionService.class)
             .getBalance(map)
@@ -116,7 +117,7 @@ public class TxModel implements ITxModel {
     @Override
     public void getMinerInfo(LogicObserver<KeyValue> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("address",  address);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getMinerInfo(map)
@@ -218,7 +219,7 @@ public class TxModel implements ITxModel {
 
     @Override
     public void checkRawTransaction(List<String> txIds, LogicObserver<Boolean> observer) {
-        Map<String, List<String>> map = new HashMap<>();
+        Map<String, List<String>> map = new ArrayMap<>();
         map.put("txids", txIds);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRawTransaction(map)
@@ -407,7 +408,7 @@ public class TxModel implements ITxModel {
         String txHash = Hex.toHexString(transaction.getEncoded());
         String txId = transaction.getTxid();
         Logger.d("txId=" + txId  + "\ttxHash=" + txHash);
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("transaction", txHash);
         NetWorkManager.createMainApiService(TransactionService.class)
             .sendRawTransaction(map)
@@ -516,7 +517,7 @@ public class TxModel implements ITxModel {
                 @Override
                 public void handleData(Long blockHeight) {
 
-                    Map<String,String> map = new HashMap<>();
+                    Map<String,String> map = new ArrayMap<>();
                     map.put("address", address);
                     map.put("blockheight", blockHeight.toString());
                     NetWorkManager.createMysqlApiService(TransactionService.class)
@@ -632,7 +633,7 @@ public class TxModel implements ITxModel {
     @Override
     public void getRankInfo(LogicObserver<KeyValue> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("address",  address);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRankInfo(map)
@@ -665,7 +666,7 @@ public class TxModel implements ITxModel {
     @Override
     public void getRewardInfo(TxObserver<RewardInfoBean> observer) {
         String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("address",  address);
         NetWorkManager.createMysqlApiService(TransactionService.class)
             .getRewardInfo(map)
@@ -755,7 +756,7 @@ public class TxModel implements ITxModel {
         String txHash = Hex.toHexString(transaction.getEncoded());
         String txId = transaction.getTxid();
         Logger.d("txId=" + txId  + "\ttxHash=" + txHash);
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("transaction", txHash);
         try {
             Response response = NetWorkManager

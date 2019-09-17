@@ -15,10 +15,11 @@
  */
 package io.taucoin.android.wallet.module.model;
 
+import android.util.ArrayMap;
+
 import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class AppModel implements IAppModel{
     @Override
     public void getInfo() {
         String publicKey = SharedPreferencesHelper.getInstance().getString(TransmitKey.PUBLIC_KEY, "");
-        Map<String,String> map=new HashMap<>();
+        Map<String,String> map = new ArrayMap<>();
         map.put("pubkey",  publicKey);
         NetWorkManager.createApiService(AppService.class)
                 .getIp(map)
@@ -69,7 +70,7 @@ public class AppModel implements IAppModel{
     @Override
     public void checkAppVersion(TAUObserver<DataResult<VersionBean>> observer) {
         int version = AppUtil.getVersionCode(MyApplication.getInstance());
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new ArrayMap<>();
         map.put("version", version);
         NetWorkManager.createApiService(AppService.class)
                 .checkAppVersion(map)

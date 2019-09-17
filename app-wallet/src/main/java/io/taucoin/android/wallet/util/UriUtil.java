@@ -16,9 +16,9 @@
 package io.taucoin.android.wallet.util;
 
 import android.net.Uri;
+import android.util.ArrayMap;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,7 +54,7 @@ public class UriUtil {
     }
 
     public static Map<String, String> getQueryMap(Uri uri) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new ArrayMap<>();
         if(uri != null){
             Set<String> names = uri.getQueryParameterNames();
             for (String name : names) {
