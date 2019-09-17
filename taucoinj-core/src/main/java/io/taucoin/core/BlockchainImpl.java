@@ -1128,7 +1128,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
         // But when app is killed, database consistency maybe happens.
         if (stateMaxNumber == blockStoreMaxNumber + 1) {
             // Rollback state database
-            Block undoBlock = fileBlockStore.get(blockStoreMaxNumber + 1).getBlock();
+            BlockWrapper wrapper = fileBlockStore.get(blockStoreMaxNumber + 1);
+            if (wrapper == null) {
+                // Fatal error and we don't know how to handle it.
+                // Just log out this fatal error.
+                logger.error("Fatal error, filesys block store corrupted:{}/{}",
+                        stateMaxNumber, blockStoreMaxNumber);
+                return false;
+            }
+
+            Block undoBlock = wrapper.getBlock();
 
             track = repository.startTracking();
             logger.info("Try to disconnect block with number: {}, hash: {}",
@@ -1136,17 +1145,16 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
 
             List<Transaction> txs = undoBlock.getTransactionsList();
             int size = txs.size();
-            for (int i = size - 1; i >= 0; i--) {
-                StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
-                        new StakeHolderIdentityUpdate(txs.get(i), track, undoBlock.getForgerAddress(),
-                                undoBlock.getNumber() - 1);
-                stakeHolderIdentityUpdate.rollbackStakeHolderIdentity();
-            }
 
             for (int i = size - 1; i >= 0; i--) {
                 TransactionExecutor executor = new TransactionExecutor(txs.get(i), track, this, listener);
                 executor.setCoinbase(undoBlock.getForgerAddress());
-                executor.undoTransaction();
+                if (executor.undoTransaction()) {
+                    StakeHolderIdentityUpdate stakeHolderIdentityUpdate =
+                            new StakeHolderIdentityUpdate(txs.get(i), track, undoBlock.getForgerAddress(),
+                                    undoBlock.getNumber() - 1);
+                    stakeHolderIdentityUpdate.rollbackStakeHolderIdentity();
+                }
             }
 
             track.commit();

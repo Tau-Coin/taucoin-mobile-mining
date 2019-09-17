@@ -322,7 +322,19 @@ public class TransactionExecutor {
                 tx.getHash());
     }
 
-    public void undoTransaction() {
+    public boolean undoTransaction() {
+        AccountState senderAccountState = track.getAccountState(tx.getSender());
+
+        // During bootup, blockchain should check sanity between block store and states repo.
+        // When app was killed, the atomic of writing opetion for states db can't be guaranteed.
+        // So here check transaction timestamp.
+        if (senderAccountState == null || (senderAccountState != null &&
+                !senderAccountState.getTranHistory().keySet().contains(ByteUtil.byteArrayToLong(tx.getTime())))) {
+            logger.warn("rollback tx {} with ts {} ignore", Hex.toHexString(tx.getHash()),
+                    ByteUtil.byteArrayToLong(tx.getTime()));
+            return false;
+        }
+
         // add sender balance
         BigInteger totalCost = toBI(tx.getAmount()).add(toBI(tx.transactionCost()));
         track.addBalance(tx.getSender(), totalCost);
@@ -334,8 +346,6 @@ public class TransactionExecutor {
         }
 
         feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
-
-        AccountState senderAccountState = track.getAccountState(tx.getSender());
 
         String coinbaseHexAddress = Hex.toHexString(coinbase);
 
@@ -413,6 +423,8 @@ public class TransactionExecutor {
         }
 
         track.reduceForgePower(tx.getSender());
+
+        return true;
     }
 
 	/**
