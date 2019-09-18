@@ -54,6 +54,8 @@ public class FileBlockStore {
     private TreeMap<Long, BlockWrapper> discontinuousBlocks
             = new TreeMap<Long, BlockWrapper>();
 
+    private boolean isAlive = false;
+
     @Inject
     public FileBlockStore() {
         open();
@@ -100,9 +102,16 @@ public class FileBlockStore {
         logger.info("File block queue blocks amount {}, start {}", maxNumber, startNumber);
 
         checkSanity();
+
+        isAlive = true;
     }
 
     public synchronized boolean put(long number, BlockWrapper block) {
+        if (!isAlive) {
+            logger.error("Skip block with the number {}.", number);
+            return false;
+        }
+
         if (number <= maxNumber) {
             logger.error("Block with the number {} has existed.", number);
             return false;
@@ -305,6 +314,7 @@ public class FileBlockStore {
     public synchronized void close() {
         blockStore.close();
         indexStore.close();
+        isAlive = false;
     }
 
     private void initDirectory(String dir) {

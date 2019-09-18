@@ -825,6 +825,11 @@ public class SystemProperties {
     }
 
     @ValidateMe
+    public long rebootCycle() {
+        return config.getInt("sync2.reboot.cycle");
+    }
+
+    @ValidateMe
     public long hibernationDuration() {
         return config.getInt("sync2.hibernation.duration");
     }

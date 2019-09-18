@@ -79,6 +79,9 @@ public class SyncQueue {
     private static final long HIBERNATION_CYCLE
             = SystemProperties.CONFIG.hibernationCycle();
 
+    private static final long REBOOT_CYCLE
+            = SystemProperties.CONFIG.rebootCycle();
+
     private static final long HIBERNATION_DURATION
             = SystemProperties.CONFIG.hibernationDuration();
 
@@ -389,13 +392,19 @@ public class SyncQueue {
                         wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
                     logger.warn("Hibernation starts at block {}", wrapper.getNumber());
                     syncManager.notifyHibernation(wrapper.getNumber());
-                    syncManager.stopSyncWithPeer();
+                    if (wrapper.getNumber() % REBOOT_CYCLE == 0) {
+                        syncManager.stopSyncWithPeer();
+                    }
+
                     try {
                         Thread.sleep(HIBERNATION_DURATION);
                     } catch (InterruptedException ie) {
                         logger.error("Sync queue hibernation interrupted {}", ie);
                     }
-                    System.exit(3);
+
+                    if (wrapper.getNumber() % REBOOT_CYCLE == 0) {
+                        System.exit(3);
+                    }
                 }
             }
         }
