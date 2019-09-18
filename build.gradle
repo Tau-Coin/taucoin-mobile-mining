@@ -41,7 +41,7 @@ ext {
     rxjava = project.property('DEP_RXJAVA')
     rxandroid = project.property('DEP_RXANDROID')
     eventbus = project.property('DEP_EVENTBUS')
-    circleimageview = project.property('DEP_CIRCLEIMAGEVIEW')
+//    circleimageview = project.property('DEP_CIRCLEIMAGEVIEW')
     smartrefreshlayout = project.property('DEP_SMARTREFRESHLAYOUT')
     smartrefreshheader = project.property('DEP_SMARTREFRESHHEADER')
     expandable = project.property('DEP_EXPANDABLE')

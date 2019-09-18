@@ -37,7 +37,7 @@ dependencies {
     api rootProject.ext.design
     api rootProject.ext.greendao
     api rootProject.ext.eventbus
-    api rootProject.ext.circleimageview
+//    api rootProject.ext.circleimageview
     api rootProject.ext.smartrefreshlayout
     api rootProject.ext.smartrefreshheader
     api rootProject.ext.expandable
