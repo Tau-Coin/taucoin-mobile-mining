@@ -1,0 +1,9 @@
+因为Android手机平台本身、电量、网络流量的限制, CPU和WiFi都会出现休眠的现象。 为了保证程序能良好运行，其中针对WiFi休眠，您可以在“WLAN”选项页面，设置手机“在休眠状态下保持WLAN网络连接”，但是有的手机由于厂商定制无此设置。
+故采用如下2种方式改善休眠现象：
+1、保持CPU工作：在RemoteService进程中利用PowerManager申请WakeLock, 保持CPU唤醒状态。
+2、保持WiFi连接：在RemoteService进程中利用WifiManager申请WifiLock，保持Wifi的连接不中断。
+
+由于Android手机系统配置参差不齐，程序进程可能会被系统、第三方管理软件、程序异常等杀死或退出，为了更好的体检，采用以下三种方式来保证进程的存活：
+1、白色保活：在启动进程Service时，采用前台服务的形式，提高的Service的优先级，减小被杀死的可能性。
+2、双进程保活：利用TxService和RemoteService两个进程互相绑定，如果一方被杀死，另一方收到通知，重新启动被杀死的一方的进程。
+3、JobService保活：利用JobService每10s检测两个进程的存活情况，如果哪个进程被杀死，然后主动启动一个新的进程。
