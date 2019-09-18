@@ -137,14 +137,14 @@ public class MiningUtil {
 
     /**
      * handle upgrade compatibility
-     * only version 1.9.0.3、1.9.0.6
+     * only version 1.9.0.3、1.9.0.5、1.9.1、1.9.2
      * */
     public static void handleUpgradeCompatibility() {
         Context context = MyApplication.getInstance();
         String forgingReloadKey = TransmitKey.FORGING_RELOAD + AppUtil.getVersionCode(context);
         boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(forgingReloadKey, false);
         if(!isReload){
-            MiningUtil.clearAndReloadBlocks(null, false);
+            MiningUtil.clearAndReloadBlocks(null, false, true);
             SharedPreferencesHelper.getInstance().putBoolean(forgingReloadKey, true);
         }
     }
@@ -166,10 +166,10 @@ public class MiningUtil {
     }
 
     public static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver) {
-        clearAndReloadBlocks(logicObserver, true);
+        clearAndReloadBlocks(logicObserver, true, false);
     }
 
-    private static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver, boolean isSleep) {
+    private static void clearAndReloadBlocks(LogicObserver<Boolean> logicObserver, boolean isSleep, boolean isReDownload) {
         MyApplication.getRemoteConnector().stopSyncAll();
         MyApplication.getRemoteConnector().stopBlockForging();
         MyApplication.getRemoteConnector().cancelRemoteConnector();
@@ -178,8 +178,8 @@ public class MiningUtil {
                 if(isSleep){
                     Thread.sleep(2000);
                 }
-                deleteBlockChainFileDir();
-                int blockSync = BlockInfoDaoUtils.getInstance().reloadBlocks();
+                deleteBlockChainFileDir(isReDownload);
+                int blockSync = BlockInfoDaoUtils.getInstance().reloadBlocks(isReDownload);
                 if(logicObserver == null){
                     EventBusUtil.post(MessageEvent.EventCode.IRREPARABLE_ERROR, blockSync);
                 }
@@ -209,7 +209,7 @@ public class MiningUtil {
             });
     }
 
-    public static void deleteBlockChainFileDir() {
+    public static void deleteBlockChainFileDir(boolean isReDownload) {
         Context context = MyApplication.getInstance();
         String dataDir =  context.getApplicationInfo().dataDir;
         Logger.d(dataDir);
@@ -225,9 +225,10 @@ public class MiningUtil {
         FileUtil.deleteFile(new File(blockStoreDir));
 
         // block chain block download dir
-//        String storeBackend = dataDir + File.separator + "store-backend";
-//        FileUtil.deleteFile(new File(storeBackend));
-
+        if(isReDownload){
+            String storeBackend = dataDir + File.separator + "store-backend";
+            FileUtil.deleteFile(new File(storeBackend));
+        }
     }
 
     public static void deleteStatesTagFileDir() {

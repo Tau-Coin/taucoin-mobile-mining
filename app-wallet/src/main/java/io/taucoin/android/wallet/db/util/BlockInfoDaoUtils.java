@@ -68,12 +68,15 @@ public class BlockInfoDaoUtils {
         getBlockInfoDao().insertOrReplace(blockInfo);
     }
 
-    public int reloadBlocks() {
+    public int reloadBlocks(boolean isReDownload) {
         BlockInfo blockInfo = query();
         int blockSync = 0;
         if(blockInfo != null){
             blockSync = blockInfo.getBlockSync();
             blockInfo.setBlockSync(0);
+            if(isReDownload){
+                blockInfo.setBlockDownload(0);
+            }
             insertOrReplace(blockInfo);
         }
         return blockSync;

@@ -218,7 +218,7 @@ public class StateTagManager {
     private synchronized void initBlockChain(boolean isReset) {
         if(isReset){
             Logger.d("delete block chain file dir");
-            MiningUtil.deleteBlockChainFileDir();
+            MiningUtil.deleteBlockChainFileDir(true);
         }
         Logger.d("initBlockChain");
         MyApplication.getRemoteConnector().initBlockChain();
