@@ -83,6 +83,11 @@ public class FileBlockStore {
 
         // Read start number and set start number for 'BlockIndex'.
         startNumber = readStartNumber();
+        // Bugfix for release v1.9.1
+        if (startNumber == 0L) {
+            startNumber = 1L;
+            writeStartNumber(startNumber);
+        }
         BlockIndex.setStartNumber(startNumber);
 
         // Get max block number.
@@ -399,6 +404,7 @@ public class FileBlockStore {
 
     private long readStartNumber() {
         if (!checkFile(START_NUMBER_FILE)) {
+            writeStartNumber(1L);
             return 1L;
         }
 
