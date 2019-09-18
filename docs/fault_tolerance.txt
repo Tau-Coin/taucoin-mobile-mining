@@ -1,0 +1,10 @@
+Android app 与 PC app　有以下区别：
+
+1. Android app java heap limit与PC java app heap limit相比较小，根据不同配置，android app heap limit往往为128MB, 256MB, 512MB.
+2. PC app运行环境相对稳定，android系统资源紧张时，会选择杀死某些app.
+
+针对以上区别，tau service（blockchain service）设计了如下容错措施：
+
+1. blockchain service同步区块需要消耗大量资源，如果手机配置较低且android app java heap limit为128MB，产生OOM时会重启tau service.
+2. 为了缓解同步内存压力，每同步1000个区块验证线程休眠30秒．
+3. 区块验证过程中app被杀死，重启tau service时states db与block store产生数据不一致性，此时states db回滚一个区块.
