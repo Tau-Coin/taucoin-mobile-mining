@@ -5,6 +5,7 @@ import android.content.Context;
 import io.taucoin.android.datasource.LevelDbDataSource;
 import io.taucoin.android.datasource.mmkv.MmkvDataSource;
 import io.taucoin.android.db.AccountStateDatabaseImpl;
+import io.taucoin.android.db.MMKVIndexedBlockStore;
 import io.taucoin.android.debug.TauMobileRefWatcher;
 import io.taucoin.android.manager.BlockLoader;
 import io.taucoin.android.settings.TaucoinSettings;
@@ -158,7 +159,8 @@ public class TaucoinModule {
 
         return sBlockStore;
         */
-        return new MemoryIndexedBlockStore();
+        //return new MemoryIndexedBlockStore();
+        return new MMKVIndexedBlockStore();
     }
 
     @Provides

@@ -61,9 +61,12 @@ public class MmkvDataSource implements KeyValueDataSource {
             f.mkdir();
         }
 
-        String root = MMKV.initialize(dbDir);
-        MMKV.registerHandler(new MMKVHandlerImpl());
-        db = MMKV.mmkvWithID(name);
+        String root = MMKV.getRootDir();
+        if (root == null) {
+            root = MMKV.initialize(CONFIG.databaseDir());
+            MMKV.registerHandler(new MMKVHandlerImpl());
+        }
+        db = MMKV.mmkvWithID(name, dbDir);
         alive = true;
         logger.info("Mmkv is alive with path: {}", root);
     }
