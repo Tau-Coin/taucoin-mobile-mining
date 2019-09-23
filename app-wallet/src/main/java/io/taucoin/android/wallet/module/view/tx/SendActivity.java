@@ -117,8 +117,12 @@ public class SendActivity extends BaseActivity implements ISendView {
         editText.setMaxLines(1);
     }
 
-    @OnTextChanged({R.id.et_amount, R.id.et_input})
-    void onTextChanged(CharSequence text){
+    @OnTextChanged({R.id.et_amount})
+    void onAmountTextChanged(CharSequence text){
+        onFeeTextChanged();
+    }
+
+    private void onFeeTextChanged() {
         String amount = etAmount.getText().toString().trim();
         String fee = etFee.getText().trim();
 
@@ -134,6 +138,12 @@ public class SendActivity extends BaseActivity implements ISendView {
         }else{
             tvTotalAmount.setVisibility(View.GONE);
         }
+    }
+
+    @OnTextChanged({R.id.et_input})
+    void onFeeTextChanged(CharSequence text){
+        onFeeTextChanged();
+        Wallet.validateTxFee(etFee);
     }
 
     @OnClick({R.id.iv_fee})
@@ -167,7 +177,7 @@ public class SendActivity extends BaseActivity implements ISendView {
         tx.setAmount(amount);
         tx.setFee(fee);
 
-        Wallet.validateTxParameter(tx, new LogicObserver<Boolean>() {
+        Wallet.validateTxParameter(etFee, tx, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 if(isSuccess){

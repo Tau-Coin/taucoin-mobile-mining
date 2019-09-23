@@ -100,6 +100,7 @@
     <string name="send_budget_too_low">Transaction budget is too low</string>
     <!--<string name="send_amount_too_high">Transaction amount is too high</string>-->
     <string name="send_fee_too_low">Transaction fee is too low</string>
+    <string name="send_fee_upper_limit">Transaction fees should not exceed %s TAU</string>
     <!--<string name="send_fee_too_high">Transaction fee is too high</string>-->
     <string name="send_budget_in_pool">TAU kindly remind you. There already has an increase power transaction in the pool. Sending frequently may increase the failure rate of the transaction.</string>
 

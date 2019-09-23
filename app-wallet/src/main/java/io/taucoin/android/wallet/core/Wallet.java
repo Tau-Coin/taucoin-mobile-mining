@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.taucoin.android.wallet.core;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.android.wallet.R;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -32,8 +33,10 @@ import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.db.util.IncreasePowerDaoUtils;
 import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.MiningUtil;
+import io.taucoin.android.wallet.util.ResourcesUtil;
 import io.taucoin.android.wallet.util.SharedPreferencesHelper;
 import io.taucoin.android.wallet.util.ToastUtils;
+import io.taucoin.android.wallet.widget.EditInput;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.StringUtil;
 import io.taucoin.platform.adress.KeyManager;
@@ -43,7 +46,7 @@ public class Wallet {
     /**
      * validate transaction parameter
      */
-    public synchronized static void validateTxParameter(TransactionHistory tx, LogicObserver<Boolean> logicObserver) {
+    public synchronized static void validateTxParameter(EditInput etFee, TransactionHistory tx, LogicObserver<Boolean> logicObserver) {
         if (tx == null) {
             logicObserver.onNext(false);
             return;
@@ -90,6 +93,12 @@ public class Wallet {
             return;
         }
         tx.setFee(feeStr);
+
+        if(!validateTxFee(etFee)){
+            logicObserver.onNext(false);
+            return;
+        }
+
         // validate balance is enough
         KeyValue keyValue = MyApplication.getKeyValue();
         long balance = keyValue.getBalance();
@@ -102,7 +111,7 @@ public class Wallet {
         }
     }
 
-    public static void validateTxBudget(IncreasePower budget, LogicObserver<Boolean> logicObserver) {
+    public static void validateTxBudget(EditInput etFee, IncreasePower budget, LogicObserver<Boolean> logicObserver) {
         if (budget == null) {
             logicObserver.onNext(false);
             return;
@@ -155,6 +164,12 @@ public class Wallet {
             return;
         }
         budget.setFee(feeStr);
+
+        if(!validateTxFee(etFee)){
+            logicObserver.onNext(false);
+            return;
+        }
+
         // validate balance is enough
         KeyValue keyValue = MyApplication.getKeyValue();
         long balance = keyValue.getBalance();
@@ -185,4 +200,27 @@ public class Wallet {
                 }
             });
         }
+
+    public static boolean validateTxFee(EditInput etFee) {
+        boolean isSuccess = true;
+        if(etFee != null){
+            try {
+                String fee = etFee.getText().trim();
+                String medianFee = StringUtil.getTag(etFee);
+                BigDecimal bigIntFee = new BigDecimal(fee);
+                BigDecimal bigIntMedianFee = new BigDecimal(medianFee);
+                bigIntMedianFee = bigIntMedianFee.multiply(new BigDecimal(5));
+                if(bigIntFee.compareTo(bigIntMedianFee) > 0){
+                    String bigIntMedianFeeText = bigIntMedianFee.toString();
+                    String upperLimit = ResourcesUtil.getText(R.string.send_fee_upper_limit);
+                    upperLimit = String.format(upperLimit, bigIntMedianFeeText);
+                    ToastUtils.showShortToast(upperLimit);
+                    isSuccess = false;
+                }
+            }catch (Exception ignore){
+
+            }
+        }
+        return isSuccess;
+    }
 }

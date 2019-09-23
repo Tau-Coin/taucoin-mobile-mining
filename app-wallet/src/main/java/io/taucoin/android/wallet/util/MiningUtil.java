@@ -131,6 +131,7 @@ public class MiningUtil {
                 public void handleData(String senderTxFee) {
                     Logger.d("MiningUtil.initSenderTxFee=" + senderTxFee);
                     textView.setText(senderTxFee);
+                    textView.setTag(senderTxFee);
                 }
             });
     }

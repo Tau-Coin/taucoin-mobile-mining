@@ -14,7 +14,6 @@ import android.widget.TextView;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -35,7 +34,6 @@ import io.taucoin.android.wallet.module.service.TxService;
 import io.taucoin.android.wallet.module.view.main.iview.ISendView;
 import io.taucoin.android.wallet.module.view.manage.SettingActivity;
 import io.taucoin.android.wallet.util.FixMemLeak;
-import io.taucoin.android.wallet.util.FmtMicrometer;
 import io.taucoin.android.wallet.util.KeyboardUtils;
 import io.taucoin.android.wallet.util.MiningUtil;
 import io.taucoin.android.wallet.util.MoneyValueFilter;
@@ -118,8 +116,8 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
         editText.setMaxLines(1);
     }
 
-    @OnTextChanged({R.id.et_amount, R.id.et_input})
-    void onTextChanged(CharSequence text){
+    @OnTextChanged({R.id.et_amount})
+    void onAmountTextChanged(CharSequence text){
         String amount = etAmount.getText().toString().trim();
         if(StringUtil.isNotEmpty(amount) ){
             String totalAmount = getText(R.string.send_tx_budget_amount).toString();
@@ -129,6 +127,11 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
         }else{
             tvTotalAmount.setVisibility(View.GONE);
         }
+    }
+
+    @OnTextChanged({R.id.et_input})
+    void onFeeTextChanged(CharSequence text){
+        Wallet.validateTxFee(etFee);
     }
 
     @OnClick({R.id.iv_fee})
@@ -161,7 +164,7 @@ public class IncreaseActivity extends BaseActivity implements ISendView {
         budget.setFee(amount);
         budget.setFee(fee);
 
-        Wallet.validateTxBudget(budget, new LogicObserver<Boolean>() {
+        Wallet.validateTxBudget(etFee, budget, new LogicObserver<Boolean>() {
             @Override
             public void handleData(Boolean isSuccess) {
                 if(isSuccess){
