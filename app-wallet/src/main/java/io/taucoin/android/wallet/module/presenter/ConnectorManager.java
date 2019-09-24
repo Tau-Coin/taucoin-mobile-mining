@@ -118,10 +118,10 @@ public abstract class ConnectorManager implements ConnectorHandler {
             mTaucoinConnector.removeHandler(this);
             try {
                 mTaucoinConnector.unbindService();
+                mTaucoinConnector.stopHandlerThread();
             }catch (Exception e){
                 Logger.e(e, "cancelLocalConnector.unbindService is error!");
             }
-            mTaucoinConnector.stopHandlerThread();
             mTaucoinConnector = null;
         }
         isInit = -1;
