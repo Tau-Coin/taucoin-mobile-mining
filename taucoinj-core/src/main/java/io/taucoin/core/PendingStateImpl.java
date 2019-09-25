@@ -277,7 +277,9 @@ public class PendingStateImpl implements PendingState {
 
         //clear wired transactions
         synchronized (wireTransactions) {
-            for (MemoryPoolEntry entry : wireTransactions) {
+            Iterator<MemoryPoolEntry> iterator = wireTransactions.iterator();
+            while(iterator.hasNext()){
+                MemoryPoolEntry entry = iterator.next();
                 long expireTime = ByteUtil.byteArrayToLong(entry.tx.getExpireTime());
                 long unlockTime = blockchain.getBestBlock().getNumber() - expireTime;
                 Block benchBlock = null;
@@ -295,7 +297,7 @@ public class PendingStateImpl implements PendingState {
                 }
                 if (benchBlock != null && !entry.tx.checkTime(benchBlock) ) {
                     removeExpendList(entry.tx);
-                    wireTransactions.remove(entry);
+                    iterator.remove();
                 }
             }
 
