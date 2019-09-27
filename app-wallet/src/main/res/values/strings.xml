@@ -37,7 +37,7 @@
 
     <string name="tx_increase">Increase Power</string>
     <string name="tx_send">Send</string>
-    <string name="tx_manager_address">Manage Addresses</string>
+    <string name="tx_manager_address">Manage Keys</string>
     <string name="tx_receive">Receive</string>
     <string name="tx_log">Transactions</string>
     <string name="tx_log_empty">No records</string>
@@ -248,7 +248,7 @@
 
     <string name="setting_title">Settings</string>
     <string name="setting_transaction_expiry_limit">Transaction valid time range: %d - %d minutes.</string>
-    <string name="setting_address_book">Address Book</string>
+    <string name="setting_address_book">Keys Management</string>
     <string name="setting_transaction_expiry">Transaction Expiry</string>
     <string name="setting_transaction_expiry_tip">Please enter the transaction expiry</string>
     <string name="setting_reset_data">Restart Verify</string>
