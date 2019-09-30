@@ -16,7 +16,7 @@
 
         <TextView
             android:id="@+id/tv_amount"
-            style="@style/style_power_black"
+            style="@style/style_big_black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

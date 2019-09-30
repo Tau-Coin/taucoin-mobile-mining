@@ -336,12 +336,16 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
 
     @Override
     public void finishRefresh() {
-        refreshLayout.finishRefresh();
+        if(refreshLayout != null){
+            refreshLayout.finishRefresh();
+        }
     }
 
     @Override
     public void finishLoadMore() {
-        refreshLayout.finishLoadmore();
+        if(refreshLayout != null){
+            refreshLayout.finishLoadmore();
+        }
     }
 
 }
