@@ -59,7 +59,7 @@ public class SplashActivity extends BaseActivity {
 
             Logger.i("SplashActivity onCreate");
 
-            MiningUtil.handleUpgradeCompatibility();
+//            MiningUtil.handleUpgradeCompatibility();
 
             requestWriteLogPermissions();
 

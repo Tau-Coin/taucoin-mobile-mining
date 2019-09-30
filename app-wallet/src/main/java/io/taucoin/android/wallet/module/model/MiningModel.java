@@ -44,8 +44,8 @@ import io.taucoin.foundation.net.NetWorkManager;
 import io.taucoin.foundation.net.callback.LogicObserver;
 
 public class MiningModel implements IMiningModel{
-    private ThreadPoolExecutor pool = new ThreadPoolExecutor(10,100,1,
-            TimeUnit.MINUTES, new LinkedBlockingDeque<>());
+    private ThreadPoolExecutor pool = new ThreadPoolExecutor(15,120,10,
+            TimeUnit.SECONDS, new LinkedBlockingDeque<>());
     private Scheduler scheduler = Schedulers.from(pool);
     @Override
     public void getMiningInfo(LogicObserver<BlockInfo> observer) {
