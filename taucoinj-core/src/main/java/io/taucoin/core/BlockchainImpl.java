@@ -317,6 +317,7 @@ public class BlockchainImpl implements io.taucoin.facade.Blockchain {
             }
 
             blockStore.saveBlock(block, totalDifficulty, false);
+            blockStore.flush();
 
             return IMPORTED_NOT_BEST;
         }
