@@ -6,7 +6,10 @@ import io.taucoin.core.BlockWrapper;
 import io.taucoin.core.Blockchain;
 import io.taucoin.http.ConnectionManager;
 import io.taucoin.http.RequestManager;
+import io.taucoin.listener.CompositeTaucoinListener;
 import io.taucoin.listener.TaucoinListener;
+import io.taucoin.listener.TaucoinListenerAdapter;
+import io.taucoin.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +67,26 @@ public class SyncManager {
 
     private AtomicBoolean started = new AtomicBoolean(false);
 
+    private ChainInfoManager.ChainInfoListener chainInfoListener
+            = new ChainInfoManager.ChainInfoListener() {
+        @Override
+        public void onChainInfoChanged(long height, byte[] previousBlockHash,
+                byte[] currentBlockHash, BigInteger totalDiff, long medianFee) {
+            SyncManager.this.onChainInfoChanged(height, currentBlockHash);
+        }
+    };
+
+    private Block bestBlock;
+    private TaucoinListenerAdapter bestBlockListener
+            = new TaucoinListenerAdapter() {
+        @Override
+        public void onBlockConnected(Block block) {
+            synchronized(bestBlock) {
+                bestBlock = block;
+            }
+        }
+    };
+
     @Inject
     public SyncManager(Blockchain blockchain, SyncQueue queue,
             TaucoinListener taucoinListener, ChainInfoManager chainInfoManager,
@@ -103,6 +126,10 @@ public class SyncManager {
     public void init() {
         // Init sync queue
         this.queue.init();
+
+        bestBlock = this.blockchain.getBestBlock();
+        this.chainInfoManager.addListener(chainInfoListener);
+        ((CompositeTaucoinListener)this.taucoinListener).addListener(bestBlockListener);
     }
 
     public void start() {
@@ -257,5 +284,20 @@ public class SyncManager {
 
     public void notifyBlockQueueRollback(long number) {
         taucoinListener.onBlockQueueRollback(number);
+    }
+
+    private void onChainInfoChanged(long height, byte[] currentHash) {
+        logger.info("On chain info changed {} {}", height, Hex.toHexString(currentHash));
+
+        if (bestBlock != null) {
+            synchronized(bestBlock) {
+                if (Utils.hashEquals(currentHash, bestBlock.getHash())
+                        && Utils.hashEquals(bestBlock.getForgerPublicKey(), CONFIG.getForgerPubkey())) {
+                    logger.info("add self-mined block {} with pubkey {}", bestBlock.getNumber(),
+                            Hex.toHexString(CONFIG.getForgerPubkey()));
+                    queue.addNew(bestBlock, CONFIG.getForgerPubkey());
+                }
+            }
+        }
     }
 }

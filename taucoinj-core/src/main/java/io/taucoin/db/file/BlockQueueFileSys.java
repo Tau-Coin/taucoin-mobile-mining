@@ -154,6 +154,7 @@ public class BlockQueueFileSys implements BlockQueue {
 
     @Override
     public void addOrReplace(BlockWrapper block) {
+        fileBlockStore.put(block.getNumber(), block);
     }
 
     public boolean reloadBlock(long number) {

@@ -279,6 +279,11 @@ public class FileBlockStore {
         long startTime = System.nanoTime();
         logger.warn("Rollback blockstore to number {}, now max {}", number, maxNumber);
 
+        if (number > maxNumber) {
+            logger.error("Invalid arguments: number {}, max {}", number, maxNumber);
+            return false;
+        }
+
         OpFilePosition position = BlockIndex.withBlockNumber(number)
                 .getOpFilePosition();
         BlockIndex index;
