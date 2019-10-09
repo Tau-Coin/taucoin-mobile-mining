@@ -66,6 +66,8 @@ public class TaucoinRemoteService extends TaucoinService {
 
     private TaucoinSettings taucoinSettings;
 
+    private ConnectivityManager connectivityManager;
+
     private RefWatcher refWatcher;
 
     public TaucoinRemoteService() {
@@ -424,9 +426,9 @@ public class TaucoinRemoteService extends TaucoinService {
     }
 
     private void initNetworkStatus() {
-        ConnectivityManager manager
+        connectivityManager
                 = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = manager.getActiveNetworkInfo();
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         if (info != null && info.isConnected()) {
             logger.info("Initial network is connected: {}", info);
             connectionManager.setConnectionState(CONNECTED);
@@ -438,7 +440,8 @@ public class TaucoinRemoteService extends TaucoinService {
 
     private void registerNetworkStateListener() {
         intentFilter = new IntentFilter();
-        networkStateListener = new NetworkStateListener(connectionManager);
+        networkStateListener
+                = new NetworkStateListener(connectionManager, connectivityManager);
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         this.registerReceiver(networkStateListener, intentFilter);
     }
@@ -453,32 +456,25 @@ public class TaucoinRemoteService extends TaucoinService {
     private static class NetworkStateListener extends BroadcastReceiver {
 
         private ConnectionManager connectionManager;
+        private ConnectivityManager connectivityManager;
 
-        public NetworkStateListener(ConnectionManager connectionManager) {
+        public NetworkStateListener(ConnectionManager connectionManager,
+                ConnectivityManager connectivityManager) {
             this.connectionManager = connectionManager;
+            this.connectivityManager = connectivityManager;
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                NetworkInfo info
-                        = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                if (info != null) {
-                    if (NetworkInfo.State.CONNECTED == info.getState()
-                            && info.isAvailable()) {
-                        logger.info("Network changed into connected: {}", info);
-                        connectionManager.setConnectionState(CONNECTED);
-                        if (taucoin.getWorldManager().isSync()) {
-                            logger.info("try to start sync due to network connected");
-                            //taucoin.getWorldManager().startDownload();
-                        }
+                if (connectivityManager != null) {
+                    NetworkInfo info = this.connectivityManager.getActiveNetworkInfo();
+                    if (info != null && info.isConnected()) {
+                        logger.info("network state changed into connected: {}", info);
+                        this.connectionManager.setConnectionState(CONNECTED);
                     } else {
-                        logger.info("Network changed into disconnected: {}", info);
-                        connectionManager.setConnectionState(DISCONNECTED);
-                        if (taucoin.getWorldManager().isSync()) {
-                            logger.info("try to stop sync due to network disconnected");
-                            //taucoin.getWorldManager().stopDownload();
-                        }
+                        logger.info("network state changed into disconnected: {}", info == null ? null : info);
+                        this.connectionManager.setConnectionState(DISCONNECTED);
                     }
                 }
             }
