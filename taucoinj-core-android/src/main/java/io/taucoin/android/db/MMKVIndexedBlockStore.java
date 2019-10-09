@@ -394,6 +394,11 @@ public class MMKVIndexedBlockStore implements BlockStore {
 
         r.lock();
         try {
+            Block block = blocksCache.get(new ByteArrayWrapper(hash));
+            if (block != null) {
+                return block;
+            }
+
             byte[] blocksBytes = blocksDB.decodeBytes(Hex.toHexString(hash));
             if (blocksBytes == null) {
                 return null;
