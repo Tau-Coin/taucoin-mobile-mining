@@ -145,7 +145,7 @@ public class MiningUtil {
         String forgingReloadKey = TransmitKey.FORGING_RELOAD + AppUtil.getVersionCode(context);
         boolean isReload = SharedPreferencesHelper.getInstance().getBoolean(forgingReloadKey, false);
         if(!isReload){
-            MiningUtil.clearAndReloadBlocks(null, false, true);
+            MiningUtil.clearAndReloadBlocks(null, false, false);
             SharedPreferencesHelper.getInstance().putBoolean(forgingReloadKey, true);
         }
     }
