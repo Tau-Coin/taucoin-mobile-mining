@@ -96,13 +96,15 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
         if(pointNum < 0){
             pointNum = 0;
             isLoading = false;
-            setNormalText(stopMsg);
+            if(StringUtil.isNotEmpty(stopMsg)){
+                setNormalText(stopMsg);
+            }
         }else{
             stringBuilder.append(text);
             if(stringBuilder.length() > 0){
                 stringBuilder.append(": ");
             }
-            long min = pointNum / 10 / 60 % 60;
+            long min = pointNum / 10 / 60;
             long second = pointNum / 10 % 60;
             long millSecond = pointNum % 10;
 
@@ -126,11 +128,12 @@ public class LoadingTextView extends AppCompatTextView implements BaseHandler.Ha
             stringBuilder.append(millSecond);
 
             setText(stringBuilder.toString(), mBufferType);
-        }
-        long countDown = pointNum / 10;
-        long countDownOld = (pointNum + 1) / 10;
-        if(mCountDownListener != null && countDown != countDownOld){
-            mCountDownListener.countDown(countDown);
+
+            long countDown = pointNum / 10;
+            long countDownNew = (pointNum - 1) / 10;
+            if(mCountDownListener != null && (countDown != countDownNew || pointNum == 0)){
+                mCountDownListener.countDown(countDown);
+            }
         }
     }
 

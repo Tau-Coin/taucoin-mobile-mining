@@ -455,33 +455,28 @@ public class UserUtil {
             return;
         }
         NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
-        tvCurrentCondition.setTag(data);
         long timeInternal = detail.timeInternal;
-
         long initStartTime  = detail.timePoint - detail.previousBlockTime - timeInternal;
         initStartTime = initStartTime >= 0 ? initStartTime : 0;
         long startCountTime = initStartTime;
-        UserUtil.setCurrentCondition(tvCurrentCondition, startCountTime);
+        UserUtil.setCurrentCondition(tvCurrentCondition, detail, startCountTime);
         tvForgedTime.setCountDown(timeInternal, count -> {
             count = startCountTime + timeInternal - count;
-            UserUtil.setCurrentCondition(tvCurrentCondition, count);
+            UserUtil.setCurrentCondition(tvCurrentCondition, detail, count);
         });
     }
 
     private static final int digit = 13;
-    private static void setCurrentCondition(TextView tvCurrentCondition, long timeInternal) {
+    private static void setCurrentCondition(TextView tvCurrentCondition, NextBlockForgedPOTDetail detail, long timeInternal) {
         if(tvCurrentCondition == null){
             return;
         }
-        Object data = tvCurrentCondition.getTag();
-        NextBlockForgedPOTDetail detail = (NextBlockForgedPOTDetail) data;
         if(detail != null){
             BigInteger forgingPower = detail.forgingPower;
             long localPower = MyApplication.getKeyValue().getPower();
             if(forgingPower.longValue() < localPower){
                 forgingPower = new BigInteger(String.valueOf(localPower));
             }
-            tvCurrentCondition.setTag(detail);
             BigInteger leftValue = detail.hitValue;
             BigInteger rightValue = detail.baseTarget.multiply(forgingPower);
             rightValue = rightValue.multiply(new BigInteger(String.valueOf(timeInternal)));
