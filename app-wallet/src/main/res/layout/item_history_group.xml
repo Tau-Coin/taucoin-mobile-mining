@@ -36,5 +36,19 @@
             android:layout_toEndOf="@+id/tv_amount"
             android:gravity="end"
             android:text="" />
+
+        <FrameLayout
+            android:id="@+id/fl_read_status"
+            android:background="@drawable/yellow_rect_small_round_bg"
+            android:layout_width="10dp"
+            android:layout_height="match_parent">
+
+            <View
+                android:background="@color/color_white"
+                android:layout_width="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
     </RelativeLayout>
 </LinearLayout>

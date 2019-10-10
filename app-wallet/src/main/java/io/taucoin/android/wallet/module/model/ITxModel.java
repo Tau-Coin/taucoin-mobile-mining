@@ -76,4 +76,6 @@ public interface ITxModel {
     void handleSendBudget(IncreasePower budget, LogicObserver<Boolean> observer);
 
     void sendBudgetTx(LogicObserver<Boolean> observer);
+
+    void updateReadStatus(String txId);
 }

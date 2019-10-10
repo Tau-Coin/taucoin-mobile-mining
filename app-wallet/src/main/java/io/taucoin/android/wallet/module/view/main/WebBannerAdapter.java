@@ -114,7 +114,7 @@ public class WebBannerAdapter extends RecyclerView.Adapter<WebBannerAdapter.View
         StringBuilder stringBuilder = new StringBuilder();
         if(StringUtil.isNotEmpty(address) && address.length() > 9){
             stringBuilder.append(address.substring(0, 3));
-            stringBuilder.append("******************");
+            stringBuilder.append("*********************");
             stringBuilder.append(address.substring(address.length() - 6));
         }
         return stringBuilder.toString();

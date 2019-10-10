@@ -59,7 +59,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
+    public TransactionHistory getGroup(int groupPosition) {
         return historyList.get(groupPosition);
     }
 
@@ -94,6 +94,7 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
+        groupViewHolder.flReadStatus.setVisibility(tx.getReadStatus() == 1 ? View.VISIBLE : View.GONE);
 
         boolean isReceiver = isReceiver(tx);
         String total = FmtMicrometer.fmtFormatAdd(tx.getAmount(), tx.getFee());
@@ -195,6 +196,8 @@ public class HistoryExpandableListAdapter extends BaseExpandableListAdapter {
         TextView tvAmount;
         @BindView(R.id.tv_time)
         TextView tvTime;
+        @BindView(R.id.fl_read_status)
+        View flReadStatus;
 
         GroupViewHolder(View view) {
             ButterKnife.bind(this, view);

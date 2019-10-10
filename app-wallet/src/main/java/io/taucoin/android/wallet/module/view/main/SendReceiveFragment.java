@@ -30,6 +30,7 @@ import io.taucoin.android.wallet.base.TransmitKey;
 import io.taucoin.android.wallet.db.entity.KeyValue;
 import io.taucoin.android.wallet.db.entity.TransactionHistory;
 import io.taucoin.android.wallet.module.bean.MessageEvent;
+import io.taucoin.android.wallet.module.model.TxModel;
 import io.taucoin.android.wallet.module.presenter.TxPresenter;
 import io.taucoin.android.wallet.module.presenter.UserPresenter;
 import io.taucoin.android.wallet.module.service.TxService;
@@ -51,7 +52,6 @@ import io.taucoin.android.wallet.widget.EmptyLayout;
 import io.taucoin.android.wallet.widget.banner.BannerLayout;
 import io.taucoin.foundation.net.callback.LogicObserver;
 import io.taucoin.foundation.util.DimensionsUtil;
-import io.taucoin.foundation.util.StringUtil;
 
 public class SendReceiveFragment extends BaseFragment implements ISendReceiveView {
 
@@ -206,6 +206,15 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
             for (int i = 0; i < groupCount; i++) {
                 if (groupPosition != i) {
                     listViewLog.collapseGroup(i);
+                }else{
+                    if(mAdapter != null && mTxPresenter != null){
+                        TransactionHistory bean = mAdapter.getGroup(groupPosition);
+                        if(bean != null && bean.getReadStatus() == 1){
+                            bean.setReadStatus(0);
+                            mTxPresenter.updateReadStatus(bean.getTxId());
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    }
                 }
             }
         });
@@ -224,7 +233,8 @@ public class SendReceiveFragment extends BaseFragment implements ISendReceiveVie
         }
         mAdapter.setHistoryList(txHistories, mPageNo != 1);
         emptyLayout.setVisibility(mAdapter.getData().size() == 0 ? View.VISIBLE : View.GONE);
-        llTip.setVisibility(mAdapter.getData().size() != 0 ? View.VISIBLE : View.GONE);
+//        llTip.setVisibility(mAdapter.getData().size() != 0 ? View.VISIBLE : View.GONE);
+        llTip.setVisibility(View.GONE);
         boolean isLoadMore = txHistories.size() % TransmitKey.PAGE_SIZE == 0 && txHistories.size() > 0;
         refreshLayout.setEnableLoadmore(isLoadMore);
 

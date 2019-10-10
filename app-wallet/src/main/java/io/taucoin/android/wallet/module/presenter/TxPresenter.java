@@ -108,4 +108,8 @@ public class TxPresenter {
     public void handleSendBudget(IncreasePower budget, LogicObserver<Boolean> sendLogicObserver) {
         mTxModel.handleSendBudget(budget, sendLogicObserver);
     }
+
+    public void updateReadStatus(String txId) {
+        mTxModel.updateReadStatus(txId);
+    }
 }

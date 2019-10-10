@@ -37,6 +37,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         public final static Property BlockHeight = new Property(10, long.class, "blockHeight", false, "BLOCK_HEIGHT");
         public final static Property TransExpiry = new Property(11, long.class, "transExpiry", false, "TRANS_EXPIRY");
         public final static Property TimeBasis = new Property(12, int.class, "timeBasis", false, "TIME_BASIS");
+        public final static Property ReadStatus = new Property(13, int.class, "readStatus", false, "READ_STATUS");
     }
 
 
@@ -64,7 +65,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
                 "\"MESSAGE\" TEXT," + // 9: message
                 "\"BLOCK_HEIGHT\" INTEGER NOT NULL ," + // 10: blockHeight
                 "\"TRANS_EXPIRY\" INTEGER NOT NULL ," + // 11: transExpiry
-                "\"TIME_BASIS\" INTEGER NOT NULL );"); // 12: timeBasis
+                "\"TIME_BASIS\" INTEGER NOT NULL ," + // 12: timeBasis
+                "\"READ_STATUS\" INTEGER NOT NULL );"); // 13: readStatus
     }
 
     /** Drops the underlying database table. */
@@ -129,6 +131,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         stmt.bindLong(11, entity.getBlockHeight());
         stmt.bindLong(12, entity.getTransExpiry());
         stmt.bindLong(13, entity.getTimeBasis());
+        stmt.bindLong(14, entity.getReadStatus());
     }
 
     @Override
@@ -187,6 +190,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         stmt.bindLong(11, entity.getBlockHeight());
         stmt.bindLong(12, entity.getTransExpiry());
         stmt.bindLong(13, entity.getTimeBasis());
+        stmt.bindLong(14, entity.getReadStatus());
     }
 
     @Override
@@ -209,7 +213,8 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // message
             cursor.getLong(offset + 10), // blockHeight
             cursor.getLong(offset + 11), // transExpiry
-            cursor.getInt(offset + 12) // timeBasis
+            cursor.getInt(offset + 12), // timeBasis
+            cursor.getInt(offset + 13) // readStatus
         );
         return entity;
     }
@@ -229,6 +234,7 @@ public class TransactionHistoryDao extends AbstractDao<TransactionHistory, Long>
         entity.setBlockHeight(cursor.getLong(offset + 10));
         entity.setTransExpiry(cursor.getLong(offset + 11));
         entity.setTimeBasis(cursor.getInt(offset + 12));
+        entity.setReadStatus(cursor.getInt(offset + 13));
      }
     
     @Override

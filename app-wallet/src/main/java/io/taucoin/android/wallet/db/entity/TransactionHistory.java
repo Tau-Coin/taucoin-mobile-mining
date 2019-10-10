@@ -40,11 +40,13 @@ public class TransactionHistory {
     private long transExpiry;
     // Time basis for acquiring transaction records
     private int timeBasis;
-    @Generated(hash = 1289841467)
+    // Whether the transaction is clicked to see
+    private int readStatus;
+    @Generated(hash = 2021127287)
     public TransactionHistory(Long id, String txId, String fromAddress,
             String toAddress, String createTime, String amount, String memo,
             String fee, String result, String message, long blockHeight,
-            long transExpiry, int timeBasis) {
+            long transExpiry, int timeBasis, int readStatus) {
         this.id = id;
         this.txId = txId;
         this.fromAddress = fromAddress;
@@ -58,6 +60,7 @@ public class TransactionHistory {
         this.blockHeight = blockHeight;
         this.transExpiry = transExpiry;
         this.timeBasis = timeBasis;
+        this.readStatus = readStatus;
     }
     @Generated(hash = 63079048)
     public TransactionHistory() {
@@ -139,5 +142,11 @@ public class TransactionHistory {
     }
     public void setTimeBasis(int timeBasis) {
         this.timeBasis = timeBasis;
+    }
+    public int getReadStatus() {
+        return this.readStatus;
+    }
+    public void setReadStatus(int readStatus) {
+        this.readStatus = readStatus;
     }
 }

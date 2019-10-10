@@ -476,6 +476,7 @@ public class TxModel implements ITxModel {
 
     private void insertTransactionHistory(TransactionHistory txHistory, LogicObserver<Boolean> logicObserver){
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            txHistory.setReadStatus(1);
             TransactionHistoryDaoUtils.getInstance().insertOrReplace(txHistory);
             emitter.onNext(true);
         }).observeOn(AndroidSchedulers.mainThread())
@@ -776,5 +777,23 @@ public class TxModel implements ITxModel {
             Logger.e("sendBudgetTx error", e);
         }
         return isSuccess;
+    }
+
+    @Override
+    public void updateReadStatus(String txId) {
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            TransactionHistory transactionHistory = TransactionHistoryDaoUtils.getInstance().queryTransactionById(txId);
+            transactionHistory.setReadStatus(0);
+            TransactionHistoryDaoUtils.getInstance().insertOrReplace(transactionHistory);
+            emitter.onNext(true);
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(scheduler)
+                .unsubscribeOn(scheduler)
+                .subscribe(new LogicObserver<Boolean>() {
+                    @Override
+                    public void handleData(Boolean aBoolean) {
+
+                    }
+                });
     }
 }
