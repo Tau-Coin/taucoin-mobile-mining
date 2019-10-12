@@ -52,13 +52,6 @@ public class KeysActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick({R.id.btn_import_key, R.id.btn_generate_key})
     void onImportKeyClick(View view) {
-        if(UserUtil.isImportKey()){
-            KeyValue KeyValue = MyApplication.getKeyValue();
-            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
-                return;
-            }
-        }
         if(view.getId() == R.id.btn_import_key){
             Intent intent = new Intent(this, ImportKeyActivity.class);
             startActivity(intent);

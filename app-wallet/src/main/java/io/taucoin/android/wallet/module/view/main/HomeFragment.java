@@ -196,6 +196,13 @@ public class HomeFragment extends BaseFragment implements IHomeView {
         NotifyManager.getInstance().sendNotify(miningState);
     }
 
+    private void switchStopMining(){
+        if(ivMiningSwitch != null && ivMiningSwitch.isChecked()){
+            ivMiningSwitch.setChecked(false);
+            starOrStopMining();
+        }
+    }
+
     @Override
     public void handleMiningSwitch(){
         if(UserUtil.isImportKey()){
@@ -267,6 +274,9 @@ public class HomeFragment extends BaseFragment implements IHomeView {
                 break;
             case APP_BACK_TO_FRONT:
                 handleForgingWifiOnlyTip();
+                break;
+            case SWITCH_STOP_MINING:
+                switchStopMining();
                 break;
             default:
                 break;

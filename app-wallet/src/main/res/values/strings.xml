@@ -241,8 +241,6 @@
 
     <string name="income_miner_rollback"> Blocks roll back.</string>
 
-    <string name="mining_import_private_key">Please stop mining first</string>
-    <string name="mining_generate_private_key">Please stop mining first</string>
     <string name="mining_power_zero">Send transactions to increase \"Mining Power\" above 0 for mining.</string>
     <string name="mining_sync_complete">Latest block need to be synced.</string>
 
@@ -273,5 +271,6 @@
     <string name="address_book_search_hint">Search Address or Remark Name</string>
     <string name="address_book_deleted_sure" formatted="false"><Data><![CDATA[Are you sure you want to <font color="#fa0105">delete</font> this address?]]></Data></string>
     <string name="address_book_switch_sure">Confirm to use this address.</string>
+    <string name="address_book_switch">Switch Mining Address</string>
 
 </resources>

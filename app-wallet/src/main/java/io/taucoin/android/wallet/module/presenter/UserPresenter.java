@@ -32,6 +32,7 @@ import io.taucoin.android.wallet.module.bean.MessageEvent;
 import io.taucoin.android.wallet.module.model.IUserModel;
 import io.taucoin.android.wallet.module.model.UserModel;
 import io.taucoin.android.wallet.module.service.TxService;
+import io.taucoin.android.wallet.module.view.manage.KeysActivity;
 import io.taucoin.android.wallet.module.view.manage.iview.IAddressView;
 import io.taucoin.android.wallet.module.view.manage.iview.IImportKeyView;
 import io.taucoin.android.wallet.util.EventBusUtil;
@@ -85,6 +86,7 @@ public class UserPresenter {
 
     private void saveKeyAndAddress(FragmentActivity context, KeyValue keyValue) {
         ProgressManager.showProgressDialog(context, false);
+        EventBusUtil.post(MessageEvent.EventCode.SWITCH_STOP_MINING);
         saveKeyAndAddress(keyValue);
     }
 
@@ -203,11 +205,7 @@ public class UserPresenter {
     public void switchAddress(FragmentActivity context, KeyValue keyValue) {
         if(UserUtil.isImportKey()){
             String address =  MyApplication.getKeyValue().getAddress();
-            String miningState =  MyApplication.getKeyValue().getMiningState();
             if(StringUtil.isSame(keyValue.getAddress(), address)){
-                return;
-            }else if(StringUtil.isSame(miningState, TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
                 return;
             }
         }

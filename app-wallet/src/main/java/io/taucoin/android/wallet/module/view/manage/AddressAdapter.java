@@ -72,8 +72,10 @@ public class AddressAdapter extends BaseAdapter {
         viewHolder.tvAddress.setTextColor(ResourcesUtil.getColor(color));
         final boolean isSelf = color == R.color.color_yellow;
         viewHolder.ivDelete.setVisibility(isSelf ? View.INVISIBLE : View.VISIBLE);
+        viewHolder.tvSwitchAddress.setVisibility(isSelf ? View.INVISIBLE : View.VISIBLE);
         viewHolder.ivDelete.setOnClickListener(v -> activity.deleteAddress(keyValue, isSelf));
         viewHolder.tvName.setOnClickListener(v -> activity.editName(keyValue, isSelf));
+        viewHolder.tvSwitchAddress.setOnClickListener(v -> activity.switchAddress(keyValue));
         return convertView;
     }
 
@@ -84,6 +86,8 @@ public class AddressAdapter extends BaseAdapter {
         ImageView ivDelete;
         @BindView(R.id.tv_address)
         TextView tvAddress;
+        @BindView(R.id.tv_switch_address)
+        TextView tvSwitchAddress;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

@@ -23,7 +23,8 @@ public class MessageEvent{
         APPLICATION_INFO,
         MINING_INCOME,
         IRREPARABLE_ERROR,
-        APP_BACK_TO_FRONT
+        APP_BACK_TO_FRONT,
+        SWITCH_STOP_MINING
     }
     private Object data;
 

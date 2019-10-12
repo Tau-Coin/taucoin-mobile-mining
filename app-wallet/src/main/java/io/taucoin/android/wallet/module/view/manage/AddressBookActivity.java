@@ -90,9 +90,7 @@ public class AddressBookActivity extends BaseActivity implements IAddressView {
         getData();
     }
 
-    @OnItemClick(R.id.list_view_help)
-    void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        KeyValue keyValue = mDataList.get(position);
+    void switchAddress(KeyValue keyValue){
         mUserPresenter.switchAddress(AddressBookActivity.this, keyValue);
     }
 

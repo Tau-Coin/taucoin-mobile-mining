@@ -530,7 +530,7 @@ public class UserUtil {
                     .append(FmtMicrometer.fmtPower(timeInternal))
                     .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue))
                     .append(Html.fromHtml(")"))
-                    .append(Html.fromHtml("="))
+                    .append(Html.fromHtml("≈"))
                     .append(Html.fromHtml("("))
                     .append(rightStr)
                     .setForegroundColor(ResourcesUtil.getColor(R.color.color_blue));

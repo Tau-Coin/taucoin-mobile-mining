@@ -49,13 +49,6 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_import)
     public void onBtnImportClicked() {
-        if(UserUtil.isImportKey()){
-            KeyValue KeyValue = MyApplication.getKeyValue();
-            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
-                return;
-            }
-        }
         String privateKey = etPrivateKey.getText().toString().trim();
         if(StringUtil.isEmpty(privateKey)){
             ToastUtils.showShortToast(R.string.keys_private_invalid);
@@ -83,13 +76,6 @@ public class ImportKeyActivity extends BaseActivity implements IImportKeyView {
 
     @OnClick(R.id.btn_generate)
     public void onBtnGenerateClicked() {
-        if(UserUtil.isImportKey()){
-            KeyValue KeyValue = MyApplication.getKeyValue();
-            if(StringUtil.isSame(KeyValue.getMiningState(), TransmitKey.MiningState.Start)){
-                ToastUtils.showShortToast(R.string.mining_import_private_key);
-                return;
-            }
-        }
         mUserPresenter.showSureDialog(this);
     }
 
