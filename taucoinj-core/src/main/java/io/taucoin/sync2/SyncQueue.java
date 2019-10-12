@@ -268,11 +268,13 @@ public class SyncQueue {
             waitForStart();
 
             BlockWrapper wrapper = null;
+            ImportResult importResult = null;
+
             try {
                 wrapper = blockQueue.take();
                 logger.debug("BlockQueue size: {}", blockQueue.size());
                 isImportingBlocks.set(true);
-                ImportResult importResult = blockchain.tryToConnect(wrapper.getBlock());
+                importResult = blockchain.tryToConnect(wrapper.getBlock());
                 isImportingBlocks.set(false);
 
                 if (wrapper.isNewBlock() && importResult.isSuccessful())
@@ -388,8 +390,9 @@ public class SyncQueue {
                 // It shows that android system is under bigger memory pressure with
                 // more and more blocks connected. This blockchain service exists periodly.
                 // The wallet will start it again.
-                if (wrapper != null && wrapper.getNumber() != 0 &&
-                        wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
+                if (importResult == IMPORTED_BEST && wrapper != null
+                        && wrapper.getNumber() != 0
+                        && wrapper.getNumber() % HIBERNATION_CYCLE == 0) {
                     logger.warn("Hibernation starts at block {}", wrapper.getNumber());
                     syncManager.notifyHibernation(wrapper.getNumber());
                     if (wrapper.getNumber() % REBOOT_CYCLE == 0) {
