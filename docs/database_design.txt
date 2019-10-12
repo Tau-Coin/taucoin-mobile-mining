@@ -1,0 +1,16 @@
+Taumobile项目在链端数据库选择上遇到过很多问题，也尝试过很多数据库，现将整个过程记录下来．
+
+1. Taumobile项目原型基于ethereumj，继承数据库leveldb，仓库为https://github.com/dain/leveldb；
+　　该数据库存在很多问题：效率低，申请较大Memory造成OOM，app被杀死后数据库产上很多不可恢复的错误等等．
+
+2. Mapdb(https://github.com/jankotek/mapdb)，该数据库效率低，app被杀死后产生无法恢复的错误，官方支持不好.
+
+3. RocksDB，etheremj team已经放弃java leveldb & mapdb，而是使用FaceBook Rocksdb，该数据库在PC上性能非常优异，
+  　但是android 平台并不支持．
+
+4. Android sqlite，无法满足区块链业务需求，效率太低．
+
+5. TDLib (Telegram Database Library)基于native sqlite实现，无法满足业务需求．
+
+6. Tencent MMKVDB(https://github.com/Tencent/MMKV)基于file memory map实现，测试下来可以很好的满足性能和容错要求，
+　　但是仍然存在很多问题，开发团队会持续关注．
