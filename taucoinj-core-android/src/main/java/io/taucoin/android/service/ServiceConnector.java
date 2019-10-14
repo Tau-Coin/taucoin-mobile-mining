@@ -143,10 +143,8 @@ public class ServiceConnector {
         if (isBound && serviceConnection != null) {
             context.getApplicationContext().unbindService(serviceConnection);
             isBound = false;
-/*
             Intent intent = new Intent(context, serviceClass);
             context.getApplicationContext().stopService(intent);
-*/
         }
     }
 

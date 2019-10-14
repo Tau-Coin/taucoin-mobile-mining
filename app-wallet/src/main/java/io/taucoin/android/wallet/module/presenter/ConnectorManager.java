@@ -65,6 +65,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     private boolean isTaucoinConnected = false;
     int isInit = -1;
     private int isSyncMe = -1;
+    private volatile boolean miningSwitch = false;
     BlockForgeExceptionStopEvent mExceptionStop;
 
     private final static int CONSOLE_LENGTH = 10000;
@@ -265,7 +266,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
 
         @Override
         public void run() {
-            if(mTaucoinConnector != null && isInit()){
+            if(mTaucoinConnector != null && isInit() && miningSwitch){
                 logger.info("startBlockForging=" + targetAmount);
                 taucoinConnector.startBlockForging(targetAmount);
             }
@@ -320,6 +321,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     private void startBlockForging(int targetAmount){
+        miningSwitch = true;
         initializer.schedule(new ForgingTask(mTaucoinConnector, targetAmount),
                 BOOT_UP_DELAY_FORGE_SECONDS, TimeUnit.SECONDS);
     }
@@ -331,6 +333,7 @@ public abstract class ConnectorManager implements ConnectorHandler {
     }
 
     private void stopBlockForging(int targetAmount){
+        miningSwitch = false;
         if(mTaucoinConnector != null && isInit()){
             logger.info("stopBlockForging=" + targetAmount);
             mTaucoinConnector.stopBlockForging(targetAmount);
