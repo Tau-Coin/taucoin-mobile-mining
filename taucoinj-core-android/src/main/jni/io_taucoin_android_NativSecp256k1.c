@@ -384,13 +384,10 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
     unsigned char* sigdata = (unsigned char*) (data);
     unsigned char* msgdata = (unsigned char*) (data+ siglen);
 
-    secp256k1_ecdsa_signature sig;
+    secp256k1_ecdsa_recoverable_signature *sig= (secp256k1_ecdsa_recoverable_signature *)sigdata;
     secp256k1_pubkey pubkey;
 
-    int ret = secp256k1_ecdsa_signature_parse_der(ctx, &sig, sigdata, siglen);
-    if( ret ) {
-        ret = secp256k1_ecdsa_recover(ctx, &pubkey, &sig, msgdata);
-    }
+    int ret = secp256k1_ecdsa_recover(ctx, &pubkey, sig, msgdata);
 
     unsigned char outputSer[72];
     size_t outputLen = 72;
