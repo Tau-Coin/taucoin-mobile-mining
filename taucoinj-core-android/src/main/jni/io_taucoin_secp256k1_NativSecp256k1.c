@@ -387,10 +387,14 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_sec
     unsigned char* msgdata = (unsigned char*) (data+ siglen);
 
 	LOGI("--------------- Recover In Native ---------------");
-    secp256k1_ecdsa_recoverable_signature *sig= (secp256k1_ecdsa_recoverable_signature *)sigdata;
+    secp256k1_ecdsa_recoverable_signature sigtemp;
+    secp256k1_ecdsa_recoverable_signature *sig= &sigtemp;
     secp256k1_pubkey pubkey;
 
-    int ret = secp256k1_ecdsa_recover(ctx, &pubkey, sig, msgdata);
+	int ret = secp256k1_ecdsa_recoverable_signature_parse_compact(ctx, sig, sigdata, (int)sigdata[64]);
+    if(ret) {
+	   	ret = secp256k1_ecdsa_recover(ctx, &pubkey, sig, msgdata);
+    }
 	LOGI("--------------- Recover In Native, RET= %d, ---------------", ret);
 
     unsigned char outputSer[72];
