@@ -1,13 +1,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "io_taucoin_android_NativSecp256k1.h"
+#include <android/log.h>
+#include "io_taucoin_secp256k1_NativSecp256k1.h"
 #include "src/include/secp256k1.h"
 #include "src/include/secp256k1_ecdh.h"
 #include "src/include/secp256k1_recovery.h"
 
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "LOG_TGA", __VA_ARGS__)
 
-SECP256K1_API jlong JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ctx_1clone
+SECP256K1_API jlong JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ctx_1clone
   (JNIEnv* env, jclass classObject, jlong ctx_l)
 {
   const secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -20,7 +22,7 @@ SECP256K1_API jlong JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1c
 
 }
 
-SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1context_1randomize
+SECP256K1_API jint JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1context_1randomize
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -33,7 +35,7 @@ SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1co
 
 }
 
-SECP256K1_API void JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1destroy_1context
+SECP256K1_API void JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1destroy_1context
   (JNIEnv* env, jclass classObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -43,7 +45,7 @@ SECP256K1_API void JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1de
   (void)classObject;(void)env;
 }
 
-SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ecdsa_1verify
+SECP256K1_API jint JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ecdsa_1verify
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint siglen, jint publen)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -70,7 +72,7 @@ SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ec
   return ret;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ecdsa_1sign
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ecdsa_1sign
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -112,7 +114,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ec_1seckey_1verify
+SECP256K1_API jint JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ec_1seckey_1verify
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -123,7 +125,7 @@ SECP256K1_API jint JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ec
   return secp256k1_ec_seckey_verify(ctx, secKey);
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ec_1pubkey_1create
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ec_1pubkey_1create
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -165,7 +167,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
 
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1privkey_1tweak_1add
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1privkey_1tweak_1add
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -200,7 +202,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1privkey_1tweak_1mul
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1privkey_1tweak_1mul
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -235,7 +237,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1pubkey_1tweak_1add
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1pubkey_1tweak_1add
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint publen)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -280,7 +282,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1pubkey_1tweak_1mul
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1pubkey_1tweak_1mul
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint publen)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -324,7 +326,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jlong JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ecdsa_1pubkey_1combine
+SECP256K1_API jlong JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ecdsa_1pubkey_1combine
   (JNIEnv * env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint numkeys)
 {
   (void)classObject;(void)env;(void)byteBufferObject;(void)ctx_l;(void)numkeys;
@@ -332,7 +334,7 @@ SECP256K1_API jlong JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1e
   return 0;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ecdh
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ecdh
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint publen)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -376,7 +378,7 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
   return retArray;
 }
 
-SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp256k1_1ecdsa_1recover
+SECP256K1_API jobjectArray JNICALL Java_io_taucoin_secp256k1_NativeSecp256k1_secp256k1_1ecdsa_1recover
     (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint siglen)
 {
     secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
@@ -384,13 +386,17 @@ SECP256K1_API jobjectArray JNICALL Java_io_taucoin_android_NativeSecp256k1_secp2
     unsigned char* sigdata = (unsigned char*) (data);
     unsigned char* msgdata = (unsigned char*) (data+ siglen);
 
+	LOGI("--------------- Recover In Native ---------------");
     secp256k1_ecdsa_recoverable_signature *sig= (secp256k1_ecdsa_recoverable_signature *)sigdata;
     secp256k1_pubkey pubkey;
 
     int ret = secp256k1_ecdsa_recover(ctx, &pubkey, sig, msgdata);
+	LOGI("--------------- Recover In Native, RET= %d, ---------------", ret);
 
     unsigned char outputSer[72];
     size_t outputLen = 72;
+
+	LOGI("--------------- Recover In Native, OPL= %d, ---------------", outputLen);
 
     if( ret ) {
         int ret2 = secp256k1_ec_pubkey_serialize(ctx, outputSer, &outputLen, &pubkey, SECP256K1_EC_UNCOMPRESSED ); (void)ret2;

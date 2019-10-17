@@ -25,10 +25,25 @@
                  # Sets the library as a shared library.
                  SHARED
                  # Provides a relative path to your source file(s).
-                 io_taucoin_android_Secp256k1Context.c
-				 io_taucoin_android_NativSecp256k1.c
+                 io_taucoin_secp256k1_Secp256k1Context.c
+				 io_taucoin_secp256k1_NativSecp256k1.c
 				 # Linck native-library
 				 $<TARGET_OBJECTS:native-library> )
+
+	find_library(
+	          # Sets the name of the path variable.
+              log-lib
+
+              # Specifies the name of the NDK library that
+              # you want CMake to locate.
+
+              # {sdk-path}/ndk-bundle/sysroot/usr/include/android/log.h
+              log )
+
+    target_link_libraries(
+		        native-secp256k1
+
+				${log-lib})
 
 	# Specifies a path to native header files.
     include_directories(src/include/)
