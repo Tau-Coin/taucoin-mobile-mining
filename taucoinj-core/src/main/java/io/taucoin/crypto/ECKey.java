@@ -79,7 +79,7 @@ import static io.taucoin.util.ByteUtil.bigIntegerToBytes;
  * bitcoinj on GitHub</a>.
  */
 public class ECKey implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger("blockchain");
+    private static final Logger logger = LoggerFactory.getLogger(ECKey.class);
 
     /**
      * The parameters of the secp256k1 curve that Ethereum uses.
@@ -512,6 +512,15 @@ public class ECKey implements Serializable {
             return sigData;
         }
 
+		/*
+		 * Set v from recid
+		 *
+		 */
+		public boolean setV(byte v) {
+			this.v = v;
+			return true;
+		}
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -614,6 +623,7 @@ public class ECKey implements Serializable {
             compressed = true;
             header -= 4;
         }
+
         int recId = header - 27;
         ECKey key = ECKey.recoverFromSignature(recId, sig, messageHash, compressed);
         if (key == null)
@@ -782,9 +792,10 @@ public class ECKey implements Serializable {
         check(sig.r.signum() >= 0, "r must be positive");
         check(sig.s.signum() >= 0, "s must be positive");
         check(messageHash != null, "messageHash must not be null");
-        logger.info("!!! Here Comes ECKey Recover Public Key:{}, Compressed:{}!!!", Secp256k1Context.isEnabled(), compressed);
+
         if (Secp256k1Context.isEnabled()) {
             try {
+				sig.setV((byte) recId);
                 return ECKey.fromPublicOnly(NativeSecp256k1.recoverPubkey(messageHash, sig.toByteArray()));
             } catch (NativeSecp256k1Util.AssertFailException e) {
                 logger.error("Caught AssertFailException inside secp256k1", e);

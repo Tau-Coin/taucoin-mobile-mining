@@ -29,20 +29,17 @@ public class Secp256k1Context {
     private static final boolean enabled; // true if the library is loaded
     private static final long context; // ref to pointer to context obj
 
-    private static final Logger log = LoggerFactory.getLogger("blockchain");
+    private static final Logger logger = LoggerFactory.getLogger(Secp256k1Context.class);
 
     static { // static initializer
         boolean isEnabled = true;
         long contextRef = -1;
         try {
             System.loadLibrary("native-secp256k1");
-			log.info("~~~Here comes sc1!!!");
             contextRef = secp256k1_init_context();
         } catch (UnsatisfiedLinkError e) {
-            log.info(e.toString());
             isEnabled = false;
         } catch (AccessControlException e) {
-            log.info(e.toString());
             isEnabled = false;
         }
         enabled = isEnabled;

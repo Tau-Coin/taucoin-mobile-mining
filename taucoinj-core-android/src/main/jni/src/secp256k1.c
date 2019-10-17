@@ -49,7 +49,6 @@ static const secp256k1_callback default_error_callback = {
     NULL
 };
 
-
 struct secp256k1_context_struct {
     secp256k1_ecmult_context ecmult_ctx;
     secp256k1_ecmult_gen_context ecmult_gen_ctx;
@@ -634,7 +633,6 @@ static int secp256k1_ecdsa_sig_recover(const secp256k1_ecmult_context *ctx, cons
     secp256k1_gej qj;
     int r;
 
-    LOGI("############## Here in sig recover core 1 ############");
     if (secp256k1_scalar_is_zero(sigr) || secp256k1_scalar_is_zero(sigs)) {
         return 0;
     }
@@ -643,19 +641,15 @@ static int secp256k1_ecdsa_sig_recover(const secp256k1_ecmult_context *ctx, cons
     r = secp256k1_fe_set_b32(&fx, brx);
     (void)r;
     VERIFY_CHECK(r); /* brx comes from a scalar, so is less than the order; certainly less than p */
-    LOGI("############## Here in sig recover core 2 ############");
     if (recid & 2) {
         if (secp256k1_fe_cmp_var(&fx, &secp256k1_ecdsa_const_p_minus_order) >= 0) {
             return 0;
         }
         secp256k1_fe_add(&fx, &secp256k1_ecdsa_const_order_as_fe);
     }
-    LOGI("############## Here in sig recover core 3 ############");
     if (!secp256k1_ge_set_xo_var(&x, &fx, recid & 1)) {
         return 0;
     }
-
-    LOGI("############## Here in sig recover core 4 ############");
 
     secp256k1_gej_set_ge(&xj, &x);
     secp256k1_scalar_inverse_var(&rn, sigr);
@@ -718,7 +712,7 @@ int secp256k1_ecdsa_recover(const secp256k1_context* ctx, secp256k1_pubkey *pubk
     secp256k1_ge q;
     secp256k1_scalar r, s;
     secp256k1_scalar m;
-    int recid= 10;
+    int recid;
     VERIFY_CHECK(ctx != NULL);
     ARG_CHECK(secp256k1_ecmult_context_is_built(&ctx->ecmult_ctx));
     ARG_CHECK(msg32 != NULL);
@@ -726,14 +720,11 @@ int secp256k1_ecdsa_recover(const secp256k1_context* ctx, secp256k1_pubkey *pubk
     ARG_CHECK(pubkey != NULL);
     secp256k1_ecdsa_recoverable_signature_load(ctx, &r, &s, &recid, signature);
     VERIFY_CHECK(recid >= 0 && recid < 4);  /* should have been caught in parse_compact */
-	int bOK= 1;
-    secp256k1_scalar_set_b32(&m, msg32, &bOK);
-     LOGI("############## Here in recover core, recid:%d, scalar:%d, b32:%d ############", recid, sizeof(secp256k1_scalar), bOK);
+    secp256k1_scalar_set_b32(&m, msg32, NULL);
     if (secp256k1_ecdsa_sig_recover(&ctx->ecmult_ctx, &r, &s, &q, &m, recid)) {
         secp256k1_pubkey_save(pubkey, &q);
         return 1;
     } else {
-        LOGI("############## Here in recover core, invalid ############");
         memset(pubkey, 0, sizeof(*pubkey));
         return 0;
     }

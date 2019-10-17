@@ -43,7 +43,7 @@ import static io.taucoin.secp256k1.NativeSecp256k1Util.*;
  */
 public class NativeSecp256k1 {
 
-    private static final Logger logger = LoggerFactory.getLogger("blockchain");
+    private static final Logger logger = LoggerFactory.getLogger(NativeSecp256k1.class);
 
     private static final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private static final Lock r = rwl.readLock();
@@ -128,7 +128,6 @@ public class NativeSecp256k1 {
      * @param pubkey byte array of pubkey
      */
     public static byte[] recoverPubkey(byte[] data, byte[] sig) throws AssertFailException{
-		logger.info("~~~Here comes RP: {}, {}", data.length, sig.length);
         Preconditions.checkArgument(data.length == 32 && sig.length == 65);
 
         ByteBuffer byteBuff = nativeECDSABuffer.get();
@@ -143,7 +142,6 @@ public class NativeSecp256k1 {
 
         byte[][] retByteArray;
 
-		logger.info("~~~Here comes RP lock");
         r.lock();
         try {
           retByteArray = secp256k1_ecdsa_recover(byteBuff, Secp256k1Context.getContext(), sig.length);
@@ -156,8 +154,6 @@ public class NativeSecp256k1 {
         int retVal = new BigInteger(new byte[] { retByteArray[1][1] }).intValue();
 
         assertEquals(pubkeyArr.length, pubkeyLen, "Got bad pubkey length.");
-
-        logger.info("RP, pka len:{}, pk len:{}, rv:{}", pubkeyArr.length, pubkeyLen, retVal);
 
         return retVal == 0 ? new byte[0] : pubkeyArr;
     }
