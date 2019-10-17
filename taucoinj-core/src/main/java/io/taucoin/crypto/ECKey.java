@@ -50,6 +50,7 @@ import java.util.Arrays;
 import javax.annotation.Nullable;
 
 import io.taucoin.core.*;
+import io.taucoin.secp256k1.*;
 import io.taucoin.config.*;
 import static io.taucoin.util.ByteUtil.bigIntegerToBytes;
 
@@ -78,7 +79,7 @@ import static io.taucoin.util.ByteUtil.bigIntegerToBytes;
  * bitcoinj on GitHub</a>.
  */
 public class ECKey implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(ECKey.class);
+    private static final Logger logger = LoggerFactory.getLogger("blockchain");
 
     /**
      * The parameters of the secp256k1 curve that Ethereum uses.
@@ -499,6 +500,18 @@ public class ECKey implements Serializable {
             return new String(Base64.encode(sigData), Charset.forName("UTF-8"));
         }
 
+        /**
+         *
+         * @return -
+         */
+        public byte[] toByteArray() {
+            byte[] sigData = new byte[65];  // 1 header + 32 bytes for R + 32 bytes for S
+            System.arraycopy(bigIntegerToBytes(this.r, 32), 0, sigData, 0, 32);
+            System.arraycopy(bigIntegerToBytes(this.s, 32), 0, sigData, 32, 32);
+            sigData[64] = this.v;
+            return sigData;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -769,6 +782,16 @@ public class ECKey implements Serializable {
         check(sig.r.signum() >= 0, "r must be positive");
         check(sig.s.signum() >= 0, "s must be positive");
         check(messageHash != null, "messageHash must not be null");
+        logger.info("!!! Here Comes ECKey Recover Public Key:{}, Compressed:{}!!!", Secp256k1Context.isEnabled(), compressed);
+        if (Secp256k1Context.isEnabled()) {
+            try {
+                return ECKey.fromPublicOnly(NativeSecp256k1.recoverPubkey(messageHash, sig.toByteArray()));
+            } catch (NativeSecp256k1Util.AssertFailException e) {
+                logger.error("Caught AssertFailException inside secp256k1", e);
+                return null;
+            }
+        }
+
         // 1.0 For j from 0 to h   (h == recId here and the loop is outside this function)
         //   1.1 Let x = r + jn
         BigInteger n = CURVE.getN();  // Curve order.

@@ -44,8 +44,6 @@ sourceSets {
     }
 }
 
-
-
 tasks.withType(JavaCompile){
     options.warnings = false
 }
