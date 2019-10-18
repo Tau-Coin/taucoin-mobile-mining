@@ -233,7 +233,7 @@ public class BlockForger {
         BigInteger forgingPower = repository.getforgePower(CONFIG.getForgerCoinbase());
 //        BigInteger balance = repository.getBalance(CONFIG.getForgerCoinbase());
         if (forgingPower.longValue() <= 0) {
-            logger.error("Forging Power < 0!!!");
+            logger.error("Forging Power <= 0!!!");
             return ForgeStatus.FORGE_POWER_LESS_THAN_ZERO;
         }
 
