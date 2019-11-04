@@ -177,7 +177,6 @@ public class Wallet {
         if (balanceBig.compareTo(amount.add(fee)) < 0) {
             ToastUtils.showShortToast(R.string.send_no_enough_coins_budget);
             logicObserver.onNext(false);
-            return;
         }
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             String address = SharedPreferencesHelper.getInstance().getString(TransmitKey.ADDRESS, "");

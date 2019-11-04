@@ -60,23 +60,21 @@
         <Button
             android:id="@+id/btn_send"
             style="@style/style_normal_white"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginTop="5dp"
             android:includeFontPadding="false"
             android:background="@drawable/yellow_rect_small_round_bg"
             android:text="@string/tx_send"
             android:textAllCaps="false" />
 
         <Button
-            android:visibility="gone"
             android:id="@+id/btn_increase"
             style="@style/style_big_white"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginTop="15dp"
             android:includeFontPadding="false"
-            android:layout_marginStart="2.5dp"
             android:background="@drawable/yellow_rect_small_round_bg"
             android:text="@string/tx_increase"
             android:textAllCaps="false" />
