@@ -161,6 +161,19 @@ public class TransactionExecutor {
      * 2. add transaction fee to actually miner 
      */
     public void executeFinal(byte[] blockhash, boolean isTxCompleted) {
+        //lookup sender account state.
+        AccountState senderAccountState = track.getAccountState(tx.getSender());
+
+        // During bootup, blockchain should check sanity between block store and states repo.
+        // When app was killed, the atomic of writing opetion for states db can't be guaranteed.
+        // So here check transaction timestamp.
+        if (senderAccountState == null || (senderAccountState != null &&
+                senderAccountState.getTranHistory().keySet().contains(ByteUtil.byteArrayToLong(tx.getTime())))) {
+            logger.warn("execute tx {} with ts {} ignore", Hex.toHexString(tx.getHash()),
+                    ByteUtil.byteArrayToLong(tx.getTime()));
+            return;
+        }
+
         outcome.setBlockHash(blockhash);
         logger.debug("in executation block hash is {}",Hex.toHexString(blockhash));
         outcome.setTxComplete(isTxCompleted);
@@ -180,10 +193,8 @@ public class TransactionExecutor {
         }
 
         feeDistributor.setTxFee(ByteUtil.byteArrayToLong(tx.transactionCost()));
-
         logger.debug("in executation total fee is {}",Hex.toHexString(tx.transactionCost()));
-        //lookup sender account state.
-        AccountState senderAccountState = track.getAccountState(tx.getSender());
+
         if (blockchain.getSize() < Constants.FEE_TERMINATE_HEIGHT + 1) {
             if (feeDistributor.distributeFee()) {
                 // Transfer fees to forger
